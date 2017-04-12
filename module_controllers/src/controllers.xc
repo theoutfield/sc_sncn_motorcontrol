@@ -46,6 +46,10 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
     param.Ki = Ki;
     param.Kd = Kd;
     param.integral_limit = integral_limit;
+
+    if (param.integral >  param.integral_limit ) param.integral = param.integral_limit;
+    if (param.integral <(-param.integral_limit)) param.integral =-param.integral_limit;
+
     param.T_s = T_s;
 }
 
