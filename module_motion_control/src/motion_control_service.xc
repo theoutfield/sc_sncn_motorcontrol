@@ -132,6 +132,9 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0, velocity_ref_in_k_2n=0;
     double velocity_k = 0.00;
 
+    double  actual_velocity[4010];
+    int  velocity_auto_tuner_counter=0;
+
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
@@ -264,7 +267,44 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    if(motion_ctrl_config.enable_profiler==1)
+                    if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
+                    {
+                        velocity_auto_tuner_counter++;
+
+                        if(1<=velocity_auto_tuner_counter && velocity_auto_tuner_counter<=4000)
+                        {
+                            velocity_ref_in_k = 1000;
+                            actual_velocity[velocity_auto_tuner_counter] = velocity_k;
+
+                            torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
+                            if(velocity_auto_tuner_counter==4000)
+                            {
+                                double steady_state_value = 0;
+                                for(int i=3801; i<=4000; i++) steady_state_value +=  actual_velocity[i];
+                                steady_state_value = steady_state_value/201.00;
+
+                                double k = (steady_state_value / 1000);
+
+                                double speed_integral=0.00;
+                                for(int i=1; i<=4000; i++) speed_integral += (k-actual_velocity[i]);
+                                speed_integral *= (POSITION_CONTROL_LOOP_PERIOD/1000000.00);
+
+                                double t = (speed_integral/(k*1000));
+
+                                double f = (1/steady_state_value) - (0.001 * (60/6.28));
+                                double j = (speed_integral * 0.001) /(k*steady_state_value);
+
+                                downstream_control_data.velocity_cmd = 0;
+                                motion_ctrl_config.enable_velocity_auto_tuner == 0;
+
+                                printf("f:%d j:%d \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
+
+                            }
+
+                        }
+                    }
+                    else if(motion_ctrl_config.enable_profiler==1)
                     {
                         velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         velocity_ref_in_k_1n = velocity_ref_in_k;
@@ -422,7 +462,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 #endif
 
 
-break;
+                break;
 
         case i_motion_control[int i].disable():
 
