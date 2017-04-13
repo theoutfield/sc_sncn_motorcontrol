@@ -166,7 +166,7 @@
 #define VELOCITY_Ki                             20000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
-
+#define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
