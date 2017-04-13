@@ -472,31 +472,43 @@ void demo_torque_position_velocity_control(client interface MotionControlInterfa
                 printf("acceleration: %d [rpm/s], deceleration: %d \n velocity: %d [rpm], torque_rate: %d [mNm/s] \n", motion_ctrl_config.max_acceleration_profiler, motion_ctrl_config.max_deceleration_profiler, motion_ctrl_config.max_speed_profiler, motion_ctrl_config.max_torque_rate_profiler);
                 break;
 
-        //auto offset tuning
+        //automatic tuning
         case 'a':
-                printf("Sending offset_detection command ...\n");
+                switch(mode_2)
+                 {
+                 case 'o'://find motor commutation offset automatically
+                         printf("Sending offset_detection command ...\n");
 
-                motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
 
-                if(motorcontrol_config.commutation_angle_offset == -1)
-                {
-                    printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-                }
-                else
-                {
-                    motorcontrol_config = i_motion_control.get_motorcontrol_config();
-                    printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+                         if(motorcontrol_config.commutation_angle_offset == -1)
+                         {
+                             printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                         }
+                         else
+                         {
+                             motorcontrol_config = i_motion_control.get_motorcontrol_config();
+                             printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
 
-                    printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
+                             printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
 
-                    if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
-                    {
-                        printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
-                        for (int i=0;i<6;i++) {
-                            printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
-                        }
-                    }
-                }
+                             if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                             {
+                                 printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
+                                 for (int i=0;i<6;i++) {
+                                     printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                                 }
+                             }
+                         }
+                         break;
+
+                 case 'v'://calculate optimal pid parameters for velocity controller
+                         break;
+
+                 default:
+                         break;
+                 }
+
                 break;
 
         //set brake
