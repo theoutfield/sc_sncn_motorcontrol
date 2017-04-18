@@ -553,7 +553,6 @@ break;
 
                 motion_ctrl_config = in_config;
 
-                pid_init(velocity_control_pid_param);
                 if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
                 if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
                 if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
@@ -566,7 +565,6 @@ break;
                         POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
 
-                pid_init(position_control_pid_param);
                 if(motion_ctrl_config.position_kp<0)            motion_ctrl_config.position_kp=0;
                 if(motion_ctrl_config.position_kp>100000000)    motion_ctrl_config.position_kp=100000000;
                 if(motion_ctrl_config.position_ki<0)            motion_ctrl_config.position_ki=0;
