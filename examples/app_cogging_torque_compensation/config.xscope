@@ -14,7 +14,7 @@
 <!--   "NONE", "UINT", "INT", "FLOAT"                        -->
 <!-- ======================================================= -->
 
-<xSCOPEconfig ioMode="timed" enabled="true">
+<xSCOPEconfig ioMode="timed" enabled="false">
 
 	<!-- Velocity Position Control -->
 

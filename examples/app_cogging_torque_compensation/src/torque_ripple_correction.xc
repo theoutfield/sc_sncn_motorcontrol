@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <data_processing.h>
 
+    int cogging_torque [2][STEPS_PER_ROTATION] = {{0}};
+
 void interpolate_sensor_data (short int *array_in, short int * is_recorded, int sensor_resolution)
 {
     int x_inf, y_inf, x_sup, y_sup;
@@ -61,50 +63,117 @@ void interpolate_sensor_data (short int *array_in, short int * is_recorded, int 
         }
     }
 }
-void map_torque_ripples(client interface MotionControlInterface i_motion_control, client interface PositionFeedbackInterface i_position_feedback
-        )
+
+
+void remove_friction_torque()
 {
-    DownstreamControlData downstream_control_data;
+    float torque_average = 0, steps = STEPS_PER_ROTATION;
+
+    for (int i = 0; i < STEPS_PER_ROTATION; i++)
+    {
+        torque_average += cogging_torque[1][i];
+    }
+
+    int friction_torque = (int)(torque_average / steps);
+
+    for (int i = 0; i < STEPS_PER_ROTATION; i++)
+    {
+        cogging_torque[1][i] -= friction_torque;
+    }
+}
+
+
+
+void map_torque_ripples(client interface MotionControlInterface i_motion_control, client interface PositionFeedbackInterface i_position_feedback
+        , client interface TorqueControlInterface i_torque_control)
+{
     UpstreamControlData upstream_control_data;
+    DownstreamControlData downstream_control_data;
     MotionControlConfig motion_ctrl_config;
+
     short int torque_values [SENSOR_RESOLUTION] = {0};
     short int datas [SENSOR_RESOLUTION] = {0};
-    int velocity_command = 1000;
+
+    int velocity_command = 10;
     int number_of_turns = 0;
     int position, count, status;
     int count_start;
-    downstream_control_data.offset_torque = 0;
-    downstream_control_data.velocity_cmd = velocity_command;
+
+
+    //Let time for the program to setup
+    delay_milliseconds(2000);
     i_motion_control.enable_velocity_ctrl();
 
-    motion_ctrl_config.enable_profiler = 1;
+
+
+    downstream_control_data.offset_torque = 0;
+    downstream_control_data.velocity_cmd = 0;
+    motion_ctrl_config = i_motion_control.get_motion_control_config();
+
+
+
+    downstream_control_data.velocity_cmd = velocity_command;
+    i_motion_control.update_control_data(downstream_control_data);
+    printf("set velocity %d\n", downstream_control_data.velocity_cmd);
 
     i_motion_control.update_control_data(downstream_control_data);
 
     delay_milliseconds(500);
+
+    printf("Start Measurements\n");
+
     {count_start, position, status} = i_position_feedback.get_position();
-    while (1)
+
+    float resolution = SENSOR_RESOLUTION, steps = STEPS_PER_ROTATION;
+    int position_step = (int)(resolution/steps);
+
+
+    short counter_average [2][STEPS_PER_ROTATION] = {{0}};
+
+    while (number_of_turns < 5)
     {
-//        {count, position, status} = i_position_feedback.get_position();
-//        //get torque
-//        //        printf("Count : %d\n", count);
-//
-////        upstream_control_data = i_motorcontrol.update_upstream_control_data();
-//        torque_values[position] += upstream_control_data.computed_torque;
-//        datas [position] ++;
-//        number_of_turns = (count-count_start)/SENSOR_RESOLUTION;
+        {count, position, status} = i_position_feedback.get_position();
+
+        if (!(position%position_step))
+        {
+            upstream_control_data = i_torque_control.update_upstream_control_data();
+            int index = position / position_step;
+            if (index < STEPS_PER_ROTATION)
+            {
+                cogging_torque [0][index] = position;
+                cogging_torque [1][index] += upstream_control_data.torque_set;
+                counter_average [0][index] = position;
+                counter_average [1][index] ++;
+            }
+            torque_values[position] += upstream_control_data.torque_set;
+            datas [position] ++;
+            number_of_turns = (count-count_start)/SENSOR_RESOLUTION;
+        }
     }
-//    interpolate_sensor_data(torque_values, datas, SENSOR_RESOLUTION);
-//
-//
-//    for (int i = 0; i< SENSOR_RESOLUTION ; i++)
-//    {
-//            printf ("\n%d", torque_values[i]);
-//
-//    }
-//    printf ("\n");
-//    downstream_control_data.velocity_cmd = 0;
-//    i_motion_control.enable_velocity_ctrl();
-//    i_motion_control.update_control_data(downstream_control_data);
-//    exit(1);
+
+    for (int i = 0; i < STEPS_PER_ROTATION; i++)
+    {
+        if (counter_average [1][i])
+        {
+            cogging_torque [1][i] = cogging_torque [1][i]/counter_average[1][i];
+        }
+    }
+
+    remove_friction_torque();
+
+    int index = 0;
+    for (int i = 0; i< SENSOR_RESOLUTION ; i++)
+    {
+        if (datas[i]&& index < STEPS_PER_ROTATION)
+        {
+            printf("%d, ", cogging_torque[0][index]);
+            printf("%d, ", cogging_torque[1][index]);
+            printf("%d \n", datas[i]);
+            index++;
+        }
+    }
+    printf ("\n");
+    downstream_control_data.velocity_cmd = 0;
+    i_motion_control.enable_velocity_ctrl();
+    i_motion_control.update_control_data(downstream_control_data);
 }

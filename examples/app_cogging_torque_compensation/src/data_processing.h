@@ -9,11 +9,12 @@
 #ifndef DATA_PROCESSING_H_
 #define DATA_PROCESSING_H_
 
-
+#include <torque_ripple_correction.h>
+#include <user_config.h>
 
 #define NB_OF_MEASUREMENTS 600
 #define MAX_COLUMNS 2
-#define MAX_ROWS 8192
+#define MAX_ROWS 36
 
 #define WRITE_BUFFER_SIZE MAX_COLUMNS*11+22
 #define READ_BUFFER_SIZE WRITE_BUFFER_SIZE

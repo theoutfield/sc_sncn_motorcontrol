@@ -20,15 +20,13 @@ unsigned char readBuffer[READ_BUFFER_SIZE];
 
 void write_array_to_csv_file(int array[MAX_COLUMNS][MAX_ROWS],int real_row_number, int real_column_number, char * name, char* headers)
 {
-    //Open the file
-    //int count_bytes_written = 0;
-
 
     char buffer [WRITE_BUFFER_SIZE];
 
     strcpy(buffer, headers);
-    //count_bytes_written += sizeof(headers);
     strcat(buffer, "\n");
+
+    //Create the file
     int fd = _open(name, O_WRONLY | O_CREAT | O_TRUNC, S_IREAD | S_IWRITE);
     printf("Trying to write \n");
     _write(fd, buffer, strlen(buffer));
@@ -36,16 +34,17 @@ void write_array_to_csv_file(int array[MAX_COLUMNS][MAX_ROWS],int real_row_numbe
         printf("Error: _close failed.\n");
         exit(1);
     }
-    //count_bytes_written ++;
+
+    // Open the file and write line after line
+    fd = _open(name, O_WRONLY | O_APPEND, S_IREAD | S_IWRITE);
+    if (fd == -1) {
+        printstrln("Error: _open failed");
+        exit(1);
+    }
+
     for (int row= 0; row < real_row_number; row++)
     {
         strcpy(buffer, "");
-        fd = _open(name, O_WRONLY | O_APPEND, S_IREAD | S_IWRITE);
-//        printf("Opening file : %s ; %d NB OF STEPS\n", name, nb_of_steps);
-        if (fd == -1) {
-            printstrln("Error: _open failed");
-            exit(1);
-        }
         for (int column = 0; column < real_column_number; column++)
         {
             int value = array[column][row];
@@ -58,20 +57,17 @@ void write_array_to_csv_file(int array[MAX_COLUMNS][MAX_ROWS],int real_row_numbe
             else{
                 sprintf(string, "%d \n", value);
             }
-//            printf("String to add : %s\n", string);
             strcat(buffer, string);
-//            printf("Buffer : %s\n", buffer);
-            // count_bytes_written += 9;
         }
         _write(fd, buffer, strlen(buffer));
-            if (_close(fd) != 0) {
-                printf("Error: _close failed.\n");
-                exit(1);
-            }
+
     }
-
-    //
-
+    // Close File
+    if (_close(fd) != 0) {
+        printf("Error: _close failed.\n");
+        exit(1);
+    }
+    else printf("File written\n");
 }
 
 

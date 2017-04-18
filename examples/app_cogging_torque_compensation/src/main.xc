@@ -35,6 +35,7 @@ port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 #include <tuning.h>
 
+//extern int cogging_torque[2][STEPS_PER_ROTATION];
 int main(void) {
 
     // Motor control channels
@@ -122,16 +123,16 @@ int main(void) {
                 //            }
                 //             exit(1);
 //            autotune(i_motion_control[0],5,  i_tuning_step[1], i_position_feedback_1[0]);
-//
-//            i_motion_control.enable_velocity_ctrl();
-//            downstream_control_data.offset_torque = 0;
-//            downstream_control_data.velocity_cmd = 5;
-//            i_motion_control.update_control_data(downstream_control_data);
-//            while(1);
-                user_interface(i_motion_control[0], i_tuning_step[1]);
 
-            //            map_torque_ripples(i_motion_control[0], i_position_feedback_1[0]);
-            //            demo_torque_position_velocity_control(i_motion_control[0]);
+//                user_interface(i_motion_control[0], i_tuning_step[1]);
+
+            map_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
+            char file_name[] = "Cogging_Torque";
+            char path[70];
+            char headers[] ="Position, Torque";
+            sprintf(path, "Data/%s_%dth_harmonic.csv", file_name, MEASURE_PRECISION);
+            write_array_to_csv_file(cogging_torque, STEPS_PER_ROTATION, 2, path, headers);
+            exit(1);
         }
 
         on tile[APP_TILE_2]:
@@ -139,57 +140,7 @@ int main(void) {
         {
             par
             {
-                {
-                    int count, status = 0;
-                    int velocity_command = 0, velocity = 0;
-                    int position_command = 0, position = 0;
-                    int error_position = 0, error_velocity = 0;
-                    int energy_error_position = 0, energy_error_velocity = 0;
-                    int torque;
-                    UpstreamControlData upstream_control_data;
-                    while (1)
-                    {
 
-                        velocity_command = i_tuning_step[2].get_reference_velocity_display();
-                        velocity = i_position_feedback_1[1].get_velocity();
-                        error_velocity = velocity_command-velocity;
-                        if (velocity_command)
-                        {
-                            energy_error_velocity += abs(error_velocity);
-                        }
-                        else energy_error_velocity = 0;
-
-                        //                        velocity_command = i_tuning_step[2].get_reference_velocity();
-                        {count, position, status} = i_position_feedback_1[1].get_position();
-                        position_command = i_tuning_step[2].get_reference_position_display();
-                        error_position = position_command-position;
-                        if (position_command)
-                        {
-                            energy_error_position += abs(error_position);
-                        }
-                        else energy_error_position = 0;
-
-//                        upstream_control_data = i_torque_control[1].update_upstream_control_data();
-                        //                        xscope_int(VELOCITY, velocity);
-                        //                        xscope_int(VELOCITY_CMD, velocity_command);
-                        //                        xscope_int(ERROR_VELOCITY, error_velocity);
-                        //                        xscope_int(ENERGY_ERROR_VELOCITY, energy_error_velocity);
-                        //                        xscope_int(POSITION, position);
-                        //                        xscope_int(POSITION_CMD, position_command);
-                        //                        xscope_int(ERROR_POSITION, error_position);
-                        //                        xscope_int(ENERGY_ERROR_POSITION, energy_error_position);
-                        //                        xscope_int(COUNT, count);
-                        //                        xscope_int(TORQUE, upstream_control_data.computed_torque);
-                        delay_microseconds(1000);
-                    }
-
-                }
-                {
-                    tuning_step_service(i_tuning_step);
-                }
-                {
-                    make_steps(i_motion_control[1], i_tuning_step[0], i_position_feedback_1[2]);
-                }
                 {
                     MotionControlConfig motion_ctrl_config;
 

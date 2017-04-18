@@ -298,23 +298,7 @@ void tuning_step_service(interface TuningStepInterface server i_tuning_step[3])
     }
 }
 
-void make_steps2(client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step,
-        client interface PositionFeedbackInterface i_position_feedback)
-{
-    DownstreamControlData downstream_control_data;
-        downstream_control_data.offset_torque = 0;
-    i_motion_control.enable_velocity_ctrl();
-    while(1)
-    {
-        downstream_control_data.velocity_cmd = 0;
-        i_motion_control.update_control_data(downstream_control_data);
-        delay_milliseconds(500);
-        downstream_control_data.velocity_cmd = 100;
-        i_motion_control.update_control_data(downstream_control_data);
-        delay_milliseconds(500);
 
-    }
-}
 
 void make_steps(client interface MotionControlInterface i_motion_control, client interface TuningStepInterface i_tuning_step,
         client interface PositionFeedbackInterface i_position_feedback)
@@ -335,18 +319,18 @@ void make_steps(client interface MotionControlInterface i_motion_control, client
 
         // For reaching faster the zero reference, the PID parameters are set to reference parameters
         // and the reference speed is set to zero for a fraction of the time_zero
-        if (flag == VELOCITY_CONTROL_ENABLE)
-        {
-            motion_ctrl_config = i_motion_control.get_motion_control_config();
-            motion_ctrl_config.velocity_kp = VELOCITY_Kp ;
-            motion_ctrl_config.velocity_ki = VELOCITY_Ki ;
-            motion_ctrl_config.velocity_kd = VELOCITY_Kd ;
-            i_motion_control.set_motion_control_config(motion_ctrl_config);
-            i_motion_control.enable_velocity_ctrl();
-            downstream_control_data.velocity_cmd = 0;
-            i_motion_control.update_control_data(downstream_control_data);
-            delay_milliseconds(time_ms_zero/4);
-        }
+//        if (flag == VELOCITY_CONTROL_ENABLE)
+//        {
+//            motion_ctrl_config = i_motion_control.get_motion_control_config();
+//            motion_ctrl_config.velocity_kp = VELOCITY_Kp ;
+//            motion_ctrl_config.velocity_ki = VELOCITY_Ki ;
+//            motion_ctrl_config.velocity_kd = VELOCITY_Kd ;
+//            i_motion_control.set_motion_control_config(motion_ctrl_config);
+//            i_motion_control.enable_velocity_ctrl();
+//            downstream_control_data.velocity_cmd = 0;
+//            i_motion_control.update_control_data(downstream_control_data);
+//            delay_milliseconds(time_ms_zero/4);
+//        }
         i_motion_control.enable_torque_ctrl();
         downstream_control_data.offset_torque = 0;
         downstream_control_data.torque_cmd = 0;
@@ -360,7 +344,7 @@ void make_steps(client interface MotionControlInterface i_motion_control, client
 
             if (flag == VELOCITY_CONTROL_ENABLE)
             {
-                delay_milliseconds(3*time_ms_zero/4);
+                delay_milliseconds(4*time_ms_zero/4);
 
                 motion_ctrl_config = i_tuning_step.get_ctrl_parameters();
                 i_motion_control.set_motion_control_config(motion_ctrl_config);
@@ -405,7 +389,7 @@ struct individual autotune (client interface MotionControlInterface i_motion_con
         client interface TuningStepInterface i_tuning_step, client interface PositionFeedbackInterface i_position_feedback)
 {
     int velocity;
-    int velocity_command = 10;
+    int velocity_command = 20;
     int error_position = 0, error_velocity = 0;
     int energy_error_position = 0, energy_error_velocity = 0;
     unsigned int time_reference = 500, time_zero = 500;
@@ -513,16 +497,16 @@ struct individual autotune (client interface MotionControlInterface i_motion_con
     evaluate_fitness(generation);
     int index_best_fit = 0;
     int i = 0;
-//    while(1){
-//        while (!i_tuning_step.get_reference_velocity_display());
-//
-//        if(generation[i].status == WINNER)
-//            compute_pid(generation, i, i_motion_control, i_tuning_step);
-//        while (i_tuning_step.get_reference_velocity_display());
-//
-//        i++;
-//        if (i == NUMBER_OF_COMPETITORS) i=0;
-//    }
+    while(1){
+        while (!i_tuning_step.get_reference_velocity_display());
+
+        if(generation[i].status == WINNER)
+            compute_pid(generation, i, i_motion_control, i_tuning_step);
+        while (i_tuning_step.get_reference_velocity_display());
+
+        i++;
+        if (i == NUMBER_OF_COMPETITORS) i=0;
+    }
 
     for (int i = 0 ; i < NUMBER_OF_COMPETITORS; i++ )
     {
