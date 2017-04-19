@@ -17,6 +17,9 @@
 #define MEASURE_PRECISION 9
 #define STEPS_PER_ROTATION 2*MOTOR_POLE_PAIRS*MEASURE_PRECISION
 
+
+int interpolate_sensor_torque (int sensor_position);
+
 void test_interpolate();
 void map_torque_ripples(client interface MotionControlInterface i_motion_control, client interface PositionFeedbackInterface i_position_feedback
         , client interface TorqueControlInterface i_torque_control);

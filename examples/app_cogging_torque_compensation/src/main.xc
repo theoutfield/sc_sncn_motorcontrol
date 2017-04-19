@@ -57,74 +57,10 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         on tile[APP_TILE]:
         {
-//            for (int generation_number = 5; generation_number < 15; generation_number+=3)
-                //            {
-                //                printf("///////////////////////////////\n"
-                //                        "//// Test : %d Generations ////\n"
-                //                        "///////////////////////////////\n", generation_number);
-                //                struct individual tests [NUMBER_OF_TESTS];
-                //                int result_parameters [MAX_COLUMNS][NUMBER_OF_TESTS];
-                //
-                //                for (int x = 0; x < NUMBER_OF_TESTS; x++)
-                //                {
-                //                    printf("\n---Test N°%d---\n", x);
-                //                    tests[x] = autotune(i_motion_control[0],generation_number,  i_tuning_step[1], i_position_feedback_1[0]);
-                //                    result_parameters[0][x] =  tests[x].kp;
-                //                    result_parameters[1][x] =  tests[x].ki;
-                //                    result_parameters[2][x] =  tests[x].criterion;
-                //                    result_parameters[3][x] =  tests[x].overshoot;
-                //                    result_parameters[4][x] =  tests[x].oscillation;
-                //                    result_parameters[5][x] =  NUMBER_OF_GENERATIONS - tests[x].age;
-                //                }
-                //
-                //                char file_name[] = "Test_autotuning\0";
-                //                char path[70];
-                //                //            char headers[WRITE_BUFFER_SIZE] = "";
-                //                char headers[] = "Kp, Ki, Criterion, Overshoot, Oscillation, Generation number";
-                //                sprintf(path, "Data/Parameters/%s_%d_generations_%d_competitors.csv", file_name, generation_number, NUMBER_OF_COMPETITORS);
-                //                write_array_to_csv_file(result_parameters, NUMBER_OF_TESTS, 6, path, headers);
-                //
-                //                //            int measurements_velocity[MAX_COLUMNS][NUMBER_OF_TESTS];
-                //                i_tuning_step[1].set_reference_velocity(1000);
-                //                i_tuning_step[1].set_time_zero(400);
-                //                i_tuning_step[1].set_time_reference(500);
-                //                i_tuning_step[1].start_steps(VELOCITY_CONTROL_ENABLE);
-                //
-                //                int time_min = INT_MAX;
-                //                //            for (int i =0; i < NUMBER_OF_TESTS; i++)
-                //                int i =0;
-                //                for (int i = 0; i< NUMBER_OF_TESTS; i++)
-                //                {
-                //                    printf("test %d\n", i);
-                //                    int time = 0;
-                //                    compute_pid(tests, i, i_motion_control[0]);
-                //
-                //
-                //                    while (!i_tuning_step[1].get_reference_velocity_display());
-                //
-                //                    while (i_tuning_step[1].get_reference_velocity_display())
-                //                    {
-                //                        result_parameters[time][i] = i_position_feedback_1[0].get_velocity();
-                //                        time++;
-                //                        delay_microseconds(1000);
-                //                    }
-                //                    if (time < time_min)
-                //                        time_min=time;
-                //                    printf("Time : %d\n", time);
-                //
-                //                }
-                //                i_tuning_step[1].stop_steps();
-                //                strcpy(file_name, "Step_measurement");
-                //                strcpy(headers ,"");
-                //                sprintf(path, "Data/Curves/%s_%d_generations_%d_competitors.csv", file_name, generation_number, NUMBER_OF_COMPETITORS);
-                //                write_array_to_csv_file(result_parameters, NUMBER_OF_TESTS, time_min, path, headers);
-                //                printf("Done");
-                //
-                //            }
-                //             exit(1);
 //            autotune(i_motion_control[0],5,  i_tuning_step[1], i_position_feedback_1[0]);
-
+//
 //                user_interface(i_motion_control[0], i_tuning_step[1]);
+
 
             map_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
             char file_name[] = "Cogging_Torque";
@@ -132,6 +68,17 @@ int main(void) {
             char headers[] ="Position, Torque";
             sprintf(path, "Data/%s_%dth_harmonic.csv", file_name, MEASURE_PRECISION);
             write_array_to_csv_file(cogging_torque, STEPS_PER_ROTATION, 2, path, headers);
+            printf("270 : %d\n ", interpolate_sensor_torque(270));
+
+            printf("1000 : %d\n ", interpolate_sensor_torque(1000));
+
+            printf("2050 : %d\n  ", interpolate_sensor_torque(2050));
+            printf("3006 : %d\n ", interpolate_sensor_torque(3006));
+            printf("3990 : %d\n ", interpolate_sensor_torque(3990));
+            printf("4096 : %d\n ", interpolate_sensor_torque(4096));
+
+            printf("8100 : %d\n ", interpolate_sensor_torque(8100));
+            printf("\n");
             exit(1);
         }
 

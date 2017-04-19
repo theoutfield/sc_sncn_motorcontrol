@@ -9,7 +9,8 @@
 #include <stdio.h>
 #include <data_processing.h>
 
-    int cogging_torque [2][STEPS_PER_ROTATION] = {{0}};
+int cogging_torque [2][STEPS_PER_ROTATION] = {{0}};
+
 
 void interpolate_sensor_data (short int *array_in, short int * is_recorded, int sensor_resolution)
 {
@@ -64,6 +65,44 @@ void interpolate_sensor_data (short int *array_in, short int * is_recorded, int 
     }
 }
 
+int interpolate_sensor_torque (int sensor_position)
+{
+    int x_inf, y_inf, x_sup = 0, y_sup;
+    int interpolated_torque;
+
+    while(cogging_torque[0][x_sup] < sensor_position && x_sup < STEPS_PER_ROTATION - 1)
+    {
+        x_sup++;
+    }
+
+    if (cogging_torque[0][x_sup] < sensor_position)
+    {
+        x_sup = 0;
+    }
+    if (x_sup == 0)
+    {
+        x_inf = STEPS_PER_ROTATION - 1;
+    }
+    else
+    {
+        x_inf = x_sup - 1;
+    }
+    y_inf = cogging_torque[1][x_inf];
+    y_sup = cogging_torque[1][x_sup];
+
+    x_inf = cogging_torque[0][x_inf];
+    x_sup = cogging_torque[0][x_sup];
+
+    if (x_sup == 0)
+    {
+        x_sup += SENSOR_RESOLUTION;
+    }
+
+    double tmp_value = (double)(sensor_position-x_inf)*(double)(y_sup-y_inf);
+    interpolated_torque = y_inf+tmp_value/(x_sup-x_inf);
+
+    return interpolated_torque;
+}
 
 void remove_friction_torque()
 {
