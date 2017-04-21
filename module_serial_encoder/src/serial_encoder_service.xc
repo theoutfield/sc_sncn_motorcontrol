@@ -322,7 +322,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     velocity = velocity_compute(difference, timediff_long, position_feedback_config.resolution);
 
                     //filter for REM_16MT_SENSOR
-                    if (sensor_type == REM_16MT_SENSOR) {
+                    if (sensor_type == REM_16MT_SENSOR || sensor_type == BISS_SENSOR) {
                         velocity = filter(velocity_buffer, index, 8, velocity);
                         timediff_long = 0;
                     }
