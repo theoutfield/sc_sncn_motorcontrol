@@ -74,7 +74,6 @@
 //////////////////////////////////////////////
 
 #define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile
-#define APP_TILE_USEC       USEC_STD       // Number of ticks in a microsecond for APP Tile
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION

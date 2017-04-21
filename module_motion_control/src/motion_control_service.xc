@@ -20,19 +20,11 @@
 #include <stdio.h>
 
 
-int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque,\
-        interface TorqueControlInterface client i_torque_control)
+int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque, MotionControlError &motion_control_error)
 {
     int steps = 8;
-    const int brake_pull_period = 800;
     int phase_1 = (duration/3); //1000
     int phase_2 = duration;
-
-    // re pull the brake
-    if ((counter) % brake_pull_period == 0)
-    {
-        i_torque_control.set_brake_status(1);
-    }
 
     int target;
     if ( (actual_position-start_position) > range || (actual_position-start_position) < (-range)) //we moved more than half the range so the brake should be released
@@ -69,13 +61,10 @@ int special_brake_release(int &counter, int start_position, int actual_position,
     else if (counter == duration) //end:
     {
         target = 0; //stop
-    }
-
-    //re pull the brake
-    if ((counter+1) % brake_pull_period == 0 && counter < (duration-1))
-    {
-        // stop brake for 1ms to reset the brake pull counter
-        i_torque_control.set_brake_status(0);
+        if ((actual_position-start_position) < range && (actual_position-start_position) > (-range)) {
+            // we didn't move enough, brake is probably not released
+            motion_control_error = MOTION_CONTROL_BRAKE_NOT_RELEASED;
+        }
     }
 
     counter++;
@@ -98,7 +87,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *
  * @return void
  *  */
-void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_config,
+void motion_control_service(MotionControlConfig &motion_ctrl_config,
         interface TorqueControlInterface client i_torque_control,
         interface MotionControlInterface server i_motion_control[3],client interface UpdateBrake i_update_brake)
 {
@@ -110,10 +99,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     DownstreamControlData downstream_control_data;
 
     PIDparam velocity_control_pid_param;
-    SecondOrderLPfilterParam velocity_SO_LP_filter_param;
 
     PIDparam position_control_pid_param;
-    SecondOrderLPfilterParam position_SO_LP_filter_param;
 
     NonlinearPositionControl nl_pos_ctrl;
 
@@ -126,10 +113,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     int pos_control_mode = 0;
 
     int torque_ref_k = 0;
-    double torque_ref_in_k=0, torque_ref_in_k_1n=0, torque_ref_in_k_2n=0;
+    double torque_ref_in_k=0, torque_ref_in_k_1n=0;
 
     double velocity_ref_k = 0;
-    double velocity_ref_in_k=0, velocity_ref_in_k_1n=0, velocity_ref_in_k_2n=0;
+    double velocity_ref_in_k=0, velocity_ref_in_k_1n=0;
     double velocity_k = 0.00;
 
     double position_ref_in_k = 0.00;
@@ -137,8 +124,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     double position_ref_in_k_2n = 0.00;
     double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
-    MotorcontrolConfig motorcontrol_config;
 
+    MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
     //pos profiler
     ProfilerParam profiler_param;
@@ -167,32 +154,13 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
         max_position = motion_ctrl_config.max_pos_range_limit;
     }
 
-    //brake
-    const int special_brake_release_range = 1000;
-    const int special_brake_release_duration = 3000;
-    int special_brake_release_counter = special_brake_release_duration+1;
-    int special_brake_release_initial_position = 0;
-    int special_brake_release_torque = 0;
-    int brake_shutdown_counter = 0;
-    unsigned int update_brake_configuration_time;
-    const unsigned int update_brake_configuration_wait = 2000; //2000 ms wait for torque safe enable
-    i_torque_control.set_safe_torque_off_enabled();
-    i_torque_control.set_brake_status(0);
-    t :> update_brake_configuration_time;
-    update_brake_configuration_time += update_brake_configuration_wait*1000*(unsigned int)app_tile_usec;
-    int update_brake_configuration_flag = 1;
-
-    int temperature_ratio=20;
-
     // initialization
-    motorcontrol_config = i_torque_control.get_config();
+    MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
-    temperature_ratio = motorcontrol_config.temperature_ratio;
+    int temperature_ratio = motorcontrol_config.temperature_ratio;
 
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-
-
 
     pid_init(velocity_control_pid_param);
     if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
@@ -228,9 +196,28 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     position_k  = ((double) upstream_control_data.position);
     position_k_1= position_k;
 
+    /* read tile frequency
+     * this needs to be after the first call to i_torque_control
+     * so when we read it the frequency has already been changed by the torque controller
+     */
+    unsigned int app_tile_usec = USEC_STD;
+    unsigned ctrlReadData;
+    read_sswitch_reg(get_local_tile_id(), 8, ctrlReadData);
+    if(ctrlReadData == 1) {
+        app_tile_usec = USEC_FAST;
+    }
 
-    t :> ts;
-    t when timerafter (ts + 200*1000*USEC_FAST) :> void;
+    //brake
+    int special_brake_release_counter = BRAKE_RELEASE_DURATION+1;
+    int special_brake_release_initial_position = 0;
+    int special_brake_release_torque = 0;
+    int brake_shutdown_counter = 0;
+    unsigned int update_brake_configuration_time;
+    i_torque_control.set_safe_torque_off_enabled();
+    i_torque_control.set_brake_status(0);
+    t :> update_brake_configuration_time;
+    update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
+    int update_brake_configuration_flag = 1;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -331,10 +318,19 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 }
 
                 //brake release, override target torque if we are in brake release
-                if (special_brake_release_counter <= special_brake_release_duration)
+                if (special_brake_release_counter <= BRAKE_RELEASE_DURATION)
                 {
                     torque_ref_k = special_brake_release(special_brake_release_counter, special_brake_release_initial_position, upstream_control_data.position,\
-                            special_brake_release_range, special_brake_release_duration, special_brake_release_torque, i_torque_control);
+                            BRAKE_RELEASE_THRESHOLD, BRAKE_RELEASE_DURATION, special_brake_release_torque, motion_control_error);
+                }
+
+                // check error code
+                if (motion_control_error != MOTION_CONTROL_NO_ERROR) {
+                    i_torque_control.set_brake_status(0);
+                    torque_enable_flag   =0;
+                    velocity_enable_flag =0;
+                    position_enable_flag =0;
+                    i_torque_control.set_torque_control_disabled();
                 }
 
                 //position limit check
@@ -391,10 +387,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                 //update brake config when ready
                 if (update_brake_configuration_flag && timeafter(ts, update_brake_configuration_time)) {
-                    update_brake_configuration(app_tile_usec, motion_ctrl_config, i_torque_control, i_update_brake);
+                    update_brake_configuration(motion_ctrl_config, i_torque_control, i_update_brake);
                     update_brake_configuration_flag = 0;
                     if (torque_enable_flag+velocity_enable_flag+position_enable_flag) { //one of the control is enabled, start motorcontrol and brake
-                        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
                     }
                 }
 
@@ -464,7 +460,7 @@ break;
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
                 }
 
                 //start control loop just after
@@ -486,7 +482,7 @@ break;
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
                 }
 
                 //start control loop just after
@@ -505,7 +501,7 @@ break;
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
+                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
                 }
 
                 //start control loop just after
@@ -547,7 +543,7 @@ break;
                     i_torque_control.set_brake_status(0);
 
                     t :> update_brake_configuration_time;
-                    update_brake_configuration_time += update_brake_configuration_wait*1000*(unsigned int)app_tile_usec;
+                    update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
                     update_brake_configuration_flag = 1;
                 }
 
@@ -582,6 +578,9 @@ break;
 
                 nl_position_control_reset(nl_pos_ctrl);
                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+
+                //reset error
+                motion_control_error = MOTION_CONTROL_NO_ERROR;
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
@@ -616,6 +615,9 @@ break;
                     downstream_control_data.velocity_cmd = motion_ctrl_config.max_motor_speed;
                 else if (downstream_control_data.velocity_cmd < -motion_ctrl_config.max_motor_speed)
                     downstream_control_data.velocity_cmd = -motion_ctrl_config.max_motor_speed;
+
+                //error
+                upstream_control_data_out.motion_control_error = motion_control_error;
 
                 break;
 
@@ -678,7 +680,7 @@ break;
                 i_torque_control.set_brake_status(0);
 
                 t :> update_brake_configuration_time;
-                update_brake_configuration_time += update_brake_configuration_wait*1000*(unsigned int)app_tile_usec;
+                update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
                 update_brake_configuration_flag = 1;
                 break;
 
@@ -723,7 +725,7 @@ break;
 }
 
 
-void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake)
+void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake)
 {
     int error=0;
     int duty_min=0, duty_max=0, duty_divider=0;
@@ -774,12 +776,14 @@ void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_c
         duty_min = 1500;
         duty_max = 13000;
         duty_divider = 16384;
+        period_start_brake = (motion_ctrl_config.pull_brake_time * 15); //pwm is runnig at 15 kHz
     }
     else if(motorcontrol_config.ifm_tile_usec==100)
     {
         duty_min = 600;
         duty_max = 7000;
         duty_divider = 8192;
+        period_start_brake = (motion_ctrl_config.pull_brake_time * 12); //pwm is runnig at 12 kHz
     }
     else if (motorcontrol_config.ifm_tile_usec!=100 && motorcontrol_config.ifm_tile_usec!=250)
     {
@@ -794,19 +798,17 @@ void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_c
     if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
     if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
 
-    period_start_brake  = (motion_ctrl_config.pull_brake_time * 1000)/(motorcontrol_config.ifm_tile_usec);
-
     i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 }
 
 
 void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, int position,
-        int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque)
+        int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque, MotionControlError &motion_control_error)
 {
 
+    motion_control_error = MOTION_CONTROL_NO_ERROR;
     //special brake release
-    if (motion_ctrl_config.brake_release_strategy > 1)
-    {
+    if (motion_ctrl_config.brake_release_strategy > 1) {
         special_brake_release_counter = 0;
         special_brake_release_initial_position = position;
         special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
