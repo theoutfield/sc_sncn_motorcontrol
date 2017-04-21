@@ -24,6 +24,21 @@
  */
 #define POSITION_CONTROL_LOOP_PERIOD    1000
 
+/**
+ * @brief Threshold to detect brake release in ticks.
+ */
+#define BRAKE_RELEASE_THRESHOLD         4000
+
+/**
+ * @brief Brake release duration in milliseconds.
+ */
+#define BRAKE_RELEASE_DURATION          3000
+
+/**
+ * @brief Time to wait when updating the brake config in milliseconds.
+ *        It is because the pwm service needs time to stop.
+ */
+#define BRAKE_UPDATE_CONFIG_WAIT        2000
 
 /**
  * @brief Position/Velocity control strategie
@@ -243,13 +258,12 @@ void init_motion_control(interface MotionControlInterface client i_motion_contro
  *        It take the DC, hold/pull voltages and pull time parameters
  *        and compute the corresponding duty cycles which are then sent to the pwm service.
  *
- * @param app_tile_usec
  * @param motion_ctrl_config config structure of the motion control
  * @param i_torque_control client interface to get the ifm tile frequency from the motorcontrol service.
  * @param i_update_brake client enterface to the pwm service to send the brake configuration
  *
  */
-void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake);
+void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake);
 
 
 /**
@@ -263,10 +277,11 @@ void update_brake_configuration(int app_tile_usec, MotionControlConfig &motion_c
  * @param special_brake_release_counter used for the shaking brake release
  * @param special_brake_release_initial_position used for the shaking brake release
  * @param special_brake_release_torque used for the shaking brake release
+ * @param motion_control_error error code of the motion control service
  *
  */
 void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, int position,
-        int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque);
+        int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque, MotionControlError &motion_control_error);
 
 
 /**
@@ -283,7 +298,7 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  *
  * @return void
  *  */
-void motion_control_service(int app_tile_usec, MotionControlConfig &pos_velocity_control_config,
+void motion_control_service(MotionControlConfig &pos_velocity_control_config,
                     interface TorqueControlInterface client i_torque_control,
                     interface MotionControlInterface server i_motion_control[3],
                     client interface UpdateBrake i_update_brake);
