@@ -18,11 +18,11 @@ The library offers following functionalities:
 
 .. cssclass:: downloadable-button 
 
-  `Download Library (Develop) <https://github.com/synapticon/sc_sncn_motorcontrol/archive/develop.zip>`_
+  `Download Library (Develop) <https://github.com/synapticon/sc_sncn_motorcontrol/archive/release.zip>`_
 
 .. cssclass:: github
 
-  `Visit Public Development Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop>`_
+  `Visit Public Development Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release>`_
 
 .. _motor_control_hw_compatibility:
 
@@ -46,7 +46,7 @@ Hardware Compatibility
 +==========================================================================================================+
 | SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`                                         |
 +----------------------------------------------------------------------------------------------------------+
-| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 500**, **DC 1000**, **DC 5000** |
+| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 1000 <ifm_dc1000_b2>`                                  |
 +----------------------------------------------------------------------------------------------------------+
 
 Modules
