@@ -7,11 +7,10 @@
  * @date 17/06/2014
  */
 
-//#include <pwm_service.h>
 #include <pwm_server.h>
 #include <adc_service.h>
 #include <user_config.h>
-#include <tuning.h>
+#include <tuning_console.h>
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
 #include <position_feedback_service.h>
@@ -49,7 +48,7 @@ int main(void) {
         on tile[APP_TILE]:
         {
 
-            demo_torque_position_velocity_control(i_motion_control[0]);
+            control_tuning_console(i_motion_control[0]);
         }
 
         on tile[APP_TILE_2]:

@@ -4,7 +4,7 @@
  *  Created on: Jul 13, 2015
  *      Author: Synapticon GmbH
  */
-#include <tuning.h>
+#include <tuning_console.h>
 #include <stdio.h>
 #include <ctype.h>
 
@@ -28,7 +28,7 @@ int auto_offset(interface TorqueControlInterface client i_torque_control)
 }
 
 
-void demo_torque_position_velocity_control(client interface MotionControlInterface i_motion_control)
+void control_tuning_console(client interface MotionControlInterface i_motion_control)
 {
     delay_milliseconds(500);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
