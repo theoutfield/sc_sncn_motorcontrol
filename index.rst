@@ -1,30 +1,30 @@
-.. _somanet_motor_control:
+.. _somanet_motion_control:
 
 SOMANET Motion Control Library
 ==============================
 
-The **SOMANET Motion Control Library** provides services and utilities to perform BLDC Motor and Motion Control using SOMANET devices.
-The library offers following functionalities:
+The **SOMANET Motion Control Library** provides services and utilities to perform BLDC Motor and Motion Controls using SOMANET devices.
+The library offers the following functionalities:
 
 * BLDC motors control
-* Field Oriented Control
+* Field Oriented Control (FOC)
 * Position, Velocity, and Torque control loops
-* Feedback sensor support (Hall Sensor, Incremental Encoder, BiSS, Magnetic Rotary sensors via SPI)
+* Runtime reconfigurable Feedback Sensor support (Hall Sensor, Incremental (AB and ABI), BiSS, and Magnetic Rotary encoders via SPI)
 * Basic Motion Profile Generation
 * Fully featured ADC drivers
-* Configurable software defined PWM module 
+* Configurable software-defined PWM module 
 * Watchdog
 * GPIO server (e.g. for homing-related functions)
 
 .. cssclass:: downloadable-button 
 
-  `Download Library (Develop) <https://github.com/synapticon/sc_sncn_motorcontrol/archive/release.zip>`_
+  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/release.zip>`_
 
 .. cssclass:: github
 
-  `Visit Public Development Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release>`_
+  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release>`_
 
-.. _motor_control_hw_compatibility:
+.. _motion_control_hw_compatibility:
 
 Hardware Compatibility
 ----------------------
@@ -75,15 +75,15 @@ Modules
 	Motion Control Module <module_motion_control/doc/index>
 	
 
-This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
+This is the complete list of modules currently included in the **SOMANET Motion Control Library**:
 
 * `PWM Module <module_pwm/doc/index.html>`_: Service to generate center-aligned Pulse-Width modulation signals.
 * `Position Feedback Module <module_position_feedback/doc/index.html>`_: Service to read position data from various sensors.
 * `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
 * `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
 * `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
-* `REM 14 Module <module_rem_14/doc/index.html>`_: Driver to read data from REM 14 Encoder.
-* `REM 16MT Module <module_rem_16mt/doc/index.html>`_: Driver to read data from REM 16MT Encoder.
+* `REM 14 Encoder Module <module_rem_14/doc/index.html>`_: Driver to read data from REM 14 Encoder.
+* `REM 16MT Encoder Module <module_rem_16mt/doc/index.html>`_: Driver to read data from REM 16MT Encoder.
 * `Serial Encoder Module <module_serial_encoder/doc/index.html>`_: Service to read position data from a Serial Encoder (SPI or BiSS)
 * `SPI Master Module <module_spi_master/doc/index.html>`_: Driver to read/write data from/to a SPI Slave.
 * `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC on your IFM Drive board.
