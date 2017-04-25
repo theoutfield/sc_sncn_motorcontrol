@@ -8,18 +8,19 @@
 
 #include <refclk.h>
 
-#include <motor_config.h>
+#include <motor_config_qmot_qbl5704.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
+#include <sensor_config_biss_AC36_1213.h>
 #include <sensor_config.h>
 ///////////////////////
 // SENSOR 1 SETTINGS //
 ///////////////////////
 
 // SENSOR 1 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
+#define SENSOR_1_TYPE                     BISS_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -29,33 +30,33 @@
 #define SENSOR_1_FUNCTION                 SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL
 
 // RESOLUTION (TICKS PER TURN) OF SENSOR_1
-#define SENSOR_1_RESOLUTION               REM_16MT_SENSOR_RESOLUTION
+#define SENSOR_1_RESOLUTION               BISS_SENSOR_RESOLUTION
 
 // VELOCITY COMPUTE PERIOD (ALSO POLLING RATE) OF SENSOR_1 (in microseconds)
-#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
+#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  BISS_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [1,-1]
-#define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
+#define SENSOR_1_POLARITY                 SENSOR_POLARITY_INVERTED
 
 ///////////////////////
 // SENSOR 2 SETTINGS //
 ///////////////////////
 
 // SENSOR 2 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_2_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
+#define SENSOR_2_TYPE                     QEI_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_2 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
 //                        SENSOR_FUNCTION_MOTION_CONTROL, SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY
 //                        SENSOR_FUNCTION_COMMUTATION_ONLY]
 // Only one sensor can be selected for commutation, motion control or feedback display only
-#define SENSOR_2_FUNCTION                 SENSOR_FUNCTION_DISABLED
+#define SENSOR_2_FUNCTION                 SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY
 
 // RESOLUTION (TICKS PER TURN) OF SENSOR_2
-#define SENSOR_2_RESOLUTION               HALL_SENSOR_RESOLUTION
+#define SENSOR_2_RESOLUTION               QEI_SENSOR_RESOLUTION
 
 // VELOCITY COMPUTE PERIOD (ALSO POLLING RATE) OF SENSOR_2 (in microseconds)
-#define SENSOR_2_VELOCITY_COMPUTE_PERIOD  HALL_SENSOR_VELOCITY_COMPUTE_PERIOD
+#define SENSOR_2_VELOCITY_COMPUTE_PERIOD  QEI_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_2 SENSOR [1,-1]
 #define SENSOR_2_POLARITY                 SENSOR_POLARITY_NORMAL
@@ -84,7 +85,7 @@
 #define COMMUTATION_FRQ            24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    0
+#define COMMUTATION_ANGLE_OFFSET    1636
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -161,8 +162,8 @@
                                                      //otherwise set as 0
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             700000
-#define VELOCITY_Ki                             20000
+#define VELOCITY_Kp                             300000
+#define VELOCITY_Ki                             2000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 
