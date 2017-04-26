@@ -113,17 +113,16 @@ extern int position_profile_generate(int step);
  *
  * @return no. of steps for quick stop profile : range [1 - steps]
  */
-extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int max_deceleration) ;
+extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int deceleration) ;
 
 /**
  * @brief Generate Quick Stop Position Profile
  *
  * @param steps current step of the profile
- * @param actual_velocity
  *
  * @return corresponding target position at the step input
  */
-extern int quick_stop_position_profile_generate(int steps, int actual_velocity);
+extern int quick_stop_position_profile_generate(int steps);
 
 extern void init_linear_profile_limits(int max_value, int polarity);
 extern int get_linear_profile_polarity();
