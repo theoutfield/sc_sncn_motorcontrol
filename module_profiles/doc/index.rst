@@ -1,8 +1,8 @@
-.. _module_profile:
+.. _module_profiles:
 
-=======================
-Profile Module
-=======================
+===============
+Profiles Module
+===============
 
 .. contents:: In this document
     :backlinks: none
@@ -17,7 +17,7 @@ the motor.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_profile>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_profiles>`_
 
 How to use
 ==========
@@ -33,11 +33,11 @@ How to use
     * :ref:`Brushed DC Position Control Demo <brushed_dc_position_control_demo>`
     * :ref:`Brushed DC Velocity Control Demo <brushed_dc_velocity_control_demo>`
 
-1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
 
     ::
 
-        USED_MODULES = module_profile module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_gpio module_qei module_watchdog module_board-support
+        USED_MODULES = module_profiles module_hall_sensor module_pwm module_adc module_controllers module_utils lib_bldc_torque_control module_gpio module_incremental_encoder module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependency issues.

@@ -1,7 +1,8 @@
 .. _module_watchdog:
-=================
+
+===============
 Watchdog Module 
-=================
+===============
 
 .. contents:: In this document
     :backlinks: none
@@ -25,11 +26,11 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
-1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
 
     ::
 
-        USED_MODULES = module_watchdog module_pwm_symmetrical module_adc module_ctrl_loops module_hall module_misc module_motorcontrol module_profile module_qei module_board-support
+        USED_MODULES = module_watchdog module_pwm module_adc module_controllers module_hall_sensor module_utils lib_bldc_torque_control module_profiles module_incremental_encoder module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependency issues.

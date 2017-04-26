@@ -1,4 +1,4 @@
-.. _module_biss:
+.. _module_biss_encoder:
 
 =====================
 BiSS Encoder Module
@@ -35,7 +35,7 @@ How to use
 
     ::
 
-        USED_MODULES = config_motor module_adc module_biss module_bldc_torque_control_lib module_board-support module_hall module_misc module_position_feedback module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_spi_master module_watchdog 
+        USED_MODULES = configuration_parameters module_adc module_biss_encoder lib_bldc_torque_control module_board-support module_hall_sensor module_utils module_position_feedback module_pwm module_incremental_encoder module_encoder_rem_14 module_encoder_rem_16mt module_serial_encoder module_shared_memory module_spi_master module_watchdog 
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules.
           This will help solving internal dependency issues.

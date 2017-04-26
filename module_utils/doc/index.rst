@@ -1,6 +1,8 @@
-============================
-Miscellaneous Module 
-============================
+.. _module_utils:
+
+================
+Utilities Module 
+================
 
 .. contents:: In this document
     :backlinks: none
@@ -21,11 +23,11 @@ From all its functionality, the user might find useful the following resources:
 How to use
 ==========
 
-1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
 
   ::
 
-    USED_MODULES = module_misc module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_motorcontrol module_profile module_gpio module_qei module_watchdog module_board-support
+    USED_MODULES = module_utils module_hall module_pwm module_adc module_controllers lib_bldc_torque_control module_profiles module_gpio module_incremental_encoder module_watchdog module_board-support
 
   .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependency issues.

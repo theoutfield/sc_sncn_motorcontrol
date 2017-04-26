@@ -1,7 +1,8 @@
 .. _module_serial_encoder:
-===========================
+
+=====================
 Serial Encoder Module
-===========================
+=====================
 
 .. contents:: In this document
     :backlinks: none
@@ -29,11 +30,11 @@ How to use
           
 .. seealso:: You might find useful the :ref:`Position feedback Demo <app_test_position_feedback>` example app, which illustrates the use of this module. 
 
-1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
 
     ::
 
-        USED_MODULES = config_motor module_biss module_bldc_torque_control_lib module_board-support module_hall module_shared_memory module_misc module_position_feedback module_serial_encoder module_rem_14 module_rem_16mt module_qei module_spi_master
+        USED_MODULES = configuration_parameters module_biss_encoder lib_bldc_torque_control module_board-support module_hall_sensor module_shared_memory module_utils module_position_feedback module_serial_encoder module_encoder_rem_14 module_encoder_rem_16mt module_incremental_encoder module_spi_master
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependency issues.
