@@ -324,6 +324,20 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                                 printf("f:%i j:%i \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
 
+
+                                double zeta_auto_tune = 0.40;
+                                double st_auto_tune   = 0.10;
+                                double wn_auto_tune   = 0.00, kp_auto_tune   = 0.00, ki_auto_tune=0.00;
+
+                                wn_auto_tune = 4.00 / (zeta_auto_tune * st_auto_tune);
+                                kp_auto_tune = 1.00/(0.001*g_speed);
+                                kp_auto_tune*= ((2.00 * zeta_auto_tune * wn_auto_tune*j)-f);
+
+                                ki_auto_tune = (wn_auto_tune*wn_auto_tune*j);
+                                ki_auto_tune/= (0.001*g_speed);
+
+                                printf("kp:%i ki:%i \n",  ((int)(kp_auto_tune*1.00)), ((int)(ki_auto_tune*1.00)));
+
                             }
                         }
                         else
