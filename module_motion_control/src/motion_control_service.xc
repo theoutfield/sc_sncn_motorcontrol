@@ -135,6 +135,23 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     double  actual_velocity[4010];
     int  velocity_auto_tuner_counter=0;
 
+    double steady_state_value = 0.00;
+    double k = 0.00;
+    double g_speed = 0.00;
+    double speed_integral = 0.00;
+    double t_auto_tune = 0.00;
+    double f = 0.00;
+    double j = 0.00;
+
+    downstream_control_data.velocity_cmd = 0;
+    motion_ctrl_config.enable_velocity_auto_tuner == 0;
+
+    printf("f:%d j:%d \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
+
+
+
+
+
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
@@ -270,6 +287,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
                         velocity_auto_tuner_counter++;
+                        xscope_int(VELOCITY_AUTO_TUNER_COUNTER, velocity_auto_tuner_counter);
 
                         if(1<=velocity_auto_tuner_counter && velocity_auto_tuner_counter<=4000)
                         {
@@ -280,29 +298,47 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                             if(velocity_auto_tuner_counter==4000)
                             {
-                                double steady_state_value = 0;
+                                velocity_ref_in_k = 1000;
+                                steady_state_value = 0;
                                 for(int i=3801; i<=4000; i++) steady_state_value +=  actual_velocity[i];
-                                steady_state_value = steady_state_value/201.00;
+                                steady_state_value = steady_state_value/200.00;
 
-                                double k = (steady_state_value / 1000);
+                                k = (steady_state_value / 1000);
 
-                                double speed_integral=0.00;
-                                for(int i=1; i<=4000; i++) speed_integral += (k-actual_velocity[i]);
+                                g_speed = 60.00/(2.00*3.1416);
+
+                                speed_integral=0.00;
+                                for(int i=1; i<=4000; i++) speed_integral += (steady_state_value-actual_velocity[i]);
                                 speed_integral *= (POSITION_CONTROL_LOOP_PERIOD/1000000.00);
+                                speed_integral /= g_speed;
 
-                                double t = (speed_integral/(k*1000));
+                                j = (speed_integral*0.001);
+                                j/= (steady_state_value/g_speed);
+                                j/= (steady_state_value/g_speed);
+                                j*= (velocity_ref_in_k);
 
-                                double f = (1/steady_state_value) - (0.001 * (60/6.28));
-                                double j = (speed_integral * 0.001) /(k*steady_state_value);
 
-                                downstream_control_data.velocity_cmd = 0;
-                                motion_ctrl_config.enable_velocity_auto_tuner == 0;
+                                f = (velocity_ref_in_k*0.001);
+                                f/= (steady_state_value/g_speed);
+                                f-= (0.001*g_speed);
 
-                                printf("f:%d j:%d \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
+                                printf("f:%i j:%i \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
 
                             }
-
                         }
+                        else
+                        {
+                            velocity_ref_in_k = 0;
+                            torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        }
+
+
+                        xscope_int(STEADY_STATE_VALUE, ((int)(steady_state_value)));
+                        xscope_int(PERCENT_K, ((int)(k*100)));
+                        xscope_int(G_SPEED, ((int)(g_speed)));
+                        xscope_int(SPEED_INTEGRAL, ((int)(speed_integral)));
+                        xscope_int(PERCENT_T_AUTO_TUNE, ((int)(t_auto_tune*100)));
+
                     }
                     else if(motion_ctrl_config.enable_profiler==1)
                     {
