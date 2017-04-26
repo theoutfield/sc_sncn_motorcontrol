@@ -3,8 +3,9 @@
 #include <IFM_BOARD_REQUIRED>
 
 /**
- * @brief Test illustrates usage of module_commutation
- * @date 17/06/2014
+ * @file main.xc
+ * @brief Demo application provides possibility to configure various services via console
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <pwm_server.h>
