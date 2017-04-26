@@ -1,30 +1,30 @@
-.. _somanet_motor_control:
+.. _somanet_motion_control:
 
 SOMANET Motion Control Library
 ==============================
 
-The **SOMANET Motion Control Library** provides services and utilities to perform BLDC Motor and Motion Control using SOMANET devices.
-The library offers following functionalities:
+The **SOMANET Motion Control Library** provides services and utilities to perform BLDC Motor and Motion Controls using SOMANET devices.
+The library offers the following functionalities:
 
 * BLDC motors control
-* Field Oriented Control
+* Field Oriented Control (FOC)
 * Position, Velocity, and Torque control loops
-* Feedback sensor support (Hall Sensor, Incremental Encoder, BiSS, Magnetic Rotary sensors via SPI)
+* Runtime reconfigurable Feedback Sensor support (Hall Sensor, Incremental (AB and ABI), BiSS, and Magnetic Rotary encoders via SPI)
 * Basic Motion Profile Generation
 * Fully featured ADC drivers
-* Configurable software defined PWM module 
+* Configurable software-defined PWM module 
 * Watchdog
 * GPIO server (e.g. for homing-related functions)
 
 .. cssclass:: downloadable-button 
 
-  `Download Library (Develop) <https://github.com/synapticon/sc_sncn_motorcontrol/archive/develop.zip>`_
+  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/release.zip>`_
 
 .. cssclass:: github
 
-  `Visit Public Development Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop>`_
+  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release>`_
 
-.. _motor_control_hw_compatibility:
+.. _motion_control_hw_compatibility:
 
 Hardware Compatibility
 ----------------------
@@ -46,7 +46,7 @@ Hardware Compatibility
 +==========================================================================================================+
 | SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`                                         |
 +----------------------------------------------------------------------------------------------------------+
-| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 300 <ifm_dc300>`, **DC 500**, **DC 1000**, **DC 5000** |
+| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 1000 <ifm_dc1000_b2>`                                  |
 +----------------------------------------------------------------------------------------------------------+
 
 Modules
@@ -58,41 +58,41 @@ Modules
 
 	PWM Module <module_pwm/doc/index>
 	Position Feedback Module <module_position_feedback/doc/index>
-	Hall Sensor Feedback Module <module_hall/doc/index>
-	Incremental Encoder Feedback Module <module_qei/doc/index>
-	BiSS Encoder Feedback Module <module_biss/doc/index>
-	REM 14 Module <module_rem_14/doc/index>
-	REM 16MT Module <module_rem_16mt/doc/index>
+	Hall Sensor Feedback Module <module_hall_sensor/doc/index>
+	Incremental Encoder Feedback Module <module_incremental_encoder/doc/index>
+	BiSS Encoder Feedback Module <module_biss_encoder/doc/index>
+	REM 14 Module <module_encoder_rem_14/doc/index>
+	REM 16MT Module <module_encoder_rem_16mt/doc/index>
 	Serial Encoder Module <module_serial_encoder/doc/index>
 	SPI Master Module <module_spi_master/doc/index>
 	ADC Module <module_adc/doc/index>
 	Watchdog Module <module_watchdog/doc/index>
 	GPIO Server Module <module_gpio/doc/index>
 	BLDC Torque Control Library <lib_bldc_torque_control/doc/index>
-	Miscellaneous Module <module_misc/doc/index>
+	Miscellaneous Module <module_utils/doc/index>
 	Controllers Implementation Module <module_controllers/doc/index>
-	Profile Module <module_profile/doc/index>
+	Profile Module <module_profiles/doc/index>
 	Motion Control Module <module_motion_control/doc/index>
 	
 
-This is the complete list of modules currently included in the **SOMANET Motor Control Library**:
+This is the complete list of modules currently included in the **SOMANET Motion Control Library**:
 
 * `PWM Module <module_pwm/doc/index.html>`_: Service to generate center-aligned Pulse-Width modulation signals.
 * `Position Feedback Module <module_position_feedback/doc/index.html>`_: Service to read position data from various sensors.
-* `Hall Sensor Feedback Module <module_hall/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
-* `Incremental Encoder Feedback Module <module_qei/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
-* `BiSS Encoder Feedback Module <module_biss/doc/index.html>`_: Driver to read data from BiSS Encoder.
-* `REM 14 Module <module_rem_14/doc/index.html>`_: Driver to read data from REM 14 Encoder.
-* `REM 16MT Module <module_rem_16mt/doc/index.html>`_: Driver to read data from REM 16MT Encoder.
+* `Hall Sensor Feedback Module <module_hall_sensor/doc/index.html>`_: Driver to read the signals from your feedback Hall sensor.
+* `Incremental Encoder Feedback Module <module_incremental_encoder/doc/index.html>`_: Driver to read the signals from your feedback Encoder Interface.
+* `BiSS Encoder Feedback Module <module_biss_encoder/doc/index.html>`_: Driver to read data from BiSS Encoder.
+* `REM 14 Encoder Module <module_encoder_rem_14/doc/index.html>`_: Driver to read data from REM 14 Encoder.
+* `REM 16MT Encoder Module <module_encoder_rem_16mt/doc/index.html>`_: Driver to read data from REM 16MT Encoder.
 * `Serial Encoder Module <module_serial_encoder/doc/index.html>`_: Service to read position data from a Serial Encoder (SPI or BiSS)
 * `SPI Master Module <module_spi_master/doc/index.html>`_: Driver to read/write data from/to a SPI Slave.
 * `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC on your IFM Drive board.
 * `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your IFM DC board.
 * `GPIO Server Module <module_gpio/doc/index.html>`_: Contains a service to handle the external digital input/outputs of your board.
 * `BLDC Torque Control Library <lib_bldc_torque_control/doc/index.html>`_: Provides a service to control torque of BLDC motors.
-* `Miscellaneous Module <module_misc/doc/index.html>`_: Contains constants and utilities used by the library.
+* `Miscellaneous Module <module_utils/doc/index.html>`_: Contains constants and utilities used by the library.
 * `Controllers Implementation Module <module_controllers/doc/index.html>`_: Contains PID and NL controllers implementations. 
-* `Profile Module <module_profile/doc/index.html>`_: Contains software for profile ramps generation.
+* `Profile Module <module_profiles/doc/index.html>`_: Contains software for profile ramps generation.
 * `Motion Control Module <module_motion_control/doc/index.html>`_: Provides service for position and velocity control.
 
 Examples
@@ -105,16 +105,16 @@ Examples
 	PWM Demo <examples/app_demo_general_pwm/doc/index>
 	Watchdog Demo <examples/app_demo_watchdog/doc/index>
 
-	Hall Effect Latched Sensor Test <examples/app_test_hall/doc/index>
-	Incremental Encoder Test <examples/app_test_qei/doc/index>
-	BiSS Absolute Encoder Test <examples/app_test_biss/doc/index>
-	REM 14 Absolute Encoder Test <examples/app_test_rem_14/doc/index.html>
-	REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt/doc/index.html>
-	Position Feedback Service Test <examples/app_test_position_feedback/doc/index.html>
+	Hall Effect Latched Sensor Test <examples/app_test_hall_sensor/doc/index>
+	Incremental Encoder Test <examples/app_test_incremental_encoder/doc/index>
+	BiSS Absolute Encoder Test <examples/app_test_biss_encoder/doc/index>
+	REM 14 Absolute Encoder Test <examples/app_test_rem_14_encoder/doc/index>
+	REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt_encoder/doc/index>
+	Position Feedback Service Test <examples/app_test_position_feedback/doc/index>
 	
 	BLDC Torque Control Demo <examples/app_demo_advanced_foc/doc/index>	
-	BLDC Motion Control Demo <examples/app_demo_bldc_position/doc/index>	
-	BLDC Control Tuning Demo <examples/app_demo_bldc_velocity_position/doc/index>
+	BLDC Motion Control Demo <examples/app_demo_motion_control/doc/index>	
+	BLDC Control Tuning Demo <examples/app_control_tuning/doc/index>
 	
 
 * **Low level functionality tests:**
@@ -124,18 +124,18 @@ Examples
 
 * **Position Feedback Sensors tests:**
 
-	* `Hall Effect Latched Sensor Test <examples/app_test_hall/doc/index.html>`_: Shows data acquired from a latched Hall sensor served as a rotary encoder.	
-	* `Incremental Encoder Test <examples/app_test_qei/doc/index.html>`_: Shows data acquired from an incremental encoder.
-	* `BiSS Absolute Encoder Test <examples/app_test_biss/doc/index.html>`_: Shows data acquired from a BiSS interface encoder.
-	* `REM 14 Absolute Encoder Test <examples/app_test_rem_14/doc/index.html>`_: Shows data acquired from REM 14 absolute magnetic rotary encoder.
-	* `REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt/doc/index.html>`_: Shows data acquired from REM 16MT absolute magnetic rotary encoder.
+	* `Hall Effect Latched Sensor Test <examples/app_test_hall_sensor/doc/index.html>`_: Shows data acquired from a latched Hall sensor served as a rotary encoder.	
+	* `Incremental Encoder Test <examples/app_test_incremental_encoder/doc/index.html>`_: Shows data acquired from an incremental encoder.
+	* `BiSS Absolute Encoder Test <examples/app_test_biss_encoder/doc/index.html>`_: Shows data acquired from a BiSS interface encoder.
+	* `REM 14 Absolute Encoder Test <examples/app_test_rem_14_encoder/doc/index.html>`_: Shows data acquired from REM 14 absolute magnetic rotary encoder.
+	* `REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt_encoder/doc/index.html>`_: Shows data acquired from REM 16MT absolute magnetic rotary encoder.
 	* `Position Feedback Service Test <examples/app_test_position_feedback/doc/index.html>`_: Simple example of the Position Feedback Service usage to acquire position from multiple sensors.
 
 * **BLDC Motor Control demos:**
 
 	* `BLDC Torque Control Demo <examples/app_demo_torque_control/doc/index.html>`_: FOC-based torque control of your BLDC motor.
 	* `BLDC Motion Control Demo <examples/app_demo_motion_control/doc/index.html>`_: Simple example to make Position/Velocity/Torque Control of your BLDC motor.
-	* `BLDC Control Tuning Demo <examples/app_bldc_control_tuning/doc/index.html>`_: Helper application to tune your motion controllers and find commutation angle offset.
+	* `BLDC Control Tuning Demo <examples/app_control_tuning/doc/index.html>`_: Helper application to tune your motion controllers and find commutation angle offset.
 
 
 Motor Control Quick Guides
@@ -160,8 +160,8 @@ To run your **Motor Control library** it is necessary to include :ref:`SOMANET B
 
 .. cssclass:: downloadable-button 
 
-  `Download SOMANET Base Library (Develop) <https://github.com/synapticon/sc_somanet-base/archive/develop.zip>`_
+  `Download SOMANET Base Library <https://github.com/synapticon/sc_somanet-base/archive/master.zip>`_
 
 .. cssclass:: github
 
-  `Visit SOMANET Base Public Development Repository <https://github.com/synapticon/sc_somanet-base/tree/develop>`_
+  `Visit SOMANET Base Public Repository <https://github.com/synapticon/sc_somanet-base/tree/master>`_

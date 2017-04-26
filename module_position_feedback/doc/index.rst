@@ -36,7 +36,7 @@ your SOMANET IFM device.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_position_feedback>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_position_feedback>`_
 
 
 .. image:: images/core-diagram-position-feedback-interface.png
@@ -54,7 +54,7 @@ How to use
 
     ::
 
-        USED_MODULES = config_motor module_biss module_bldc_torque_control_lib module_board-support module_hall module_shared_memory module_misc module_position_feedback module_qei module_rem_14 module_rem_16mt module_serial_encoder module_spi_master
+        USED_MODULES = configuration_parameters module_biss_encoder lib_bldc_torque_control module_board-support module_hall_sensor module_shared_memory module_utils module_position_feedback module_incremental_encoder module_encoder_rem_14 module_encoder_rem_16mt module_serial_encoder module_spi_master
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules.
           This will help solving internal dependency issues.

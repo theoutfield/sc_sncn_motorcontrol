@@ -3,11 +3,11 @@
 #include <IFM_BOARD_REQUIRED>
 
 /**
- * @brief Test illustrates usage of module_commutation
- * @date 17/06/2014
+ * @file main.xc
+ * @brief Demo application illustrates usage of module_motion_control
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
-//#include <pwm_service.h>
 #include <pwm_server.h>
 #include <adc_service.h>
 #include <user_config.h>
