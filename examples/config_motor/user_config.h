@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT4.h>
+#include <motor_config_AMK_DD5.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -35,7 +35,7 @@
 #define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [1,-1]
-#define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
+#define SENSOR_1_POLARITY                 SENSOR_POLARITY_INVERTED
 
 ///////////////////////
 // SENSOR 2 SETTINGS //
@@ -85,7 +85,7 @@
 #define COMMUTATION_FRQ            24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    300
+#define COMMUTATION_ANGLE_OFFSET    3000
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -167,6 +167,7 @@
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
+
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
