@@ -1,8 +1,8 @@
-.. _offset_commutation_tuning_demo:
+.. _app_control_tuning:
 
-======================================================
-Helper for finding your sensor and commutation offsets
-======================================================
+====================================================
+Commutation angle offset and PID gains tuning helper
+====================================================
 
 .. contents:: In this document
     :backlinks: none
