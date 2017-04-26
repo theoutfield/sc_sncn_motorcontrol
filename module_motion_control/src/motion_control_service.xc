@@ -135,6 +135,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     double  actual_velocity[4010];
     int  velocity_auto_tuner_counter=0;
 
+    double zeta_auto_tune = 0.70;
+    double st_auto_tune   = 2.00;
+    double wn_auto_tune   = 0.00, kp_auto_tune   = 0.00, ki_auto_tune=0.00;
+
     double steady_state_value = 0.00;
     double k = 0.00;
     double g_speed = 0.00;
@@ -147,10 +151,6 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     motion_ctrl_config.enable_velocity_auto_tuner == 0;
 
     printf("f:%d j:%d \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
-
-
-
-
 
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
@@ -287,7 +287,6 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
                         velocity_auto_tuner_counter++;
-                        xscope_int(VELOCITY_AUTO_TUNER_COUNTER, velocity_auto_tuner_counter);
 
                         if(1<=velocity_auto_tuner_counter && velocity_auto_tuner_counter<=4000)
                         {
@@ -324,11 +323,6 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                                 printf("f:%i j:%i \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
 
-
-                                double zeta_auto_tune = 0.40;
-                                double st_auto_tune   = 0.10;
-                                double wn_auto_tune   = 0.00, kp_auto_tune   = 0.00, ki_auto_tune=0.00;
-
                                 wn_auto_tune = 4.00 / (zeta_auto_tune * st_auto_tune);
                                 kp_auto_tune = 1.00/(0.001*g_speed);
                                 kp_auto_tune*= ((2.00 * zeta_auto_tune * wn_auto_tune*j)-f);
@@ -336,22 +330,31 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                                 ki_auto_tune = (wn_auto_tune*wn_auto_tune*j);
                                 ki_auto_tune/= (0.001*g_speed);
 
-                                printf("kp:%i ki:%i \n",  ((int)(kp_auto_tune*1.00)), ((int)(ki_auto_tune*1.00)));
+                                kp_auto_tune *= 1000000.00;
+                                ki_auto_tune *= 1000.00;
+
+                                printf("kp:%i ki:%i \n",  ((int)(kp_auto_tune)), ((int)(ki_auto_tune)));
 
                             }
                         }
-                        else
+                        else if (velocity_auto_tuner_counter<=(4000*2))
                         {
                             velocity_ref_in_k = 0;
                             torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
                         }
+                        else
+                        {
+                            motion_ctrl_config.enable_velocity_auto_tuner = 0;
+                            velocity_auto_tuner_counter=0;
+                            for(int i=0; i<=4005; i++) actual_velocity[i] = 0.00;
 
+                            torque_enable_flag   =0;
+                            velocity_enable_flag =0;
+                            position_enable_flag =0;
+                            i_torque_control.set_torque_control_disabled();
 
-                        xscope_int(STEADY_STATE_VALUE, ((int)(steady_state_value)));
-                        xscope_int(PERCENT_K, ((int)(k*100)));
-                        xscope_int(G_SPEED, ((int)(g_speed)));
-                        xscope_int(SPEED_INTEGRAL, ((int)(speed_integral)));
-                        xscope_int(PERCENT_T_AUTO_TUNE, ((int)(t_auto_tune*100)));
+                        }
 
                     }
                     else if(motion_ctrl_config.enable_profiler==1)

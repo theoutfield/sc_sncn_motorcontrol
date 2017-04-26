@@ -130,7 +130,6 @@ void demo_torque_position_velocity_control(client interface MotionControlInterfa
                         motion_ctrl_config.velocity_kp = 1000000;
                         motion_ctrl_config.velocity_ki = 0;
                         motion_ctrl_config.velocity_kd = 0;
-                        motion_ctrl_config.velocity_integral_limit = 0;
 
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
 
