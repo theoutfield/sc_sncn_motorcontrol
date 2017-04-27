@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <CORE_C22-rev-a.bsp>
+#include <IFM_DC1K-rev-c4.bsp>
 
 /**
  * @brief Test illustrates usage of module_commutation
@@ -57,29 +57,19 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         on tile[APP_TILE]:
         {
-//            autotune(i_motion_control[0],5,  i_tuning_step[1], i_position_feedback_1[0]);
+//            autotune(i_motion_control[0],10,  i_tuning_step[1], i_position_feedback_1[0]);
 //
 //                user_interface(i_motion_control[0], i_tuning_step[1]);
 
-
+//
             map_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
-            char file_name[] = "Cogging_Torque";
-            char path[70];
-            char headers[] ="Position, Torque";
-            sprintf(path, "Data/%s_%dth_harmonic.csv", file_name, MEASURE_PRECISION);
+            compensate_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
+//            char file_name[] = "Cogging_Torque";
+//            char path[70];
+//            char headers[] ="Position, Torque";
+//            sprintf(path, "Data/%s_%dth_harmonic2.csv", file_name, MEASURE_PRECISION);
 //            write_array_to_csv_file(cogging_torque, STEPS_PER_ROTATION, 2, path, headers);
-            printf("270 : %d\n ", interpolate_sensor_torque(270));
-
-            printf("1000 : %d\n ", interpolate_sensor_torque(1000));
-
-            printf("2050 : %d\n  ", interpolate_sensor_torque(2050));
-            printf("3006 : %d\n ", interpolate_sensor_torque(3006));
-            printf("3990 : %d\n ", interpolate_sensor_torque(3990));
-            printf("4096 : %d\n ", interpolate_sensor_torque(4096));
-
-            printf("8100 : %d\n ", interpolate_sensor_torque(8100));
-            printf("\n");
-            exit(1);
+                        exit(1);
         }
 
         on tile[APP_TILE_2]:
@@ -87,7 +77,12 @@ int main(void) {
         {
             par
             {
-
+//                {
+//                    make_steps(i_motion_control[1], i_tuning_step[0],i_position_feedback_1[1]);
+//                }
+//                {
+//                    tuning_step_service(i_tuning_step);
+//                }
                 {
                     MotionControlConfig motion_ctrl_config;
 

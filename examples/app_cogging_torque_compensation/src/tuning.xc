@@ -392,7 +392,7 @@ struct individual autotune (client interface MotionControlInterface i_motion_con
     int velocity_command = 20;
     int error_position = 0, error_velocity = 0;
     int energy_error_position = 0, energy_error_velocity = 0;
-    unsigned int time_reference = 500, time_zero = 500;
+    unsigned int time_reference = 600, time_zero = 300;
     int error_min = 0;
     int oscillation_number = 0, overshoot = 0;
     int sign = 0;
@@ -473,7 +473,7 @@ struct individual autotune (client interface MotionControlInterface i_motion_con
             if (generation[i].competitor)
             {
             printf("[%d] :Energy : %d ; Overshoot : %d ; Vibration : %d\n", i, generation[i].energy, generation[i].overshoot, generation[i].oscillation);
-                total_criterion = generation[i].energy*2.9 + (generation[i].overshoot) *000 + (generation[i].oscillation - oscillation_average) * /*200000*/0;
+                total_criterion = generation[i].energy*2.9 + (generation[i].overshoot) *10 + (generation[i].oscillation - oscillation_average) * /*200000*/0;
 //                total_criterion += (generation_number-generation[i].age)*250000;
 //                printf ("[%d] generation : %d, age : %d\n", i, generation_number, generation[i].age);
                 generation[i].age++;

@@ -25,3 +25,9 @@ void map_torque_ripples(client interface MotionControlInterface i_motion_control
         , client interface TorqueControlInterface i_torque_control);
 
 extern int cogging_torque [2][STEPS_PER_ROTATION];
+
+void compensate_torque_ripples(client interface MotionControlInterface i_motion_control, client interface PositionFeedbackInterface i_position_feedback
+        , client interface TorqueControlInterface i_torque_control);
+
+void find_friction_torque(client interface MotionControlInterface i_motion_control, client interface PositionFeedbackInterface i_position_feedback
+        , client interface TorqueControlInterface i_torque_control);
