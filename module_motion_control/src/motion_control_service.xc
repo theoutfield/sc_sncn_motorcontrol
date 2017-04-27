@@ -12,6 +12,7 @@
 
 #include <controllers.h>
 #include <profile.h>
+#include <auto_tune.h>
 #include <filters.h>
 
 #include <motion_control_service.h>
@@ -132,8 +133,12 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0, velocity_ref_in_k_2n=0;
     double velocity_k = 0.00;
 
-    double  actual_velocity[4010];
-    int  velocity_auto_tuner_counter=0;
+    AutoTuneParam velocity_auto_tune;
+
+    //autotune initialization
+    velocity_auto_tune.counter=0;
+    velocity_auto_tune.array_length=1000;
+    for(int i=0; i<=1000; i++) velocity_auto_tune.actual_velocity[i]=0;
 
     double zeta_auto_tune = 0.70;
     double st_auto_tune   = 2.00;
@@ -286,20 +291,21 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 {
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
-                        velocity_auto_tuner_counter++;
+                        velocity_auto_tune.counter++;
 
-                        if(1<=velocity_auto_tuner_counter && velocity_auto_tuner_counter<=4000)
+                        if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
                         {
                             velocity_ref_in_k = 1000;
-                            actual_velocity[velocity_auto_tuner_counter] = velocity_k;
+                            velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = velocity_k;
 
                             torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
-                            if(velocity_auto_tuner_counter==4000)
+                            if(velocity_auto_tune.counter==velocity_auto_tune.array_length)
                             {
                                 velocity_ref_in_k = 1000;
                                 steady_state_value = 0;
-                                for(int i=3801; i<=4000; i++) steady_state_value +=  actual_velocity[i];
+                                for(int i=(velocity_auto_tune.array_length-200); i<=velocity_auto_tune.array_length; i++)
+                                    steady_state_value +=  velocity_auto_tune.actual_velocity[i];
                                 steady_state_value = steady_state_value/200.00;
 
                                 k = (steady_state_value / 1000);
@@ -307,7 +313,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                                 g_speed = 60.00/(2.00*3.1416);
 
                                 speed_integral=0.00;
-                                for(int i=1; i<=4000; i++) speed_integral += (steady_state_value-actual_velocity[i]);
+                                for(int i=1; i<=4000; i++) speed_integral += (steady_state_value-velocity_auto_tune.actual_velocity[i]);
                                 speed_integral *= (POSITION_CONTROL_LOOP_PERIOD/1000000.00);
                                 speed_integral /= g_speed;
 
@@ -337,7 +343,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                             }
                         }
-                        else if (velocity_auto_tuner_counter<=(4000*2))
+                        else if (velocity_auto_tune.counter<=(4000*2))
                         {
                             velocity_ref_in_k = 0;
                             torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
@@ -346,8 +352,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                         else
                         {
                             motion_ctrl_config.enable_velocity_auto_tuner = 0;
-                            velocity_auto_tuner_counter=0;
-                            for(int i=0; i<=4005; i++) actual_velocity[i] = 0.00;
+                            velocity_auto_tune.counter=0;
+                            for(int i=0; i<=4005; i++) velocity_auto_tune.actual_velocity[i] = 0.00;
 
                             torque_enable_flag   =0;
                             velocity_enable_flag =0;
