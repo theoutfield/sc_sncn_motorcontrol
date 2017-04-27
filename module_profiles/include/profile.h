@@ -107,13 +107,13 @@ extern int position_profile_generate(int step);
 /**
  * @brief Initialize Quick Stop Position Profile
  *
- * @param actual_velocity
- * @param actual_position
- * @param max_deceleration defines the deceleration for quick stop profile
+ * @param actual_velocity in ticks/s
+ * @param actual_position int ticks
+ * @param quick_stop_deceleration defines the deceleration for quick stop profile in ticks.s^-2
  *
  * @return no. of steps for quick stop profile : range [1 - steps]
  */
-extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int deceleration) ;
+extern int init_quick_stop_position_profile(int actual_velocity, int actual_position, int quick_stop_deceleration);
 
 /**
  * @brief Generate Quick Stop Position Profile

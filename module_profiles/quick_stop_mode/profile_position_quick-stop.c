@@ -24,18 +24,18 @@ struct {
 
 
 
-int init_quick_stop_position_profile(int actual_velocity, int actual_position, int deceleration)  //emergency stop
+int init_quick_stop_position_profile(int actual_velocity, int actual_position, int quick_stop_deceleration)  //emergency stop
 {
     pos_param_s.qi = 0;
-    pos_param_s.qf = (float) actual_velocity;   //always positive -ticks/s
+    pos_param_s.qf = (float) actual_velocity;   //in ticks/s
 
     if(pos_param_s.qf < 0) {
         pos_param_s.qf = 0 - pos_param_s.qf;
     }
 
-    pos_param_s.acc = deceleration;
+    pos_param_s.acc = quick_stop_deceleration; //in ticks.s^-2
 
-    pos_param_s.cur_pos_s = (float) actual_position; //ticks
+    pos_param_s.cur_pos_s = (float) actual_position; //in ticks
 
     pos_param_s.tb = pos_param_s.qf / pos_param_s.acc;
 
