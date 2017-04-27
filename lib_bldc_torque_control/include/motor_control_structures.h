@@ -52,6 +52,15 @@ typedef enum {
 } SensorError;
 
 /**
+ * @brief Type for Motion control Error
+ *
+ */
+typedef enum {
+    MOTION_CONTROL_NO_ERROR=0,
+    MOTION_CONTROL_BRAKE_NOT_RELEASED=1
+} MotionControlError;
+
+/**
  * @brief Type for motors.
  */
 typedef enum {
@@ -203,6 +212,8 @@ typedef struct
     SensorError  secondary_sensor_error;
     SensorError  secondary_last_sensor_error;
     unsigned int secondary_sensor_timestamp;
+
+    MotionControlError motion_control_error;
 
     int temperature;
 
