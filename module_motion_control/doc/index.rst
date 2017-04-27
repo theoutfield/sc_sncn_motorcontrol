@@ -15,7 +15,7 @@ therefore they must be instantiated in a different tile from the remaining Motor
 
 .. cssclass:: github
 
-  `See Module on Public Repository (Develop) <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_motion_control>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_motion_control>`_
 
 How to use Motion Control Service
 =================================
@@ -28,11 +28,11 @@ How to use Motion Control Service
     
     * :ref:`BLDC Motion Control Demo <app_demo_bldc_motion_control>`
 
-1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
 
     ::
 
-        USED_MODULES = module_ctrl_loops module_motorcontrol module_pwm_symmetrical module_adc module_hall module_misc module_profile module_qei module_gpio module_watchdog module_board-support
+        USED_MODULES = module_controllers lib_bldc_torque_control module_pwm module_adc module_hall_sensor module_utils module_profiles module_incremental_encoder module_gpio module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
               This will help solving internal dependency issues.

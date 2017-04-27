@@ -1,8 +1,8 @@
 .. _module_pwm:
 
-=====================
+==========
 PWM Module
-=====================
+==========
 
 .. contents:: In this document
     :backlinks: none
@@ -29,11 +29,11 @@ How to use
 
 .. seealso:: You might find useful the :ref:`SOMANET General PWM Demo <app_demo_general_pwm>` app, which illustrates the use of some parts of this module. 
 
-1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
+1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
 
     ::
 
-        USED_MODULES = module_advanced_torquecontrol_lib module_board-support module_misc module_pwm module_watchdog
+        USED_MODULES = lib_bldc_torque_control module_board-support module_utils module_pwm module_watchdog
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules.
           This will help solving internal dependency issues.

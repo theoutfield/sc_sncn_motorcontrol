@@ -13,7 +13,7 @@ TARGET =
 APP_NAME = app_demo_torque_control
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor lib_bldc_torque_control module_adc module_biss module_board-support module_controllers module_filters module_hall module_misc module_motion_control module_position_feedback module_profile module_pwm module_qei module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_spi_master module_watchdog
+USED_MODULES = configuration_parameters lib_bldc_torque_control module_adc module_biss_encoder module_board-support module_controllers module_encoder_rem_14 module_encoder_rem_16mt module_filters module_hall_sensor module_incremental_encoder module_motion_control module_position_feedback module_profiles module_pwm module_serial_encoder module_shared_memory module_spi_master module_utils module_watchdog
 
 
 # The flags passed to xcc when building the application

@@ -14,7 +14,7 @@ TARGET =
 APP_NAME = app_demo_general_pwm
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor lib_bldc_torque_control module_board-support module_misc module_pwm module_watchdog
+USED_MODULES = configuration_parameters lib_bldc_torque_control module_board-support module_pwm module_utils module_watchdog
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
