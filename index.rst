@@ -18,11 +18,11 @@ The library offers the following functionalities:
 
 .. cssclass:: downloadable-button 
 
-  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/release.zip>`_
+  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/master.zip>`_
 
 .. cssclass:: github
 
-  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release>`_
+  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master>`_
 
 .. _motion_control_hw_compatibility:
 
