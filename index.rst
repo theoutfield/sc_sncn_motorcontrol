@@ -73,6 +73,7 @@ Modules
 	Controllers Implementation Module <module_controllers/doc/index>
 	Profile Module <module_profiles/doc/index>
 	Motion Control Module <module_motion_control/doc/index>
+	Shared Memory Module <module_shared_memory/doc/index>
 	
 
 This is the complete list of modules currently included in the **SOMANET Motion Control Library**:
@@ -94,6 +95,7 @@ This is the complete list of modules currently included in the **SOMANET Motion 
 * `Controllers Implementation Module <module_controllers/doc/index.html>`_: Contains PID and NL controllers implementations. 
 * `Profile Module <module_profiles/doc/index.html>`_: Contains software for profile ramps generation.
 * `Motion Control Module <module_motion_control/doc/index.html>`_: Provides service for position and velocity control.
+* `Shared Memory Module <module_shared_memory/doc/index.html>`_: Enables asynchronous data access among tasks
 
 Examples
 --------
