@@ -11,7 +11,7 @@ TARGET =
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_bldc_control_tuning
+APP_NAME = app_control_tuning
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = configuration_parameters lib_bldc_torque_control module_adc module_biss_encoder module_board-support module_controllers module_encoder_rem_14 module_encoder_rem_16mt module_filters module_hall_sensor module_incremental_encoder module_motion_control module_position_feedback module_profiles module_pwm module_serial_encoder module_shared_memory module_spi_master module_utils module_watchdog
