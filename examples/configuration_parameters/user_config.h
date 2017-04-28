@@ -79,8 +79,9 @@
 //////////////////////////////////////////////
 //////  IFM TILE FREQ CONFIGURATION
 //////////////////////////////////////////////
-
-#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile. Warning!!! This parameter alters PWM switching frequency
+// Warning!!! This parameter alters PWM switching frequency.
+// Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
+#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile.
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
