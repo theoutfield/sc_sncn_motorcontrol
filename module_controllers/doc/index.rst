@@ -274,8 +274,9 @@ The functions provided by module_controllers are used inside motion_control_serv
 
 5. The proper torque reference is calculated by calling the pid_update function. After this step the calculated value of reference torque can be sent to torque control service.
 
-This procedure can be similarly used to control the position of electric motor
+This procedure can be similarly used to control the position of electric motor.
 
+ 
     .. code-block:: c
 
     PIDparam velocity_control_pid_param; // step 1
@@ -288,10 +289,10 @@ This procedure can be similarly used to control the position of electric motor
             POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 3
 
 
-                velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
-                velocity_k        = ((double) upstream_control_data.velocity); // step 4
+    velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
+    velocity_k        = ((double) upstream_control_data.velocity); // step 4
 
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 5
+    torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 5
 
 
 API
