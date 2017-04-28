@@ -8,7 +8,7 @@ Profiles Module
     :backlinks: none
     :depth: 3
 
-This module contains utilities to generate Torque/Velocity/Position ramps to smooth the variation rate of their corresponding reference signals, and ensure a smooth transition between set points on a control loop. 
+This module contains utilities to generate Torque/Velocity/Position ramps to smooth the variation rate of their corresponding reference signals, and to ensure a smooth transition between set points on a control loop. 
 In some cases, where 2 set points are not close enough, it is mandatory the use a profiled reference signal to avoid mechanical stresses.
 
 .. cssclass:: github
@@ -22,9 +22,9 @@ How to use
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
 .. seealso:: 
-    You might find useful the **app_demo_motion_control** example apps, which illustrate the use of module_controllers: 
+    You might find useful the **app_demo_motion_control** example apps, which illustrate the use of module_profiles: 
     
-    * :ref:`BLDC Motion Control Demo <app_demo_bldc_motion_control>`
+    * :ref:`BLDC Motion Control Demo <app_demo_motion_control>`
 
 1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
 
@@ -43,7 +43,7 @@ How to use
 
 5. Outside your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
 
-6. Now you can perform calls to the Motion Control Service (which uses the functions of module_controllers) through the interfaces connected to it. You can do this at whichever other core. 
+6. Now you can perform calls to the Motion Control Service (which uses the functions of module_profiles) through the interfaces connected to it. You can do this at whichever other core. 
 
     .. code-block:: c
 
@@ -262,36 +262,43 @@ How to use
     return 0;
 }
 
-The functions provided by module_controllers are used inside motion_control_service. As an example, here we explain the algorithm of velocity control inside motion_control_service step by step.
+The functions provided by module_profiles are used inside motion_control_service. As an example, here we explain the use of this module to smooth out the transition rate of velocity reference signal.
 
-1. The required structure which contains the controller parameters are defined at the beginning of motion_control_service.
+1. The required ProfilerParam structure which contains the profiler parameters are defined at the beginning of motion_control_service.
 
-2. The PID controller is initialized by calling pid_init function
+2. Different members of defined structure are initialized. This includes the speed of your control loop, maximum velocity, maximum acceleration, maximum deceleration, maximum torque rate and (in case it is applicable) the resolution of your position sensor 
 
-3. The PID controller parameters are set. This includes PID constants, the integral limit of PID controller, and the controlling loop period.
+3. Reference and real values of Velocity are updated inside the main loop
 
-4. Reference and real values of Velocity are updated inside the main loop
-
-5. The proper torque reference is calculated by calling the pid_update function. After this step the calculated value of reference torque can be sent to torque control service.
+4. The smoothed value of reference velocity is calculated by calling the function velocity_profiler. This smoothed value of reference signal will be used inside the controller function as the new reference value.
 
 This procedure can be similarly used to control the position of electric motor
 
     .. code-block:: c
 
-    PIDparam velocity_control_pid_param; // step 1
+    ProfilerParam profiler_param; // step 1
 
-    pid_init(velocity_control_pid_param);// step 2
+    // step 2
+    profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
+    profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
+    profiler_param.acceleration_max = (double)(motion_ctrl_config.max_acceleration_profiler);
+    profiler_param.deceleration_max = (double)(motion_ctrl_config.max_deceleration_profiler);
+    profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
+    profiler_param.resolution = (double)(motion_ctrl_config.resolution);
 
-    pid_set_parameters(
-            (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
-            (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
-            POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 3
 
+    // step 3
+    velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
+    velocity_k        = ((double) upstream_control_data.velocity);
 
-                velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
-                velocity_k        = ((double) upstream_control_data.velocity); // step 4
+    // step 4
+    if(motion_ctrl_config.enable_profiler==1)
+    {
+        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
+        velocity_ref_in_k_1n = velocity_ref_in_k;
+        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+    }
 
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 5
 
 
 API
