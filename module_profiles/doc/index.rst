@@ -277,36 +277,28 @@ This procedure can be similarly used to control the position of electric motor
 
     .. code-block:: c
 
-     // step 1
-
-    ProfilerParam profiler_param;
-
-
-     // step 2
-
-    profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
-    profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
-    profiler_param.acceleration_max = (double)(motion_ctrl_config.max_acceleration_profiler);
-    profiler_param.deceleration_max = (double)(motion_ctrl_config.max_deceleration_profiler);
-    profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
-    profiler_param.resolution = (double)(motion_ctrl_config.resolution);
-
-
-     // step 3
-
-    velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
-    velocity_k        = ((double) upstream_control_data.velocity);
-
-
-     // step 4
-
-    if(motion_ctrl_config.enable_profiler==1)
-    {
-        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
-        velocity_ref_in_k_1n = velocity_ref_in_k;
-        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-    } 
-
+		// step 1
+	    ProfilerParam profiler_param;
+	
+		// step 2
+	    profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
+	    profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
+	    profiler_param.acceleration_max = (double)(motion_ctrl_config.max_acceleration_profiler);
+	    profiler_param.deceleration_max = (double)(motion_ctrl_config.max_deceleration_profiler);
+	    profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
+	    profiler_param.resolution = (double)(motion_ctrl_config.resolution);
+	
+		// step 3
+	    velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
+	    velocity_k        = ((double) upstream_control_data.velocity);
+	
+		// step 4
+	    if(motion_ctrl_config.enable_profiler==1)
+	    {
+	        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
+	        velocity_ref_in_k_1n = velocity_ref_in_k;
+	        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+	    } 
 
 
 API
