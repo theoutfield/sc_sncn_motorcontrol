@@ -190,6 +190,9 @@ interface ADCInterface
 };
 
 
+/**
+ * @brief Interface exchange data between tasks OF THE SAME TILE without blocking tasks execution.
+ */
 interface shared_memory_interface
 {
     /**
