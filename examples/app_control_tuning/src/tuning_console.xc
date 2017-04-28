@@ -8,54 +8,37 @@
 #include <stdio.h>
 #include <ctype.h>
 
-int auto_offset(interface TorqueControlInterface client i_torque_control)
-{
-    printf("Sending offset_detection command ...\n");
-    i_torque_control.set_offset_detection_enabled();
-
-    while(i_torque_control.get_offset()==-1) delay_milliseconds(50);//wait until offset is detected
-
-    int offset=i_torque_control.get_offset();
-    printf("Detected offset is: %i\n", offset);
-    //    printf(">>  CHECK PROPER OFFSET POLARITY ...\n");
-    int proper_sensor_polarity=i_torque_control.get_sensor_polarity_state();
-    if(proper_sensor_polarity == 1) {
-        printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-    } else {
-        printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-    }
-    return offset;
-}
-
 
 void control_tuning_console(client interface MotionControlInterface i_motion_control)
 {
-    delay_milliseconds(500);
-    printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
+    DownstreamControlData downstream_control_data = {0};
 
-    DownstreamControlData downstream_control_data;
-    MotionControlConfig motion_ctrl_config;
+    MotionControlConfig motion_ctrl_config = i_motion_control.get_motion_control_config();
+    MotorcontrolConfig motorcontrol_config = i_motion_control.get_motorcontrol_config();
 
-    MotorcontrolConfig motorcontrol_config;
-    int proper_sensor_polarity=0;
-    int offset=0;
-
-    int velocity_running = 0;
-    int velocity = 0;
-
-    int torque = 0;
     int brake_flag = 0;
-    int period_us;     // torque generation period in micro-seconds
-    int pulse_counter; // number of generated pulses
-    int torque_control_flag = 0;
+
+    /* read tile frequency
+     * this needs to be after the first call to i_torque_control
+     * so when we read it the frequency has already been changed by the torque controller
+     */
+    unsigned int tile_usec = USEC_STD;
+    unsigned ctrlReadData;
+    read_sswitch_reg(get_local_tile_id(), 8, ctrlReadData);
+    if(ctrlReadData == 1) {
+        tile_usec = USEC_FAST;
+    }
+
+    delay_ticks(100*1000*tile_usec);
+    printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
     fflush(stdout);
     //read and adjust the offset.
     while (1)
     {
-        char mode = '@';
-        char mode_2 = '@';
-        char mode_3 = '@';
+        char mode_1 = 0;
+        char mode_2 = 0;
+        char mode_3 = 0;
         char c;
         int value = 0;
         int sign = 1;
@@ -73,11 +56,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
             }
             else if (c != ' ')
             {
-                if (mode == '@')
+                if (mode_1 == 0)
                 {
-                    mode = c;
+                    mode_1 = c;
                 }
-                else if (mode_2 == '@')
+                else if (mode_2 == 0)
                 {
                     mode_2 = c;
                 }
@@ -89,7 +72,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         }
         value *= sign;
 
-        switch(mode)
+        switch(mode_1)
         {
         //position commands
         case 'p':
@@ -125,10 +108,10 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.position_cmd = value;
                         i_motion_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(1500);
+                        delay_ticks(1500*1000*tile_usec);
                         downstream_control_data.position_cmd = -value;
                         i_motion_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(1500);
+                        delay_ticks(1500*1000*tile_usec);
                         downstream_control_data.position_cmd = 0;
                         i_motion_control.update_control_data(downstream_control_data);
                         break;
@@ -168,29 +151,24 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         }
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         i_motion_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(1000);
+                        delay_ticks(1000*1000*tile_usec);
                         downstream_control_data.velocity_cmd = -value;
                         i_motion_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(1000);
+                        delay_ticks(1000*1000*tile_usec);
                         downstream_control_data.velocity_cmd = 0;
                         i_motion_control.update_control_data(downstream_control_data);
                         break;
                 //direct command
                 default:
-                        if(value==0)
-                            velocity_running = 0;
-                        else
-                            velocity_running = 1;
                         downstream_control_data.offset_torque = 0;
-                        velocity = value;
-                        downstream_control_data.velocity_cmd = velocity;
+                        downstream_control_data.velocity_cmd = value;
                         i_motion_control.update_control_data(downstream_control_data);
                         printf("set velocity %d\n", downstream_control_data.velocity_cmd);
                         break;
                 }
                 break;
 
-        //enable and disable torque controller
+        //set torque commmand
         case 't':
                 downstream_control_data.offset_torque = 0;
                 downstream_control_data.torque_cmd = value;
@@ -221,10 +199,10 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         }
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         i_motion_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(1000);
+                        delay_ticks(1000*1000*tile_usec);
                         downstream_control_data.torque_cmd = -value;
                         i_motion_control.update_control_data(downstream_control_data);
-                        delay_milliseconds(1000);
+                        delay_ticks(1000*1000*tile_usec);
                         downstream_control_data.torque_cmd = 0;
                         i_motion_control.update_control_data(downstream_control_data);
                         break;
@@ -248,11 +226,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 }
                 break;
 
-        //reverse torque
+        //reverse torque or velocity command
         case 'r':
                 downstream_control_data.torque_cmd = -downstream_control_data.torque_cmd;
+                downstream_control_data.velocity_cmd = -downstream_control_data.velocity_cmd;
                 i_motion_control.update_control_data(downstream_control_data);
-                printf("torque command %d milli-Nm\n", downstream_control_data.torque_cmd);
                 break;
 
         //pid coefficients
@@ -350,6 +328,10 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 //max torque limit
                 case 't':
                         motion_ctrl_config.max_torque = value;
+                        motorcontrol_config = i_motion_control.get_motorcontrol_config();
+                        motorcontrol_config.max_torque = value;
+                        i_motion_control.set_motorcontrol_config(motorcontrol_config);
+                        brake_flag = 0;
                         break;
 
                 default:
@@ -399,6 +381,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         else
                         {
                             i_motion_control.disable();
+                            brake_flag = 0;
                             printf("position ctrl disabled\n");
                         }
                         break;
@@ -411,20 +394,20 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         else
                         {
                             i_motion_control.disable();
+                            brake_flag = 0;
                             printf("velocity ctrl disabled\n");
                         }
                         break;
                 case 't':
                         if (value == 1)
                         {
-                            torque_control_flag = 1;
                             i_motion_control.enable_torque_ctrl();
                             printf("torque ctrl enabled\n");
                         }
                         else
                         {
-                            torque_control_flag = 0;
                             i_motion_control.disable();
+                            brake_flag = 0;
                             printf("torque ctrl disabled\n");
                         }
                         break;
@@ -439,6 +422,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 break;
         //help
         case 'h':
+                printf("a->start auto offset tuning\n");
                 printf("p->set position\n");
                 printf("v->set veloctiy\n");
                 printf("k->set PIDs\n");
@@ -497,6 +481,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         }
                     }
                 }
+                brake_flag = 0;
                 break;
 
         //set brake
@@ -510,6 +495,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
 
                 case 'v'://brake voltage configure
+                        brake_flag = 0;
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
                         switch(mode_3)
                         {
@@ -556,6 +542,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
                         i_motion_control.update_brake_configuration();
                         printf("brake pull time is %d milli-seconds \n", motion_ctrl_config.pull_brake_time);
+                        brake_flag = 0;
                         break;
 
                 default:
@@ -584,10 +571,18 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                     motorcontrol_config.commutation_angle_offset = value;
                     i_motion_control.set_motorcontrol_config(motorcontrol_config);
                     printf("set offset to %d\n", motorcontrol_config.commutation_angle_offset);
+                    brake_flag = 0;
+                    break;
+                //set percent offset torque
+                case 'p':
+                    motorcontrol_config.percent_offset_torque = value;
+                    i_motion_control.set_motorcontrol_config(motorcontrol_config);
+                    printf("set offset detection torque percentage to %d\n", motorcontrol_config.percent_offset_torque);
+                    brake_flag = 0;
                     break;
                 //print offset
-                case 'p':
-                    printf("offset %d\n", motorcontrol_config.commutation_angle_offset);
+                default:
+                    printf("offset %d (set with 'os' command)\n", motorcontrol_config.commutation_angle_offset);
                     break;
                 }
                 break;
@@ -614,7 +609,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 i_motion_control.reset_motorcontrol_faults();
 
                 //check if reset worked
-                delay_milliseconds(500);
+                delay_ticks(500*1000*tile_usec);
                 upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
                 if(upstream_control_data.error_status == NO_FAULT)
                 {
@@ -628,10 +623,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         //disable controllers
         default:
                 i_motion_control.disable();
+                brake_flag = 0;
                 printf("controller disabled\n");
                 break;
 
         }
-        delay_milliseconds(10);
+        delay_ticks(10*1000*tile_usec);
     }
 }
