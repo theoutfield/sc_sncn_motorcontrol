@@ -308,17 +308,13 @@ API
 Global Types
 ------------
 
-.. doxygenstruct:: PIDparam
-.. doxygenstruct:: NonlinearPositionControl
+.. doxygenstruct:: ProfilerParam
 
-Module Controllers
+Module Profiles
 ``````````````````
 
-.. doxygenfunction:: pid_init
-.. doxygenfunction:: pid_set_parameters
-.. doxygenfunction:: pid_update
-.. doxygenfunction:: pid_reset
-.. doxygenfunction:: nl_position_control_reset
-.. doxygenfunction:: nl_position_control_set_parameters
-.. doxygenfunction:: update_nl_position_control
+.. doxygenfunction:: init_position_profiler
+.. doxygenfunction:: torque_profiler
+.. doxygenfunction:: velocity_profiler
+.. doxygenfunction:: pos_profiler
 
