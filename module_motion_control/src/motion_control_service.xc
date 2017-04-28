@@ -139,6 +139,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     velocity_auto_tune.counter=0;
     velocity_auto_tune.array_length=4000;
     for(int i=1; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i]=0;
+    velocity_auto_tune.velocity_ref = 1000;
 
     double zeta_auto_tune = 0.70;
     double st_auto_tune   = 2.00;
@@ -295,36 +296,40 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                         if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
                         {
-                            velocity_ref_in_k = 1000;
-                            velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = ((unsigned char)(velocity_k));
-                            xscope_int(ACTUAL_VELOCITY_ARRAY, ((int)( velocity_auto_tune.actual_velocity[velocity_auto_tune.counter])));
+                            velocity_ref_in_k = velocity_auto_tune.velocity_ref;
+
+                            //fix me: check if the measured velocity is positive, if not, do not save it!
+                            velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = ((int)(velocity_k));
+
+                            xscope_int(ACTUAL_VELOCITY_ARRAY, velocity_auto_tune.actual_velocity[velocity_auto_tune.counter]);
 
                             torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
                             if(velocity_auto_tune.counter==velocity_auto_tune.array_length)
                             {
-                                velocity_ref_in_k = 1000;//FIX ME: this line can be removed in future cleanups
                                 steady_state_value = 0;
                                 for(int i=(velocity_auto_tune.array_length-200); i<=velocity_auto_tune.array_length; i++)
                                     steady_state_value +=  ((double)velocity_auto_tune.actual_velocity[i]);
                                 steady_state_value = steady_state_value/200.00;
 
-                                k = (steady_state_value / 1000);
+                                k = (steady_state_value / velocity_auto_tune.velocity_ref);
 
                                 g_speed = 60.00/(2.00*3.1416);
 
                                 speed_integral=0.00;
-                                for(int i=1; i<=4000; i++) speed_integral += (steady_state_value-((double)(velocity_auto_tune.actual_velocity[i])));
+                                for(int i=1; i<=velocity_auto_tune.array_length; i++)
+                                    speed_integral += (steady_state_value-((double)(velocity_auto_tune.actual_velocity[i])));
+
                                 speed_integral *= (POSITION_CONTROL_LOOP_PERIOD/1000000.00);
                                 speed_integral /= g_speed;
 
                                 j = (speed_integral*0.001);
                                 j/= (steady_state_value/g_speed);
                                 j/= (steady_state_value/g_speed);
-                                j*= (velocity_ref_in_k);
+                                j*= (velocity_auto_tune.velocity_ref);
 
 
-                                f = (velocity_ref_in_k*0.001);
+                                f = (velocity_auto_tune.velocity_ref*0.001);
                                 f/= (steady_state_value/g_speed);
                                 f-= (0.001*g_speed);
 
@@ -344,7 +349,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                             }
                         }
-                        else if (velocity_auto_tune.counter<=(4000*2))
+                        else if (velocity_auto_tune.counter<=(velocity_auto_tune.array_length*2))
                         {
                             velocity_ref_in_k = 0;
                             torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
