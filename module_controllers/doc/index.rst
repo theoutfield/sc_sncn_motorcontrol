@@ -279,6 +279,8 @@ This procedure can be similarly used to control the position of electric motor.
  
     .. code-block:: c
 
+{
+
     PIDparam velocity_control_pid_param; // step 1
 
     pid_init(velocity_control_pid_param);// step 2
@@ -293,6 +295,8 @@ This procedure can be similarly used to control the position of electric motor.
     velocity_k        = ((double) upstream_control_data.velocity); // step 4
 
     torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 5
+
+}
 
 
 API
