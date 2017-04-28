@@ -17,7 +17,7 @@ your SOMANET IFM device.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_rem_14>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_rem_14>`_
 
 
 How to use

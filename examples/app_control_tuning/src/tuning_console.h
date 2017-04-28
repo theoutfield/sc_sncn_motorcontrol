@@ -12,15 +12,14 @@
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
 #include <refclk.h>
-#include <adc_service.h>
 #include <motion_control_service.h>
 
-#include <xscope.h>
-#include <mc_internal_constants.h>
 
-interface PositionLimiterInterface {
-    void set_limit(int limit);
-    int get_limit();
-};
 
+/**
+ * @brief Console app to tune the motor/motion control
+ *
+ * @param i_motion_control client interface to the motion control service
+ *
+ */
 void control_tuning_console(client interface MotionControlInterface i_motion_control);
