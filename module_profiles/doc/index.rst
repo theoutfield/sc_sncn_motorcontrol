@@ -9,7 +9,7 @@ Profiles Module
     :depth: 3
 
 This module contains utilities to generate Torque/Velocity/Position ramps to smooth the variation rate of their corresponding reference signals, and to ensure a smooth transition between set points on a control loop. 
-In some cases, where 2 set points are not close enough, it is mandatory the use a profiled reference signal to avoid mechanical stresses.
+In some cases, where two set points are not close enough, it is mandatory to use a profiled reference signal to avoid mechanical stresses.
 
 .. cssclass:: github
 
@@ -266,6 +266,7 @@ The functions provided by module_profiles are used inside motion_control_service
 
 1. The required ProfilerParam structure which contains the profiler parameters are defined at the beginning of motion_control_service.
 
+
 2. Different members of defined structure are initialized. This includes the speed of your control loop, maximum velocity, maximum acceleration, maximum deceleration, maximum torque rate and (in case it is applicable) the resolution of your position sensor 
 
 3. Reference and real values of Velocity are updated inside the main loop
@@ -278,26 +279,27 @@ This procedure can be similarly used to control the position of electric motor
 
     ProfilerParam profiler_param; // step 1
 
-    // step 2
+    
+
     profiler_param.delta_T = ((double)POSITION_CONTROL_LOOP_PERIOD)/1000000.00;
     profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
     profiler_param.acceleration_max = (double)(motion_ctrl_config.max_acceleration_profiler);
     profiler_param.deceleration_max = (double)(motion_ctrl_config.max_deceleration_profiler);
     profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
-    profiler_param.resolution = (double)(motion_ctrl_config.resolution);
+    profiler_param.resolution = (double)(motion_ctrl_config.resolution);// step 2
 
 
-    // step 3
+    
     velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
-    velocity_k        = ((double) upstream_control_data.velocity);
+    velocity_k        = ((double) upstream_control_data.velocity);      // step 3
 
-    // step 4
+    
     if(motion_ctrl_config.enable_profiler==1)
     {
         velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
         velocity_ref_in_k_1n = velocity_ref_in_k;
         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-    }
+    }                                                                   // step 4
 
 
 
