@@ -137,8 +137,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
     //autotune initialization
     velocity_auto_tune.counter=0;
-    velocity_auto_tune.array_length=1000;
-    for(int i=0; i<=1000; i++) velocity_auto_tune.actual_velocity[i]=0;
+    velocity_auto_tune.array_length=4000;
+    for(int i=1; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i]=0;
 
     double zeta_auto_tune = 0.70;
     double st_auto_tune   = 2.00;
@@ -296,16 +296,17 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                         if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
                         {
                             velocity_ref_in_k = 1000;
-                            velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = velocity_k;
+                            velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = ((unsigned char)(velocity_k));
+                            xscope_int(ACTUAL_VELOCITY_ARRAY, ((int)( velocity_auto_tune.actual_velocity[velocity_auto_tune.counter])));
 
                             torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
                             if(velocity_auto_tune.counter==velocity_auto_tune.array_length)
                             {
-                                velocity_ref_in_k = 1000;
+                                velocity_ref_in_k = 1000;//FIX ME: this line can be removed in future cleanups
                                 steady_state_value = 0;
                                 for(int i=(velocity_auto_tune.array_length-200); i<=velocity_auto_tune.array_length; i++)
-                                    steady_state_value +=  velocity_auto_tune.actual_velocity[i];
+                                    steady_state_value +=  ((double)velocity_auto_tune.actual_velocity[i]);
                                 steady_state_value = steady_state_value/200.00;
 
                                 k = (steady_state_value / 1000);
@@ -313,7 +314,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                                 g_speed = 60.00/(2.00*3.1416);
 
                                 speed_integral=0.00;
-                                for(int i=1; i<=4000; i++) speed_integral += (steady_state_value-velocity_auto_tune.actual_velocity[i]);
+                                for(int i=1; i<=4000; i++) speed_integral += (steady_state_value-((double)(velocity_auto_tune.actual_velocity[i])));
                                 speed_integral *= (POSITION_CONTROL_LOOP_PERIOD/1000000.00);
                                 speed_integral /= g_speed;
 
@@ -353,7 +354,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                         {
                             motion_ctrl_config.enable_velocity_auto_tuner = 0;
                             velocity_auto_tune.counter=0;
-                            for(int i=0; i<=4005; i++) velocity_auto_tune.actual_velocity[i] = 0.00;
+                            for(int i=0; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i] = 0;
 
                             torque_enable_flag   =0;
                             velocity_enable_flag =0;
