@@ -139,7 +139,11 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     velocity_auto_tune.counter=0;
     velocity_auto_tune.array_length=4000;
     for(int i=1; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i]=0;
+    velocity_auto_tune.j = 0.00;
+    velocity_auto_tune.f = 0.00;
+
     velocity_auto_tune.velocity_ref = 1000;
+
 
     double zeta_auto_tune = 0.70;
     double st_auto_tune   = 2.00;
@@ -150,13 +154,11 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     double g_speed = 0.00;
     double speed_integral = 0.00;
     double t_auto_tune = 0.00;
-    double f = 0.00;
-    double j = 0.00;
+
 
     downstream_control_data.velocity_cmd = 0;
     motion_ctrl_config.enable_velocity_auto_tuner == 0;
 
-    printf("f:%d j:%d \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
 
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
@@ -323,23 +325,23 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                                 speed_integral *= (POSITION_CONTROL_LOOP_PERIOD/1000000.00);
                                 speed_integral /= g_speed;
 
-                                j = (speed_integral*0.001);
-                                j/= (steady_state_value/g_speed);
-                                j/= (steady_state_value/g_speed);
-                                j*= (velocity_auto_tune.velocity_ref);
+                                velocity_auto_tune.j = (speed_integral*0.001);
+                                velocity_auto_tune.j/= (steady_state_value/g_speed);
+                                velocity_auto_tune.j/= (steady_state_value/g_speed);
+                                velocity_auto_tune.j*= (velocity_auto_tune.velocity_ref);
 
 
-                                f = (velocity_auto_tune.velocity_ref*0.001);
-                                f/= (steady_state_value/g_speed);
-                                f-= (0.001*g_speed);
+                                velocity_auto_tune.f = (velocity_auto_tune.velocity_ref*0.001);
+                                velocity_auto_tune.f/= (steady_state_value/g_speed);
+                                velocity_auto_tune.f-= (0.001*g_speed);
 
-                                printf("f:%i j:%i \n",  ((int)(f*1000000.00)), ((int)(j*1000000.00)));
+                                printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
 
                                 wn_auto_tune = 4.00 / (zeta_auto_tune * st_auto_tune);
                                 kp_auto_tune = 1.00/(0.001*g_speed);
-                                kp_auto_tune*= ((2.00 * zeta_auto_tune * wn_auto_tune*j)-f);
+                                kp_auto_tune*= ((2.00 * zeta_auto_tune * wn_auto_tune*velocity_auto_tune.j)-velocity_auto_tune.f);
 
-                                ki_auto_tune = (wn_auto_tune*wn_auto_tune*j);
+                                ki_auto_tune = (wn_auto_tune*wn_auto_tune*velocity_auto_tune.j);
                                 ki_auto_tune/= (0.001*g_speed);
 
                                 kp_auto_tune *= 1000000.00;
