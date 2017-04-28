@@ -8,10 +8,11 @@ Commutation angle offset and PID gains tuning helper
     :backlinks: none
     :depth: 3
 
-It is common that sensors used for position feedback are not perfectly placed physically along the windings. This strongly affects the commutation efficiency of your motor. In order to avoid such loss of efficiency we can configure at the *Position Sensor Service* the sensor offset and at the :ref:`Motor Control Service <module_motorcontrol>` the commutation offsets to compensate the error on clock-wise and counter-clock-wise spin. The purpose of this app (app_demo_offset_commutation_tuning) is helping you to find such offsets.
+The purpose of this application is finding the commutation angle offset to be able to turn the motor, and the the PID setting for position and velocity controllers.
 
-The motor will commutate at a certain voltage and the current at the phases will be displayed over XScope. At the same time, the user could set different offsets over the console and see the effect of it on the amplitude of the phase currents.
+This is a console app which use simple command of 1, 2 or 3 characters and an optional value.
 
+The app also displays various data in real time with `XScope`
 
 * **Minimum Number of Cores**: 7
 * **Minimum Number of Tiles**: 3
@@ -24,30 +25,83 @@ The motor will commutate at a certain voltage and the current at the phases will
 Console commands
 ================
 
-The app uses commands to set the offsets and voltage over the console:
+The app uses commands up to 3 characters with an optional value. The command are executed by pressing enter. If no value is entered the default is `0`:
 
-- a
-    Automatically find the sensor offset, the clockwise or counterclockwise commutation offsets are set to 0 and 2048 (half a turn). This is not very precise but should suffice to turn the motor.
-- c
-    Automatically tune the commutation offset, this works by searching the offset with minimum peak current consumption.
-- s VALUE
-    Set the sensor offset to VALUE
-- VALUE
-    Set the commutation offset to VALUE (clockwise or counterclockwise offset depending on the voltage sign and winding type)
-- w
-    Reverse motor polarity, use this when the the motor is not moving. It happens when the phases wiring or the position sensor polarity is changed.
-- d
-    Reverse the motor direction. For FOC it is done by changing the winding type. For Sinusoidal commutation it is done by fliping the clockwise and counterclockwise commutation offsets,
-- l VALUE
-    Limit position to VALUE tick around the current position. The voltage will be set to ``0`` when the limit is reached and the motor will only be be able to move in the oposite direction. If VALUE is ``0`` this set the current position as the center position for the limiter. If VALUE is negative the position limiter is disabled.
-- z 
-    Return to the zero position (can be set with the ``l`` command). This will work only if the direction of the motor is right. That means positive voltage corresponds to positive velocity.
-- v VALUE
-    Set the voltage to VALUE, accept negative values
-- r
-    Reverse the voltage
-- p
-    Print the offsets, sensor polarity and voltage
+- ``a``: start the auto offset tuning. It automatically update the offset field display. If the offset detection fails the offset will be -1. If it displays "WRONG POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. After the offset is found you need to make sure that a positive torque command result in a positive velocity/position increment. Otherwise the position and velocity controller will not work.
+- ``kp``: print the position PID parameters
+- ``kpp [number]``: set the P coefficient of the Position controller.
+- ``kpi [number]``: set the I coefficient of the Position controller.
+- ``kpd [number]``: set the D coefficient of the Position controller.
+- ``kpl [number]``: set the Integral part limit the Position controller.
+- ``kpj [number]``: set the Moment of inertia of the Position controller.
+- ``kv``: print the velocity PID parameters
+- ``kvp [number]``: set the P coefficient of the Velocity controller.
+- ``kvi [number]``: set the I coefficient of the Velocity controller.
+- ``kvd [number]``: set the D coefficient of the Velocity controller.
+- ``kpl [number]``: set the Integral part limit the Velocity controller.
+- ``L``: print the limits
+- ``Lp [number]``:  set both the maximum and minimum position limit to [number] and -[number]. The motorcontrol will be automatically disable when the position limit is reached. You can use this feature if your axis has a limited movement. If you are past the limits move the axis manually (use b and tss to unlock the motor) or restart position/velocity/torque controller in the right direction (the position limiter has a threshold to allow to restart if the motor is right after the limit).
+- ``Lpu [number]``: set the maximum position limit.
+- ``Lpl [number]``: set the minimum position limit.
+- ``Lt [number]``: set the torque limit. The unit in in 1/1000 of rated torque. This command stops the motorcontrol.
+- ``Lv [number]``: set the velocity limit. Used in velocity control and in cascaded and non linear position control modes.
+- ``ep1``: enable position control with simple PID controller
+- ``ep2``: enable position control with velocity cascaded controller
+- ``ep3``: enable position control with Non linear controller
+- ``ev1``: enable velocity control 
+- ``et1``: enable torque control 
+- ``p``: set a position command (the position controller need to be started first)
+- ``pp``: set a position command with profiler
+- ``ps``: do a position step command
+- ``psp``: do a position step command with profiler
+- ``v``: set a velocity command (the velocity controller need to be started first)
+- ``vs``: do a velocity step command
+- ``vsp``: do a velocity step command with profiler
+- ``t``: set a torque command (the torque controller need to be started first)
+- ``ts``: do a torque step command
+- ``tp``: set a torque command with profiler
+- ``tsp``: do a torque step command with profiler
+- ``tss``: activate the torque safe mode. in this mode all the phases are disconnected and the motor can turn freely (usefull if you want to turn it by hand).
+- ``r``: reverse the current torque or velocity command
+- ``d``: toggle the motion polarity. It reverse the position/velocity/torque commands and feedback in the motion controller. Which will make you motor turn the other direction.
+- ``j``: print profilers parameters
+- ``ja``: set profiler acceleration
+- ``jd``: set profiler deceleration
+- ``jv``: set profiler speed
+- ``jt``: set profiler maximum torque
+- ``b``: toggle the brake state between blocking and released.
+- ``bs``: set the brake release strategy parameter. 0 is to disable the brake. 1 to enable normal release. and 2 to 100
+- ``bvn``: set the nominal voltage of dc-bus in Volts
+- ``bvp``: set the pull voltage for releasing the brake at startup in millivolts
+- ``bvh``: set the hold voltage for holding the brake after it is pulled in millivolts
+- ``bt``: set the pull time of the brake
+- ``o``: print the commutation offset
+- ``os``: set the commutation offset
+- ``op``: set the offset detection torque percentage. increase it you motor is loaded or has a lot of friction (it will also increase the current consumption).
+- ``f``: reset the motorcontrol fault. If the motor stops because of over/under current. Try adjusting you power supply
+- ``h``: print some help
+- ``[enter]``: disable the motorcontrol (can be use as an emergency stop)
+
+XScope display
+==============
+The data displayed with XScope is:
+
+- Position
+- Velocity
+- Torque
+- secondary position (if you have a second sensor)
+- secondary velocity (if you have a second sensor)
+- position command
+- velocity command
+- torque command
+- fault code: motorcontrol fault code (the value is multiplied by 1000 for better display)
+- sensor error: the sensor error code (the value is multiplied by 100 for better display)
+- V DC: the DC bus voltage
+- I DC DC bus current
+- temperature
+
+
+You can use trigger on position/velocity/torque value and step command to test the reaction of the controller and tune the PID settings.
 
 
 Quick How-to
@@ -60,83 +114,79 @@ Quick How-to
 
 #. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`.
 #. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-#. Edit **user_config.h** in **config_motor** to set the motor parameters. The importants parameters are the number of poles pairs, the winding type, the commutation sensor and the commutation offsets. For the first start leave the offsets to their default values.
+#. Edit **user_config.h** in **configuration_parameters** to set the motor and sensor parameters. The motor parameters are in **motor_config.h** and the sensor parameters in **sensor_config.h**.
+
+  In  **user_config.h** you need to specify the sensors you want to use for commutation and motion control using by setting `SENSOR_x_FUNCTION`. You can use up to 2 sensors.
+
+  For each sensor you need to set:
+
+  - `SENSOR_x_TYPE`
+  - `SENSOR_x_FUNCTION`
+  - `SENSOR_x_RESOLUTION`
+  - `SENSOR_x_VELOCITY_COMPUTE_PERIOD`
+  - `SENSOR_x_POLARITY`
+
+  For exemple here we set the `Sensor 1` as `REM 16MT`. We set the sensor function to both commutation and motion control. We set the resolution. We set the velocity compute period to the default value for this sensor (can be found in **sensor_config.h**). And we set the polarity to normal. We don't need a second sensor so we set the second sensor function to disabled.
 
    .. code-block:: C
+                
+                // SENSOR 1 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
+                #define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
-                #define POLE_PAIRS                11
-                #define BLDC_WINDING_TYPE         STAR_WINDING
-                #define MOTOR_COMMUTATION_SENSOR  AMS_SENSOR
-                #define COMMUTATION_OFFSET_CLK    0
-                #define COMMUTATION_OFFSET_CCLK   2048
+                // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
+                //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
+                //                        SENSOR_FUNCTION_MOTION_CONTROL, SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY
+                //                        SENSOR_FUNCTION_COMMUTATION_ONLY]
+                // Only one sensor can be selected for commutation, motion control or feedback display only
+                #define SENSOR_1_FUNCTION                 SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL
 
-#. Set parameters for your position sensor. The most important parameters are the sensor offset and polarity. For the first start leave the default offset value. The sensor polarity will define the physical direction of your motor. You can use the test app of the position sensor to test which physical direction corresponds to a positive velocity.
+                // RESOLUTION (TICKS PER TURN) OF SENSOR_1
+                #define SENSOR_1_RESOLUTION               REM_16MT_SENSOR_RESOLUTION
 
-   - For AMS sensor edit **ams_service.h** in **module_ams_rotary_sensor**:
+                // VELOCITY COMPUTE PERIOD (ALSO POLLING RATE) OF SENSOR_1 (in microseconds)
+                #define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
 
-     .. code-block:: C
+                // POLARITY OF SENSOR_1 SENSOR [1,-1]
+                #define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
 
-                     #define AMS_OFFSET      0
-                     #define AMS_POLARITY    AMS_POLARITY_NORMAL
+                // SENSOR 2 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
+                #define SENSOR_2_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
-   - For BiSS sensor edit **biss_service.h** in **module_biss**:
+                // FUNCTION OF SENSOR_2 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
+                //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
+                //                        SENSOR_FUNCTION_MOTION_CONTROL, SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY
+                //                        SENSOR_FUNCTION_COMMUTATION_ONLY]
+                // Only one sensor can be selected for commutation, motion control or feedback display only
+                #define SENSOR_2_FUNCTION                 SENSOR_FUNCTION_DISABLED
 
-     .. code-block:: C
+                // RESOLUTION (TICKS PER TURN) OF SENSOR_2
+                #define SENSOR_2_RESOLUTION               HALL_SENSOR_RESOLUTION
 
-                     #define BISS_OFFSET_ELECTRICAL  0
-                     #define BISS_POLARITY           BISS_POLARITY_NORMAL
+                // VELOCITY COMPUTE PERIOD (ALSO POLLING RATE) OF SENSOR_2 (in microseconds)
+                #define SENSOR_2_VELOCITY_COMPUTE_PERIOD  HALL_SENSOR_VELOCITY_COMPUTE_PERIOD
 
-   - For Hall sensor no parameters are needed.
+                // POLARITY OF SENSOR_2 SENSOR [1,-1]
+                #define SENSOR_2_POLARITY                 SENSOR_POLARITY_NORMAL
+
+
 
 #. Open the **main.xc** within  the **app_demo_offset_commutation_tuning**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
 
    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
-#. Set parameters for your :ref:`Motor Control Service <module_motorcontrol>` to use the values previously defined in **user_config.h**. The motor polarity depends on the wiring of the phases and the position sensor polarity.
-
-   .. code-block:: C
-
-                /* Motor Control Service */
-                {
-                    MotorcontrolConfig motorcontrol_config;
-                    motorcontrol_config.motor_type = BLDC_MOTOR;
-                    motorcontrol_config.polarity_type = NORMAL_POLARITY;
-                    motorcontrol_config.commutation_sensor = MOTOR_COMMUTATION_SENSOR;
-                    motorcontrol_config.bldc_winding_type = BLDC_WINDING_TYPE;
-                    motorcontrol_config.hall_offset[0] = COMMUTATION_OFFSET_CLK;
-                    motorcontrol_config.hall_offset[1] = COMMUTATION_OFFSET_CCLK;
-                    motorcontrol_config.commutation_loop_period = COMMUTATION_LOOP_PERIOD;
-
-                    motorcontrol_service(fet_driver_ports, motorcontrol_config,
-                                            c_pwm_ctrl, i_hall[0], null, i_biss[0], i_ams[0], i_watchdog[0], i_motorcontrol);
-                }
-
-#. Define a low voltage value to start with. The value depends on you motor, usually less than 1000. The value can be changed at run time in the app. Remember to use a current limited power supply and always monitor the current consumption.
-
-   .. code-block:: C
-
-                   #define VOLTAGE 1000
 
 #. :ref:`Run the application enabling XScope <running_an_application>`.
 
-#. The app start with ``0`` commutation voltage so the motor will not move and the current consumption should be low. Remember to use a current limited power supply and always monitor the current consumption.
+#. When the app start you can check if the motor control and sensor error are `0` and maybe turn the motor manually to see if the position and velocity feedback are working
 
-   First try to set the offset automatically with the ``a`` command. If the motor is not turning and the current consumption is high try to change the motor polarity with the ``d`` command and repeat the ``a`` command. This will find the sensor offset and set the clockwise or counterclockwise commutation offsets to 0 and 2048 (half a turn) and the motor should start turning.
+   Use the ``a`` command to start the offset detection. This should make the motor turn slowly in both direction for maximum one minute. When it is finished the 
+   offset is printed. If the motor does not move or with difficulty try increasing the offset detection torque with the ``op`` command. If it displays "WRONG 
+   POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. You can try to run the offset 
+   detection several time to see if you get similar result. After the offset is found you need to make sure that a positive torque command result in a positive 
+   velocity/position increment. Otherwise the position and velocity controller will not work. You can tune the offset manually with the ``os`` command.
 
-   With a positive voltage the motor should turn in the direction of positive velocity. If it is not the case you can change the direction by flipping the clockwise and counterclockwise commutation offsets with the ``f`` command.
+   Then you can use the command starting with `k` to tune the position and velocity controllers. There are tutorials on the `documentation <https://doc.synapticon.com/tutorials/index.html>`_
 
-   Fine tune the sensor commutation offset for the current direction. You could use the ``c`` command for auto tuning or the ``VALUE`` command to manually minimize the phases current. The offset is a 12 bit positive value so it wraps around at 4096. It means that if you want an offset of ``-100`` you enter ``3996``.
-
-   Reverse the voltage with the ``r`` command, the motor should turn in the other direction. Fine tune the commutation offset for this direction with the ``c`` (auto tuning) or ``VALUE`` (manual tuning) command.
-
-   You can change the voltage with the ``v VALUE`` command (up to 4000) to test and tune the offsets at a different velocity and obtain finer results.
-
-   You can print all the current offsets with the ``p`` command.
-
-   .. important:: When you have found all the offsets save them in your configuration files for your app:
-
-                  - the motor configuration file **user_config.h**
-                  - the sensor configuration file **ams_service.h** or **biss_service.h**
-                  - the **main.c** of your app (for the motor polarity)
+   .. important:: When you have found the offset and PID parameters save them in your **user_config.h** file for your app
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.

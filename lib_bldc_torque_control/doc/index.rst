@@ -41,7 +41,7 @@ As it is shown in Fig. 1, torque control service is responsible for transferring
 
 .. cssclass:: github
 
-  `See Library on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/lib_bldc_torque_control>`_
+  `See Library on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/lib_bldc_torque_control>`_
 
 
 How to use

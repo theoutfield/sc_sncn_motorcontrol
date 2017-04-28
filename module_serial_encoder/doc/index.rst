@@ -17,7 +17,7 @@ your SOMANET IFM device.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_serial_encoder>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_serial_encoder>`_
 
 .. image:: images/core-diagram-serial-encoder.png
    :width: 50%

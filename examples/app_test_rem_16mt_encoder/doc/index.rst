@@ -45,7 +45,7 @@ The commands are:
 
 .. cssclass:: github
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/examples/app_test_rem_16mt/>`_
+  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_rem_16mt/>`_
 
 Quick How-to
 ============

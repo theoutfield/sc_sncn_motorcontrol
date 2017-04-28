@@ -18,7 +18,7 @@ your SOMANET IFM device.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/module_hall_sensor>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_hall_sensor>`_
 
 .. image:: images/core-diagram-hall-interface.png
    :width: 50%
