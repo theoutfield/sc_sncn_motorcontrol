@@ -77,7 +77,7 @@
 
 
 //////////////////////////////////////////////
-//////  IFM TILE FREQ CONFIGURATION
+//////  IFM TILE/PWM FREQ CONFIGURATION
 //////////////////////////////////////////////
 // Warning!!! This parameter alters PWM switching frequency.
 // Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
@@ -86,7 +86,9 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
-#define DC_BUS_VOLTAGE             20
+#define DC_BUS_VOLTAGE             48 //Warning! This parameter is used as well as a base for brake voltage configuration
+// (maximum) generated torque while finding offset value as a percentage of rated torque
+#define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
 #define COMMUTATION_ANGLE_OFFSET    0
@@ -154,14 +156,6 @@
 #define MAX_ACCELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
-
-
-//////////////////////////////////////////////////////
-//////  COMMUTATION ANGLE OFFSET TUNING CONFIGURATION
-//////////////////////////////////////////////////////
-
-// (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 20
 
 
 //////////////////////////////////////////////
