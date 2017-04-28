@@ -142,18 +142,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     velocity_auto_tune.j = 0.00;
     velocity_auto_tune.f = 0.00;
 
+    velocity_auto_tune.zeta = 0.70;
+    velocity_auto_tune.st   = 2.00;
+
     velocity_auto_tune.velocity_ref = 1000;
-
-
-    double zeta_auto_tune = 0.70;
-    double st_auto_tune   = 2.00;
-    double wn_auto_tune   = 0.00, kp_auto_tune   = 0.00, ki_auto_tune=0.00;
-
-    double steady_state_value = 0.00;
-    double k = 0.00;
-    double g_speed = 0.00;
-    double speed_integral = 0.00;
-    double t_auto_tune = 0.00;
 
 
     downstream_control_data.velocity_cmd = 0;
@@ -294,6 +286,14 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                 {
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
+                        double wn_auto_tune   = 0.00, kp_auto_tune   = 0.00, ki_auto_tune=0.00;
+
+                        double steady_state_value = 0.00;
+                        double k = 0.00;
+                        double g_speed = 0.00;
+                        double speed_integral = 0.00;
+                        double t_auto_tune = 0.00;
+
                         velocity_auto_tune.counter++;
 
                         if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
@@ -337,9 +337,9 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                                 printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
 
-                                wn_auto_tune = 4.00 / (zeta_auto_tune * st_auto_tune);
+                                wn_auto_tune = 4.00 / (velocity_auto_tune.zeta * velocity_auto_tune.st);
                                 kp_auto_tune = 1.00/(0.001*g_speed);
-                                kp_auto_tune*= ((2.00 * zeta_auto_tune * wn_auto_tune*velocity_auto_tune.j)-velocity_auto_tune.f);
+                                kp_auto_tune*= ((2.00 * velocity_auto_tune.zeta * wn_auto_tune*velocity_auto_tune.j)-velocity_auto_tune.f);
 
                                 ki_auto_tune = (wn_auto_tune*wn_auto_tune*velocity_auto_tune.j);
                                 ki_auto_tune/= (0.001*g_speed);
