@@ -265,33 +265,21 @@ How to use
 API
 ===
 
-Definitions
--------------
-
-.. doxygendefine:: PID_DENOMINATOR
-.. doxygendefine:: POSITION_LIMIT_THRESHOLD
-.. doxygendefine:: POSITION_CONTROL_LOOP_PERIOD
-.. doxygendefine:: PID_DENOMINATOR
-.. doxygendefine:: PID_DENOMINATOR
-.. doxygendefine:: PID_DENOMINATOR
 
 Global Types
--------------
+------------
 
-.. doxygenstruct:: MotionControlStrategies
-.. doxygenstruct:: MotionControlConfig
-.. doxygenstruct:: MotionPolarity
-.. doxygenstruct:: ControlConfig
+.. doxygenstruct:: PIDparam
+.. doxygenstruct:: NonlinearPositionControl
 
-Motion Control Service
-````````````````````````
+Module Controllers
+``````````````````
 
-.. doxygenfunction:: motion_control_service
-.. doxygenfunction:: init_motion_control
-
-Position Control Interface
-``````````````````````````
-
-.. doxygeninterface:: MotionControlInterface
-
+.. doxygenfunction:: pid_init
+.. doxygenfunction:: pid_set_parameters
+.. doxygenfunction:: pid_update
+.. doxygenfunction:: pid_reset
+.. doxygenfunction:: nl_position_control_reset
+.. doxygenfunction:: nl_position_control_set_parameters
+.. doxygenfunction:: update_nl_position_control
 
