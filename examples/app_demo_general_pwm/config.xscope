@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ======================================================= -->
+<!-- The 'ioMode' attribute on the xSCOPEconfig              -->
+<!-- element can take the following values:                  -->
+<!--   "none", "basic", "timed"                              -->
+<!--                                                         -->
+<!-- The 'type' attribute on Probe                           -->
+<!-- elements can take the following values:                 -->
+<!--   "STARTSTOP", "CONTINUOUS", "DISCRETE", "STATEMACHINE" -->
+<!--                                                         -->
+<!-- The 'datatype' attribute on Probe                       -->
+<!-- elements can take the following values:                 -->
+<!--   "NONE", "UINT", "INT", "FLOAT"                        -->
+<!-- ======================================================= -->
+
+<xSCOPEconfig ioMode="timed" enabled="true">
+
+	<!-- Velocity Position Control -->
+
+	<Probe name="POSITION REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="POSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="POSITION CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="POSITION TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="POSITION TEMP2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	
+	<Probe name="VELOCITY REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="VELOCITY CMD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="VELOCITY TEMP1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="VELOCITY TEMP2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="VELOCITY FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+
+</xSCOPEconfig>

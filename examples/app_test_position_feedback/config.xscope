@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ======================================================= -->
+<!-- The 'ioMode' attribute on the xSCOPEconfig              -->
+<!-- element can take the following values:                  -->
+<!--   "none", "basic", "timed"                              -->
+<!--                                                         -->
+<!-- The 'type' attribute on Probe                           -->
+<!-- elements can take the following values:                 -->
+<!--   "STARTSTOP", "CONTINUOUS", "DISCRETE", "STATEMACHINE" -->
+<!--                                                         -->
+<!-- The 'datatype' attribute on Probe                       -->
+<!-- elements can take the following values:                 -->
+<!--   "NONE", "UINT", "INT", "FLOAT"                        -->
+<!-- ======================================================= -->
+
+<xSCOPEconfig ioMode="timed" enabled="true">
+    <!-- For example: -->
+    <!-- <Probe name="Probe Name" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/> -->
+
+    <Probe name="Position 1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Angle 1" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
+    <Probe name="Velocity 1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Position 2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Angle 2" type="CONTINUOUS" datatype="UINT" units="Value" enabled="true"/>
+    <Probe name="Velocity 2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Position Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Position secondary Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Angle Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="Velocity Shared Memory" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="GPIO 0" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    
+
+</xSCOPEconfig>

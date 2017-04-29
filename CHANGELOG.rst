@@ -1,6 +1,23 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+3.0.0
+-----
+
+  * Channels are completeley replaced by interfaces
+  * New configurable PWM module
+  * New flexible software architecture
+  * New runtime configurable feedback service 
+  * Support of any two feedback sensors including two absolute encoders
+  * Fully featured BiSS-C interface support
+  * Support for two new Absolute Magnetic Rotary encoders offered by SYNAPTICON
+  * New model-predictive torque control
+  * Removed support of sine commutation 
+  * Removed support of Brushed DC motors
+  * Supports new XS2 (xCORE-200) architecture  
+  * Added built-in profiles for position/velocity/torque control
+  * Added new Nonlinear position controll still supporting classical PID options
+ 
 2.0.0
 -----
 
