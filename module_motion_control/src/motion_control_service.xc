@@ -140,12 +140,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     AutoTuneParam velocity_auto_tune;
 
     //autotune initialization
-    init_velocity_auto_tuner(velocity_auto_tune);
-
+    init_velocity_auto_tuner(velocity_auto_tune, 1000);
 
     downstream_control_data.velocity_cmd = 0;
     motion_ctrl_config.enable_velocity_auto_tuner == 0;
-
 
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
