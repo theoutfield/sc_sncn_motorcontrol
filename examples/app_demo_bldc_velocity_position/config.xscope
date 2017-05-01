@@ -37,7 +37,7 @@
     <Probe name="AI_B1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="AI_B2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
-    <Probe name="ACTUAL_VELOCITY_ARRAY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="ACTUAL_VELOCITY_ARRAY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
     
 </xSCOPEconfig>

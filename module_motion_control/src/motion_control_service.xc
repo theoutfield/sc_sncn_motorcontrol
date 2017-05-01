@@ -11,6 +11,8 @@
 #include <math.h>
 
 #include <controllers.h>
+#include <auto_tune.h>
+
 #include <profile.h>
 #include <auto_tune.h>
 #include <filters.h>
@@ -21,96 +23,6 @@
 #include <stdio.h>
 
 
-
-int velocity_controller_auto_tune(AutoTuneParam &velocity_auto_tune, double &velocity_ref_in_k, double velocity_k)
-{
-
-    double wn_auto_tune   = 0.00, kp_auto_tune   = 0.00, ki_auto_tune=0.00;
-
-    double steady_state_value = 0.00;
-    double k = 0.00;
-    double g_speed = 0.00;
-    double speed_integral = 0.00;
-    double t_auto_tune = 0.00;
-    int    saving_reduction_factor = 4;//reduces the number of saved states
-
-    velocity_auto_tune.save_counter++;
-
-    if(velocity_auto_tune.save_counter==saving_reduction_factor)
-    {
-        velocity_auto_tune.save_counter=0;
-        velocity_auto_tune.counter++;
-    }
-
-    if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
-    {
-        velocity_auto_tune.enable = 1;
-
-        velocity_ref_in_k = velocity_auto_tune.velocity_ref;
-
-        //fix me: check if the measured velocity is positive, if not, do not save it!
-        velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = ((int)(velocity_k));
-
-        xscope_int(ACTUAL_VELOCITY_ARRAY, velocity_auto_tune.actual_velocity[velocity_auto_tune.counter]);
-
-        if(velocity_auto_tune.counter==velocity_auto_tune.array_length)
-        {
-            steady_state_value = 0;
-            for(int i=(velocity_auto_tune.array_length-50); i<=velocity_auto_tune.array_length; i++)
-                steady_state_value +=  ((double)velocity_auto_tune.actual_velocity[i]);
-            steady_state_value = steady_state_value/50.00;
-
-            k = (steady_state_value / velocity_auto_tune.velocity_ref);
-
-            g_speed = 60.00/(2.00*3.1416);
-
-            speed_integral=0.00;
-            for(int i=1; i<=velocity_auto_tune.array_length; i++)
-                speed_integral += (steady_state_value-((double)(velocity_auto_tune.actual_velocity[i])));
-
-            speed_integral *= ((saving_reduction_factor*POSITION_CONTROL_LOOP_PERIOD)/1000000.00);
-            speed_integral /= g_speed;
-
-            velocity_auto_tune.j = (speed_integral*0.001);
-            velocity_auto_tune.j/= (steady_state_value/g_speed);
-            velocity_auto_tune.j/= (steady_state_value/g_speed);
-            velocity_auto_tune.j*= (velocity_auto_tune.velocity_ref);
-
-
-            velocity_auto_tune.f = (velocity_auto_tune.velocity_ref*0.001);
-            velocity_auto_tune.f/= (steady_state_value/g_speed);
-            velocity_auto_tune.f-= (0.001*g_speed);
-
-            printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
-
-            wn_auto_tune = 4.00 / (velocity_auto_tune.zeta * velocity_auto_tune.st);
-            kp_auto_tune = 1.00/(0.001*g_speed);
-            kp_auto_tune*= ((2.00 * velocity_auto_tune.zeta * wn_auto_tune*velocity_auto_tune.j)-velocity_auto_tune.f);
-
-            ki_auto_tune = (wn_auto_tune*wn_auto_tune*velocity_auto_tune.j);
-            ki_auto_tune/= (0.001*g_speed);
-
-            kp_auto_tune *= 1000000.00;
-            ki_auto_tune *= 1000.00;
-
-            printf("kp:%i ki:%i \n",  ((int)(kp_auto_tune)), ((int)(ki_auto_tune)));
-
-        }
-    }
-    else if (velocity_auto_tune.counter<=(velocity_auto_tune.array_length*2))
-    {
-        velocity_auto_tune.enable = 1;
-        velocity_ref_in_k = 0;
-    }
-    else
-    {
-        velocity_auto_tune.enable = 0;
-        velocity_auto_tune.counter=0;
-        for(int i=0; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i] = 0;
-    }
-
-    return 0;
-}
 
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque,\
@@ -238,6 +150,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
     velocity_auto_tune.zeta = 0.70;
     velocity_auto_tune.st   = 2.00;
+
+    velocity_auto_tune.kp   = 0.00;
+    velocity_auto_tune.ki   = 0.00;
+
 
     velocity_auto_tune.velocity_ref = 1000;
 
@@ -381,7 +297,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
 
-                        velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k);
+                        velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
 
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
@@ -392,6 +308,10 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                             velocity_enable_flag =0;
                             position_enable_flag =0;
                             i_torque_control.set_torque_control_disabled();
+
+                            printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
+                            printf("kp:%i ki:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)));
+
                         }
 
                     }
