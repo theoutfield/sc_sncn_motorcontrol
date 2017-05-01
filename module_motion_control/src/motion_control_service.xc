@@ -294,9 +294,14 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                             position_enable_flag =0;
                             i_torque_control.set_torque_control_disabled();
 
-                            printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
-                            printf("kp:%i ki:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)));
+                            motion_ctrl_config.enable_velocity_auto_tuner = 0;
 
+                            printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
+                            printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
+
+                            motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
+                            motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
+                            motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
                         }
 
                     }
