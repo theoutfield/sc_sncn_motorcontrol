@@ -524,6 +524,19 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
                 pid_reset(velocity_control_pid_param);
 
+                pid_init(velocity_control_pid_param);
+                if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
+                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
+                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+                if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
+                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
+                pid_set_parameters(
+                        (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
+                        (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
+                        POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
+
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
                     enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque);
