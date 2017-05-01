@@ -137,7 +137,8 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
 
     //autotune initialization
     velocity_auto_tune.counter=0;
-    velocity_auto_tune.array_length=4000;
+    velocity_auto_tune.save_counter=0;
+    velocity_auto_tune.array_length=1000;
     for(int i=1; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i]=0;
     velocity_auto_tune.j = 0.00;
     velocity_auto_tune.f = 0.00;
@@ -294,7 +295,14 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                         double speed_integral = 0.00;
                         double t_auto_tune = 0.00;
 
-                        velocity_auto_tune.counter++;
+                        velocity_auto_tune.save_counter++;
+
+                        if(velocity_auto_tune.save_counter==4)
+                        {
+                            velocity_auto_tune.save_counter=0;
+                            velocity_auto_tune.counter++;
+                        }
+
 
                         if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
                         {
@@ -310,9 +318,9 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                             if(velocity_auto_tune.counter==velocity_auto_tune.array_length)
                             {
                                 steady_state_value = 0;
-                                for(int i=(velocity_auto_tune.array_length-200); i<=velocity_auto_tune.array_length; i++)
+                                for(int i=(velocity_auto_tune.array_length-50); i<=velocity_auto_tune.array_length; i++)
                                     steady_state_value +=  ((double)velocity_auto_tune.actual_velocity[i]);
-                                steady_state_value = steady_state_value/200.00;
+                                steady_state_value = steady_state_value/50.00;
 
                                 k = (steady_state_value / velocity_auto_tune.velocity_ref);
 
@@ -322,7 +330,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
                                 for(int i=1; i<=velocity_auto_tune.array_length; i++)
                                     speed_integral += (steady_state_value-((double)(velocity_auto_tune.actual_velocity[i])));
 
-                                speed_integral *= (POSITION_CONTROL_LOOP_PERIOD/1000000.00);
+                                speed_integral *= ((4*POSITION_CONTROL_LOOP_PERIOD)/1000000.00);
                                 speed_integral /= g_speed;
 
                                 velocity_auto_tune.j = (speed_integral*0.001);
