@@ -140,22 +140,7 @@ void motion_control_service(int app_tile_usec, MotionControlConfig &motion_ctrl_
     AutoTuneParam velocity_auto_tune;
 
     //autotune initialization
-    velocity_auto_tune.enable=0;
-    velocity_auto_tune.counter=0;
-    velocity_auto_tune.save_counter=0;
-    velocity_auto_tune.array_length=1000;
-    for(int i=1; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i]=0;
-    velocity_auto_tune.j = 0.00;
-    velocity_auto_tune.f = 0.00;
-
-    velocity_auto_tune.zeta = 0.70;
-    velocity_auto_tune.st   = 2.00;
-
-    velocity_auto_tune.kp   = 0.00;
-    velocity_auto_tune.ki   = 0.00;
-
-
-    velocity_auto_tune.velocity_ref = 1000;
+    init_velocity_auto_tuner(velocity_auto_tune);
 
 
     downstream_control_data.velocity_cmd = 0;
