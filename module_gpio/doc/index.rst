@@ -1,3 +1,5 @@
+.. _module_gpio:
+
 ====================
 GPIO Service Module 
 ====================
@@ -31,7 +33,7 @@ How to use
 
     ::
 
-        USED_MODULES = module_gpio module_hall module_pwm_symmetrical module_adc module_ctrl_loops module_misc module_motorcontrol module_profile module_qei module_watchdog module_board-support
+        USED_MODULES = module_gpio module_hall_sensor module_pwm module_adc module_controllers module_utils lib_bldc_torque_control module_profiles module_incremenatal_encoder module_watchdog module_board-support
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
           This will help solving internal dependency issues.

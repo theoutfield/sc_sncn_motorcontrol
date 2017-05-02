@@ -3,11 +3,11 @@
 #include <IFM_BOARD_REQUIRED>
 
 /**
- * @brief Test illustrates usage of module_commutation
- * @date 17/06/2014
+ * @file main.xc
+ * @brief Demo application illustrates usage of module_motion_control
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
-//#include <pwm_service.h>
 #include <pwm_server.h>
 #include <adc_service.h>
 #include <user_config.h>
@@ -79,6 +79,7 @@ int main(void) {
             motion_ctrl_config.velocity_ki =                           VELOCITY_Ki;
             motion_ctrl_config.velocity_kd =                           VELOCITY_Kd;
             motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
+            motion_ctrl_config.enable_velocity_auto_tuner =           ENABLE_VELOCITY_AUTO_TUNER;
 
             motion_ctrl_config.brake_release_strategy =                BRAKE_RELEASE_STRATEGY;
             motion_ctrl_config.brake_release_delay =                 BRAKE_RELEASE_DELAY;
@@ -132,9 +133,9 @@ int main(void) {
 
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
                     motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
-                    motorcontrol_config.torque_P_gain =  TORQUE_P_VALUE;
-                    motorcontrol_config.torque_I_gain =  TORQUE_I_VALUE;
-                    motorcontrol_config.torque_D_gain =  TORQUE_D_VALUE;
+                    motorcontrol_config.torque_P_gain =  TORQUE_Kp;
+                    motorcontrol_config.torque_I_gain =  TORQUE_Ki;
+                    motorcontrol_config.torque_D_gain =  TORQUE_Kd;
                     motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                     motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;

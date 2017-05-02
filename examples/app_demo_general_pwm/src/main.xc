@@ -3,8 +3,9 @@
 #include <IFM_BOARD_REQUIRED>
 
 /**
- * @brief Test illustrates usage of module_commutation
- * @date 17/06/2014
+ * @file main.xc
+ * @brief Demo application illustrates usage of module_pwm
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
 #include <pwm_server.h>
@@ -20,13 +21,8 @@ PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
-/**
- * @brief Send pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
- *
- * @param i_update_pwm  Interface to communicate with client and update the PWM values.
- *
- * @return void
- */
+
+//Sends pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
 void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 {
     timer t;
