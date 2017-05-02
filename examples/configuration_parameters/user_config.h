@@ -123,6 +123,7 @@
 #define VELOCITY_Ki                             20000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
+#define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
 #define POSITION_Kp                             20000
@@ -156,7 +157,6 @@
 #define MAX_ACCELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
-
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION

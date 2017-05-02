@@ -11,7 +11,9 @@
 #include <math.h>
 
 #include <controllers.h>
+
 #include <profile.h>
+#include <auto_tune.h>
 #include <filters.h>
 
 #include <motion_control_service.h>
@@ -118,6 +120,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double velocity_ref_k = 0;
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0;
     double velocity_k = 0.00;
+
+    AutoTuneParam velocity_auto_tune;
+
+    //autotune initialization
+    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config.max_motor_speed);
+
+    downstream_control_data.velocity_cmd = 0;
+    motion_ctrl_config.enable_velocity_auto_tuner == 0;
 
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
@@ -251,7 +261,34 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    if(motion_ctrl_config.enable_profiler==1)
+                    if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
+                    {
+
+                        velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
+
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
+                        if(velocity_auto_tune.enable == 0)
+                        {
+                            torque_ref_k=0;
+                            torque_enable_flag   =0;
+                            velocity_enable_flag =0;
+                            position_enable_flag =0;
+                            i_torque_control.set_torque_control_disabled();
+
+                            motion_ctrl_config.enable_velocity_auto_tuner = 0;
+
+                            printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
+                            printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
+                            printf("motor ref speed %i\n", ((int)(velocity_auto_tune.velocity_ref)));
+
+                            motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
+                            motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
+                            motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
+                        }
+
+                    }
+                    else if(motion_ctrl_config.enable_profiler==1)
                     {
                         velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         velocity_ref_in_k_1n = velocity_ref_in_k;
@@ -418,7 +455,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 #endif
 
 
-break;
+                break;
 
         case i_motion_control[int i].disable():
 
@@ -479,6 +516,19 @@ break;
                 downstream_control_data.offset_torque = 0;
 
                 pid_reset(velocity_control_pid_param);
+
+                pid_init(velocity_control_pid_param);
+                if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
+                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
+                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+                if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
+                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
+                pid_set_parameters(
+                        (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
+                        (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
+                        POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {

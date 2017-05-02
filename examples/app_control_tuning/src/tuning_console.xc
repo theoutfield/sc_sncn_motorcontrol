@@ -74,6 +74,84 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
         switch(mode_1)
         {
+
+        //automatic tuning
+        case 'a':
+                switch(mode_2)
+                {
+                case 'o'://find motor commutation offset automatically
+                         printf("Sending offset_detection command ...\n");
+
+                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+
+                         if(motorcontrol_config.commutation_angle_offset == -1)
+                         {
+                             printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                         }
+                         else
+                         {
+                             motorcontrol_config = i_motion_control.get_motorcontrol_config();
+                             printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+
+                             printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
+
+                             if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                             {
+                                 printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
+                                 for (int i=0;i<6;i++) {
+                                     printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                                 }
+                             }
+                         }
+                         break;
+
+                case 'v'://calculate optimal pid parameters for velocity controller
+
+                        // set kp, ki and kd equal to 0 for velocity controller:
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+
+                        motion_ctrl_config.velocity_kp = 1000000;
+                        motion_ctrl_config.velocity_ki = 0;
+                        motion_ctrl_config.velocity_kd = 0;
+
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",  motion_ctrl_config.velocity_kp,
+                                motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd,
+                                motion_ctrl_config.velocity_integral_limit);
+
+                        // enable velocity controller
+                        i_motion_control.enable_velocity_ctrl();
+                        printf("velocity ctrl enabled\n");
+
+                        // set the velocity command to 0
+                        downstream_control_data.offset_torque = 0;
+                        downstream_control_data.velocity_cmd  = 0;
+
+                        i_motion_control.update_control_data(downstream_control_data);
+                        printf("set velocity %d\n", downstream_control_data.velocity_cmd);
+
+                        delay_milliseconds(500);//wait until the actual speed goes to 0.
+
+                        // set the velocity pid tuning flag to 1
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        motion_ctrl_config.enable_velocity_auto_tuner = 1;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        printf("velocity pid tunning flag set to %d\n",  motion_ctrl_config.enable_velocity_auto_tuner);
+
+                        // end of automatic velocity controller tuning
+                        break;
+
+                 default:
+                         break;
+                 }
+
+                break;
+
+
         //position commands
         case 'p':
                 downstream_control_data.offset_torque = 0;
@@ -454,34 +532,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                 printf("profiler settings: \n");
                 printf("acceleration: %d [rpm/s], deceleration: %d \n velocity: %d [rpm], torque_rate: %d [mNm/s] \n", motion_ctrl_config.max_acceleration_profiler, motion_ctrl_config.max_deceleration_profiler, motion_ctrl_config.max_speed_profiler, motion_ctrl_config.max_torque_rate_profiler);
-                break;
-
-        //auto offset tuning
-        case 'a':
-                printf("Sending offset_detection command ...\n");
-
-                motorcontrol_config = i_motion_control.set_offset_detection_enabled();
-
-                if(motorcontrol_config.commutation_angle_offset == -1)
-                {
-                    printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-                }
-                else
-                {
-                    motorcontrol_config = i_motion_control.get_motorcontrol_config();
-                    printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-
-                    printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
-
-                    if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
-                    {
-                        printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
-                        for (int i=0;i<6;i++) {
-                            printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
-                        }
-                    }
-                }
-                brake_flag = 0;
                 break;
 
         //set brake

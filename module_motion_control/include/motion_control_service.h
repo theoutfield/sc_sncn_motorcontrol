@@ -105,6 +105,8 @@ typedef struct {
     int velocity_kd;                    /**< Parameter for velocity controller D-constant */
     int velocity_integral_limit;        /**< Parameter for integral limit of velocity pid controller */
 
+    int enable_velocity_auto_tuner;     /**< Parameter for enabling/disabling auto tuner for velocity controller */
+
     int k_fb;                           /**< Parameter for setting the feedback position sensor gain */
     int resolution;                     /**< Parameter for setting the resolution of position sensor [ticks/rotation] */
     int k_m;                            /**< Parameter for setting the gain of torque actuator */
