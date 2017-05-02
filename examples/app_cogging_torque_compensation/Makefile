@@ -14,7 +14,7 @@ TARGET =
 APP_NAME = app_cogging_torque_compensation
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = config_motor lib_bldc_torque_control module_adc module_biss module_board-support module_controllers module_filters module_hall module_misc module_motion_control module_position_feedback module_profile module_pwm module_qei module_random module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_spi_master module_watchdog
+USED_MODULES = config_motor lib_bldc_torque_control module_adc module_biss module_board-support module_cogging_torque_compensation module_controllers module_filters module_hall module_misc module_motion_control module_position_feedback module_profile module_pwm module_qei module_random module_rem_14 module_rem_16mt module_serial_encoder module_shared_memory module_spi_master module_watchdog
 
 
 

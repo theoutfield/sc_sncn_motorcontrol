@@ -9,15 +9,15 @@
 #ifndef DATA_PROCESSING_H_
 #define DATA_PROCESSING_H_
 
-#include <torque_ripple_correction.h>
+//#include <torque_ripple_correction.h>
 #include <user_config.h>
 
 #define NB_OF_MEASUREMENTS 600
 #define MAX_COLUMNS 2
-#define MAX_ROWS 36
+#define MAX_ROWS 90
 
 #define WRITE_BUFFER_SIZE MAX_COLUMNS*11+22
-#define READ_BUFFER_SIZE WRITE_BUFFER_SIZE
+#define READ_BUFFER_SIZE WRITE_BUFFER_SIZE*MAX_ROWS
 
 void read_csv_file_to_array(int Numbers_array[MAX_COLUMNS][MAX_ROWS]);
 

@@ -75,7 +75,7 @@ void read_csv_file_to_array(int Numbers_array[MAX_COLUMNS][MAX_ROWS])
 {
     //Open the file
 
-    int fd = _open("Data/Test_autotuning2_10_generations_10_competitors.csv", O_RDONLY, 0);
+    int fd = _open("Data/Cogging_Torque_9th_harmonic_testbench.csv", O_RDONLY, 0);
     if (fd == -1) {
       printstrln("Error: _open failed");
       exit(1);
@@ -98,7 +98,7 @@ void read_csv_file_to_array(int Numbers_array[MAX_COLUMNS][MAX_ROWS])
     char eol = '\n';
 
     //Parse the buffer from csv standard
-    while (sizeof(readBuffer) > index && row < 10)
+    while (sizeof(readBuffer) > index && row < MAX_ROWS)
     {
 
         while (!new_row && !new_column)

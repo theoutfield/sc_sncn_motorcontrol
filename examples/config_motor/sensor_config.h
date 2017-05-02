@@ -22,7 +22,7 @@
 #endif
 
 //REM 16MT config
-#define REM_16MT_FILTER            0x02
+#define REM_16MT_FILTER            0x04
 #define REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD     400 // velocity loop time in microseconds (will be rounded to the next multiple of the polling time)
 
 //REM 14 config

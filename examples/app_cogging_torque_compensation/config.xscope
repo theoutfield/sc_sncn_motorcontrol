@@ -14,7 +14,7 @@
 <!--   "NONE", "UINT", "INT", "FLOAT"                        -->
 <!-- ======================================================= -->
 
-<xSCOPEconfig ioMode="timed" enabled="false">
+<xSCOPEconfig ioMode="timed" enabled="true">
 
 	<!-- Velocity Position Control -->
 
@@ -26,6 +26,7 @@
     <Probe name="Velocity Secondary" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="TORQUE_SENT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Fault Code" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Sensor Error x100" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 

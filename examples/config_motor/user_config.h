@@ -8,7 +8,7 @@
 
 #include <refclk.h>
 
-#include <motor_config_AMK_DT3.h>
+#include <motor_config_AMK_DD5.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -35,7 +35,7 @@
 #define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [1,-1]
-#define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
+#define SENSOR_1_POLARITY                 SENSOR_POLARITY_INVERTED
 
 ///////////////////////
 // SENSOR 2 SETTINGS //
@@ -66,7 +66,7 @@
 #define PROTECTION_MAXIMUM_CURRENT        100       //maximum tolerable value of phase current (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        55        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
-#define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
+#define TEMP_BOARD_MAX                    200000        //maximum tolerable value of board temperature (Degree Centigrade)
 
 
 //////////////////////////////////////////////
@@ -84,7 +84,7 @@
 #define COMMUTATION_FRQ            24
 
 //// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    300
+#define COMMUTATION_ANGLE_OFFSET    3178
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -161,8 +161,8 @@
                                                      //otherwise set as 0
 
 //PID parameters of the velocity PID controller
-#define VELOCITY_Kp                             2100000
-#define VELOCITY_Ki                             150000
+#define VELOCITY_Kp                             7000000
+#define VELOCITY_Ki                             50000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 

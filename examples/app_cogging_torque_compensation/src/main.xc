@@ -1,13 +1,13 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C22-rev-a.bsp>
-#include <IFM_DC1K-rev-c4.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED>
 
 /**
  * @brief Test illustrates usage of module_commutation
  * @date 17/06/2014
  */
 
-#include <torque_ripple_correction.h>
+#include <cogging_torque_compensation.h>
 #include <pwm_server.h>
 #include <adc_service.h>
 #include <user_config.h>
@@ -35,7 +35,6 @@ port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 #include <tuning.h>
 
-//extern int cogging_torque[2][STEPS_PER_ROTATION];
 int main(void) {
 
     // Motor control channels
@@ -62,13 +61,15 @@ int main(void) {
 //                user_interface(i_motion_control[0], i_tuning_step[1]);
 
 //
-            map_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
-            compensate_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
+//            map_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
 //            char file_name[] = "Cogging_Torque";
 //            char path[70];
 //            char headers[] ="Position, Torque";
-//            sprintf(path, "Data/%s_%dth_harmonic2.csv", file_name, MEASURE_PRECISION);
+//            sprintf(path, "Data/%s_%dth_harmonic_testbench_with_motor.csv", file_name, MEASURE_PRECISION);
 //            write_array_to_csv_file(cogging_torque, STEPS_PER_ROTATION, 2, path, headers);
+            read_csv_file_to_array(cogging_torque);
+
+            compensate_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
                         exit(1);
         }
 
