@@ -278,9 +278,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             motion_ctrl_config.enable_velocity_auto_tuner = 0;
 
-                            printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
                             printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
-                            printf("motor ref speed %i\n", ((int)(velocity_auto_tune.velocity_ref)));
 
                             motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
                             motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
