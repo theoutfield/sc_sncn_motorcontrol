@@ -124,7 +124,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     AutoTuneParam velocity_auto_tune;
 
     //autotune initialization
-    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config.max_motor_speed);
+    init_velocity_auto_tuner(velocity_auto_tune, TUNING_VELOCITY, SETTLING_TIME);
 
     downstream_control_data.velocity_cmd = 0;
     motion_ctrl_config.enable_velocity_auto_tuner == 0;
@@ -278,9 +278,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             motion_ctrl_config.enable_velocity_auto_tuner = 0;
 
-                            printf("f:%i j:%i \n",  ((int)(velocity_auto_tune.f*1000000.00)), ((int)(velocity_auto_tune.j*1000000.00)));
                             printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
-                            printf("motor ref speed %i\n", ((int)(velocity_auto_tune.velocity_ref)));
 
                             motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
                             motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));

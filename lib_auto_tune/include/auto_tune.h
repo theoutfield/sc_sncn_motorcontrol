@@ -6,6 +6,14 @@
 #pragma once
 
 /**
+ * @brief The velocity in which the tuning will happen. (suggested value: 60% of rated velocity).
+ *        Note: The dc-bus voltage should be high enough for the selected velocity.
+ */
+#define TUNING_VELOCITY 1000 //[rpm]
+
+#define SETTLING_TIME   0.3  //preffered settling time for velocity controller [seconds]
+
+/**
  * @brief Structure type containing auto_tuning parameters of velocity/position controllers
  */
 typedef struct {
@@ -34,7 +42,7 @@ typedef struct {
  *
  * @return int                  the function returns 0 by default
  *  */
-int init_velocity_auto_tuner(AutoTuneParam &velocity_auto_tune, int velocity_ref);
+int init_velocity_auto_tuner(AutoTuneParam &velocity_auto_tune, int velocity_ref, double settling_time);
 
 
 /**
