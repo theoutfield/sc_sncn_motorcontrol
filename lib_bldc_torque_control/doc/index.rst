@@ -41,7 +41,7 @@ As it is shown in Fig. 1, torque control service is responsible for transferring
 
 .. cssclass:: github
 
-  `See Library on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/lib_bldc_torque_control>`_
+  `See Library on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/lib_bldc_torque_control>`_
 
 
 How to use
@@ -212,9 +212,9 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
         
                             motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
                             motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
-                            motorcontrol_config.torque_P_gain =  TORQUE_Kp;
-                            motorcontrol_config.torque_I_gain =  TORQUE_Ki;
-                            motorcontrol_config.torque_D_gain =  TORQUE_Kd;
+                            motorcontrol_config.torque_P_gain =  TORQUE_P_VALUE;
+                            motorcontrol_config.torque_I_gain =  TORQUE_I_VALUE;
+                            motorcontrol_config.torque_D_gain =  TORQUE_D_VALUE;
                             motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                             motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                             motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
