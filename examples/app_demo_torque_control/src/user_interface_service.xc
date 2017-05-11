@@ -142,7 +142,7 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
     fflush(stdout);
     while (1)
     {
-        char mode = '@';
+         char mode = '@';
          char mode_2 = '@';
          char mode_3 = '@';
          char c;
@@ -395,7 +395,7 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
 
         //directly set the torque
         default:
-                torque_ref = value * sign;
+                torque_ref = value;
                 i_torque_control.set_torque(torque_ref);
 
                 delay_milliseconds(1);
