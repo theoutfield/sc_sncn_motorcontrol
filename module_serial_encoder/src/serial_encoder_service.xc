@@ -59,14 +59,14 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         } else {
             { count, state.position, void } = biss_encoder(data, position_feedback_config.biss_config);
         }
+        if (position_feedback_config.polarity == SENSOR_POLARITY_INVERTED) {
+            count = -count;
+            state.position = position_feedback_config.resolution - state.position - 1;
+        }
         if (position_feedback_config.biss_config.multiturn_resolution != 0) {
             state.count = count;
         } else {
             multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
-        }
-        if (position_feedback_config.polarity == SENSOR_POLARITY_INVERTED) {
-            state.count = -state.count;
-            state.position = position_feedback_config.resolution - state.position - 1;
         }
         if (position_feedback_config.biss_config.singleturn_resolution > 12) {
             state.angle = (position_feedback_config.pole_pairs * (state.position >> (position_feedback_config.biss_config.singleturn_resolution-12))) & 4095;
@@ -259,7 +259,6 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     }
                     t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
                     rem_16mt_write(*spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + singleturn, 32, position_feedback_config.ifm_usec);
-                    pos_state.last_position = singleturn;
                     break;
                 case REM_14_SENSOR:
                     { pos_state.last_position, pos_state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
