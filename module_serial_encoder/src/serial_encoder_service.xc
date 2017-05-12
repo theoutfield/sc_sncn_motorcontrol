@@ -14,6 +14,7 @@
 #include <xscope.h>
 #include <mc_internal_constants.h>
 #include <filters.h>
+#include <stdio.h>
 
 extern char start_message[];
 
@@ -189,6 +190,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     unsigned int sensor_error_check_time = last_read;
     unsigned int end_time = 0;
 
+    int sensor_resolution = position_feedback_config.resolution;
     int notification = MOTCTRL_NTF_EMPTY;
 
     int read_period = init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
@@ -357,6 +359,10 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 } else {
                     last_sensor_error = pos_state.status;
                 }
+            }
+            if(sensor_resolution < 65536)
+            {
+                pos_state.position = pos_state.position << (16 - 13);
             }
 
             //send data to shared memory

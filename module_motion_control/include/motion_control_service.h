@@ -40,6 +40,8 @@
  */
 #define BRAKE_UPDATE_CONFIG_WAIT        2000
 
+
+
 /**
  * @brief Position/Velocity control strategie
  */
@@ -106,6 +108,7 @@ typedef struct {
     int velocity_integral_limit;        /**< Parameter for integral limit of velocity pid controller */
 
     int enable_velocity_auto_tuner;     /**< Parameter for enabling/disabling auto tuner for velocity controller */
+    int enable_compensation_recording;  /**< Parameter for enabling/disabling the cogging torque compensator recording*/
 
     int k_fb;                           /**< Parameter for setting the feedback position sensor gain */
     int resolution;                     /**< Parameter for setting the resolution of position sensor [ticks/rotation] */
@@ -239,6 +242,13 @@ interface MotionControlInterface
      * @return structure of type UpstreamControlData -> structure including the actual parameters (measurements, ...) from torque controller to higher controlling levels
      */
     UpstreamControlData update_control_data(DownstreamControlData downstreamcontroldata);
+
+    /**
+     * @brief           Enables/disables the cogging torque compensation
+     *
+     * @param   flag    value : 0 (disable) or 1 (enable)
+     */
+    void enable_cogging_compensation(int flag);
 };
 
 

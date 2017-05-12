@@ -111,6 +111,20 @@ interface TorqueControlInterface
     void reset_faults();
 
     UpstreamControlData update_upstream_control_data ();
+
+    /**
+     * @brief   Enables the cogging torque compensation
+     *
+     * @return  void
+     */
+    void enable_cogging_compensation();
+
+    /**
+     * @brief   Disables the cogging torque compensation
+     *
+     * @return  void
+     */
+    void disable_cogging_compensation();
 };
 
 /**
@@ -218,7 +232,7 @@ interface shared_memory_interface
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write electrical angle to shared memory.
@@ -242,7 +256,7 @@ interface shared_memory_interface
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write primary position feedback (used for motion control) to shared memory.
@@ -253,7 +267,7 @@ interface shared_memory_interface
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_primary_feedback(int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_primary_feedback(int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write secondary position feedback (display only) to shared memory.
@@ -264,7 +278,7 @@ interface shared_memory_interface
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_secondary_feedback(int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_secondary_feedback(int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
      * @brief Write write gpio input data to shared memory, return the gpio output data.

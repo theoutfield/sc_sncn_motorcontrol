@@ -33,8 +33,6 @@ port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 #include <motion_control_service.h>
 #include <profile_control.h>
 
-#include <tuning.h>
-
 int main(void) {
 
     // Motor control channels
@@ -48,42 +46,38 @@ int main(void) {
     interface MotionControlInterface i_motion_control[3];
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
-    interface TuningStepInterface i_tuning_step[3];
 
     par
     {
-        /* WARNING: only one blocking task is possible per tile. */
-        /* Waiting for a user input blocks other tasks on the same tile from execution. */
+
         on tile[APP_TILE]:
-        {
-//            autotune(i_motion_control[0],10,  i_tuning_step[1], i_position_feedback_1[0]);
-//
-//                user_interface(i_motion_control[0], i_tuning_step[1]);
-
-//
-//            map_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
-//            char file_name[] = "Cogging_Torque";
-//            char path[70];
-//            char headers[] ="Position, Torque";
-//            sprintf(path, "Data/%s_%dth_harmonic_testbench_with_motor.csv", file_name, MEASURE_PRECISION);
-//            write_array_to_csv_file(cogging_torque, STEPS_PER_ROTATION, 2, path, headers);
-            read_csv_file_to_array(cogging_torque);
-
-            compensate_torque_ripples(i_motion_control[0], i_position_feedback_1[0], i_torque_control[1]);
-                        exit(1);
-        }
-
-        on tile[APP_TILE_2]:
         /* Position Control Loop */
         {
             par
             {
-//                {
-//                    make_steps(i_motion_control[1], i_tuning_step[0],i_position_feedback_1[1]);
-//                }
-//                {
-//                    tuning_step_service(i_tuning_step);
-//                }
+                {
+
+                    delay_seconds(3);
+                    i_motion_control[1].enable_velocity_ctrl();
+                    MotionControlConfig motion_ctrl_config = i_motion_control[1].get_motion_control_config();
+                    motion_ctrl_config.enable_compensation_recording = 1;
+                    i_motion_control[1].set_motion_control_config(motion_ctrl_config);
+
+                    while (motion_ctrl_config.enable_compensation_recording)
+                    {
+                        motion_ctrl_config = i_motion_control[0].get_motion_control_config();
+                        delay_milliseconds(1);
+                    }
+                    i_motion_control[1].enable_cogging_compensation(1);
+                    i_motion_control[1].enable_velocity_ctrl();
+
+                    DownstreamControlData downstream_control_data;
+
+                    downstream_control_data.velocity_cmd = 10;
+                    downstream_control_data.offset_torque = 0;
+                    i_motion_control[1].update_control_data(downstream_control_data);
+                }
+
                 {
                     MotionControlConfig motion_ctrl_config;
 
@@ -160,6 +154,7 @@ int main(void) {
 
                 /* Motor Control Service */
                 {
+
                     MotorcontrolConfig motorcontrol_config;
 
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
@@ -182,12 +177,20 @@ int main(void) {
                     motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
                     motorcontrol_config.current_ratio =  CURRENT_RATIO;
                     motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
+                    motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
                     motorcontrol_config.rated_current =  MOTOR_RATED_CURRENT;
                     motorcontrol_config.rated_torque  =  MOTOR_RATED_TORQUE;
                     motorcontrol_config.percent_offset_torque =  APPLIED_TUNING_TORQUE_PERCENT;
                     motorcontrol_config.protection_limit_over_current =  PROTECTION_MAXIMUM_CURRENT;
                     motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
+                    motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
+
+
+                    for (int i = 0; i < 1024; i++)
+                    {
+                        motorcontrol_config.torque_offset[i] = 0;
+                    }
 
                     torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
                             i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
