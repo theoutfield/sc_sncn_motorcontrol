@@ -17,7 +17,8 @@ char start_message[] = ">>   SOMANET SENSOR SERVICE STARTING: ";
 
 void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
                       client interface shared_memory_interface ?i_shared_memory,
-                      server interface PositionFeedbackInterface i_position_feedback[3])
+                      server interface PositionFeedbackInterface i_position_feedback[3],
+                      int gpio_on)
 {
 #ifdef DEBUG_POSITION_FEEDBACK
     printstr(start_message);
@@ -77,7 +78,7 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
 
         //gpio
         case t when timerafter(ts + (1000*position_feedback_config.ifm_usec)) :> ts:
-                gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
+                gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
                 break;
         }
     }
@@ -87,30 +88,31 @@ void start_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
                    int hall_enc_select_config,
                    PositionFeedbackConfig &position_feedback_config,
                    client interface shared_memory_interface ?i_shared_memory,
-                   server interface PositionFeedbackInterface i_position_feedback[3])
+                   server interface PositionFeedbackInterface i_position_feedback[3],
+                   int gpio_on)
 {
     switch(position_feedback_config.sensor_type) {
     case BISS_SENSOR:
     case REM_16MT_SENSOR:
     case REM_14_SENSOR:
-        serial_encoder_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports, hall_enc_select_config, position_feedback_config, i_shared_memory, i_position_feedback);
+        serial_encoder_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports, hall_enc_select_config, position_feedback_config, i_shared_memory, i_position_feedback, gpio_on);
         break;
     case HALL_SENSOR:
         if (position_feedback_config.hall_config.port_number == ENCODER_PORT_1) {
-            hall_service(*qei_hall_port_1, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+            hall_service(*qei_hall_port_1, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback, gpio_on);
         } else if (position_feedback_config.hall_config.port_number == ENCODER_PORT_2) {
-            hall_service(*qei_hall_port_2, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+            hall_service(*qei_hall_port_2, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback, gpio_on);
         }
         break;
     case QEI_SENSOR:
         if (position_feedback_config.qei_config.port_number == ENCODER_PORT_1) {
-            qei_service(*qei_hall_port_1, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+            qei_service(*qei_hall_port_1, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback, gpio_on);
         } else if (position_feedback_config.qei_config.port_number == ENCODER_PORT_2) {
-            qei_service(*qei_hall_port_2, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+            qei_service(*qei_hall_port_2, gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback, gpio_on);
         }
         break;
     default:
-        fallback_service(gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback);
+        fallback_service(gpio_ports, position_feedback_config, i_shared_memory, i_position_feedback, gpio_on);
         break;
     }
 }
@@ -184,6 +186,7 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
                 } else {
                     set_port_use_on(*gpio_ports[position_feedback_config.biss_config.clock_port_config]);
                     configure_out_port(*gpio_ports[position_feedback_config.biss_config.clock_port_config], (*spi_ports).spi_interface.blk1, 1);
+                    position_feedback_config.gpio_config[position_feedback_config.biss_config.clock_port_config] = GPIO_OFF; //disable GPIO on this port
                 }
             }
             //configure clock rate
@@ -293,9 +296,9 @@ void gpio_write(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedb
     }
 }
 
-void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory)
+void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, int gpio_on)
 {
-    if (!isnull(gpio_ports) && !isnull(i_shared_memory)) {
+    if (gpio_on == 1 && !isnull(i_shared_memory)) {
         unsigned int gpio_input = 0;
         for (int i=0 ; i<4 ; i++) {
             if ( gpio_ports[i] != null &&
@@ -439,24 +442,15 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                 spi_on = 1;
             }
         }
-        if (!spi_on && gpio_ports_check) {
-            for (int i=0 ; i<NUMBER_OF_GPIO_PORTS ; i++) {
-                if (position_feedback_config_1.gpio_config[i] == GPIO_INPUT_PULLDOWN) {
-                    set_port_pull_down(*gpio_ports[i]);
-                } else {
-                    set_port_pull_none(*gpio_ports[i]);
-                }
-            }
-        }
 
         //start services
         par {
             {//sensor 1
-                start_service(qei_hall_port_1_1, qei_hall_port_2_1, hall_enc_select_port_1, spi_ports_1, gpio_ports, hall_enc_select_config, position_feedback_config_1, i_shared_memory_1, i_position_feedback_1);
+                start_service(qei_hall_port_1_1, qei_hall_port_2_1, hall_enc_select_port_1, spi_ports_1, gpio_ports, hall_enc_select_config, position_feedback_config_1, i_shared_memory_1, i_position_feedback_1, 1);
             }
             {//sensor 2
                 if (!isnull(i_position_feedback_2) && !isnull(position_feedback_config_2)) {
-                    start_service(qei_hall_port_1_2, qei_hall_port_2_2, hall_enc_select_port_2, spi_ports_2, gpio_ports_2, hall_enc_select_config, position_feedback_config_2, i_shared_memory_2, i_position_feedback_2);
+                    start_service(qei_hall_port_1_2, qei_hall_port_2_2, hall_enc_select_port_2, spi_ports_2, gpio_ports_2, hall_enc_select_config, position_feedback_config_2, i_shared_memory_2, i_position_feedback_2, 0);
                 }
             }
         }

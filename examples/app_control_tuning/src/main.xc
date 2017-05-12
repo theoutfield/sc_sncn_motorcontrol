@@ -203,6 +203,11 @@ int main(void) {
 
                     position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
 
+                    position_feedback_config.gpio_config[0] = GPIO_OFF;
+                    position_feedback_config.gpio_config[1] = GPIO_OFF;
+                    position_feedback_config.gpio_config[2] = GPIO_OFF;
+                    position_feedback_config.gpio_config[3] = GPIO_OFF;
+
                     //setting second sensor
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
                     position_feedback_config_2.sensor_type = 0;

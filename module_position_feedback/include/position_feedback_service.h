@@ -26,7 +26,8 @@
  * @brief GPIO port type
  */
 typedef enum {
-    GPIO_INPUT=0,           /**< Input GPIO port */
+    GPIO_OFF=0,             /**< GPIO port off */
+    GPIO_INPUT,             /**< Input GPIO port */
     GPIO_INPUT_PULLDOWN,    /**< Input GPIO port with pulldown */
     GPIO_OUTPUT             /**< Output GPIO port */
 } GPIOType;
@@ -326,8 +327,9 @@ void gpio_write(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedb
  * @param gpio_ports The GPIO ports array
  * @param position_feedback_config The position feedback service configuration
  * @param i_shared_memory The client interface to the shared memory
+ * @param service_number Service number (1 or 2) use to enable GPIO only on 1.
  */
-void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory);
+void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, int service_number);
 
 
 #endif
