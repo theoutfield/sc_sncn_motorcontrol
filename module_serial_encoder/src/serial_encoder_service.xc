@@ -162,7 +162,11 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
 }
 
 
-void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * (&?gpio_ports)[4], int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, interface PositionFeedbackInterface server i_position_feedback[3])
+void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * (&?gpio_ports)[4],
+                int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config,
+                client interface shared_memory_interface ?i_shared_memory,
+                interface PositionFeedbackInterface server i_position_feedback[3],
+                int gpio_on)
 {
 
     //init variables
@@ -362,7 +366,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
             write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, velocity, pos_state.angle, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
 
             //gpio
-            gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
+            gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
 
 
             //compute next loop time

@@ -45,11 +45,12 @@ void position_feedback_display(client interface PositionFeedbackInterface i_posi
             xscope_int(VELOCITY_SHARED_MEMORY, upstream_control_data.velocity);
 
             //write gpio
-            unsigned int gpio_out = 0b1010;
+            unsigned int gpio_out = 0b0010; // we write 1 to the port 1 and 0 to the port 3, port 0 and 2 are in read mode
             i_shared_memory.write_gpio_output(gpio_out);
 
             //read gpio
             xscope_int(GPIO_0, 1000 * upstream_control_data.gpio[0]);
+            xscope_int(GPIO_2, 1000 * upstream_control_data.gpio[2]);
         }
 
         xscope_int(POSITION_1, position_1);
@@ -254,9 +255,9 @@ int main(void)
 
                 position_feedback_config_1.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
 
-                position_feedback_config_1.gpio_config[0] = GPIO_INPUT_PULLDOWN;
+                position_feedback_config_1.gpio_config[0] = GPIO_INPUT;
                 position_feedback_config_1.gpio_config[1] = GPIO_OUTPUT;
-                position_feedback_config_1.gpio_config[2] = GPIO_OUTPUT;
+                position_feedback_config_1.gpio_config[2] = GPIO_INPUT_PULLDOWN;
                 position_feedback_config_1.gpio_config[3] = GPIO_OUTPUT;
 
                 PositionFeedbackConfig position_feedback_config_2;
