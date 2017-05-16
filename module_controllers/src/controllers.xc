@@ -170,7 +170,6 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, M
     nl_pos_ctrl.kd *= nl_pos_ctrl.integral_limit_pos;
     nl_pos_ctrl.kd /=100000.00;
 
-    nl_pos_ctrl.calculated_j = (nl_pos_ctrl.kd*10000000)/(nl_pos_ctrl.constant_gain*0.216);
 
     nl_pos_ctrl.t_max=((double)(motion_ctrl_config.max_torque));
 }
