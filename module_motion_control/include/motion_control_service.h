@@ -22,7 +22,7 @@
 /**
  * @brief Period for the control loop [microseconds].
  */
-#define POSITION_CONTROL_LOOP_PERIOD    1000
+#define POSITION_CONTROL_LOOP_PERIOD    300
 
 /**
  * @brief Threshold to detect brake release in ticks.
