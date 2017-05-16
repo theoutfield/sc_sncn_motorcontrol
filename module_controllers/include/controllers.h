@@ -30,11 +30,11 @@ typedef struct {
     double integral_limit_pos;
     double pid_gain;
 
-    double sensor_gain;         // position feedback gain
+    double sensor_gain;  // position feedback gain
     double resolution;   // position sensor resolution
     double gained_error; //position error which is directly measured
     double constant_gain;
-    double actuator_gain;          // actuator torque gain
+    double actuator_gain;// actuator torque gain
 
     double feedback_p_loop;
     double feedback_d_loop;
@@ -51,9 +51,9 @@ typedef struct {
     double state_min;
     double state_index;
 
-    double dynamic_max_speed; //the maximum speed which the system should have (in order to stop at target with no overshoot)
+    double dynamic_max_speed;   //the maximum speed which the system should have (in order to stop at target with no overshoot)
 
-    double ts_position; // sampling time for position controller [sec]
+    double ts_position;         // sampling time for position controller [sec]
 
     double w_max; // maximum speed [rad/sec]
     double t_max; // maximum motor torque [milli-Nm]

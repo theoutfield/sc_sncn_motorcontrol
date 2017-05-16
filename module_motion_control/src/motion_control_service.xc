@@ -95,6 +95,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 {
     timer t;
     unsigned int ts;
+    unsigned time_start=0, time_start_old=0, time_loop=0, time_end=0, time_free=0, time_used=0;
 
     // structure definition
     UpstreamControlData upstream_control_data;
@@ -238,6 +239,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         select
         {
         case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
+
+                time_start_old = time_start;
+                t :> time_start;
+                time_loop = time_start - time_start_old;
+                time_free = time_start - time_end;
 
                 upstream_control_data = i_torque_control.update_upstream_control_data();
 
@@ -429,6 +435,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
+/*
+
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
@@ -452,6 +460,21 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
 
+                xscope_int(TIME_FREE, (time_free/app_tile_usec));
+                xscope_int(TIME_LOOP, (time_loop/app_tile_usec));
+                xscope_int(TIME_USED, (time_used/app_tile_usec));
+*/
+
+                if((time_used/app_tile_usec)>250)
+                {
+                    while(1)
+                    {
+                        printf("TIMING ERROR \n");
+                    }
+                }
+
+                t :> time_end;
+                time_used = time_end - time_start;
 
                 break;
 
