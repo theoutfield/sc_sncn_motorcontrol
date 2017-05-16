@@ -102,8 +102,8 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
 {
     //************************************
     // reset position controller structure
-    nl_pos_ctrl.k_fb = 0.00;
-    nl_pos_ctrl.k_m = 0.00;
+    nl_pos_ctrl.sensor_gain = 0.00;
+    nl_pos_ctrl.actuator_gain = 0.00;
     nl_pos_ctrl.moment_of_inertia = 0.00;
     nl_pos_ctrl.ts_position = 0.00;
 
@@ -148,8 +148,8 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, M
     // set parameters of position controller structure
     nl_pos_ctrl.w_max= (((double)(motion_ctrl_config.max_motor_speed))*2.00*3.1416)/60;// motion_ctrl_config.max_motor_speed in [rpm]
     nl_pos_ctrl.resolution = ((double)(motion_ctrl_config.resolution));
-    nl_pos_ctrl.k_fb = (nl_pos_ctrl.resolution)/(2.00*3.1416);
-    nl_pos_ctrl.k_m  = ( (double)(1) )/1000.00;
+    nl_pos_ctrl.sensor_gain = (nl_pos_ctrl.resolution)/(2.00*3.1416);
+    nl_pos_ctrl.actuator_gain  = ( (double)(1) )/1000.00;
     nl_pos_ctrl.ts_position = ((double)(control_loop_period))/1000000.00; //s
     nl_pos_ctrl.moment_of_inertia   = ((double)(motion_ctrl_config.moment_of_inertia));// moment of inertia in gram square centimeter
 
@@ -163,7 +163,7 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, M
 
     nl_pos_ctrl.constant_gain = 2/nl_pos_ctrl.ts_position;
     nl_pos_ctrl.constant_gain/= nl_pos_ctrl.ts_position;
-    nl_pos_ctrl.constant_gain/=(nl_pos_ctrl.k_fb * nl_pos_ctrl.k_m);
+    nl_pos_ctrl.constant_gain/=(nl_pos_ctrl.sensor_gain * nl_pos_ctrl.actuator_gain);
 
     nl_pos_ctrl.integral_limit_pos = ((double)(motion_ctrl_config.position_integral_limit))/1000.00;
 
@@ -229,7 +229,7 @@ int update_nl_position_control(
     else if(nl_pos_ctrl.gained_error==0)
         nl_pos_ctrl.dynamic_max_speed  = 0;
 
-    nl_pos_ctrl.dynamic_max_speed /= nl_pos_ctrl.k_fb;
+    nl_pos_ctrl.dynamic_max_speed /= nl_pos_ctrl.sensor_gain;
 
     if(nl_pos_ctrl.moment_of_inertia>=1)
     {
@@ -244,14 +244,14 @@ int update_nl_position_control(
 
     nl_pos_ctrl.state_2*= nl_pos_ctrl.kd;
     nl_pos_ctrl.state_2*= nl_pos_ctrl.ts_position;
-    nl_pos_ctrl.state_2*= nl_pos_ctrl.k_fb;
+    nl_pos_ctrl.state_2*= nl_pos_ctrl.sensor_gain;
     //FIXME: the effect of transient ref_torque is not considered in state_2
     nl_pos_ctrl.state_2*=0.9;
 
     nl_pos_ctrl.state_3 = nl_pos_ctrl.w_max;
     nl_pos_ctrl.state_3*= nl_pos_ctrl.kd;
     nl_pos_ctrl.state_3*= nl_pos_ctrl.ts_position;
-    nl_pos_ctrl.state_3*= nl_pos_ctrl.k_fb;
+    nl_pos_ctrl.state_3*= nl_pos_ctrl.sensor_gain;
 
 
     //consider state_2 only if it is possible to measure moment of inertia.

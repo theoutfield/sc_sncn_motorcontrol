@@ -30,11 +30,11 @@ typedef struct {
     double integral_limit_pos;
     double pid_gain;
 
-    double k_fb;         // position feedback gain
+    double sensor_gain;         // position feedback gain
     double resolution;   // position sensor resolution
     double gained_error; //position error which is directly measured
     double constant_gain;
-    double k_m;          // actuator torque gain
+    double actuator_gain;          // actuator torque gain
 
     double feedback_p_loop;
     double feedback_d_loop;
