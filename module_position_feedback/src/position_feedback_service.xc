@@ -93,6 +93,7 @@ void start_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
 {
     switch(position_feedback_config.sensor_type) {
     case BISS_SENSOR:
+    case SSI_SENSOR:
     case REM_16MT_SENSOR:
     case REM_14_SENSOR:
         serial_encoder_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports, hall_enc_select_config, position_feedback_config, i_shared_memory, i_position_feedback, gpio_on);
@@ -152,7 +153,7 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
             position_feedback_config.sensor_type = 0;
         }
     }
-    else if (position_feedback_config.sensor_type == BISS_SENSOR) {
+    else if (position_feedback_config.sensor_type == BISS_SENSOR || position_feedback_config.sensor_type == SSI_SENSOR) {
         if (spi_ports == null) {
             position_feedback_config.sensor_type = 0;
         } else {
@@ -170,7 +171,11 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
                     configure_in_port(qei_hall_port_2->p_qei_hall, (*spi_ports).spi_interface.blk1);
                 }
             }
-            hall_enc_select_config |=  (1 << position_feedback_config.biss_config.data_port_number);  //RS422 (differential) mode
+            if (position_feedback_config.sensor_type == SSI_SENSOR) {
+                hall_enc_select_config &=  ~(1 << position_feedback_config.biss_config.data_port_number);  //TTL
+            } else {
+                hall_enc_select_config |=  (1 << position_feedback_config.biss_config.data_port_number);  //RS422 (differential) mode
+            }
             //check and configure clock port
             if (position_feedback_config.biss_config.clock_port_config >= BISS_CLOCK_PORT_EXT_D4) { //hall_enc_select_port clock port
                 if (hall_enc_select_port == null || isnull(hall_enc_select_port->p_hall_enc_select)) {
@@ -400,6 +405,7 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                 }
                 break;
             case BISS_SENSOR:
+            case SSI_SENSOR:
                 //move data port
                 if (position_feedback_config_2.biss_config.data_port_number == ENCODER_PORT_1) {
                     qei_hall_port_1_2 = move(qei_hall_port_1_1);

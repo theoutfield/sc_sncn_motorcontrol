@@ -49,15 +49,15 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
         break;
     case BISS_SENSOR:
+    case SSI_SENSOR:
         unsigned int data[BISS_FRAME_BYTES];
-        t when timerafter(last_read + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec) :> void;
-        state.status = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, position_feedback_config.biss_config, data);
+        state.status = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, t, position_feedback_config, data);
         t :> last_read;
         int count;
         if(state.status == SENSOR_NO_ERROR) {
-            { count, state.position, state.status } = biss_encoder(data, position_feedback_config.biss_config);
+            { count, state.position, state.status } = biss_encoder(data, position_feedback_config);
         } else {
-            { count, state.position, void } = biss_encoder(data, position_feedback_config.biss_config);
+            { count, state.position, void } = biss_encoder(data, position_feedback_config);
         }
         if (position_feedback_config.polarity == SENSOR_POLARITY_INVERTED) {
             count = -count;
@@ -104,6 +104,7 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
         read_period = position_feedback_config.ifm_usec*REM_14_POLLING_TIME;
         break;
     case BISS_SENSOR:
+    case SSI_SENSOR:
 #ifdef DEBUG_POSITION_FEEDBACK
         //check if resolution is a power of 2
         if ( position_feedback_config.resolution & (position_feedback_config.resolution -1) )
@@ -134,6 +135,13 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
             printstrln("biss_service: ERROR: initialization");
         printstr(start_message);
         printstrln("BISS");
+        break;
+    case SSI_SENSOR:
+        if (pos_state.status != SENSOR_NO_ERROR) {
+            printstrln("biss_service: ERROR: initialization");
+        }
+        printstr(start_message);
+        printstrln("SSI");
         break;
     case REM_16MT_SENSOR:
         if (pos_state.status != SENSOR_NO_ERROR) {
@@ -268,6 +276,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     { pos_state.last_position, pos_state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
                     break;
                 case BISS_SENSOR:
+                case SSI_SENSOR:
                     read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
                     break;
                 }
@@ -325,7 +334,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     velocity = velocity_compute(difference, timediff_long, position_feedback_config.resolution);
 
                     //filter for REM_16MT_SENSOR
-                    if (sensor_type == REM_16MT_SENSOR || sensor_type == BISS_SENSOR) {
+                    if (sensor_type == REM_16MT_SENSOR || sensor_type == BISS_SENSOR || sensor_type == SSI_SENSOR) {
                         velocity = filter(velocity_buffer, index, 8, velocity);
                         timediff_long = 0;
                     }
@@ -370,7 +379,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
 
             //compute next loop time
-            if (sensor_type == BISS_SENSOR) {
+            if (sensor_type == BISS_SENSOR || sensor_type == SSI_SENSOR) {
                 //for BiSS we read just after the timeout is finished
                 next_read = last_read + (position_feedback_config.biss_config.timeout+2)*position_feedback_config.ifm_usec;
             } else {
