@@ -19,7 +19,16 @@
 						<toolChain id="com.xmos.cdt.toolchain.1753357573" name="com.xmos.cdt.toolchain" superClass="com.xmos.cdt.toolchain">
 							<targetPlatform archList="all" binaryParser="com.xmos.cdt.core.XEBinaryParser;org.eclipse.cdt.core.GNU_ELF" id="com.xmos.cdt.core.platform.418892718" isAbstract="false" osList="linux,win32,macosx" superClass="com.xmos.cdt.core.platform"/>
 							<builder id="com.xmos.cdt.builder.base.1945689195" managedBuildOn="false" name="null.Default" superClass="com.xmos.cdt.builder.base"/>
-							<tool id="com.xmos.cdt.xc.compiler.39660095" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler"/>
+							<tool id="com.xmos.cdt.xc.compiler.39660095" name="com.xmos.cdt.xc.compiler" superClass="com.xmos.cdt.xc.compiler">
+								<option id="com.xmos.xc.compiler.option.include.paths.1345686492" name="com.xmos.xc.compiler.option.include.paths" superClass="com.xmos.xc.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${XMOS_TOOL_PATH}/target/include&quot;"/>
+								</option>
+								<option id="com.xmos.xc.compiler.option.defined.symbols.574552773" superClass="com.xmos.xc.compiler.option.defined.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="__XC__=1"/>
+								</option>
+								<inputType id="com.xmos.cdt.xc.compiler.input.1553009718" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
+							</tool>
+							<tool id="com.xmos.cdt.c.compiler.612135521" name="com.xmos.cdt.c.compiler" superClass="com.xmos.cdt.c.compiler"/>
 							<tool id="com.xmos.cdt.c.compiler.612135521" name="com.xmos.cdt.c.compiler" superClass="com.xmos.cdt.c.compiler"/>
 							<tool id="com.xmos.cdt.cxx.compiler.2061758345" name="com.xmos.cdt.cxx.compiler" superClass="com.xmos.cdt.cxx.compiler"/>
 						</toolChain>
