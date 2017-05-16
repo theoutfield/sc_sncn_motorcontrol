@@ -146,12 +146,12 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, M
 {
     //************************************************
     // set parameters of position controller structure
-    nl_pos_ctrl.w_max= (((double)(motion_ctrl_config.max_motor_speed))*2.00*3.1415)/60;
+    nl_pos_ctrl.w_max= (((double)(motion_ctrl_config.max_motor_speed))*2.00*3.1416)/60;// motion_ctrl_config.max_motor_speed in [rpm]
     nl_pos_ctrl.resolution = ((double)(motion_ctrl_config.resolution));
     nl_pos_ctrl.k_fb = (nl_pos_ctrl.resolution)/(2.00*3.1416);
     nl_pos_ctrl.k_m  = ( (double)(1) )/1000.00;
-    nl_pos_ctrl.moment_of_inertia   = ((double)(motion_ctrl_config.moment_of_inertia));
     nl_pos_ctrl.ts_position = ((double)(control_loop_period))/1000000.00; //s
+    nl_pos_ctrl.moment_of_inertia   = ((double)(motion_ctrl_config.moment_of_inertia));// moment of inertia in gram square centimeter
 
     //check if the PID parameters are in range
     if(0<=motion_ctrl_config.position_kp && motion_ctrl_config.position_kp<=100000000)
@@ -171,7 +171,7 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, M
     nl_pos_ctrl.kd /=100000.00;
 
 
-    nl_pos_ctrl.t_max=((double)(motion_ctrl_config.max_torque));
+    nl_pos_ctrl.t_max=((double)(motion_ctrl_config.max_torque));//t_max in [milli-Nm]
 }
 
 /**
@@ -186,9 +186,9 @@ void nl_position_control_set_parameters(NonlinearPositionControl &nl_pos_ctrl, M
  */
 int update_nl_position_control(
         NonlinearPositionControl &nl_pos_ctrl,
-        double position_ref_k_,
-        double position_sens_k_1_,
-        double position_sens_k_)
+        double position_ref_k_    ,
+        double position_sens_k_1_ ,
+        double position_sens_k_   )
 {
     nl_pos_ctrl.gained_error = position_ref_k_ - position_sens_k_;
 
@@ -220,7 +220,7 @@ int update_nl_position_control(
 
     nl_pos_ctrl.state_1 = nl_pos_ctrl.abs_y_k;
 
-    nl_pos_ctrl.dynamic_max_speed  = (2.00*nl_pos_ctrl.t_max)/1000;//t_max is considered as milli-Nm
+    nl_pos_ctrl.dynamic_max_speed  = (2.00*nl_pos_ctrl.t_max)/1000;//t_max in [milli-Nm]
 
     if(nl_pos_ctrl.gained_error>0)
         nl_pos_ctrl.dynamic_max_speed *=   nl_pos_ctrl.gained_error;
