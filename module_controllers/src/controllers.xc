@@ -124,8 +124,8 @@ void nl_position_control_reset(NonlinearPositionControl &nl_pos_ctrl)
     nl_pos_ctrl.dynamic_max_speed=0.00;
     nl_pos_ctrl.w_max = 0.00;
     nl_pos_ctrl.state_1=0.00;
-    nl_pos_ctrl.state_2=0.00;
-    nl_pos_ctrl.state_3=0.00;
+    nl_pos_ctrl.limit_inertia=0.00;
+    nl_pos_ctrl.limit_w=0.00;
     nl_pos_ctrl.state_min=0.00;
 
     nl_pos_ctrl.torque_ref_k=0.00;
@@ -240,36 +240,36 @@ int update_nl_position_control(
 
     nl_pos_ctrl.dynamic_max_speed  = sqrt(nl_pos_ctrl.dynamic_max_speed);
 
-    nl_pos_ctrl.state_2 = nl_pos_ctrl.dynamic_max_speed;
+    nl_pos_ctrl.limit_inertia = nl_pos_ctrl.dynamic_max_speed;
 
-    nl_pos_ctrl.state_2*= nl_pos_ctrl.kd;
-    nl_pos_ctrl.state_2*= nl_pos_ctrl.ts_position;
-    nl_pos_ctrl.state_2*= nl_pos_ctrl.sensor_gain;
-    //FIXME: the effect of transient ref_torque is not considered in state_2
-    nl_pos_ctrl.state_2*=0.9;
+    nl_pos_ctrl.limit_inertia*= nl_pos_ctrl.kd;
+    nl_pos_ctrl.limit_inertia*= nl_pos_ctrl.ts_position;
+    nl_pos_ctrl.limit_inertia*= nl_pos_ctrl.sensor_gain;
+    //FIXME: the effect of transient ref_torque is not considered in limit_inertia
+    nl_pos_ctrl.limit_inertia*=0.9;
 
-    nl_pos_ctrl.state_3 = nl_pos_ctrl.w_max;
-    nl_pos_ctrl.state_3*= nl_pos_ctrl.kd;
-    nl_pos_ctrl.state_3*= nl_pos_ctrl.ts_position;
-    nl_pos_ctrl.state_3*= nl_pos_ctrl.sensor_gain;
+    nl_pos_ctrl.limit_w = nl_pos_ctrl.w_max;
+    nl_pos_ctrl.limit_w*= nl_pos_ctrl.kd;
+    nl_pos_ctrl.limit_w*= nl_pos_ctrl.ts_position;
+    nl_pos_ctrl.limit_w*= nl_pos_ctrl.sensor_gain;
 
 
-    //consider state_2 only if it is possible to measure moment of inertia.
-    //otherwise, only consider state_1 and state_3
-    if(nl_pos_ctrl.state_1<nl_pos_ctrl.state_3)
+    //consider limit_inertia only if it is possible to measure moment of inertia.
+    //otherwise, only consider state_1 and limit_w
+    if(nl_pos_ctrl.state_1<nl_pos_ctrl.limit_w)
     {
         nl_pos_ctrl.state_min = nl_pos_ctrl.state_1;
         nl_pos_ctrl.state_index=1000;
     }
     else
     {
-        nl_pos_ctrl.state_min = nl_pos_ctrl.state_3;
+        nl_pos_ctrl.state_min = nl_pos_ctrl.limit_w;
         nl_pos_ctrl.state_index=3000;
     }
 
-    if((nl_pos_ctrl.state_2<nl_pos_ctrl.state_min)&&(nl_pos_ctrl.moment_of_inertia>=1))
+    if((nl_pos_ctrl.limit_inertia<nl_pos_ctrl.state_min)&&(nl_pos_ctrl.moment_of_inertia>=1))
     {
-        nl_pos_ctrl.state_min = nl_pos_ctrl.state_2;
+        nl_pos_ctrl.state_min = nl_pos_ctrl.limit_inertia;
         nl_pos_ctrl.state_index=2000;
     }
 

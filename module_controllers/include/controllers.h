@@ -46,8 +46,8 @@ typedef struct {
     double delta_y_k;
 
     double state_1;
-    double state_2;
-    double state_3;
+    double limit_inertia;
+    double limit_w;
     double state_min;
     double state_index;
 
