@@ -139,7 +139,7 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
             position_feedback_config.sensor_type = 0;
         }
         //set qei_hall_port to TTL or RS422 (differential) mode
-        if (position_feedback_config.qei_config.signal_type == QEI_TTL_SIGNAL) {
+        if (position_feedback_config.qei_config.signal_type == ENCODER_PORT_TTL_SIGNAL) {
             hall_enc_select_config &= ~(1 << position_feedback_config.qei_config.port_number) ; //TTL mode
         } else {
             hall_enc_select_config |=  (1 << position_feedback_config.qei_config.port_number);  //RS422 (differential) mode
@@ -171,7 +171,7 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
                     configure_in_port(qei_hall_port_2->p_qei_hall, (*spi_ports).spi_interface.blk1);
                 }
             }
-            if (position_feedback_config.sensor_type == SSI_SENSOR) {
+            if (position_feedback_config.biss_config.data_port_signal_type == ENCODER_PORT_TTL_SIGNAL) {
                 hall_enc_select_config &=  ~(1 << position_feedback_config.biss_config.data_port_number);  //TTL
             } else {
                 hall_enc_select_config |=  (1 << position_feedback_config.biss_config.data_port_number);  //RS422 (differential) mode
