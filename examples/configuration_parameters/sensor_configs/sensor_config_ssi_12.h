@@ -13,6 +13,6 @@
 #define BISS_SENSOR_VELOCITY_COMPUTE_PERIOD 500 // velocity loop time in microseconds
 #define BISS_TIMEOUT               25           // BiSS timeout in microseconds
 #define BISS_BUSY                  0
-#define BISS_CLOCK_PORT            BISS_CLOCK_PORT_EXT_D5
-#define BISS_DATA_PORT_NUMBER      ENCODER_PORT_2
+#define BISS_CLOCK_PORT            BISS_CLOCK_PORT_EXT_D0
+#define BISS_DATA_PORT_NUMBER      ENCODER_PORT_EXT_D1
 #define BISS_DATA_PORT_SIGNAL_TYPE ENCODER_PORT_TTL_SIGNAL   // [ENCODER_PORT_RS422_SIGNAL, ENCODER_PORT_TTL_SIGNAL]

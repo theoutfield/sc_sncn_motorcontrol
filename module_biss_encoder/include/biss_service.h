@@ -13,22 +13,31 @@
 /**
  * @brief Read generic BiSS sensor data
  *
- * @param qei_hall_port_1 BiSS input port 1
- * @param qei_hall_port_2 BiSS input port 2
+ * @param qei_hall_port BiSS/SSI input port
  * @param hall_enc_select_port port used to select the mode (differential or not) of Hall/qei ports and optionally output the BiSS clock
  * @param hall_enc_select_config config to select the mode (differential or not) of Hall/qei ports
- * @param biss_clock_port port used to optionally output the BiSS clock
+ * @param gpio_ports to optionally use gpio ports for input/output
  * @param t used for the timeout
  * @param position_feedback_config Configuration of the BiSS sensor (data lengths, crc polynomial, etc)
  * @param[out] data Array to store the read bits, should be large enough to store all the data bits + crc bits
  *
  * @return error status (No Error, CRC Error, No Ack, No Start Bit)
  */
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
+SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config,
-        port * biss_clock_port, timer t,
+        port * (&?gpio_ports)[4], timer t,
         PositionFeedbackConfig &position_feedback_config, unsigned int data[]);
 
+/**
+ * @brief Read BiSS/SSI bit
+ *
+ * @param qei_hall_port BiSS/SSI input port
+ * @param data_port port used to optionally input the BiSS/SSI data with a gpio port
+ * @param data_port_config input port configuration
+ *
+ * @return bit read
+ */
+unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config);
 
 /**
  * @brief Extract position data from a BiSS encoder raw sensor data

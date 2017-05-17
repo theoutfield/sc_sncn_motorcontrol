@@ -12,9 +12,9 @@
 extern char start_message[];
 
 
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
+SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config,
-        port * biss_clock_port, timer t,
+        port * (&?gpio_ports)[4], timer t,
         PositionFeedbackConfig &position_feedback_config, unsigned int data[])
 {
     unsigned int crc  =  0;
@@ -33,24 +33,23 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
 
     //set clock and data port config
     unsigned int clock_config = 0;
+    port *clock_port;
     if (position_feedback_config.biss_config.clock_port_config <= BISS_CLOCK_PORT_EXT_D3) { //clock is output on a gpio port
         clock_config = 1;
+        clock_port = gpio_ports[position_feedback_config.biss_config.clock_port_config];
     }
     unsigned int data_port_config = 0;
-    if (position_feedback_config.biss_config.data_port_number == ENCODER_PORT_2) {
+    port *data_port;
+    if (position_feedback_config.biss_config.data_port_number > ENCODER_PORT_2) { //data is input on a gpio port
         data_port_config = 1;
+        data_port = gpio_ports[position_feedback_config.biss_config.data_port_number-ENCODER_PORT_EXT_D0];
     }
 
     //wait for the data line to go high
     t :> time;
     timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
     while(bit != 1 && timeafter(timeout, time)) {
-        if (data_port_config) {
-            qei_hall_port_2->p_qei_hall :> bit;
-        } else {
-            qei_hall_port_1->p_qei_hall :> bit;
-        }
-        bit = (bit >> BISS_DATA_PORT_BIT)&1;
+        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
         t :> time;
     }
 
@@ -69,18 +68,13 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
     //read the raw data
     while (read_limit) {
         if (clock_config) { //clock is output on a gpio port
-            *biss_clock_port <:0;
-            *biss_clock_port <:1;
+            *clock_port <:0;
+            *clock_port <:1;
         } else { //clock is output on the hall_enc_select port leftmost 2 bits
             hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
             hall_enc_select_port->p_hall_enc_select <: position_feedback_config.biss_config.clock_port_config | hall_enc_select_config;
         }
-        if (data_port_config) {
-            qei_hall_port_2->p_qei_hall :> bit;
-        } else {
-            qei_hall_port_1->p_qei_hall :> bit;
-        }
-        bit = (bit >> BISS_DATA_PORT_BIT)&1;
+        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
 
         //check ack and start bits and save the data
         if (read_status == 2) { //ack and start bit received, save data
@@ -107,12 +101,7 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
     t :> time;
     timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
     while(bit != 0 && timeafter(timeout, time)) {
-        if (data_port_config) {
-            qei_hall_port_2->p_qei_hall :> bit;
-        } else {
-            qei_hall_port_1->p_qei_hall :> bit;
-        }
-        bit = (bit >> BISS_DATA_PORT_BIT)&1;
+        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
         t :> time;
     }
 
@@ -142,6 +131,18 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
         status = SENSOR_BISS_NO_ACK_BIT_ERROR;
     }
     return status;
+}
+
+unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config)
+{
+    unsigned int bit = 0;
+    if (data_port_config) {
+        *data_port :> bit;
+    } else {
+        qei_hall_port->p_qei_hall :> bit;
+        bit = (bit >> BISS_DATA_PORT_BIT)&1;
+    }
+    return bit;
 }
 
 
