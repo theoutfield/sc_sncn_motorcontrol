@@ -1,12 +1,14 @@
-/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+/*
+ * main.xc
+ *
+ *  Created on: May 9, 2017
+ *      Author: sasa
+ */
+
+
 #include <CORE_C21-DX_G2.bsp>
 #include <IFM_DC1K-rev-c4.bsp>
-
-/**
- * @file main.xc
- * @brief Demo application illustrates usage of lib_bldc_torque_control
- * @author Synapticon GmbH <support@synapticon.com>
- */
+#include <xs1.h>
 
 #include <user_interface_service.h>
 #include <pwm_server.h>
@@ -32,8 +34,8 @@ port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 #define POSITION_LIMIT 5000000 //+/- 4095
 
-int main(void) {
-
+int main()
+{
     // Motor control interfaces
     interface WatchdogInterface i_watchdog[2];
     interface UpdateBrake i_update_brake;
@@ -43,13 +45,13 @@ int main(void) {
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
     interface UpdatePWM i_update_pwm;
-    // interface TuningInterface i_tuning;
 
     par
     {
-        /* WARNING: only one blocking task is possible per tile. */
-        /* Waiting for a user input blocks other tasks on the same tile from execution. */
-        on tile[APP_TILE]: demo_torque_control(i_torque_control[0], i_update_brake);
+        on tile[APP_TILE]:
+        {
+            app_gen_sys_eval(i_torque_control[0]);
+        }
 
         on tile[IFM_TILE]:
         {
@@ -153,11 +155,6 @@ int main(void) {
                     position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
 
                     position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
-
-                    position_feedback_config.gpio_config[0] = GPIO_OFF;
-                    position_feedback_config.gpio_config[1] = GPIO_OFF;
-                    position_feedback_config.gpio_config[2] = GPIO_OFF;
-                    position_feedback_config.gpio_config[3] = GPIO_OFF;
 
                     //setting second sensor
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
