@@ -1,0 +1,91 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol/module_adc/src/adc_service.xc">
+<fDef name="adc_service" global="true" noreturn="false" doNotSpecialize="false" numParams="5"/>
+<fDef name="delay_microseconds" global="true" noreturn="false" doNotSpecialize="true" numParams="1"/>
+<fDef name="delay_milliseconds" global="true" noreturn="false" doNotSpecialize="true" numParams="1"/>
+<fDef name="delay_seconds" global="true" noreturn="false" doNotSpecialize="true" numParams="1"/>
+<fCall name="delay_ticks_longlong" global="true" numArgs="1">
+  <arg num="0">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+</fCall>
+<fCall name="delay_ticks_longlong" global="true" numArgs="1">
+  <arg num="0">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+</fCall>
+<fCall name="delay_ticks_longlong" global="true" numArgs="1">
+  <arg num="0">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+</fCall>
+<fCall name="adc_ad7949" global="true" numArgs="6">
+  <arg num="0">
+    <values>
+      <value type="interface"/>
+    </values>
+  </arg>
+  <arg num="1">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+  <arg num="2">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+  <arg num="3">
+    <passThroughArg param="2" caller="adc_service" global="true"/>
+    <values>
+    </values>
+  </arg>
+  <arg num="4">
+    <passThroughArg param="4" caller="adc_service" global="true"/>
+    <values>
+    </values>
+  </arg>
+  <arg num="5">
+    <passThroughArg param="3" caller="adc_service" global="true"/>
+    <values>
+    </values>
+  </arg>
+</fCall>
+<fCall name="adc_ad7265" global="true" numArgs="6">
+  <arg num="0">
+    <values>
+      <value type="interface"/>
+    </values>
+  </arg>
+  <arg num="1">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+  <arg num="2">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+  <arg num="3">
+    <passThroughArg param="2" caller="adc_service" global="true"/>
+    <values>
+    </values>
+  </arg>
+  <arg num="4">
+    <passThroughArg param="4" caller="adc_service" global="true"/>
+    <values>
+    </values>
+  </arg>
+  <arg num="5">
+    <passThroughArg param="3" caller="adc_service" global="true"/>
+    <values>
+    </values>
+  </arg>
+</fCall>
+</preCompilationAnalysis>

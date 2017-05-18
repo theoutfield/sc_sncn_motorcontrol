@@ -289,6 +289,29 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profiles/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/configuration_parameters/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/ds3/FilterData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/gen}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/os3/FilterData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/ds3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc/pdf}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/os3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/fft}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/api}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.587447682" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -706,6 +729,29 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profiles/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/configuration_parameters/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/ds3/FilterData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/gen}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/os3/FilterData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/ds3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc/pdf}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/os3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/fft}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/api}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.510371603" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1128,6 +1174,29 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_profiles/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/examples/configuration_parameters/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/ds3/FilterData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/gen}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/os3/FilterData}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/ds3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc/images}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc/pdf}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/os3}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/src/fft}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/api}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.438703266" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

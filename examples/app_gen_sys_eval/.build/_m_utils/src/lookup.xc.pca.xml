@@ -1,0 +1,19 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol/module_utils/src/lookup.xc">
+<fDef name="lookup_map256" global="false" unit="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol/module_utils/src/lookup.xc" noreturn="false" doNotSpecialize="false" numParams="1"/>
+<fDef name="sine_table_expanded" global="true" noreturn="false" doNotSpecialize="false" numParams="1"/>
+<fDef name="sine_third_expanded" global="true" noreturn="false" doNotSpecialize="false" numParams="1"/>
+<fCall name="lookup_map256" global="false" unit="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol/module_utils/src/lookup.xc" numArgs="1">
+  <arg num="0">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+</fCall>
+<fCall name="lookup_map256" global="false" unit="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol/module_utils/src/lookup.xc" numArgs="1">
+  <arg num="0">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+</fCall>
+</preCompilationAnalysis>

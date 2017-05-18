@@ -1,0 +1,3 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol_new/sc_sncn_motorcontrol_new/module_bldc_torque_control/libsrc/src/predict.xc">
+<fDef name="predict" global="true" noreturn="false" doNotSpecialize="false" numParams="3"/>
+</preCompilationAnalysis>

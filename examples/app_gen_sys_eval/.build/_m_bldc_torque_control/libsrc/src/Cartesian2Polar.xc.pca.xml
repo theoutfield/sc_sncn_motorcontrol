@@ -1,0 +1,3 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol_new/sc_sncn_motorcontrol_new/module_bldc_torque_control/libsrc/src/Cartesian2Polar.xc">
+<fDef name="Cartesian2Polar" global="true" noreturn="false" doNotSpecialize="false" numParams="2"/>
+</preCompilationAnalysis>

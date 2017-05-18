@@ -1,0 +1,4 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol_new/sc_sncn_motorcontrol_new/module_auto_tune/src/auto_tune.xc">
+<fDef name="init_velocity_auto_tuner" global="true" noreturn="false" doNotSpecialize="false" numParams="3"/>
+<fDef name="velocity_controller_auto_tune" global="true" noreturn="false" doNotSpecialize="false" numParams="4"/>
+</preCompilationAnalysis>

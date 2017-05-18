@@ -1,0 +1,10 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol_new/sc_sncn_motorcontrol_new/module_bldc_torque_control/libsrc/src/offset_detection.xc">
+<fDef name="offset_detection" global="true" noreturn="false" doNotSpecialize="false" numParams="2"/>
+<fCall name="initialize_control" global="true" numArgs="1">
+  <arg num="0">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+</fCall>
+</preCompilationAnalysis>

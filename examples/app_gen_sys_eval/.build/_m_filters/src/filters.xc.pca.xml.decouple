@@ -1,0 +1,10 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol/module_filters/src/filters.xc">
+<fDef name="filter" global="true" noreturn="false" doNotSpecialize="false" numParams="4"/>
+<fDef name="first_order_LP_filter_init" global="true" noreturn="false" doNotSpecialize="false" numParams="3"/>
+<fDef name="first_order_LP_filter_update" global="true" noreturn="false" doNotSpecialize="false" numParams="2"/>
+<fDef name="init_filter" global="true" noreturn="false" doNotSpecialize="false" numParams="3"/>
+<fDef name="second_order_LP_filter_init" global="true" noreturn="false" doNotSpecialize="false" numParams="3"/>
+<fDef name="second_order_LP_filter_update" global="true" noreturn="false" doNotSpecialize="false" numParams="2"/>
+<fDef name="third_order_LP_filter_init" global="true" noreturn="false" doNotSpecialize="false" numParams="3"/>
+<fDef name="third_order_LP_filter_update" global="true" noreturn="false" doNotSpecialize="false" numParams="2"/>
+</preCompilationAnalysis>

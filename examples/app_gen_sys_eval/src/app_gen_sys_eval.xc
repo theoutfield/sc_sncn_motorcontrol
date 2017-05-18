@@ -93,6 +93,7 @@ void app_gen_sys_eval(client interface TorqueControlInterface i_torque_control)
                         printf("Ra= %.2f\n", R[A]);
                         printf("Rb= %.2f\n", R[B]);
                         printf("Rc= %.2f\n", R[C]);
+                        nr_measur  = 0;
 
                         break;
                 }

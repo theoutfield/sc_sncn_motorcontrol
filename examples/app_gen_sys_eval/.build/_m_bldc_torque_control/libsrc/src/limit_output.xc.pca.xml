@@ -1,0 +1,15 @@
+<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol_new/sc_sncn_motorcontrol_new/module_bldc_torque_control/libsrc/src/limit_output.xc">
+<fDef name="limit_output" global="true" noreturn="false" doNotSpecialize="false" numParams="2"/>
+<fCall name="Cartesian2Polar" global="true" numArgs="2">
+  <arg num="0">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+  <arg num="1">
+    <values>
+      <value type="unknown"/>
+    </values>
+  </arg>
+</fCall>
+</preCompilationAnalysis>
