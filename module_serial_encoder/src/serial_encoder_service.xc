@@ -181,6 +181,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     int timediff_long = 0;
     //position
     PositionState pos_state = {0};
+    int singleturn = 0;
     //timing
     timer t;
     unsigned int last_read = 0;
@@ -360,13 +361,19 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     last_sensor_error = pos_state.status;
                 }
             }
-            if(sensor_resolution < 65536)
+
+            //format the sensor singleturn position as a 16-bit data
+            if (sensor_type == BISS_SENSOR) {
+
+                singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
+            }
+            else if (sensor_type == REM_14_SENSOR)
             {
-                pos_state.position = pos_state.position << (16 - 13);
+                singleturn = pos_state.position << 2;
             }
 
             //send data to shared memory
-            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, pos_state.position, velocity, pos_state.angle, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
+            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, singleturn, velocity, pos_state.angle, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
 
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);

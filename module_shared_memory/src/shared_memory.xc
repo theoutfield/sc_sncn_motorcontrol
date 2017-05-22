@@ -60,7 +60,7 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 data.angle_sensor_error = sensor_error;
                 data.angle_last_sensor_error = last_sensor_error;
                 data.secondary_position = position;
-                data.singleturn = singleturn;
+                data.secondary_singleturn = singleturn;
                 data.secondary_velocity = velocity;
                 data.secondary_sensor_error = sensor_error;
                 data.secondary_last_sensor_error = last_sensor_error;
@@ -78,7 +78,7 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
 
         case i_shared_memory[int j].write_secondary_feedback(int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp):
                 data.secondary_position = position;
-                data.singleturn = singleturn;
+                data.secondary_singleturn = singleturn;
                 data.secondary_velocity = velocity;
                 data.secondary_sensor_error = sensor_error;
                 data.secondary_last_sensor_error = last_sensor_error;

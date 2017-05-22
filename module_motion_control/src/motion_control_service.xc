@@ -96,6 +96,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     timer t;
     unsigned int ts;
 
+    int torque_measurement;
+    int torque_buffer [8] = {0};
+    int index = 0;
+
     // structure definition
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
@@ -338,7 +342,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 if (upstream_control_data.singleturn % ct_parameters.position_step)
                                 {
                                     int index = upstream_control_data.singleturn / ct_parameters.position_step;
-                                    ct_parameters.torque_recording[index] += torque_ref_k;
+                                    ct_parameters.torque_recording[index] += torque_measurement;
                                     if (ct_parameters.counter_average[index] == 0)
                                     {
                                         ct_parameters.remaining_cells--;
@@ -373,7 +377,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     {
                                         motorcontrol_config.torque_offset[i] += ct_parameters.torque_recording[i];
                                         motorcontrol_config.torque_offset[i] /= 2;
-                                        //                                    printf("%d\n", motorcontrol_config.torque_offset[i]);
                                         ct_parameters.torque_recording[i]= 0;
                                     }
                                     ct_parameters.rotation_sign = 0;
@@ -490,7 +493,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             min_position_orig = min_position;
                         }
                     }
-                    //increase limit by threashold
+                    //increase limit by threshold
                     max_position += POSITION_LIMIT_THRESHOLD;
                     min_position -= POSITION_LIMIT_THRESHOLD;
                 }
@@ -525,9 +528,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
+                torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
+
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(POSITION, upstream_control_data.position);
+                xscope_int(POSITION, upstream_control_data.count);
                 xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
                 xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);

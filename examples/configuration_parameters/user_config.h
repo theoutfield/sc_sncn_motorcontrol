@@ -11,7 +11,8 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config_AMK_DD5.h>
+
+#include <motor_config_Nanotec_DB59C02.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -24,7 +25,7 @@
 ///////////////////////
 
 // SENSOR 1 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
+#define SENSOR_1_TYPE                     QEI_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -34,13 +35,13 @@
 #define SENSOR_1_FUNCTION                 SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL
 
 // RESOLUTION (TICKS PER TURN) OF SENSOR_1
-#define SENSOR_1_RESOLUTION               REM_16MT_SENSOR_RESOLUTION
+#define SENSOR_1_RESOLUTION               QEI_SENSOR_RESOLUTION
 
 // VELOCITY COMPUTE PERIOD (ALSO POLLING RATE) OF SENSOR_1 (in microseconds)
-#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
+#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  QEI_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [1,-1]
-#define SENSOR_1_POLARITY                 SENSOR_POLARITY_INVERTED
+#define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
 
 
 ///////////////////////
@@ -90,8 +91,8 @@
 // (maximum) generated torque while finding offset value as a percentage of rated torque
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
-//// COMMUTATION CW SPIN OFFSET (if applicable) [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    3178
+//// COMMUTATION ANGLE OFFSET [0:4095]
+#define COMMUTATION_ANGLE_OFFSET    1400
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -119,16 +120,16 @@
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
-#define VELOCITY_Kp                             700000
-#define VELOCITY_Ki                             20000
+#define VELOCITY_Kp                             8000000
+#define VELOCITY_Ki                             2000000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             20000
-#define POSITION_Ki                             500
-#define POSITION_Kd                             41000
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode

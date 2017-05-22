@@ -212,6 +212,7 @@ typedef struct
     unsigned int sensor_timestamp;
 
     int secondary_position;
+    int secondary_singleturn;
     int secondary_velocity;
     SensorError  secondary_sensor_error;
     SensorError  secondary_last_sensor_error;

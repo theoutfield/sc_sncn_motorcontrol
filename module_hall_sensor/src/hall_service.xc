@@ -113,7 +113,8 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
     int hall_sector_and_state;
     hall_sector_and_state=0;
 
-    int angle_out=0, last_angle=0, speed_out=0, count = 0;
+    int angle_out=0, last_angle=0, speed_out=0, count = 0, singleturn = 0;
+    int singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
     int init_angle = 0;
 
     int hall_sector_and_state_temp;
@@ -206,7 +207,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, SensorError status }:
                 out_count = count;
-                out_position = angle_out;
+                out_position = singleturn;
                 status = SENSOR_NO_ERROR;
                 break;
 
@@ -424,8 +425,10 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 }
                 last_angle = angle_out;
 
+                singleturn = (count % singleturn_resolution )* 16 / position_feedback_config.pole_pairs;
+
                 tx :> time1;
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, angle_out, speed_out, angle_out, hall_state_new, SENSOR_NO_ERROR, SENSOR_NO_ERROR, time1/position_feedback_config.ifm_usec);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn, speed_out, angle_out, hall_state_new, SENSOR_NO_ERROR, SENSOR_NO_ERROR, time1/position_feedback_config.ifm_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);

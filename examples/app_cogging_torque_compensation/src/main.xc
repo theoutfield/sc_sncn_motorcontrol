@@ -57,7 +57,19 @@ int main(void) {
             {
                 {
 
+
+                    printf("Start\n");
                     delay_seconds(3);
+                    MotorcontrolConfig motorcontrol_config = i_motion_control[1].get_motorcontrol_config();
+
+                    //Uncomment these lines if the sensor is a QEI
+//                    motorcontrol_config = i_motion_control[1].set_offset_detection_enabled();
+//                    printf("First index found\n");
+
+                    motorcontrol_config = i_motion_control[1].set_offset_detection_enabled();
+
+                    printf("Start cogging torque\n");
+
                     i_motion_control[1].enable_velocity_ctrl();
                     MotionControlConfig motion_ctrl_config = i_motion_control[1].get_motion_control_config();
                     motion_ctrl_config.enable_compensation_recording = 1;
@@ -68,14 +80,17 @@ int main(void) {
                         motion_ctrl_config = i_motion_control[0].get_motion_control_config();
                         delay_milliseconds(1);
                     }
-                    i_motion_control[1].enable_cogging_compensation(1);
-                    i_motion_control[1].enable_velocity_ctrl();
 
+                    i_motion_control[1].enable_velocity_ctrl();
                     DownstreamControlData downstream_control_data;
 
                     downstream_control_data.velocity_cmd = 10;
                     downstream_control_data.offset_torque = 0;
                     i_motion_control[1].update_control_data(downstream_control_data);
+
+                    i_motion_control[1].enable_cogging_compensation(1);
+                    while(1);
+
                 }
 
                 {
