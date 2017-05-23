@@ -9,6 +9,7 @@ Commutation angle offset and PID gains tuning helper
     :depth: 3
 
 The purpose of this application is finding the commutation angle offset to be able to turn the motor, and the the PID setting for position and velocity controllers.
+The application is given the functionnality to compensate the cogging torque of the motor, allowing a better control at slow speed.
 
 This is a console app which use simple command of 1, 2 or 3 characters and an optional value.
 
@@ -27,7 +28,8 @@ Console commands
 
 The app uses commands up to 3 characters with an optional value. The command are executed by pressing enter. If no value is entered the default is `0`:
 
-- ``a``: start the auto offset tuning. It automatically update the offset field display. If the offset detection fails the offset will be -1. If it displays "WRONG POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. After the offset is found you need to make sure that a positive torque command result in a positive velocity/position increment. Otherwise the position and velocity controller will not work.
+- ``ao``: start the auto offset tuning. It automatically updates the offset field display. If the offset detection fails the offset will be -1. If it displays "WRONG POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. After the offset is found you need to make sure that a positive torque command result in a positive velocity/position increment. Otherwise the position and velocity controller will not work.
+- ``ac``: start the cogging torque detection. It automatically records the cogging torque present in the motor in one mechanical rotation. After the torque is recorded, press "ec1" to enable the compensation of the cogging torque
 - ``kp``: print the position PID parameters
 - ``kpp [number]``: set the P coefficient of the Position controller.
 - ``kpi [number]``: set the I coefficient of the Position controller.
@@ -50,6 +52,7 @@ The app uses commands up to 3 characters with an optional value. The command are
 - ``ep3``: enable position control with Non linear controller
 - ``ev1``: enable velocity control 
 - ``et1``: enable torque control 
+- ``ec[number]``: 1 -> enable cogging torque compensation ; 0 -> disable cogging torque compensation
 - ``p``: set a position command (the position controller need to be started first)
 - ``pp``: set a position command with profiler
 - ``ps``: do a position step command
@@ -179,7 +182,7 @@ Quick How-to
 
 #. When the app start you can check if the motor control and sensor error are `0` and maybe turn the motor manually to see if the position and velocity feedback are working
 
-   Use the ``a`` command to start the offset detection. This should make the motor turn slowly in both direction for maximum one minute. When it is finished the 
+   Use the ``ao`` command to start the offset detection. This should make the motor turn slowly in both direction for maximum one minute. When it is finished the 
    offset is printed. If the motor does not move or with difficulty try increasing the offset detection torque with the ``op`` command. If it displays "WRONG 
    POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. You can try to run the offset 
    detection several time to see if you get similar result. After the offset is found you need to make sure that a positive torque command result in a positive 
@@ -187,6 +190,10 @@ Quick How-to
 
    Then you can use the command starting with `k` to tune the position and velocity controllers. There are tutorials on the `documentation <https://doc.synapticon.com/tutorials/index.html>`_
 
-   .. important:: When you have found the offset and PID parameters save them in your **user_config.h** file for your app
+	To be able to start the cogging torque detection you need to tune your velocity controller in order to have a stable speed at 10 RPM. Then start the measurement with the command 'ac'. 
+	The motor will operate two turns in each direction at slow speed.
+	Once the measurement is done, it is possible to enable or disable the compensation with the command 'ec'
+   
+.. important:: When you have found the offset and PID parameters save them in your **user_config.h** file for your app
 
 .. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
