@@ -157,6 +157,8 @@
 #define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
 
+#define POSITION_CONTROL_STRATEGY               NL_POSITION_CONTROLLER
+
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
