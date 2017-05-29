@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+#include <motor_config_FAULHABER.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -24,7 +24,7 @@
 ///////////////////////
 
 // SENSOR 1 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
+#define SENSOR_1_TYPE                     HALL_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -81,7 +81,7 @@
 //////////////////////////////////////////////
 // Warning!!! This parameter alters PWM switching frequency.
 // Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
-#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile.
+#define IFM_TILE_USEC       USEC_STD      // Number of ticks in a microsecond for IFM Tile.
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
@@ -91,16 +91,16 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    0
+#define COMMUTATION_ANGLE_OFFSET    1303
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
-#define HALL_STATE_1_ANGLE     0
-#define HALL_STATE_2_ANGLE     0
-#define HALL_STATE_3_ANGLE     0
-#define HALL_STATE_4_ANGLE     0
-#define HALL_STATE_5_ANGLE     0
-#define HALL_STATE_6_ANGLE     0
+#define HALL_STATE_1_ANGLE     4003
+#define HALL_STATE_2_ANGLE     2681
+#define HALL_STATE_3_ANGLE     3348
+#define HALL_STATE_4_ANGLE     1301
+#define HALL_STATE_5_ANGLE     693
+#define HALL_STATE_6_ANGLE     1969
 
 // MOTOR POLARITY [MOTOR_PHASES_NORMAL, MOTOR_PHASES_INVERTED]
 #define MOTOR_PHASE_CONFIGURATION       MOTOR_PHASES_NORMAL

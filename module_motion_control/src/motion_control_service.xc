@@ -19,8 +19,22 @@
 #include <motion_control_service.h>
 #include <refclk.h>
 #include <mc_internal_constants.h>
-#include <stdio.h>
 
+#include <dsp.h>
+
+#define MAX_PERCENTAGE 100
+#define MIN_PERCENTAGE 0
+#define FILTER 100
+
+enum
+{
+    A,
+    B,
+    C,
+    NR_PHASES
+};
+
+int32_t v_dc[FILTER];
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque, MotionControlError &motion_control_error)
 {
@@ -216,6 +230,17 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     if(ctrlReadData == 1) {
         app_tile_usec = USEC_FAST;
     }
+
+    // open phase detection
+
+    int phase_voltage_percentage[NR_PHASES] = {0, 0, 0};
+    int filter_out = 0;
+    float Vdc = 0, V[NR_PHASES] = { 0 }, I[NR_PHASES] = { 0 };
+    int z = 0;
+    int start = 0;
+    int nr_measur = 0;
+    float rb_rc = 0, ib_ic = 0, ib = 0, vb_va = 0;
+    unsigned counter = 10000;
 
     //brake
     int special_brake_release_counter = BRAKE_RELEASE_DURATION+1;
@@ -767,6 +792,103 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 velocity_enable_flag = 0;
                 position_enable_flag = 0;
                 i_torque_control.set_safe_torque_off_enabled();
+                break;
+
+        case i_motion_control[int i].open_phase_detection() -> {float res_a, float res_b, float res_c}:
+
+                nr_measur = 0;
+                start = 0;
+                i_torque_control.set_torque_control_disabled();
+                i_torque_control.start_system_eval();
+
+                while (nr_measur < 3)
+                {
+                    ++nr_measur;
+                    counter = 10000;
+
+                    for (int i= 0; i < NR_PHASES; i++)
+                    {
+                        if(I[i] < 0)
+                            I[i] = -I[i];
+                    }
+
+                    switch (nr_measur)
+                    {
+                    case 1:
+                        phase_voltage_percentage[A] = 30;
+                        phase_voltage_percentage[B] = 50;
+                        phase_voltage_percentage[C] = 50;
+                        break;
+
+                    case 2:
+                        phase_voltage_percentage[A] = 50;
+                        phase_voltage_percentage[B] = 30;
+                        phase_voltage_percentage[C] = 50;
+                        rb_rc = I[C]/I[B];   // Rb/Rc
+                        ib_ic = I[B] + I[C];
+                        ib = I[B];
+                        vb_va = V[B] - V[A];
+                        break;
+
+                    case 3:
+                        res_c = (V[A] - V[B]) / (I[B] * rb_rc + I[C]);
+                        res_b = rb_rc * res_c;
+                        res_a = (vb_va - ib*res_b)/ib_ic;
+
+                        break;
+                    }
+
+                    for (int i= 0; i < NR_PHASES; i++)
+                    {
+                        if (phase_voltage_percentage[i] > MAX_PERCENTAGE)
+                            phase_voltage_percentage[i] = MAX_PERCENTAGE;
+
+                        if (phase_voltage_percentage[i] < MIN_PERCENTAGE)
+                            phase_voltage_percentage[i] = MIN_PERCENTAGE;
+                    }
+
+                    i_torque_control.set_evaluation_references(phase_voltage_percentage[A], phase_voltage_percentage[B], phase_voltage_percentage[C]);
+
+                    while (counter > 0)
+                    {
+                        upstream_control_data = i_torque_control.update_upstream_control_data();
+
+                        /*
+                         * moving average filter for DC bus voltage
+                         * average of last FILTER values
+                         */
+                        if(z < FILTER)
+                            v_dc[z++] = upstream_control_data.V_dc;
+                        else
+                        {
+                            start = 1;
+                            z = 0;
+                        }
+
+                        filter_out = dsp_vector_mean(v_dc, FILTER, 16);
+
+                        if (start)
+                        {
+                            /*
+                             * voltage calculation
+                             */
+                            Vdc = (float)filter_out/(1<<16);
+                            for (int i = 0; i <  NR_PHASES; i++)
+                                V[i] = (float)phase_voltage_percentage[i]/100*filter_out/(1<<16);
+
+                            /*
+                             * current calculation
+                             */
+
+                            I[B] = (float)upstream_control_data.I_b/(1<<16);
+                            I[C] = (float)upstream_control_data.I_c/(1<<16);
+                            I[A] = -(I[B] + I[C]);
+
+                        }
+
+                        --counter;
+                    }
+                }
                 break;
         }
     }
