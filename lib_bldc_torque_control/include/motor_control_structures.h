@@ -88,8 +88,8 @@ typedef enum {
  * @brief Fixes matching of reference torque sign to position and velocity signs.
  */
 typedef enum {
-    MOTOR_PHASES_NORMAL   = 1,  /**< Normal connection  */
-    MOTOR_PHASES_INVERTED =-1   /**< Flipped connection */
+    MOTOR_PHASES_NORMAL   = 0,  /**< Normal connection  */
+    MOTOR_PHASES_INVERTED = 1   /**< Flipped connection */
 } MotorPhasesConfiguration;
 
 /**
@@ -99,14 +99,6 @@ typedef enum {
     LINEAR  = 1 /**< Linear profiler */
 } MotionProfileType;
 
-
-/**
- * @brief Type for the polarity of the position sensor
- */
-typedef enum {
-    NORMAL_POLARITY  = 1, /**< Normal polarity. */
-    INVERTED_POLARITY=-1   /**< Inverted polarity. */
-} PolarityType;
 
 /**
  * @brief Fault Codes
