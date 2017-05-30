@@ -1,6 +1,11 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+3.0.2
+-----
+
+  * Rename MOTOR_PHASES_CONFIGURATION in user_config.h and main.xc files.
+
 3.0.1
 -----
 

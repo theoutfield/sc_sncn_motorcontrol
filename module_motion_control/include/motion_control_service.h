@@ -44,10 +44,10 @@
  * @brief Position/Velocity control strategie
  */
 typedef enum {
-    POS_PID_CONTROLLER                      = 101,
-    POS_PID_VELOCITY_CASCADED_CONTROLLER    = 102,
-    NL_POSITION_CONTROLLER                  = 103,
-    VELOCITY_PID_CONTROLLER                 = 201
+    POS_PID_CONTROLLER                      = 1,
+    POS_PID_VELOCITY_CASCADED_CONTROLLER    = 2,
+    NL_POSITION_CONTROLLER                  = 3,
+    VELOCITY_PID_CONTROLLER                 = 4
 } MotionControlStrategies;
 
 
