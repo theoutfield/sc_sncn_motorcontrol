@@ -182,6 +182,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
     int temperature_ratio = motorcontrol_config.temperature_ratio;
+    int current_ratio = motorcontrol_config.current_ratio;
 
     nl_position_control_reset(nl_pos_ctrl);
     nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
@@ -235,8 +236,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     int phase_voltage_percentage[NR_PHASES] = {0, 0, 0};
     int filter_out = 0;
-    float Vdc = 0, V[NR_PHASES] = { 0 }, I[NR_PHASES] = { 0 };
-    int z = 0;
+    float I[NR_PHASES] = { 0 };
+    int z = 0, V[NR_PHASES] = { 0 }, Ib = 0, Ic = 0;
     int start = 0;
     int nr_measur = 0;
     float rb_rc = 0, ib_ic = 0, ib = 0, vb_va = 0;
@@ -814,28 +815,28 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                     switch (nr_measur)
                     {
-                    case 1:
-                        phase_voltage_percentage[A] = 30;
-                        phase_voltage_percentage[B] = 50;
-                        phase_voltage_percentage[C] = 50;
-                        break;
+                        case 1:
+                            phase_voltage_percentage[A] = 30;
+                            phase_voltage_percentage[B] = 50;
+                            phase_voltage_percentage[C] = 50;
+                            break;
 
-                    case 2:
-                        phase_voltage_percentage[A] = 50;
-                        phase_voltage_percentage[B] = 30;
-                        phase_voltage_percentage[C] = 50;
-                        rb_rc = I[C]/I[B];   // Rb/Rc
-                        ib_ic = I[B] + I[C];
-                        ib = I[B];
-                        vb_va = V[B] - V[A];
-                        break;
+                        case 2:
+                            phase_voltage_percentage[A] = 50;
+                            phase_voltage_percentage[B] = 30;
+                            phase_voltage_percentage[C] = 50;
+                            rb_rc = I[C]/I[B];   // Rb/Rc
+                            ib_ic = I[B] + I[C];
+                            ib = I[B];
+                            vb_va = V[B] - V[A];
+                            break;
 
-                    case 3:
-                        res_c = (V[A] - V[B]) / (I[B] * rb_rc + I[C]);
-                        res_b = rb_rc * res_c;
-                        res_a = (vb_va - ib*res_b)/ib_ic;
+                        case 3:
+                            res_c = (V[A] - V[B]) / (I[B] * rb_rc + I[C]);
+                            res_b = rb_rc * res_c;
+                            res_a = (vb_va - ib*res_b)/ib_ic;
 
-                        break;
+                            break;
                     }
 
                     for (int i= 0; i < NR_PHASES; i++)
@@ -852,6 +853,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     while (counter > 0)
                     {
                         upstream_control_data = i_torque_control.update_upstream_control_data();
+
+                        Ib = (float)(upstream_control_data.I_b)/(float)(current_ratio) * (1<<16);
+                        Ic = (float)(upstream_control_data.I_c)/(float)(current_ratio)  * (1<<16);
 
                         /*
                          * moving average filter for DC bus voltage
@@ -872,16 +876,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             /*
                              * voltage calculation
                              */
-                            Vdc = (float)filter_out/(1<<16);
                             for (int i = 0; i <  NR_PHASES; i++)
-                                V[i] = (float)phase_voltage_percentage[i]/100*filter_out/(1<<16);
+                                V[i] = phase_voltage_percentage[i] * filter_out / 100;
 
                             /*
                              * current calculation
                              */
 
-                            I[B] = (float)upstream_control_data.I_b/(1<<16);
-                            I[C] = (float)upstream_control_data.I_c/(1<<16);
+                            I[B] = (float)Ib/(1<<16);
+                            I[C] = (float)Ic/(1<<16);
                             I[A] = -(I[B] + I[C]);
 
                         }
@@ -889,6 +892,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         --counter;
                     }
                 }
+
                 break;
         }
     }
