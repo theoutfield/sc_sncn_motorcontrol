@@ -126,9 +126,9 @@
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
+#define POSITION_Kp                             10000
+#define POSITION_Ki                             100
+#define POSITION_Kd                             40000
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
