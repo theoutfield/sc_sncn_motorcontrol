@@ -48,7 +48,8 @@ typedef enum {
     SENSOR_BISS_ERROR_AND_WARNING_BIT_ERROR    = 17,
     SENSOR_BISS_NO_ACK_BIT_ERROR               = 18,
     SENSOR_BISS_NO_START_BIT_ERROR             = 19,
-    SENSOR_CHECKSUM_ERROR                      = 20
+    SENSOR_CHECKSUM_ERROR                      = 20,
+    SENSOR_BISS_DATA_LINE_ERROR                = 21
 } SensorError;
 
 /**
@@ -88,8 +89,8 @@ typedef enum {
  * @brief Fixes matching of reference torque sign to position and velocity signs.
  */
 typedef enum {
-    MOTOR_PHASES_NORMAL   = 1,  /**< Normal connection  */
-    MOTOR_PHASES_INVERTED =-1   /**< Flipped connection */
+    MOTOR_PHASES_NORMAL   = 0,  /**< Normal connection  */
+    MOTOR_PHASES_INVERTED = 1   /**< Flipped connection */
 } MotorPhasesConfiguration;
 
 /**
@@ -99,14 +100,6 @@ typedef enum {
     LINEAR  = 1 /**< Linear profiler */
 } MotionProfileType;
 
-
-/**
- * @brief Type for the polarity of the position sensor
- */
-typedef enum {
-    NORMAL_POLARITY  = 1, /**< Normal polarity. */
-    INVERTED_POLARITY=-1   /**< Inverted polarity. */
-} PolarityType;
 
 /**
  * @brief Fault Codes

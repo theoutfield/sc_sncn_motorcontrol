@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        100       //maximum tolerable value of phase current (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        100000    //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
@@ -103,7 +103,7 @@
 #define HALL_STATE_6_ANGLE     0
 
 // MOTOR POLARITY [MOTOR_PHASES_NORMAL, MOTOR_PHASES_INVERTED]
-#define MOTOR_PHASE_CONFIGURATION       MOTOR_PHASES_NORMAL
+#define MOTOR_PHASES_CONFIGURATION       MOTOR_PHASES_NORMAL
 
 
 ///////////////////////////////////////////////
@@ -157,6 +157,9 @@
 #define MAX_ACCELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
+
+#define POSITION_CONTROL_STRATEGY               NL_POSITION_CONTROLLER
+
 
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
