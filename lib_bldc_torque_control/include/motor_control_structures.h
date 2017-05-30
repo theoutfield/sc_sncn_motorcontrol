@@ -48,7 +48,8 @@ typedef enum {
     SENSOR_BISS_ERROR_AND_WARNING_BIT_ERROR    = 17,
     SENSOR_BISS_NO_ACK_BIT_ERROR               = 18,
     SENSOR_BISS_NO_START_BIT_ERROR             = 19,
-    SENSOR_CHECKSUM_ERROR                      = 20
+    SENSOR_CHECKSUM_ERROR                      = 20,
+    SENSOR_BISS_DATA_LINE_ERROR                = 21
 } SensorError;
 
 /**
