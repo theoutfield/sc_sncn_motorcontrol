@@ -12,7 +12,7 @@
 extern char start_message[];
 
 
-inline unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config)
+static inline unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config)
 {
     unsigned int bit = 0;
     if (data_port_config) {
