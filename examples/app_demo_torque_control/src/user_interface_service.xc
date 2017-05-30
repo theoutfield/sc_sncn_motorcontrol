@@ -11,7 +11,6 @@
 #include <print.h>
 
 #include <user_interface_service.h>
-#include <dsp.h>
 #include <position_feedback_service.h>
 #include <motor_control_interfaces.h>
 #include <xscope.h>
@@ -106,20 +105,6 @@ void update_brake(
     i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 }
 
-#define MAX_PERCENTAGE 100
-#define MIN_PERCENTAGE 0
-#define FILTER 100
-
-enum
-{
-    A,
-    B,
-    C,
-    NR_PHASES
-};
-
-int32_t v_dc[FILTER];
-
 void demo_torque_control(interface TorqueControlInterface client i_torque_control, client interface UpdateBrake i_update_brake)
 {
 
@@ -145,16 +130,6 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
     pull_brake_time   =  2000; //milli-Seconds
     dc_bus_voltage = motorcontrol_config.dc_bus_voltage;
     update_brake(app_tile_usec, dc_bus_voltage, pull_brake_voltage, hold_brake_voltage, pull_brake_time, i_torque_control, i_update_brake);
-
-    int phase_voltage_percentage[NR_PHASES] = {0, 0, 0};
-    int filter_out = 0;
-    float Vdc = 0, V[NR_PHASES] = { 0 }, I[NR_PHASES] = { 0 }, R[NR_PHASES];
-
-    int i = 0;
-    int start = 0;
-    int nr_measur = 0;
-    float rb_rc = 0, ib_ic = 0, ib = 0, vb_va = 0;
-    unsigned counter = 10000;
 
     printf(" DEMO_TORQUE_CONTROL started...\n");
     i_torque_control.set_brake_status(1);
@@ -263,118 +238,6 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
                     printf("Torque control deactivated\n");
                 }
                 break;
-
-        case 'g':
-
-            printf("app gen syst eval started\n");
-            nr_measur = 0;
-            start = 0;
-            i_torque_control.set_torque_control_disabled();
-            i_torque_control.start_system_eval();
-
-              while (nr_measur < 3)
-              {
-                  ++nr_measur;
-                  counter = 10000;
-
-                  for (int i= 0; i < NR_PHASES; i++)
-                  {
-                      if(I[i] < 0)
-                          I[i] = -I[i];
-                  }
-
-                  switch (nr_measur)
-                  {
-                      case 1:
-                          phase_voltage_percentage[A] = 30;
-                          phase_voltage_percentage[B] = 50;
-                          phase_voltage_percentage[C] = 50;
-                          break;
-
-                      case 2:
-                          phase_voltage_percentage[A] = 50;
-                          phase_voltage_percentage[B] = 30;
-                          phase_voltage_percentage[C] = 50;
-                          rb_rc = I[C]/I[B];  // Rb/Rc
-                          ib_ic = I[B] + I[C];
-                          ib = I[B];
-                          vb_va = V[B] - V[A];
-                          break;
-
-                      case 3:
-                          R[C] = (V[A] - V[B]) / (I[B] * rb_rc + I[C]);
-                          R[B] = rb_rc * R[C];
-                          R[A] = (vb_va - ib*R[B])/ib_ic;
-
-                          printf("Ra = %.2f\n", R[A]);
-                          printf("Rb = %.2f\n", R[B]);
-                          printf("Rc = %.2f\n", R[C]);
-
-                          break;
-                  }
-
-                  for (int i= 0; i < NR_PHASES; i++)
-                  {
-                      if (phase_voltage_percentage[i] > MAX_PERCENTAGE)
-                          phase_voltage_percentage[i] = MAX_PERCENTAGE;
-
-                      if (phase_voltage_percentage[i] < MIN_PERCENTAGE)
-                          phase_voltage_percentage[i] = MIN_PERCENTAGE;
-                  }
-
-                  i_torque_control.set_evaluation_references(phase_voltage_percentage[A], phase_voltage_percentage[B], phase_voltage_percentage[C]);
-
-                  while (counter > 0)
-                  {
-                      upstream_control_data = i_torque_control.update_upstream_control_data();
-
-                      /*
-                       * moving average filter for DC bus voltage
-                       * average of last FILTER values
-                       */
-                      if(i < FILTER)
-                          v_dc[i++] = upstream_control_data.V_dc;
-                      else
-                      {
-                          start = 1;
-                          i = 0;
-                      }
-
-                      filter_out = dsp_vector_mean(v_dc, FILTER, 16);
-
-                      if (start)
-                      {
-                          /*
-                           * voltage calculation
-                           */
-                          Vdc = (float)filter_out/(1<<16);
-                          for (int i = 0; i <  NR_PHASES; i++)
-                              V[i] = (float)phase_voltage_percentage[i]/100*filter_out/(1<<16);
-
-                          //                    xscope_float(VDC, Vdc);
-                          //                    printf("Vdc = %.2f\n", Vdc);
-                          //                    printf("Va = %.2f\n", V[A]);
-                          //                    printf("Vb = %.2f\n", V[B]);
-                          //                    printf("Vc = %.2f\n", V[C]);
-
-                          /*
-                           * current calculation
-                           */
-
-                          I[B] = (float)upstream_control_data.I_b/(1<<16);
-                          I[C] = (float)upstream_control_data.I_c/(1<<16);
-                          I[A] = -(I[B] + I[C]);
-
-                          //                    printf("Ia = %.2f\n", I[A]);
-                          //                    printf("Ib = %.2f\n", I[B]);
-                          //                    printf("Ic = %.2f\n", I[C]);
-                      }
-
-                      --counter;
-                  }
-              }
-
-            break;
 
         //reverse the direction of reference torque
         case 'r':

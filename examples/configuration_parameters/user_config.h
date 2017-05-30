@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config_FAULHABER.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -81,7 +81,7 @@
 //////////////////////////////////////////////
 // Warning!!! This parameter alters PWM switching frequency.
 // Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
-#define IFM_TILE_USEC       USEC_STD      // Number of ticks in a microsecond for IFM Tile.
+#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile.
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
