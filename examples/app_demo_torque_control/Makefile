@@ -21,7 +21,7 @@ USED_MODULES = configuration_parameters lib_auto_tune lib_bldc_torque_control mo
 # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
 # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
 # xcc for the final link (mapping) stage.
-XCC_FLAGS_Debug = -g -O1 -report #-DUSE_XSCOPE
+XCC_FLAGS_Debug = -g -O3 -report #-DUSE_XSCOPE
 XCC_FLAGS_Release = -g -O3
 
 # The XCORE_ARM_PROJECT variable, if set to 1, configures this
