@@ -1,6 +1,0 @@
-<preCompilationAnalysis file="/home/sasa/xmos_workspaces/sc_sncn_motorcontrol/module_utils/src/lookup_tables.c">
-  <fCall global="true" name="sine_third.globound"/>
-  <fCall global="true" name="sine_third"/>
-  <fCall global="true" name="sine_table.globound"/>
-  <fCall global="true" name="sine_table"/>
-</preCompilationAnalysis>
