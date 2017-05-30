@@ -12,6 +12,19 @@
 extern char start_message[];
 
 
+inline unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config)
+{
+    unsigned int bit = 0;
+    if (data_port_config) {
+        *data_port :> bit;
+    } else {
+        qei_hall_port->p_qei_hall :> bit;
+        bit = (bit >> BISS_DATA_PORT_BIT)&1;
+    }
+    return bit;
+}
+
+
 SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config,
         port * (&?gpio_ports)[4], timer t,
@@ -55,7 +68,7 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
 
     //test if the line went up
     if (bit != 1) {
-        return 21; //error data line
+        return SENSOR_BISS_DATA_LINE_ERROR; //error data line
     }
 
     //SSI sensor, no ack, start, status and checksum, only read the position
@@ -131,18 +144,6 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         status = SENSOR_BISS_NO_ACK_BIT_ERROR;
     }
     return status;
-}
-
-unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config)
-{
-    unsigned int bit = 0;
-    if (data_port_config) {
-        *data_port :> bit;
-    } else {
-        qei_hall_port->p_qei_hall :> bit;
-        bit = (bit >> BISS_DATA_PORT_BIT)&1;
-    }
-    return bit;
 }
 
 

@@ -28,16 +28,6 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         port * (&?gpio_ports)[4], timer t,
         PositionFeedbackConfig &position_feedback_config, unsigned int data[]);
 
-/**
- * @brief Read BiSS/SSI bit
- *
- * @param qei_hall_port BiSS/SSI input port
- * @param data_port port used to optionally input the BiSS/SSI data with a gpio port
- * @param data_port_config input port configuration
- *
- * @return bit read
- */
-unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config);
 
 /**
  * @brief Extract position data from a BiSS encoder raw sensor data

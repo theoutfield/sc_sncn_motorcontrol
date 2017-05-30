@@ -123,7 +123,6 @@ Functions
 --------
 
 .. doxygenfunction:: read_biss_sensor_data
-.. doxygenfunction:: read_biss_bit
 .. doxygenfunction:: biss_encoder
 .. doxygenfunction:: biss_crc
 .. doxygenfunction:: biss_crc_correct
