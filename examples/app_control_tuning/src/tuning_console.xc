@@ -306,6 +306,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 break;
 
        case 'g':
+
                 printf("open phase detection started\n");
                 {res_a, res_b, res_c} = i_motion_control.open_phase_detection();
 

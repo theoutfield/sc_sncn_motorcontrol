@@ -19,7 +19,6 @@
 #include <motion_control_service.h>
 #include <refclk.h>
 #include <mc_internal_constants.h>
-
 #include <dsp.h>
 
 #define MAX_PERCENTAGE 100
@@ -837,6 +836,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             res_a = (vb_va - ib*res_b)/ib_ic;
 
                             break;
+
                     }
 
                     for (int i= 0; i < NR_PHASES; i++)
@@ -876,6 +876,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             /*
                              * voltage calculation
                              */
+
                             for (int i = 0; i <  NR_PHASES; i++)
                                 V[i] = phase_voltage_percentage[i] * filter_out / 100;
 
