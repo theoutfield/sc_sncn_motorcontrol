@@ -39,12 +39,16 @@
     
     <Probe name="ACTUAL_VELOCITY_ARRAY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="TUNING_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="KP" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="KI" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="KD" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="KP" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="KI" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="KD" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="KL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
 	<Probe name="TORQUE_REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	
+	<Probe name="ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="ERROR_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="ERROR_ENERGY_INTEGRAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     
     
 </xSCOPEconfig>
