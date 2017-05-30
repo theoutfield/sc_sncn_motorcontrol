@@ -100,6 +100,8 @@ typedef struct {
     int position_kd;                    /**< Parameter for position controller D-constant */
     int position_integral_limit;        /**< Parameter for integral limit of position pid controller */
 
+    int position_control_autotune;      /**< Parameter for enabling/disabling automatic tuning of position controller*/
+
     int velocity_kp;                    /**< Parameter for velocity controller P-constant */
     int velocity_ki;                    /**< Parameter for velocity controller I-constant */
     int velocity_kd;                    /**< Parameter for velocity controller D-constant */

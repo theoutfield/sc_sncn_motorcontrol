@@ -145,6 +145,63 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         // end of automatic velocity controller tuning
                         break;
 
+
+                case 'p'://calculate optimal pid parameters for position controllers
+
+                        if (value == 1)
+                        {
+                            //i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                            //printf("simple PID pos ctrl enabled\n");
+                        }
+                        else if (value == 2)
+                        {
+                            //i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                            //printf("vel.-cascaded pos ctrl enabled\n");
+                        }
+                        else if (value == 3)
+                        {
+                            // set kp, ki and kd equal to 0 for velocity controller:
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+
+                            motion_ctrl_config.position_kp = 0;
+                            motion_ctrl_config.position_ki = 0;
+                            motion_ctrl_config.position_kd = 0;
+                            motion_ctrl_config.position_integral_limit = 1000;
+                            motion_ctrl_config.moment_of_inertia       = 0;
+
+                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",  motion_ctrl_config.position_kp,
+                                    motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                    motion_ctrl_config.position_integral_limit);
+
+                            i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                            printf("Nonlinear pos ctrl enabled\n");
+
+                            downstream_control_data.offset_torque = 0;
+
+                            // set the velocity pid tuning flag to 1
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            motion_ctrl_config.position_control_autotune = 1;
+                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            printf("position pid tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
+
+                            // end of automatic velocity controller tuning
+                        }
+                        else
+                        {
+                            //i_motion_control.disable();
+                            //brake_flag = 0;
+                            //printf("position ctrl disabled\n");
+                        }
+                        break;
+
+
+                        break;
+
                  default:
                          break;
                  }
