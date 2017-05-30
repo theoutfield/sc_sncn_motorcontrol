@@ -97,7 +97,7 @@ The data displayed with XScope is:
 - fault code: motorcontrol fault code (the value is multiplied by 1000 for better display)
 - sensor error: the sensor error code (the value is multiplied by 100 for better display)
 - V DC: the DC bus voltage
-- I DC DC bus current
+- I DC: the DC bus current
 - temperature
 
 
@@ -170,7 +170,7 @@ Quick How-to
 
 
 
-#. Open the **main.xc** within  the **app_demo_offset_commutation_tuning**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
+#. Open the **main.xc** within  the **app_control_tuning**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropiate target in your Makefile <somanet_board_support_module>`.
 
    .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
