@@ -19,7 +19,7 @@ The app also displays various data in real time with `XScope`
 
 .. cssclass:: github
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_offset_commutation_tuning/>`_
+  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_control_tuning/>`_
 
 
 Console commands
