@@ -290,7 +290,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
                             motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
                         }
-
                     }
                     else if(motion_ctrl_config.enable_profiler==1)
                     {
@@ -354,7 +353,49 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
                     {
-                        torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+                        int nonlinear_control_autotune =1;
+                        int oscillation_center=0;
+                        int tuning_procedure_completed=0;
+                        int tuning_counter=0;
+                        int tuning_oscillation_range = 20000;
+
+                        if(nonlinear_control_autotune == 1)
+                        {
+                            //measure the current position (as the middle point of ocsilation):
+                            if(tuning_procedure_completed==0)
+                            {
+                                oscillation_center = position_k;
+                                tuning_procedure_completed = 1;
+                            }
+
+
+
+                            //velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
+                            //
+                            //torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                            //
+                            //if(velocity_auto_tune.enable == 0)
+                            //{
+                            //    torque_ref_k=0;
+                            //    torque_enable_flag   =0;
+                            //    velocity_enable_flag =0;
+                            //    position_enable_flag =0;
+                            //    i_torque_control.set_torque_control_disabled();
+                            //
+                            //    motion_ctrl_config.enable_velocity_auto_tuner = 0;
+                            //
+                            //    printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
+                            //
+                            //    motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
+                            //    motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
+                            //    motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
+                            //}
+                        }
+                        else
+                        {
+
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+                        }
                     }
                 }
 
@@ -435,7 +476,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-/*
+                /*
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -463,7 +504,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TIME_FREE, (time_free/app_tile_usec));
                 xscope_int(TIME_LOOP, (time_loop/app_tile_usec));
                 xscope_int(TIME_USED, (time_used/app_tile_usec));
-*/
+                 */
 
                 if((time_used/app_tile_usec)>250)
                 {
