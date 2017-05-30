@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_C21-DX_G2.bsp>
-#include <IFM_DC1K-rev-c4.bsp>
+#include <CORE_BOARD_REQUIRED>
+#include <IFM_BOARD_REQUIRED
 
 /**
  * @file main.xc
