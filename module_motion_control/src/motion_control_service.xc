@@ -19,7 +19,7 @@
 #include <motion_control_service.h>
 #include <refclk.h>
 #include <mc_internal_constants.h>
-#include <dsp.h>
+#include <stdio.h>
 
 #define MAX_PERCENTAGE 100
 #define MIN_PERCENTAGE 0
@@ -32,8 +32,6 @@ enum
     C,
     NR_PHASES
 };
-
-int32_t v_dc[FILTER];
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque, MotionControlError &motion_control_error)
 {
@@ -234,7 +232,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // open phase detection
 
     int phase_voltage_percentage[NR_PHASES] = {0, 0, 0};
-    int filter_out = 0;
+    int filter_out = 0, v_dc[FILTER];
     double I[NR_PHASES] = { 0 };
     int z = 0, V[NR_PHASES] = { 0 };
     int start = 0;
@@ -864,14 +862,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                          * average of last FILTER values
                          */
                         if(z < FILTER)
-                            v_dc[z++] = upstream_control_data.V_dc;
+                            v_dc[z] = upstream_control_data.V_dc;
                         else
                         {
                             start = 1;
                             z = 0;
                         }
 
-                        filter_out = dsp_vector_mean(v_dc, FILTER, 16);
+                        filter_out = (filter_out + v_dc[z]) / FILTER;
+                        if (z != 0)
+                            z++;
 
                         if (start)
                         {
