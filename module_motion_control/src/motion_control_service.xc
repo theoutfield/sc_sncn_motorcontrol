@@ -420,9 +420,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
 
-                                motion_ctrl_config.position_integral_limit += 100;
-                                if(motion_ctrl_config.position_integral_limit > 600)
-                                    motion_ctrl_config.position_integral_limit = 600;
+                                if(error_energy_integral > (error_energy_integral_max/10))
+                                    motion_ctrl_config.position_integral_limit += 100;
+
+
+//                                if(motion_ctrl_config.position_integral_limit > 600)
+//                                    motion_ctrl_config.position_integral_limit = 600;
 
 
 
