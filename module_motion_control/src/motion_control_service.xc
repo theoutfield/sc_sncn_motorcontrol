@@ -170,6 +170,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int first_tuning_step_counter=0;
     int first_tuning_step_completed=0;
 
+    int  second_tuning_step_counter=0;
+    int  second_tuning_step_completed=0;
+
+
     int tuning_reference_rising_edge=0;
 
     double overshoot=0.00;
@@ -455,11 +459,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
                                 xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
 
+                                xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
+                                xscope_int(SECOND_STEP_COMPLETED, (1000*second_tuning_step_completed));
+
                                 // in case first tuning phase is completed
                                 if(first_tuning_step_completed==1)
                                 {
 
-                                    if(overshoot_max>((5*tuning_oscillation_range)/100))
+                                    if(overshoot_max<((5*tuning_oscillation_range)/100))
+                                        second_tuning_step_counter++;
+                                    else
                                     {
                                         motion_ctrl_config.position_ki -= 50;
 
@@ -469,6 +478,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                         overshoot=0;
                                         overshoot_max=0;
+                                    }
+
+
+                                    if(second_tuning_step_counter==10)
+                                    {
+                                        second_tuning_step_completed=1;
+                                        number_of_samples = number_of_samples*2;
                                     }
 
                                 }
