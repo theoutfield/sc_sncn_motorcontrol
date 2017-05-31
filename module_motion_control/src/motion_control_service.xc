@@ -170,6 +170,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int first_tuning_step_counter=0;
     int first_tuning_step_completed=0;
 
+    int tuning_reference_rising_edge=0;
+
 
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -417,9 +419,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             if(tuning_counter==number_of_samples)
                             {
                                 if(tuning_position_ref == (tuning_initial_position + tuning_oscillation_range))
+                                {
                                     tuning_position_ref = tuning_initial_position - tuning_oscillation_range;
+                                    tuning_reference_rising_edge=0;
+                                }
                                 else
+                                {
                                     tuning_position_ref = tuning_initial_position + tuning_oscillation_range;
+                                    tuning_reference_rising_edge=1;
+                                }
+
 
 
                                 if(first_tuning_step_completed==0)
@@ -440,6 +449,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 }
                                 xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
                                 xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
+
+                                // in case first tuning phase is completed
+                                if(first_tuning_step_completed==1)
+                                {
+
+                                }
 
 
 
@@ -498,9 +513,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             }
 
 
+                            // measurement of error energy
                             error = (tuning_position_ref - position_k)/1000.00;
                             error_energy = error * error;
                             error_energy_integral += error_energy;
+
+
 
                             xscope_int(ERROR, ((int)(error)));
                             xscope_int(ERROR_ENERGY, ((int)(error_energy)));
@@ -511,6 +529,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             xscope_int(POSITION_CMD, (int)(tuning_position_ref-tuning_initial_position));
                             xscope_int(POSITION,     (int)(position_k-tuning_initial_position));
+
+                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
 
 
                             //velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
