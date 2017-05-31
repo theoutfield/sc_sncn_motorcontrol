@@ -422,21 +422,22 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     tuning_position_ref = tuning_initial_position + tuning_oscillation_range;
 
 
-
-                                if(error_energy_integral < (error_energy_integral_max/10))
+                                if(first_tuning_step_completed==0)
                                 {
-                                    first_tuning_step_counter++;
+                                    if(error_energy_integral < (error_energy_integral_max/10))
+                                    {
+                                        first_tuning_step_counter++;
+                                    }
+                                    else
+                                    {
+                                        motion_ctrl_config.position_integral_limit += 100;
+                                        first_tuning_step_counter=0;
+                                    }
+
+                                    if(first_tuning_step_counter==10)
+                                        first_tuning_step_completed=1;
+
                                 }
-                                else
-                                {
-                                    motion_ctrl_config.position_integral_limit += 100;
-                                    first_tuning_step_counter=0;
-                                }
-
-
-                                if(first_tuning_step_counter==10)
-                                    first_tuning_step_completed=1;
-
                                 xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
                                 xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
 
