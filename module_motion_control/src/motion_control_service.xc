@@ -862,16 +862,17 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                          * average of last FILTER values
                          */
                         if(z < FILTER)
-                            v_dc[z] = upstream_control_data.V_dc;
+                            v_dc[z++] = upstream_control_data.V_dc;
                         else
                         {
                             start = 1;
                             z = 0;
                         }
 
-                        filter_out = (filter_out + v_dc[z]) / FILTER;
-                        if (z != 0)
-                            z++;
+                        for (int i = 0; i< FILTER; i++)
+                            filter_out += v_dc[i];
+
+                        filter_out = filter_out / FILTER;
 
                         if (start)
                         {
