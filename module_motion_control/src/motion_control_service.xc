@@ -165,6 +165,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     int tuning_kl_first_try_completed=0;
 
+    int error_energy_integral_counter=0;
+
+
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
@@ -398,7 +401,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 motion_ctrl_config.position_integral_limit = 1;
                                 motion_ctrl_config.moment_of_inertia       = 0;
 
-                                error_energy_integral_opt = (tuning_oscillation_range/1000) * (tuning_oscillation_range/1000) * number_of_samples;
+                                error_energy_integral_opt = ((2*tuning_oscillation_range)/1000) * ((2*tuning_oscillation_range)/1000) * number_of_samples;
 
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
@@ -410,36 +413,64 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             tuning_counter++;
                             if(tuning_counter==number_of_samples)
                             {
-                                if(tuning_position_ref == tuning_initial_position)
+                                if(tuning_position_ref == (tuning_initial_position + tuning_oscillation_range))
+                                    tuning_position_ref = tuning_initial_position - tuning_oscillation_range;
+                                else
                                     tuning_position_ref = tuning_initial_position + tuning_oscillation_range;
-                                else
-                                    tuning_position_ref = tuning_initial_position;
 
-                                if(error_energy_integral < (error_energy_integral_opt/2))
-                                {
-                                    tuning_kp_opt = ((double)( motion_ctrl_config.position_kp));
-                                    tuning_ki_opt = ((double)( motion_ctrl_config.position_ki));
-                                    tuning_kd_opt = ((double)( motion_ctrl_config.position_kd));
-                                    tuning_kl_opt = ((double)( motion_ctrl_config.position_integral_limit));
 
-                                    tuning_kl_first_try_completed = 1;
-                                    //error_energy_integral_opt = error_energy_integral;
-                                }
-                                else
-                                {
-                                    motion_ctrl_config.position_integral_limit += 100;
-                                }
-//                                if(error_energy_integral > ((4*error_energy_integral_opt)/5))
-//                                {
-//                                    motion_ctrl_config.position_integral_limit -= 100;
-//                                }
+
+                                motion_ctrl_config.position_integral_limit += 100;
+                                if(motion_ctrl_config.position_integral_limit > 600)
+                                    motion_ctrl_config.position_integral_limit = 600;
+
+
+
+                                //                                if(tuning_kl_first_try_completed==0)
+                                //                                {
+                                /*                                    if(error_energy_integral < (error_energy_integral_opt/2))
+                                    {
+                                        error_energy_integral_counter++;
+                                        motion_ctrl_config.position_integral_limit -= 100;
+
+                                        if(error_energy_integral_counter==4)
+                                        {
+                                            tuning_kp_opt = ((double)( motion_ctrl_config.position_kp));
+                                            tuning_ki_opt = ((double)( motion_ctrl_config.position_ki));
+                                            tuning_kd_opt = ((double)( motion_ctrl_config.position_kd));
+                                            tuning_kl_opt = ((double)( motion_ctrl_config.position_integral_limit));
+
+                                            tuning_kl_first_try_completed = 1;
+
+                                        }
+
+                                        //error_energy_integral_opt = error_energy_integral;
+                                    }
+                                    else
+                                        error_energy_integral_counter=0;*/
+
+
+                                /*                                    if (tuning_kl_first_try_completed == 0)
+                                        motion_ctrl_config.position_integral_limit += 100;*/
+
+
+                                //                                    else
+                                //                                    {
+                                //                                        error_energy_integral_counter=0;
+                                //                                        motion_ctrl_config.position_integral_limit += 100;
+                                //                                    }
+                                //                                }
+
+
+
+
+
+                                nl_position_control_reset(nl_pos_ctrl);
+                                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
 
                                 error=0.00;
                                 error_energy =0.00;
                                 error_energy_integral=0.00;
-
-                                nl_position_control_reset(nl_pos_ctrl);
-                                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
 
                                 tuning_counter=0;
                             }
@@ -449,25 +480,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             error_energy = error * error;
                             error_energy_integral += error_energy;
 
-                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, tuning_position_ref, position_k_1, position_k);
-
-                            xscope_int(TUNING_COUNTER, tuning_counter);
-
-                            xscope_int(KP, ((int)(tuning_kp_opt)));
-                            xscope_int(KI, ((int)(tuning_ki_opt)));
-                            xscope_int(KD, ((int)(tuning_kd_opt)));
-                            xscope_int(KL, ((int)(tuning_kl_opt)));
-
-                            xscope_int(TORQUE_REF, torque_ref_k);
-
                             xscope_int(ERROR, ((int)(error)));
                             xscope_int(ERROR_ENERGY, ((int)(error_energy)));
                             xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
-                            xscope_int(ERROR_ENERGY_INTEGRAL_OPT, ((int)(error_energy_integral_opt)));
 
-                            xscope_int(POSITION, (upstream_control_data.position - ((int)(tuning_initial_position))));
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, tuning_position_ref, position_k_1, position_k);
+
                             xscope_int(POSITION_CMD, (int)(tuning_position_ref-tuning_initial_position));
-
+                            xscope_int(POSITION,     (int)(position_k-tuning_initial_position));
 
 
                             //velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
@@ -496,7 +516,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         {
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                         }
-                        */
+                         */
                     }
                 }
 
@@ -579,7 +599,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
 
-/*
+                xscope_int(TUNING_COUNTER, tuning_counter);
+
+                xscope_int(KP, ((int)(tuning_kp_opt)));
+                xscope_int(KI, ((int)(tuning_ki_opt)));
+                xscope_int(KD, ((int)(tuning_kd_opt)));
+                xscope_int(KL, motion_ctrl_config.position_integral_limit);
+
+                xscope_int(TORQUE_REF, torque_ref_k);
+
+
+
+
+                /*
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
@@ -602,7 +634,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
-*/
+                 */
                 //xscope_int(TIME_FREE, (time_free/app_tile_usec));
                 //xscope_int(TIME_LOOP, (time_loop/app_tile_usec));
                 //xscope_int(TIME_USED, (time_used/app_tile_usec));
