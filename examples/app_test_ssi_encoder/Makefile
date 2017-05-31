@@ -10,7 +10,7 @@ TARGET =
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
 # the project name
-APP_NAME = app_test_biss_encoder
+APP_NAME = app_test_ssi_encoder
 
 # The USED_MODULES variable lists other module used by the application.
 USED_MODULES = configuration_parameters lib_bldc_torque_control module_biss_encoder module_board-support module_encoder_rem_14 module_encoder_rem_16mt module_filters module_hall_sensor module_incremental_encoder module_position_feedback module_pwm module_serial_encoder module_shared_memory module_spi_master module_utils module_watchdog
