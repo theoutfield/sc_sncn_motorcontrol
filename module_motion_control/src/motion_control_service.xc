@@ -191,6 +191,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int rise_time_min_opt=0;
     int rise_time_opt=0;
 
+    int tuning_process_ended=0;
+
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
@@ -475,24 +477,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 if(first_tuning_step_completed==1)
                                 {
 
-                                    // at the first step, we focus on the energy to start the system moving.
-                                    // once the system starts to move properly (step 1), then we consequtively follow the following procedure:
-
-                                    // we reduce the overshoot down to its 2%, and once it is reduced to 2%, we reduce the energy as long as the overshoot is not
-                                    // over 2%. if so, we again switch to reduction of overshoot.
-                                    //
-                                    // in each step, first we reduce the overshoot down to its 5%, and when it is low enough,
-                                    // we focus on the energy.
-
-
-
                                     if(overshoot_max<((10*tuning_oscillation_range)/1000))
                                         overshoot_counter++;
                                     else
                                     {
+                                        if(tuning_process_ended==0)
                                         motion_ctrl_config.position_ki -= 10;
 
-                                        if(motion_ctrl_config.position_ki<0)
+                                        if(motion_ctrl_config.position_ki<0 && tuning_process_ended==0)
                                             motion_ctrl_config.position_ki += 10;
 
                                         overshoot=0;
@@ -508,61 +500,18 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                     if(overshoot_counter>10)
                                     {
-                                        if(error_energy_integral > (dynamic_step_error_energy_integral_max/10))
+                                        if(error_energy_integral > (dynamic_step_error_energy_integral_max/10) && tuning_process_ended==0 )
                                         {
                                             motion_ctrl_config.position_integral_limit += 100;
                                         }
 
                                         if(rise_time<rise_time_opt && rise_time!=0) rise_time_opt = rise_time;
+
+                                        if(rise_time>(150*rise_time_opt)/100) tuning_process_ended=1;
+
                                     }
-
-
-/*
-
-                                    if(overshoot_max<((10*tuning_oscillation_range)/1000))
-                                        second_tuning_step_counter++;
-                                    else
-                                    {
-                                        motion_ctrl_config.position_ki -= 10;
-
-                                        if(motion_ctrl_config.position_ki<0)
-                                            motion_ctrl_config.position_ki += 10;
-
-                                        overshoot=0;
-                                        overshoot_max=0;
-                                    }
-
-                                    if(second_tuning_step_counter==10)
-                                    {
-                                        second_tuning_step_completed=1;
-                                        number_of_samples = number_of_samples*2;
-                                        third_step_error_energy_integral_max = error_energy_integral;
-                                    }
-                                }
-
-                                if (second_tuning_step_completed==1)
-                                {
-
-                                    if(error_energy_integral < (third_step_error_energy_integral_max/10))
-                                    {
-                                        third_tuning_step_counter++;
-                                    }
-                                    else
-                                    {
-                                        motion_ctrl_config.position_integral_limit += 100;
-                                        third_tuning_step_counter=0;
-                                    }
-
-//                                    if(third_tuning_step_counter==10)
-//                                    {
-//                                        first_tuning_step_completed=1;
-//                                        number_of_samples = number_of_samples/2;
-//                                    }
-
-*/
 
                                 }
-
 
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
