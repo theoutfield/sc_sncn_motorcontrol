@@ -1,23 +1,23 @@
-.. _app_test_biss:
+.. _app_test_ssi:
 
 =================================
-BiSS Interface Demo
+SSI Interface Demo
 =================================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-The purpose of this app is showing the use of the :ref:`BiSS Interface Module <module_biss>` with :ref:`Position Feedback Module <module_position_feedback>`.
-For that, it implements a simple app that reads the output of an BiSS sensor and shows over **XScope** the read velocity and position.
-It also displays the status of the BiSS sensor for debugging.
+The purpose of this app is showing the use of the :ref:`BiSS / SSI Interface Module <module_biss>` with :ref:`Position Feedback Module <module_position_feedback>`.
+For that, it implements a simple app that reads the output of an SSI sensor and shows over **XScope** the read velocity and position.
+It also displays the status of the SSI sensor for debugging.
 
 * **Min. Nr. of cores**: 2
 * **Min. Nr. of tiles**: 1
 
 .. cssclass:: github
 
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_biss/>`_
+  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_ssi/>`_
 
 Quick How-to
 ============
@@ -38,7 +38,7 @@ Quick How-to
             /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = BISS_SENSOR;
+                position_feedback_config.sensor_type = SSI_SENSOR;
                 position_feedback_config.resolution  = BISS_SENSOR_RESOLUTION;
                 position_feedback_config.polarity    = NORMAL_POLARITY;
                 position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
@@ -48,14 +48,14 @@ Quick How-to
                 position_feedback_config.offset      = 0;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
-                position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
-                position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                position_feedback_config.biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
-                position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                position_feedback_config.biss_config.busy = BISS_BUSY;
-                position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
-                position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                position_feedback_config.ssi_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                position_feedback_config.ssi_config.filling_bits = BISS_FILLING_BITS;
+                position_feedback_config.ssi_config.crc_poly = BISS_CRC_POLY;
+                position_feedback_config.ssi_config.clock_frequency = BISS_CLOCK_FREQUENCY;
+                position_feedback_config.ssi_config.timeout = BISS_TIMEOUT;
+                position_feedback_config.ssi_config.busy = BISS_BUSY;
+                position_feedback_config.ssi_config.clock_port_config = BISS_CLOCK_PORT;
+                position_feedback_config.ssi_config.data_port_number = BISS_DATA_PORT_NUMBER;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
@@ -71,7 +71,6 @@ Quick How-to
             timer t;
             unsigned int start_time, end_time;
             int count = 0;
-            int real_count = 0;
             unsigned int angle = 0;
             int velocity = 0;
             unsigned int position = 0;
@@ -79,11 +78,11 @@ Quick How-to
 
             while(1) {
 
-                /* get position from BiSS Encoder */
+                /* get position from SSI Encoder */
                 { count, position, status } = i_position_feedback.get_position();
 
                 t :> start_time;
-                /* get angle and velocity from BiSS Encoder */
+                /* get angle and velocity from SSI Encoder */
                 angle = i_position_feedback.get_angle();
                 velocity = i_position_feedback.get_velocity();
                 t :> end_time;
@@ -97,14 +96,11 @@ Quick How-to
                 }
 
                 xscope_int(COUNT, count);                           //absolute count
-                xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
                 xscope_int(POSITION, position);                     //singleturn position
                 xscope_int(ANGLE, angle);                           //electrical angle
                 xscope_int(VELOCITY, velocity);                     //velocity in rpm
-                xscope_int(ERROR_BIT, (status&0b10) * 500);         //error bit, should be 0
-                xscope_int(WARNING_BIT, (status&0b01) * 1000);      //warning bit, should be 0
                 xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
-                xscope_int(CRC_ERROR, (status>>2)*1000);            //number of CRC errors, should be 0
+                xscope_int(STATUS_X100, status*100);                //error status
 
                 delay_milliseconds(1);
             }

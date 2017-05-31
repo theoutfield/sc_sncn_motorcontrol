@@ -20,7 +20,6 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
     timer t;
     unsigned int start_time, end_time;
     int count = 0;
-    int real_count = 0;
     unsigned int angle = 0;
     int velocity = 0;
     unsigned int position = 0;
@@ -46,12 +45,11 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
         }
 
         xscope_int(COUNT, count);                           //absolute count
-        xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
         xscope_int(POSITION, position);                     //singleturn position
         xscope_int(ANGLE, angle);                           //electrical angle
         xscope_int(VELOCITY, velocity);                     //velocity in rpm
         xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
-        xscope_int(STATUS, status);                         //error status
+        xscope_int(STATUS_X100, status*100);                //error status
 
 
         switch(status) {

@@ -4,7 +4,7 @@
 
 /**
  * @file main.xc
- * @brief Test illustrates usage of biss absolute encoder to get position and velocity information
+ * @brief Test illustrates usage of SSI encoder to get position and velocity information
  * @author Synapticon GmbH <support@synapticon.com>
  */
 //BiSS libs
@@ -49,7 +49,7 @@ void ssi_test(client interface PositionFeedbackInterface i_position_feedback, cl
         xscope_int(ANGLE, angle);                           //electrical angle
         xscope_int(VELOCITY, velocity);                     //velocity in rpm
         xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
-        xscope_int(STATUS_X100, status*100);                    //error status
+        xscope_int(STATUS_X100, status*100);                //error status
 
         delay_milliseconds(1);
     }

@@ -71,7 +71,6 @@ Quick How-to
             timer t;
             unsigned int start_time, end_time;
             int count = 0;
-            int real_count = 0;
             unsigned int angle = 0;
             int velocity = 0;
             unsigned int position = 0;
@@ -97,14 +96,39 @@ Quick How-to
                 }
 
                 xscope_int(COUNT, count);                           //absolute count
-                xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
                 xscope_int(POSITION, position);                     //singleturn position
                 xscope_int(ANGLE, angle);                           //electrical angle
                 xscope_int(VELOCITY, velocity);                     //velocity in rpm
-                xscope_int(ERROR_BIT, (status&0b10) * 500);         //error bit, should be 0
-                xscope_int(WARNING_BIT, (status&0b01) * 1000);      //warning bit, should be 0
                 xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
-                xscope_int(CRC_ERROR, (status>>2)*1000);            //number of CRC errors, should be 0
+                xscope_int(STATUS_X100, status*100);                //error status
+                
+                switch(status) {
+                case SENSOR_CHECKSUM_ERROR:
+                    xscope_int(CRC_ERROR, 1000);    //CRC error
+                    xscope_int(ERROR_BIT, 0);       //error bit
+                    xscope_int(WARNING_BIT, 0);     //warning bit
+                    break;
+                case SENSOR_BISS_ERROR_BIT_ERROR:
+                    xscope_int(CRC_ERROR, 0);       //CRC error
+                    xscope_int(ERROR_BIT, 1000);    //error bit
+                    xscope_int(WARNING_BIT, 0);     //warning bit
+                    break;
+                case SENSOR_BISS_WARNING_BIT_ERROR:
+                    xscope_int(CRC_ERROR, 0);       //CRC error
+                    xscope_int(ERROR_BIT, 0);       //error bit
+                    xscope_int(WARNING_BIT, 1000);  //warning bit
+                    break;
+                case SENSOR_BISS_ERROR_AND_WARNING_BIT_ERROR:
+                    xscope_int(CRC_ERROR, 0);       //CRC error
+                    xscope_int(ERROR_BIT, 1000);    //error bit
+                    xscope_int(WARNING_BIT, 1000);  //warning bit
+                    break;
+                default:
+                    xscope_int(CRC_ERROR, 0);       //CRC error
+                    xscope_int(ERROR_BIT, 0);       //error bit
+                    xscope_int(WARNING_BIT, 0);     //warning bit
+                    break;
+                }
 
                 delay_milliseconds(1);
             }
