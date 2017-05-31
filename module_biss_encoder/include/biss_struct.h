@@ -41,7 +41,7 @@ typedef struct {
     int crc_poly;               /**< CRC polynom in reverse representation:  x^0 + x^1 + x^6 is 0b110000 */
     int clock_frequency;        /**< BiSS output clock frequency in kHz, supported frequencies depend on IFM Tile frequency */
     int timeout;                /**< Timeout after a BiSS read in microseconds */
-    int busy;                   /**< maximum number of bits to read before the start bit (= maximum duration of ACK bit) */
+    int busy;                   /**< For BiSS maximum number of bits to read before the start bit (= maximum duration of ACK bit). For SSI processing time before reading in microseconds */
     BISSClockPortConfig   clock_port_config;        /**< Configure of the biss clock port (GPIO or hall_enc_select_port) */
     EncoderPortNumber     data_port_number;         /**< Configure which port is used for the biss input data */
     EncoderPortSignalType data_port_signal_type;    /**< Configure of the data port signal type (RS422 (differential) or TTL) */

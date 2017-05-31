@@ -115,6 +115,7 @@ Definitions
 Types
 -----
 
+.. doxygenstruct:: PositionFeedbackConfig
 .. doxygenstruct:: BISSConfig
 .. doxygenenum:: SensorError
 .. doxygenenum:: EncoderPortNumber

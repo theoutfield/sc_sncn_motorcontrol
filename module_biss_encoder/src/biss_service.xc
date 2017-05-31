@@ -71,11 +71,20 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         return SENSOR_BISS_DATA_LINE_ERROR; //error data line
     }
 
-    //SSI sensor, no ack, start, status and checksum, only read the position
+    //SSI sensor, no ack, start, status bits
     if (position_feedback_config.sensor_type == SSI_SENSOR) {
         read_status = 2; //force status to 2 to skip the ack and start bit detection
         read_limit = 1 + position_feedback_config.biss_config.multiturn_resolution +  position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits + crc_length;
-        data_length = 1 + position_feedback_config.biss_config.multiturn_resolution +  position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits;
+        data_length = read_limit - crc_length;
+        //put clock low and wait for the encoder to be ready
+        if (position_feedback_config.biss_config.busy) {
+            if (clock_config) { //clock is output on a gpio port
+                *clock_port <:0;
+            } else { //clock is output on the hall_enc_select port leftmost 2 bits
+                hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
+            }
+            delay_ticks(position_feedback_config.biss_config.busy*position_feedback_config.ifm_usec);
+        }
     }
 
     //read the raw data
