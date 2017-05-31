@@ -149,7 +149,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double error=0.00, error_energy=0.00;
 
     double error_energy_integral    =0.00;
-    double error_energy_integral_opt=0.00;
+    double error_energy_integral_max=0.00;
 
     double tuning_kp_opt=0.00;
     double tuning_ki_opt=0.00;
@@ -401,7 +401,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 motion_ctrl_config.position_integral_limit = 1;
                                 motion_ctrl_config.moment_of_inertia       = 0;
 
-                                error_energy_integral_opt = ((2*tuning_oscillation_range)/1000) * ((2*tuning_oscillation_range)/1000) * number_of_samples;
+                                error_energy_integral_max = ((2*tuning_oscillation_range)/1000) * ((2*tuning_oscillation_range)/1000) * number_of_samples;
 
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
@@ -428,7 +428,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 //                                if(tuning_kl_first_try_completed==0)
                                 //                                {
-                                /*                                    if(error_energy_integral < (error_energy_integral_opt/2))
+                                /*                                    if(error_energy_integral < (error_energy_integral_max/2))
                                     {
                                         error_energy_integral_counter++;
                                         motion_ctrl_config.position_integral_limit -= 100;
@@ -444,7 +444,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                         }
 
-                                        //error_energy_integral_opt = error_energy_integral;
+                                        //error_energy_integral_max = error_energy_integral;
                                     }
                                     else
                                         error_energy_integral_counter=0;*/
@@ -483,6 +483,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             xscope_int(ERROR, ((int)(error)));
                             xscope_int(ERROR_ENERGY, ((int)(error_energy)));
                             xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
+                            xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
 
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, tuning_position_ref, position_k_1, position_k);
 
