@@ -187,6 +187,8 @@ typedef struct
     int torque_set;
 
     int V_dc;
+    int I_b;
+    int I_c;
 
     unsigned int angle;
     unsigned int hall_state;

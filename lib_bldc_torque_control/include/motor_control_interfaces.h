@@ -110,6 +110,21 @@ interface TorqueControlInterface
      */
     void reset_faults();
 
+    /**
+     * @brief   starts global system evaluation (fault detection)
+     *
+     * @return  void
+     */
+    void start_system_eval();
+
+    /**
+     * @brief   sets reference of phase voltages directly on the output of inverter
+     *
+     * @return  void
+     */
+    void set_evaluation_references(int phase_a, int phase_b, int phase_c);
+
+
     UpstreamControlData update_upstream_control_data ();
 };
 
