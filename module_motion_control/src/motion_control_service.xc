@@ -176,7 +176,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double overshoot_max=0.00;
 
 
-
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
     //pos profiler
@@ -447,7 +446,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     }
 
                                     if(first_tuning_step_counter==10)
+                                    {
                                         first_tuning_step_completed=1;
+                                        number_of_samples = number_of_samples/2;
+                                    }
 
                                 }
                                 xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
@@ -456,6 +458,18 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 // in case first tuning phase is completed
                                 if(first_tuning_step_completed==1)
                                 {
+
+                                    if(overshoot_max>((5*tuning_oscillation_range)/100))
+                                    {
+                                        motion_ctrl_config.position_ki -= 50;
+
+                                        if(motion_ctrl_config.position_ki<0)
+                                            motion_ctrl_config.position_ki += 50;
+
+
+                                        overshoot=0;
+                                        overshoot_max=0;
+                                    }
 
                                 }
 
@@ -515,6 +529,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 tuning_counter=0;
                             }
 
+                            xscope_int(KI, motion_ctrl_config.position_ki);
+
 
                             // measurement of error energy
                             error = (tuning_position_ref - position_k)/1000.00;
@@ -527,8 +543,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             xscope_int(ERROR_ENERGY, ((int)(error_energy)));
                             xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
                             xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
-
-
 
 
                             // measurement of overshoot:
@@ -663,7 +677,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TUNING_COUNTER, tuning_counter);
 
                 xscope_int(KP, ((int)(tuning_kp_opt)));
-                xscope_int(KI, ((int)(tuning_ki_opt)));
+
                 xscope_int(KD, ((int)(tuning_kd_opt)));
                 xscope_int(KL, motion_ctrl_config.position_integral_limit);
 
