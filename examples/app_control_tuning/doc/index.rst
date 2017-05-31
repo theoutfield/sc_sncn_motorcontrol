@@ -63,7 +63,7 @@ The app uses commands up to 3 characters with an optional value. The command are
 - ``tsp``: do a torque step command with profiler
 - ``tss``: activate the torque safe mode. in this mode all the phases are disconnected and the motor can turn freely (usefull if you want to turn it by hand).
 - ``r``: reverse the current torque or velocity command
-- ``g``: start the detection of open circuit in phases. Open circuit is detected based on masurement of resistance in phases. If the open circuit is detected, message about the open circuit is printed and phases of the motor should be checked.  
+- ``g``: start the detection of open circuit in phases. Open circuit is detected based on measurement of resistance in phases. If the open circuit is detected, message about the open circuit is printed and phases of the motor should be checked.  
 - ``d``: toggle the motion polarity. It reverse the position/velocity/torque commands and feedback in the motion controller. Which will make you motor turn the other direction.
 - ``j``: print profilers parameters
 - ``ja``: set profiler acceleration
