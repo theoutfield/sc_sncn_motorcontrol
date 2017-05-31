@@ -53,6 +53,7 @@
 	<Probe name="FIRST_STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="FIRST_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="RISING_EDGE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="OVERSHOOT_MAX" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     
     
 </xSCOPEconfig>

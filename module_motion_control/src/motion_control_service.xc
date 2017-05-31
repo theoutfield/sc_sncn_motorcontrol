@@ -172,6 +172,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     int tuning_reference_rising_edge=0;
 
+    double overshoot=0.00;
+    double overshoot_max=0.00;
+
 
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -524,6 +527,21 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             xscope_int(ERROR_ENERGY, ((int)(error_energy)));
                             xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
                             xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
+
+
+
+
+                            // measurement of overshoot:
+                            if(tuning_reference_rising_edge==1)
+                            {
+                                overshoot = position_k - tuning_position_ref;
+                                if(overshoot > overshoot_max)
+                                    overshoot_max=overshoot;
+                            }
+
+                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
+
+
 
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, tuning_position_ref, position_k_1, position_k);
 
