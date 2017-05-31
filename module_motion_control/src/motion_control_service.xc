@@ -167,6 +167,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     int error_energy_integral_counter=0;
 
+    int first_tuning_step_counter=0;
+    int first_tuning_step_completed=0;
+
 
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -420,8 +423,23 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
 
-                                if(error_energy_integral > (error_energy_integral_max/10))
+                                if(error_energy_integral < (error_energy_integral_max/10))
+                                {
+                                    first_tuning_step_counter++;
+                                }
+                                else
+                                {
                                     motion_ctrl_config.position_integral_limit += 100;
+                                    first_tuning_step_counter=0;
+                                }
+
+
+                                if(first_tuning_step_counter==10)
+                                    first_tuning_step_completed=1;
+
+                                xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
+                                xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
+
 
 
 //                                if(motion_ctrl_config.position_integral_limit > 600)

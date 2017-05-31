@@ -50,6 +50,8 @@
 	<Probe name="ERROR_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="ERROR_ENERGY_INTEGRAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="ERROR_ENERGY_INTEGRAL_MAX" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="FIRST_STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="FIRST_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     
     
 </xSCOPEconfig>
