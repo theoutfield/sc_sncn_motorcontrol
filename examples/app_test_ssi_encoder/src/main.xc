@@ -15,12 +15,11 @@
 #include <pwm_server.h>
 #include <user_config.h>
 
-/* Test BiSS Encoder Client */
-void biss_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory) {
+/* Test SSI Encoder Client */
+void ssi_test(client interface PositionFeedbackInterface i_position_feedback, client interface shared_memory_interface ?i_shared_memory) {
     timer t;
     unsigned int start_time, end_time;
     int count = 0;
-    int real_count = 0;
     unsigned int angle = 0;
     int velocity = 0;
     unsigned int position = 0;
@@ -46,41 +45,11 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
         }
 
         xscope_int(COUNT, count);                           //absolute count
-        xscope_int(REAL_COUNT, real_count);                 //real internal absolute count
         xscope_int(POSITION, position);                     //singleturn position
         xscope_int(ANGLE, angle);                           //electrical angle
         xscope_int(VELOCITY, velocity);                     //velocity in rpm
         xscope_int(TIME, (end_time-start_time)/USEC_STD);   //time to get the data in microseconds
-        xscope_int(STATUS, status);                         //error status
-
-
-        switch(status) {
-        case SENSOR_CHECKSUM_ERROR:
-            xscope_int(CRC_ERROR, 1000);    //CRC error
-            xscope_int(ERROR_BIT, 0);       //error bit
-            xscope_int(WARNING_BIT, 0);     //warning bit
-            break;
-        case SENSOR_BISS_ERROR_BIT_ERROR:
-            xscope_int(CRC_ERROR, 0);       //CRC error
-            xscope_int(ERROR_BIT, 1000);    //error bit
-            xscope_int(WARNING_BIT, 0);     //warning bit
-            break;
-        case SENSOR_BISS_WARNING_BIT_ERROR:
-            xscope_int(CRC_ERROR, 0);       //CRC error
-            xscope_int(ERROR_BIT, 0);       //error bit
-            xscope_int(WARNING_BIT, 1000);  //warning bit
-            break;
-        case SENSOR_BISS_ERROR_AND_WARNING_BIT_ERROR:
-            xscope_int(CRC_ERROR, 0);       //CRC error
-            xscope_int(ERROR_BIT, 1000);    //error bit
-            xscope_int(WARNING_BIT, 1000);  //warning bit
-            break;
-        default:
-            xscope_int(CRC_ERROR, 0);       //CRC error
-            xscope_int(ERROR_BIT, 0);       //error bit
-            xscope_int(WARNING_BIT, 0);     //warning bit
-            break;
-        }
+        xscope_int(STATUS_X100, status*100);                    //error status
 
         delay_milliseconds(1);
     }
@@ -93,6 +62,10 @@ QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
 QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
 HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
+port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
+port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
+port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 int main() {
     interface WatchdogInterface i_watchdog[2];
@@ -107,7 +80,7 @@ int main() {
          ************************************************************/
         on tile[IFM_TILE]: par {
             /* Test BiSS Encoder Client */
-            biss_test(i_position_feedback[0], null);
+            ssi_test(i_position_feedback[0], null);
 
             /* PWM Service */
             {
@@ -133,7 +106,7 @@ int main() {
             /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;
-                position_feedback_config.sensor_type = BISS_SENSOR;
+                position_feedback_config.sensor_type = SSI_SENSOR;
                 position_feedback_config.resolution  = BISS_SENSOR_RESOLUTION;
                 position_feedback_config.polarity    = SENSOR_POLARITY_NORMAL;
                 position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
@@ -153,7 +126,12 @@ int main() {
                 position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
                 position_feedback_config.biss_config.data_port_signal_type = BISS_DATA_PORT_SIGNAL_TYPE;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
+                position_feedback_config.gpio_config[0] = GPIO_OFF;
+                position_feedback_config.gpio_config[1] = GPIO_OFF;
+                position_feedback_config.gpio_config[2] = GPIO_OFF;
+                position_feedback_config.gpio_config[3] = GPIO_OFF;
+
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

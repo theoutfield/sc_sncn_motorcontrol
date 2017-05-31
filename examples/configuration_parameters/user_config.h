@@ -23,8 +23,8 @@
 // SENSOR 1 SETTINGS //
 ///////////////////////
 
-// SENSOR 1 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
+// SENSOR 1 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
+#define SENSOR_1_TYPE                     REM_16MT_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -47,7 +47,7 @@
 // SENSOR 2 SETTINGS //
 ///////////////////////
 
-// SENSOR 2 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
+// SENSOR 2 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
 #define SENSOR_2_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_2 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        100       //maximum tolerable value of phase current (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        100000    //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
