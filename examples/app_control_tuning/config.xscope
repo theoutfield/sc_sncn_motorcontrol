@@ -46,16 +46,16 @@
 	
 	<Probe name="TORQUE_REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	
-	<Probe name="ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="ERROR_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="ERROR" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="ERROR_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="ERROR_ENERGY_INTEGRAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="ERROR_ENERGY_INTEGRAL_MAX" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="FIRST_STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="FIRST_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="RISING_EDGE" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="OVERSHOOT_MAX" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="SECOND_STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="SECOND_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="FIRST_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="RISING_EDGE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="OVERSHOOT_MAX" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="SECOND_STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="SECOND_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
     
 </xSCOPEconfig>

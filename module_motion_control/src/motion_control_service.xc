@@ -150,6 +150,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     double error_energy_integral    =0.00;
     double error_energy_integral_max=0.00;
+    double third_step_error_energy_integral_max = 0.00;
+    double dynamic_step_error_energy_integral_max=0.00;
 
     double tuning_kp_opt=0.00;
     double tuning_ki_opt=0.00;
@@ -173,11 +175,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int  second_tuning_step_counter=0;
     int  second_tuning_step_completed=0;
 
+    int  third_tuning_step_counter=0;
+    int  third_tuning_step_completed=0;
+
 
     int tuning_reference_rising_edge=0;
 
     double overshoot=0.00;
     double overshoot_max=0.00;
+    int overshoot_counter=0;
+
 
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -435,8 +442,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     tuning_reference_rising_edge=1;
                                 }
 
-
-
                                 if(first_tuning_step_completed==0)
                                 {
                                     if(error_energy_integral < (error_energy_integral_max/10))
@@ -445,7 +450,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     }
                                     else
                                     {
-                                        motion_ctrl_config.position_integral_limit += 100;
+                                        motion_ctrl_config.position_integral_limit += 50;
                                         first_tuning_step_counter=0;
                                     }
 
@@ -456,83 +461,100 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     }
 
                                 }
-                                xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
-                                xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
 
-                                xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
-                                xscope_int(SECOND_STEP_COMPLETED, (1000*second_tuning_step_completed));
 
                                 // in case first tuning phase is completed
                                 if(first_tuning_step_completed==1)
                                 {
 
-                                    if(overshoot_max<((5*tuning_oscillation_range)/100))
+                                    // at the first step, we focus on the energy to start the system moving.
+                                    // once the system starts to move properly (step 1), then we consequtively follow the following procedure:
+
+                                    // we reduce the overshoot down to its 2%, and once it is reduced to 2%, we reduce the energy as long as the overshoot is not
+                                    // over 2%. if so, we again switch to reduction of overshoot.
+                                    //
+                                    // in each step, first we reduce the overshoot down to its 5%, and when it is low enough,
+                                    // we focus on the energy.
+
+
+
+                                    if(overshoot_max<((10*tuning_oscillation_range)/1000))
+                                        overshoot_counter++;
+                                    else
+                                    {
+                                        motion_ctrl_config.position_ki -= 10;
+
+                                        if(motion_ctrl_config.position_ki<0)
+                                            motion_ctrl_config.position_ki += 10;
+
+                                        overshoot=0;
+                                        overshoot_max=0;
+
+                                        overshoot_counter=0;
+                                    }
+
+                                    if(overshoot_counter==10)
+                                    {
+                                        dynamic_step_error_energy_integral_max = error_energy_integral;
+                                    }
+
+                                    if(overshoot_counter>10)
+                                    {
+                                        if(error_energy_integral > (dynamic_step_error_energy_integral_max/10))
+                                        {
+                                            motion_ctrl_config.position_integral_limit += 100;
+                                        }
+                                    }
+
+
+
+
+
+/*
+
+                                    if(overshoot_max<((10*tuning_oscillation_range)/1000))
                                         second_tuning_step_counter++;
                                     else
                                     {
-                                        motion_ctrl_config.position_ki -= 50;
+                                        motion_ctrl_config.position_ki -= 10;
 
                                         if(motion_ctrl_config.position_ki<0)
-                                            motion_ctrl_config.position_ki += 50;
-
+                                            motion_ctrl_config.position_ki += 10;
 
                                         overshoot=0;
                                         overshoot_max=0;
                                     }
 
-
                                     if(second_tuning_step_counter==10)
                                     {
                                         second_tuning_step_completed=1;
                                         number_of_samples = number_of_samples*2;
+                                        third_step_error_energy_integral_max = error_energy_integral;
                                     }
-
                                 }
 
+                                if (second_tuning_step_completed==1)
+                                {
 
-
-//                                if(motion_ctrl_config.position_integral_limit > 600)
-//                                    motion_ctrl_config.position_integral_limit = 600;
-
-
-
-                                //                                if(tuning_kl_first_try_completed==0)
-                                //                                {
-                                /*                                    if(error_energy_integral < (error_energy_integral_max/2))
+                                    if(error_energy_integral < (third_step_error_energy_integral_max/10))
                                     {
-                                        error_energy_integral_counter++;
-                                        motion_ctrl_config.position_integral_limit -= 100;
-
-                                        if(error_energy_integral_counter==4)
-                                        {
-                                            tuning_kp_opt = ((double)( motion_ctrl_config.position_kp));
-                                            tuning_ki_opt = ((double)( motion_ctrl_config.position_ki));
-                                            tuning_kd_opt = ((double)( motion_ctrl_config.position_kd));
-                                            tuning_kl_opt = ((double)( motion_ctrl_config.position_integral_limit));
-
-                                            tuning_kl_first_try_completed = 1;
-
-                                        }
-
-                                        //error_energy_integral_max = error_energy_integral;
+                                        third_tuning_step_counter++;
                                     }
                                     else
-                                        error_energy_integral_counter=0;*/
+                                    {
+                                        motion_ctrl_config.position_integral_limit += 100;
+                                        third_tuning_step_counter=0;
+                                    }
 
+//                                    if(third_tuning_step_counter==10)
+//                                    {
+//                                        first_tuning_step_completed=1;
+//                                        number_of_samples = number_of_samples/2;
+//                                    }
 
-                                /*                                    if (tuning_kl_first_try_completed == 0)
-                                        motion_ctrl_config.position_integral_limit += 100;*/
+*/
 
-
-                                //                                    else
-                                //                                    {
-                                //                                        error_energy_integral_counter=0;
-                                //                                        motion_ctrl_config.position_integral_limit += 100;
-                                //                                    }
-                                //                                }
-
-
-
+                                }
 
 
                                 nl_position_control_reset(nl_pos_ctrl);
@@ -544,7 +566,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 tuning_counter=0;
                             }
+//                            xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
+//                            xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
 
+//                            xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
+//                            xscope_int(SECOND_STEP_COMPLETED, (1000*second_tuning_step_completed));
                             xscope_int(KI, motion_ctrl_config.position_ki);
 
 
@@ -555,8 +581,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
 
-                            xscope_int(ERROR, ((int)(error)));
-                            xscope_int(ERROR_ENERGY, ((int)(error_energy)));
+//                            xscope_int(ERROR, ((int)(error)));
+//                            xscope_int(ERROR_ENERGY, ((int)(error_energy)));
                             xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
                             xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
 
@@ -569,7 +595,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     overshoot_max=overshoot;
                             }
 
-                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
+//                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
 
 
 
@@ -578,7 +604,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             xscope_int(POSITION_CMD, (int)(tuning_position_ref-tuning_initial_position));
                             xscope_int(POSITION,     (int)(position_k-tuning_initial_position));
 
-                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
+//                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
 
 
                             //velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
@@ -690,14 +716,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
 
-                xscope_int(TUNING_COUNTER, tuning_counter);
+//                xscope_int(TUNING_COUNTER, tuning_counter);
 
-                xscope_int(KP, ((int)(tuning_kp_opt)));
+//                xscope_int(KP, ((int)(tuning_kp_opt)));
 
-                xscope_int(KD, ((int)(tuning_kd_opt)));
+//                xscope_int(KD, ((int)(tuning_kd_opt)));
                 xscope_int(KL, motion_ctrl_config.position_integral_limit);
 
-                xscope_int(TORQUE_REF, torque_ref_k);
+//                xscope_int(TORQUE_REF, torque_ref_k);
 
 
 
@@ -730,7 +756,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 //xscope_int(TIME_LOOP, (time_loop/app_tile_usec));
                 //xscope_int(TIME_USED, (time_used/app_tile_usec));
 
-                if((time_used/app_tile_usec)>250)
+                if((time_used/app_tile_usec)>290)
                 {
                     while(1)
                     {
