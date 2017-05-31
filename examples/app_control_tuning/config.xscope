@@ -56,6 +56,10 @@
 	<Probe name="OVERSHOOT_MAX" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="SECOND_STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="SECOND_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="RISE_TIME_MIN_TEMP" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="RISE_TIME_OPT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="RISE_TIME" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	
     
     
 </xSCOPEconfig>

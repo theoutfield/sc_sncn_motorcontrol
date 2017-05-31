@@ -185,6 +185,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double overshoot_max=0.00;
     int overshoot_counter=0;
 
+    int rise_time_counter=0;
+    int rise_time=0;
+    int rise_time_min_temp=0;
+    int rise_time_min_opt=0;
+    int rise_time_opt=0;
 
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -458,6 +463,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     {
                                         first_tuning_step_completed=1;
                                         number_of_samples = number_of_samples/2;
+
+                                        rise_time_opt = number_of_samples;
+
                                     }
 
                                 }
@@ -504,10 +512,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         {
                                             motion_ctrl_config.position_integral_limit += 100;
                                         }
+
+                                        if(rise_time<rise_time_opt && rise_time!=0) rise_time_opt = rise_time;
                                     }
-
-
-
 
 
 /*
@@ -564,6 +571,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 error_energy =0.00;
                                 error_energy_integral=0.00;
 
+                                rise_time_counter=0;
+                                rise_time = 0;
+                                rise_time_min_temp = 0;
+
                                 tuning_counter=0;
                             }
 //                            xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
@@ -586,14 +597,22 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
                             xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
 
-
                             // measurement of overshoot:
                             if(tuning_reference_rising_edge==1)
                             {
                                 overshoot = position_k - tuning_position_ref;
+
                                 if(overshoot > overshoot_max)
                                     overshoot_max=overshoot;
+
+                                if(position_k > (tuning_initial_position+(60*tuning_oscillation_range)/100)  && rise_time==0)
+                                    rise_time = tuning_counter;
+
                             }
+
+                            xscope_int(RISE_TIME, rise_time);
+                            xscope_int(RISE_TIME_OPT, rise_time_opt);
+
 
 //                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
 
