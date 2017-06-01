@@ -46,10 +46,10 @@
  * @brief Position/Velocity control strategie
  */
 typedef enum {
-    POS_PID_CONTROLLER                      = 101,
-    POS_PID_VELOCITY_CASCADED_CONTROLLER    = 102,
-    NL_POSITION_CONTROLLER                  = 103,
-    VELOCITY_PID_CONTROLLER                 = 201
+    POS_PID_CONTROLLER                      = 1,
+    POS_PID_VELOCITY_CASCADED_CONTROLLER    = 2,
+    NL_POSITION_CONTROLLER                  = 3,
+    VELOCITY_PID_CONTROLLER                 = 4
 } MotionControlStrategies;
 
 
@@ -233,6 +233,11 @@ interface MotionControlInterface
      * @brief getter of actual velocity
      */
     int get_velocity();
+
+    /**
+     * @brief return the value of phase resistances
+     */
+    {float, float, float} open_phase_detection();
 
     /**
      * @brief responsible for data communication between torque controller and higher level controllers

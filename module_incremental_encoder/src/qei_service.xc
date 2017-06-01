@@ -59,7 +59,8 @@ int check_qei_config(PositionFeedbackConfig &position_feedback_config)
 #pragma unsafe arrays
 void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
                  client interface shared_memory_interface ?i_shared_memory,
-                 server interface PositionFeedbackInterface i_position_feedback[3])
+                 server interface PositionFeedbackInterface i_position_feedback[3],
+                 int gpio_on)
 {
 
 #ifdef DEBUG_POSITION_FEEDBACK
@@ -317,7 +318,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/position_feedback_config.ifm_usec);
 
                 //gpio
-                gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);
+                gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
 
                 break;
 

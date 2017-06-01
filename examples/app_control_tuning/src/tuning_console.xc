@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-
 void control_tuning_console(client interface MotionControlInterface i_motion_control)
 {
     DownstreamControlData downstream_control_data = {0};
@@ -28,6 +27,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
     if(ctrlReadData == 1) {
         tile_usec = USEC_FAST;
     }
+
+    float res_a, res_b, res_c;
 
     delay_ticks(100*1000*tile_usec);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
@@ -318,6 +319,28 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         printf("set torque %d\n", downstream_control_data.torque_cmd);
                         break;
                 }
+                break;
+
+       case 'g':
+
+                printf("detection of open circuit in phases started ...\n");
+                {res_a, res_b, res_c} = i_motion_control.open_phase_detection();
+
+                printf("Resistance in phase A = %.2f Om\n", res_a);
+                if(res_a >= 1)
+                    printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+
+                printf("Resistance in phase B = %.2f Om\n", res_b);
+                if(res_b >= 1)
+                    printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+
+                printf("Resistance in phase C = %.2f Om\n", res_c);
+                if(res_c >= 1)
+                    printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+
+                if(res_a < 1 && res_b < 1 && res_c < 1)
+                    printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
+
                 break;
 
         //reverse torque or velocity command

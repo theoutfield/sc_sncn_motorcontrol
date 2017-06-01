@@ -67,7 +67,7 @@ int main(void) {
             motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
             motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
 
-            motion_ctrl_config.position_control_strategy =            NL_POSITION_CONTROLLER;
+            motion_ctrl_config.position_control_strategy =            POSITION_CONTROL_STRATEGY;
 
             motion_ctrl_config.position_kp =                                POSITION_Kp;
             motion_ctrl_config.position_ki =                                POSITION_Ki;
@@ -132,7 +132,7 @@ int main(void) {
                     MotorcontrolConfig motorcontrol_config;
 
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
-                    motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
+                    motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
                     motorcontrol_config.torque_P_gain =  TORQUE_Kp;
                     motorcontrol_config.torque_I_gain =  TORQUE_Ki;
                     motorcontrol_config.torque_D_gain =  TORQUE_Kd;
@@ -188,6 +188,7 @@ int main(void) {
                     position_feedback_config.biss_config.busy = BISS_BUSY;
                     position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
                     position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                    position_feedback_config.biss_config.data_port_signal_type = BISS_DATA_PORT_SIGNAL_TYPE;
 
                     position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
@@ -201,6 +202,11 @@ int main(void) {
                     position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
 
                     position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+
+                    position_feedback_config.gpio_config[0] = GPIO_OFF;
+                    position_feedback_config.gpio_config[1] = GPIO_OFF;
+                    position_feedback_config.gpio_config[2] = GPIO_OFF;
+                    position_feedback_config.gpio_config[3] = GPIO_OFF;
 
                     //setting second sensor
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;

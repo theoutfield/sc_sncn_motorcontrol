@@ -1,6 +1,18 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+3.0.2
+-----
+
+  * Rename MOTOR_PHASES_CONFIGURATION in user_config.h and main.xc files.
+
+3.0.1
+-----
+
+  * Fix issue with a not working Debug/Release build configuration for demo apps
+  * Fix app_demo_torque_control to accept negative torque reference from console
+  * Update lib_bldc_torque_control to work with xTIMEcomposer v.14.3.0
+
 3.0.0
 -----
 
