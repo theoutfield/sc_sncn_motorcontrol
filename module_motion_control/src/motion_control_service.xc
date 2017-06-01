@@ -147,8 +147,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double tuning_oscillation_range = 20000.00;
 
     double error=0.00, error_energy=0.00;
+    double error_steady_state=0.00, error_energy_steady_state=0.00;
 
     double error_energy_integral    =0.00;
+    double steady_state_error_energy_integral=0.00;
     double error_energy_integral_max=0.00;
     double third_step_error_energy_integral_max = 0.00;
     double dynamic_step_error_energy_integral_max=0.00;
@@ -560,6 +562,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 error=0.00;
                                 error_energy =0.00;
                                 error_energy_integral=0.00;
+                                steady_state_error_energy_integral = 0.00;
 
                                 rise_time_counter=0;
                                 rise_time = 0;
@@ -597,7 +600,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             }
 
+                            /*
+                             * measurement of error energy after steady state
+                             */
+                            if((90*number_of_samples)/100<tuning_counter && tuning_counter<(98*number_of_samples)/100 && tuning_reference_rising_edge==1)
+                            {
+                                error_steady_state = (tuning_position_ref - position_k);
+                                error_energy_steady_state = error_steady_state * error_steady_state;
+                                steady_state_error_energy_integral += error_energy_steady_state;
+                            }
 
+
+                            /*
+                             * XSCOPE CALLS
+                             */
                             //                            xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
                             //                            xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
                             //                            xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
@@ -607,6 +623,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             //                            xscope_int(ERROR_ENERGY, ((int)(error_energy)));
                             //                            xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
                             //                            xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
+                            xscope_int(ERROR_ENERGY_STEADY_STATE, ((int)(steady_state_error_energy_integral)));
                             xscope_int(RISE_TIME, rise_time);
                             xscope_int(RISE_TIME_OPT, rise_time_opt);
                             //                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
@@ -622,6 +639,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             //                xscope_int(TORQUE_REF, torque_ref_k);
 
                         }
+
                         //*************************  END OF AUTOMATIC TUNING  *************************
                         //else
                         //{
