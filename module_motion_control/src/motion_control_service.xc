@@ -424,7 +424,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 //initialize pid variables
                                 motion_ctrl_config.position_kp = 10000 ;
-                                motion_ctrl_config.position_ki = 1000  ;
+                                motion_ctrl_config.position_ki = 150  ;
                                 motion_ctrl_config.position_kd = 40000 ;
                                 motion_ctrl_config.position_integral_limit = 1;
                                 motion_ctrl_config.moment_of_inertia       = 0;
@@ -441,6 +441,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             tuning_counter++;
                             if(tuning_counter==number_of_samples)
                             {
+                                /*
+                                 * change the reference value in each round, and update the flag of rising edge
+                                 */
                                 if(tuning_position_ref == (tuning_initial_position + tuning_oscillation_range))
                                 {
                                     tuning_position_ref = tuning_initial_position - tuning_oscillation_range;
@@ -452,6 +455,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     tuning_reference_rising_edge=1;
                                 }
 
+
+
+                                /*
+                                 * *********************** PHASE ONE OF CONSTANT CHANGES **************
+                                 *
+                                 * increase the integral limit until the real position follows the reference position.
+                                 * initialize the value of rise_time_opt with number_of_samples (3000)
+                                 */
                                 if(first_tuning_step_completed==0)
                                 {
                                     if(error_energy_integral < (error_energy_integral_max/10))
@@ -467,8 +478,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     if(first_tuning_step_counter==10)
                                     {
                                         first_tuning_step_completed=1;
-                                        //number_of_samples = number_of_samples/2;
-
                                         rise_time_opt = number_of_samples;
 
                                     }
@@ -476,16 +485,23 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 }
 
 
-                                // in case first tuning phase is completed
-                                if(first_tuning_step_completed==1) //when we enter this mode for the first time, real position is following the reference position with high overshoot
-                                {
 
+                                /*
+                                 * *********************** PHASE TWO OF CONSTANT CHANGES **************
+                                 */
+                                if(first_tuning_step_completed==1)
+                                {
+                                    /*
+                                     * decrease the integral part to reduce the overshoot value
+                                     */
                                     if(overshoot_max<((10*tuning_oscillation_range)/1000))
                                     {
                                         overshoot_counter++;
 
-                                        //save the minimum overshoot value while we are reducing i part.
-                                        //this value will be used to avoid vibration in the next steps of tuning
+                                        /*
+                                         * save the minimum overshoot value while we are reducing i part.
+                                         * this value will be used to avoid vibration in the next steps of tuning
+                                         */
                                         if(overshoot_max<minimum_overshoot_while_reducing_ki_for_1st_round && overshoot_max!=0 && first_overshoot_reduction_round_completed==0)
                                             minimum_overshoot_while_reducing_ki_for_1st_round = overshoot_max;
 
@@ -493,41 +509,53 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     else
                                     {
                                         if(tuning_process_ended==0)
-                                        motion_ctrl_config.position_ki -= 10;
+                                            motion_ctrl_config.position_ki -= 10;
 
                                         if(motion_ctrl_config.position_ki<0 && tuning_process_ended==0)
                                             motion_ctrl_config.position_ki += 10;
 
-                                        overshoot=0;
-                                        overshoot_max=0;
-
                                         overshoot_counter=0;
                                     }
 
+                                    /*
+                                     * ovreshoot is low enough for 10 consequtive times after the reduction of ki
+                                     * - update the energy of error
+                                     * - for the first time, set the first_overshoot_reduction_round_completed to 1.
+                                     */
                                     if(overshoot_counter==10)
                                     {
                                         dynamic_step_error_energy_integral_max = error_energy_integral;
                                         first_overshoot_reduction_round_completed=1;
                                     }
 
-                                    if(overshoot_counter>10)//now the overshoot is reduced enough, and we can reduce the energy of the error
+                                    /*
+                                     * now the overshoot is reduced enough, and we can reduce the energy of the error
+                                     */
+                                    if(overshoot_counter>10)
                                     {
                                         if(error_energy_integral > (dynamic_step_error_energy_integral_max/10) && tuning_process_ended==0 )
                                         {
-                                            motion_ctrl_config.position_integral_limit += 100;
+                                            motion_ctrl_config.position_integral_limit += 200;
                                         }
 
-
                                         if(rise_time<rise_time_opt && rise_time!=0) rise_time_opt = rise_time;
-
-                                        if(rise_time>(150*rise_time_opt)/100 || overshoot_max>(2*first_overshoot_reduction_round_completed)) tuning_process_ended=1;
-
+                                        /*
+                                        if(rise_time>(150*rise_time_opt)/100) tuning_process_ended=1;//stopping tuning process because of two low integral constant
+                                         */
                                     }
 
+                                    /*
+                                     * do not decreas ki when rise-time decreases.
+                                     */
+                                    if(rise_time > (150*rise_time_opt)/100)
+                                        motion_ctrl_config.position_ki += 10;
                                 }
 
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+
+                                overshoot=0;
+                                overshoot_max=0;
 
                                 error=0.00;
                                 error_energy =0.00;
@@ -539,27 +567,24 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 tuning_counter=0;
                             }
-//                            xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
-//                            xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
 
-//                            xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
-//                            xscope_int(SECOND_STEP_COMPLETED, (1000*second_tuning_step_completed));
-//                            xscope_int(KI, motion_ctrl_config.position_ki);
+                            /*
+                             * position controller
+                             */
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, tuning_position_ref, position_k_1, position_k);
 
 
-                            // measurement of error energy
+                            /*
+                             * measurement of error energy
+                             */
                             error = (tuning_position_ref - position_k)/1000.00;
                             error_energy = error * error;
                             error_energy_integral += error_energy;
 
 
-
-//                            xscope_int(ERROR, ((int)(error)));
-//                            xscope_int(ERROR_ENERGY, ((int)(error_energy)));
-//                            xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
-//                            xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
-
-                            // measurement of overshoot:
+                            /*
+                             * measurement of overshoot and rise time
+                             */
                             if(tuning_reference_rising_edge==1)
                             {
                                 overshoot = position_k - tuning_position_ref;
@@ -572,53 +597,39 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             }
 
+
+                            //                            xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
+                            //                            xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
+                            //                            xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
+                            //                            xscope_int(SECOND_STEP_COMPLETED, (1000*second_tuning_step_completed));
+                            xscope_int(KI, motion_ctrl_config.position_ki);
+                            //                            xscope_int(ERROR, ((int)(error)));
+                            //                            xscope_int(ERROR_ENERGY, ((int)(error_energy)));
+                            //                            xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
+                            //                            xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
                             xscope_int(RISE_TIME, rise_time);
                             xscope_int(RISE_TIME_OPT, rise_time_opt);
-                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
-                            xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
-
-
-//                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
-
-
-
-                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, tuning_position_ref, position_k_1, position_k);
-
+                            //                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
+                            //xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
+                            //                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
                             xscope_int(POSITION_CMD, (int)(tuning_position_ref-tuning_initial_position)-20000);
                             xscope_int(POSITION,     (int)(position_k-tuning_initial_position)-20000);
+                            //                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
+                            //                xscope_int(TUNING_COUNTER, tuning_counter);
+                            //                xscope_int(KP, ((int)(tuning_kp_opt)));
+                            //                xscope_int(KD, ((int)(tuning_kd_opt)));
+                            xscope_int(KL, motion_ctrl_config.position_integral_limit);
+                            //                xscope_int(TORQUE_REF, torque_ref_k);
 
-//                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
-
-
-                            //velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
-                            //
-                            //torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                            //
-                            //if(velocity_auto_tune.enable == 0)
-                            //{
-                            //    torque_ref_k=0;
-                            //    torque_enable_flag   =0;
-                            //    velocity_enable_flag =0;
-                            //    position_enable_flag =0;
-                            //    i_torque_control.set_torque_control_disabled();
-                            //
-                            //    motion_ctrl_config.enable_velocity_auto_tuner = 0;
-                            //
-                            //    printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
-                            //
-                            //    motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
-                            //    motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
-                            //    motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
-                            //}
                         }
-                        /*
-                        else
-                        {
-                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
-                        }
-                         */
+                        //*************************  END OF AUTOMATIC TUNING  *************************
+                        //else
+                        //{
+                        //    torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+                        //}
                     }
                 }
+
 
                 //brake release, override target torque if we are in brake release
                 if (special_brake_release_counter <= BRAKE_RELEASE_DURATION)
@@ -699,14 +710,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
 
-//                xscope_int(TUNING_COUNTER, tuning_counter);
 
-//                xscope_int(KP, ((int)(tuning_kp_opt)));
-
-//                xscope_int(KD, ((int)(tuning_kd_opt)));
-//                xscope_int(KL, motion_ctrl_config.position_integral_limit);
-
-//                xscope_int(TORQUE_REF, torque_ref_k);
 
 
 
