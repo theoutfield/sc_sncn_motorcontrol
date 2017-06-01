@@ -114,7 +114,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     int shift = position_feedback_config.resolution;
     int shift_counter = 0;
 
-    while (!shift%2)
+    while (!shift%2 && shift_counter < 16)
     {
         shift /= 2;
         shift_counter ++;
@@ -261,7 +261,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 position_feedback_config.ifm_usec = ifm_usec;
                 shift = position_feedback_config.resolution;
                 shift_counter = 0;
-                while (!shift%2)
+                while (!shift%2 && shift_counter < 16)
                 {
                     shift /= 2;
                     shift_counter ++;

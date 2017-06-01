@@ -203,7 +203,6 @@ void serial_encoder_service(QEIHallPort * qei_hall_port, HallEncSelectPort * hal
     unsigned int sensor_error_check_time = last_read;
     unsigned int end_time = 0;
 
-    int sensor_resolution = position_feedback_config.resolution;
     int notification = MOTCTRL_NTF_EMPTY;
 
     int read_period = init_sensor(qei_hall_port, hall_enc_select_port, spi_ports, gpio_ports, hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
@@ -385,7 +384,11 @@ void serial_encoder_service(QEIHallPort * qei_hall_port, HallEncSelectPort * hal
                 break;
             case BISS_SENSOR:
             case SSI_SENSOR:
-                singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
+                if (position_feedback_config.biss_config.singleturn_resolution > 16) {
+                    singleturn = pos_state.position >> (position_feedback_config.biss_config.singleturn_resolution -16);
+                } else {
+                    singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
+                }
                 break;
             }
 

@@ -572,7 +572,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(POSITION, upstream_control_data.singleturn);
+                xscope_int(POSITION, upstream_control_data.position);
                 xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
                 xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);
