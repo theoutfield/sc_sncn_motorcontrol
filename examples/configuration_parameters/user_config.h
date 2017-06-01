@@ -125,6 +125,7 @@
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
 
+#define ENABLE_COMPENSATION_RECORDING           0 //set the cogging torque recording to 0 on startup
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
 #define POSITION_Kp                             20000
 #define POSITION_Ki                             500
