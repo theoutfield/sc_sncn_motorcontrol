@@ -548,9 +548,29 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         if(steady_state_error_energy_integral<steady_state_error_energy_integral_min && steady_state_error_energy_integral!=0)
                                             steady_state_error_energy_integral_min = steady_state_error_energy_integral;
 
-                                        /*
-                                        if(rise_time>(150*rise_time_opt)/100) tuning_process_ended=1;//stopping tuning process because of two low integral constant
-                                         */
+
+                                        if(steady_state_error_energy_integral>(steady_state_error_energy_integral_min*10))
+                                        {
+                                            tuning_process_ended=1;
+                                            motion_ctrl_config.position_control_autotune = 0;
+                                            tuning_procedure=0;
+
+                                            motion_ctrl_config.position_kp *= motion_ctrl_config.position_integral_limit ;
+                                            motion_ctrl_config.position_ki *= motion_ctrl_config.position_integral_limit;
+                                            motion_ctrl_config.position_kd *= motion_ctrl_config.position_integral_limit;
+                                            motion_ctrl_config.position_integral_limit = 1000;
+                                            motion_ctrl_config.moment_of_inertia       = 0;
+
+                                            motion_ctrl_config.position_kp /= 1500;
+                                            motion_ctrl_config.position_ki /= 1500;
+                                            motion_ctrl_config.position_kd /= 1500;
+
+                                            printf("END OF POSITION CONTROL TUNING \n");
+                                            printf("kp:%i ki:%i kd:%i j:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.moment_of_inertia);
+                                        }
+
+
+
                                     }
 
                                     /*
@@ -619,43 +639,41 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 error_energy_steady_state = error_steady_state * error_steady_state;
                                 steady_state_error_energy_integral += error_energy_steady_state;
                             }
-
-
-                            /*
-                             * XSCOPE CALLS
-                             */
-                            //                            xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
-                            //                            xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
-                            //                            xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
-                            //                            xscope_int(SECOND_STEP_COMPLETED, (1000*second_tuning_step_completed));
-                            xscope_int(KI, motion_ctrl_config.position_ki);
-                            //                            xscope_int(ERROR, ((int)(error)));
-                            //                            xscope_int(ERROR_ENERGY, ((int)(error_energy)));
-                            //                            xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
-                            //                            xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
-                            xscope_int(ERROR_ENERGY_STEADY_STATE, ((int)(steady_state_error_energy_integral)));
-                            xscope_int(ERROR_ENERGY_STEADY_STATE_MIN, ((int)(steady_state_error_energy_integral_min)));
-                            xscope_int(RISE_TIME, rise_time);
-                            xscope_int(RISE_TIME_OPT, rise_time_opt);
-                            //                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
-                            //xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
-                            //                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
-                            xscope_int(POSITION_CMD, (int)(tuning_position_ref-tuning_initial_position)-20000);
-                            xscope_int(POSITION,     (int)(position_k-tuning_initial_position)-20000);
-                            //                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
-                            //                xscope_int(TUNING_COUNTER, tuning_counter);
-                            //                xscope_int(KP, ((int)(tuning_kp_opt)));
-                            //                xscope_int(KD, ((int)(tuning_kd_opt)));
-                            xscope_int(KL, motion_ctrl_config.position_integral_limit);
-                            //                xscope_int(TORQUE_REF, torque_ref_k);
-
+                        }
+                        //*************************  END OF AUTOMATIC TUNING  *************************
+                        else
+                        {
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                         }
 
-                        //*************************  END OF AUTOMATIC TUNING  *************************
-                        //else
-                        //{
-                        //    torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
-                        //}
+
+                        /*
+                         * XSCOPE CALLS
+                         */
+                        //                            xscope_int(FIRST_STEP_COUNTER, (1000*first_tuning_step_counter));
+                        //                            xscope_int(FIRST_STEP_COMPLETED, (1000*first_tuning_step_completed));
+                        //                            xscope_int(SECOND_STEP_COUNTER, (1000*second_tuning_step_counter));
+                        //                            xscope_int(SECOND_STEP_COMPLETED, (1000*second_tuning_step_completed));
+                        xscope_int(KI, motion_ctrl_config.position_ki);
+                        //                            xscope_int(ERROR, ((int)(error)));
+                        //                            xscope_int(ERROR_ENERGY, ((int)(error_energy)));
+                        //                            xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
+                        //                            xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
+                        xscope_int(ERROR_ENERGY_STEADY_STATE, ((int)(steady_state_error_energy_integral)));
+                        xscope_int(ERROR_ENERGY_STEADY_STATE_MIN, ((int)(steady_state_error_energy_integral_min)));
+                        xscope_int(RISE_TIME, rise_time);
+                        xscope_int(RISE_TIME_OPT, rise_time_opt);
+                        //                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
+                        //xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
+                        //                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
+                        xscope_int(POSITION_CMD, (int)(tuning_position_ref-tuning_initial_position)-20000);
+                        xscope_int(POSITION,     (int)(position_k-tuning_initial_position)-20000);
+                        //                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
+                        //                xscope_int(TUNING_COUNTER, tuning_counter);
+                        //                xscope_int(KP, ((int)(tuning_kp_opt)));
+                        //                xscope_int(KD, ((int)(tuning_kd_opt)));
+                        xscope_int(KL, motion_ctrl_config.position_integral_limit);
+                        //                xscope_int(TORQUE_REF, torque_ref_k);
                     }
                 }
 
