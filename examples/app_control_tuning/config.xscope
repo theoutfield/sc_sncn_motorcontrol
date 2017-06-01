@@ -61,6 +61,7 @@
 	<Probe name="RISE_TIME" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
 	<Probe name="OVERSHOOT_OPT_KI" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="TUNING_PROCESS_ENDED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	
     
     

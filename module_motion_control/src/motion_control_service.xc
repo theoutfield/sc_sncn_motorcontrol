@@ -183,7 +183,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     double overshoot=0.00;
     double overshoot_max=0.00;
-    double overshoot_optimal_for_ki=tuning_oscillation_range;
+    double minimum_overshoot_while_reducing_ki_for_1st_round=tuning_oscillation_range;
+    int    first_overshoot_reduction_round_completed=0;
 
     int overshoot_counter=0;
 
@@ -476,7 +477,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
                                 // in case first tuning phase is completed
-                                if(first_tuning_step_completed==1) //real position is following the reference position with high overshoot
+                                if(first_tuning_step_completed==1) //when we enter this mode for the first time, real position is following the reference position with high overshoot
                                 {
 
                                     if(overshoot_max<((10*tuning_oscillation_range)/1000))
@@ -485,8 +486,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                         //save the minimum overshoot value while we are reducing i part.
                                         //this value will be used to avoid vibration in the next steps of tuning
-                                        if(overshoot_max<overshoot_optimal_for_ki && overshoot_max!=0)
-                                            overshoot_optimal_for_ki = overshoot_max;
+                                        if(overshoot_max<minimum_overshoot_while_reducing_ki_for_1st_round && overshoot_max!=0 && first_overshoot_reduction_round_completed==0)
+                                            minimum_overshoot_while_reducing_ki_for_1st_round = overshoot_max;
 
                                     }
                                     else
@@ -506,18 +507,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     if(overshoot_counter==10)
                                     {
                                         dynamic_step_error_energy_integral_max = error_energy_integral;
+                                        first_overshoot_reduction_round_completed=1;
                                     }
 
-                                    if(overshoot_counter>10)
+                                    if(overshoot_counter>10)//now the overshoot is reduced enough, and we can reduce the energy of the error
                                     {
                                         if(error_energy_integral > (dynamic_step_error_energy_integral_max/10) && tuning_process_ended==0 )
                                         {
                                             motion_ctrl_config.position_integral_limit += 100;
                                         }
 
+
                                         if(rise_time<rise_time_opt && rise_time!=0) rise_time_opt = rise_time;
 
-                                        if(rise_time>(150*rise_time_opt)/100) tuning_process_ended=1;
+                                        if(rise_time>(150*rise_time_opt)/100 || overshoot_max>(2*first_overshoot_reduction_round_completed)) tuning_process_ended=1;
 
                                     }
 
@@ -571,7 +574,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             xscope_int(RISE_TIME, rise_time);
                             xscope_int(RISE_TIME_OPT, rise_time_opt);
-                            xscope_int(OVERSHOOT_OPT_KI, overshoot_optimal_for_ki);
+                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
+                            xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
 
 
 //                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
