@@ -226,6 +226,21 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         app_tile_usec = USEC_FAST;
     }
 
+    //QEI index calibration
+    printf("Find encoder index \n");
+    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+    {
+        int index_found = 0;
+        i_torque_control.enable_index_detection();
+        while (!index_found)
+        {
+            upstream_control_data = i_torque_control.update_upstream_control_data();
+            index_found = upstream_control_data.qei_index_found;
+        }
+        printf("Incremental encoder index found\n");
+        i_torque_control.disable_index_detection();
+    }
+
     //brake
     int special_brake_release_counter = BRAKE_RELEASE_DURATION+1;
     int special_brake_release_initial_position = 0;
@@ -237,6 +252,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     t :> update_brake_configuration_time;
     update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
     int update_brake_configuration_flag = 1;
+
+
+
 
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
@@ -532,7 +550,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(POSITION, upstream_control_data.count);
+                xscope_int(POSITION, upstream_control_data.singleturn);
                 xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
                 xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);

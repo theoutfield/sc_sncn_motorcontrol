@@ -282,7 +282,7 @@ void multiturn(int &count, int last_position, int position, int ticks_per_turn);
  * @param sensor_error the sensor error status
  * @param timestamp timestamp in microseconds of when the position data was read
  */
-void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int position, int velocity, int angle, int hall_state, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int position, int velocity, int angle, int hall_state, unsigned int qei_index_found, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
 /**
  * @brief Compute the velocity in rpm

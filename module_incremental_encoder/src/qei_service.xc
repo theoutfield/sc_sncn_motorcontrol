@@ -98,6 +98,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     int calib_bw_flag = 0;
     int sync_out = 0;
     int flag_index = 0;
+    unsigned int index_found =0;
     unsigned int new_pins_1;
 
     int qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
@@ -149,6 +150,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                             v = lookup[new_pins][old_pins];
                             if (!v) {
                                 flag_index = 1;
+                                index_found = 1;
                                 ok = 1;
                                 position = 0;
                             } else {
@@ -312,7 +314,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 }
                 // set the singleturn position to a 16 bits format
                 singleturn = singleturn * (1 << (16 - shift_counter)) / shift;
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/position_feedback_config.ifm_usec);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/position_feedback_config.ifm_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory);

@@ -37,7 +37,7 @@
 #define QEI_SENSOR_SIGNAL_TYPE          QEI_RS422_SIGNAL   // [QEI_RS422_SIGNAL, QEI_TTL_SIGNAL]
 #define QEI_SENSOR_PORT_NUMBER          ENCODER_PORT_2     // [ENCODER_PORT_1, ENCODER_PORT_2]
 #define QEI_SENSOR_VELOCITY_COMPUTE_PERIOD        1000
-#define QEI_SENSOR_RESOLUTION           4000               // ticks per turn = 4 * CPR (Cycles per revolution)
+#define QEI_SENSOR_RESOLUTION           4096               // ticks per turn = 4 * CPR (Cycles per revolution)
 
 //Hall config
 #define HALL_SENSOR_PORT_NUMBER      ENCODER_PORT_1     // [ENCODER_PORT_1, ENCODER_PORT_2]

@@ -71,7 +71,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        100       //maximum tolerable value of phase current (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        100000    //maximum tolerable value of phase current (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
@@ -92,7 +92,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    1400
+#define COMMUTATION_ANGLE_OFFSET    282
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -120,11 +120,12 @@
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
-#define VELOCITY_Kp                             8000000
-#define VELOCITY_Ki                             2000000
+#define VELOCITY_Kp                             600000
+#define VELOCITY_Ki                             40000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
+#define ENABLE_COMPENSATION_RECORDING           0   // set the cogging torque recording flag to 0 on startup
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
 #define POSITION_Kp                             0
