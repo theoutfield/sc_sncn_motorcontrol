@@ -251,9 +251,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     unsigned counter = 10000;
 
     //QEI index calibration
-    printf("Find encoder index \n");
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
     {
+        printf("Find encoder index \n");
         int index_found = 0;
         i_torque_control.enable_index_detection();
         while (!index_found)
