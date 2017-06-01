@@ -9,6 +9,7 @@ BLDC Torque Control Library
     :depth: 3
 
 This library provides a Service which controls the output torque of a three-phase BLDC motor. It is also able to find the offset value for position sensor.
+A cogging torque compensation feature also enables to remove magnetic disturbances from the motor shaft. 
 
 The service takes the following parameters as input:
 

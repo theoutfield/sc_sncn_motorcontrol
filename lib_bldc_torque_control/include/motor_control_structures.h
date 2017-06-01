@@ -173,6 +173,9 @@ typedef struct {
     int protection_limit_under_voltage; //minimum tolerable value of dc-bus voltave (under abnormal conditions)
     int protection_limit_over_temperature; //maximum tolerable value of board temperature
 
+    //cogging torque compensation
+    int torque_offset [1024]; //values of torque to add to the torque command relative to the sensor position (in milliNm)
+
 } MotorcontrolConfig;
 
 /**
@@ -192,17 +195,20 @@ typedef struct
 
     unsigned int angle;
     unsigned int hall_state;
+    unsigned int qei_index_found;
     int angle_velocity;
     SensorError angle_sensor_error;
     SensorError angle_last_sensor_error;
 
     int position;
+    int singleturn;
     int velocity;
     SensorError  sensor_error;
     SensorError  last_sensor_error;
     unsigned int sensor_timestamp;
 
     int secondary_position;
+    int secondary_singleturn;
     int secondary_velocity;
     SensorError  secondary_sensor_error;
     SensorError  secondary_last_sensor_error;
