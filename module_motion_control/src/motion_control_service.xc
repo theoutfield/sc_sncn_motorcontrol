@@ -151,6 +151,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     double error_energy_integral    =0.00;
     double steady_state_error_energy_integral=0.00;
+    double steady_state_error_energy_integral_min=0.00;
+
     double error_energy_integral_max=0.00;
     double third_step_error_energy_integral_max = 0.00;
     double dynamic_step_error_energy_integral_max=0.00;
@@ -432,6 +434,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 motion_ctrl_config.moment_of_inertia       = 0;
 
                                 error_energy_integral_max = ((2*tuning_oscillation_range)/1000) * ((2*tuning_oscillation_range)/1000) * number_of_samples;
+                                steady_state_error_energy_integral_min = error_energy_integral_max /10;// we are considering the last 10% of the error!
 
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
@@ -541,6 +544,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         }
 
                                         if(rise_time<rise_time_opt && rise_time!=0) rise_time_opt = rise_time;
+
+                                        if(steady_state_error_energy_integral<steady_state_error_energy_integral_min && steady_state_error_energy_integral!=0)
+                                            steady_state_error_energy_integral_min = steady_state_error_energy_integral;
+
                                         /*
                                         if(rise_time>(150*rise_time_opt)/100) tuning_process_ended=1;//stopping tuning process because of two low integral constant
                                          */
@@ -562,6 +569,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 error=0.00;
                                 error_energy =0.00;
                                 error_energy_integral=0.00;
+
+                                error_steady_state=0.00;
+                                error_energy_steady_state =0.00;
                                 steady_state_error_energy_integral = 0.00;
 
                                 rise_time_counter=0;
@@ -624,6 +634,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             //                            xscope_int(ERROR_ENERGY_INTEGRAL, ((int)(error_energy_integral)));
                             //                            xscope_int(ERROR_ENERGY_INTEGRAL_MAX, ((int)(error_energy_integral_max)));
                             xscope_int(ERROR_ENERGY_STEADY_STATE, ((int)(steady_state_error_energy_integral)));
+                            xscope_int(ERROR_ENERGY_STEADY_STATE_MIN, ((int)(steady_state_error_energy_integral_min)));
                             xscope_int(RISE_TIME, rise_time);
                             xscope_int(RISE_TIME_OPT, rise_time_opt);
                             //                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
