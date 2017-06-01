@@ -6,8 +6,9 @@
 
 #include <qei_service.h>
 #include <limits.h>
-#include "print.h"
+#include <print.h>
 #include <mc_internal_constants.h>
+#include <filters.h>
 
 //#pragma xta command "analyze loop qei_loop"
 //#pragma xta command "set required - 1.0 us"
@@ -81,6 +82,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
     int previous_position = 0;
     int count = 0;
+    unsigned int angle = 0;
     int first = 1;
     int const config_max_ticks = INT_MAX;//position_feedback_config.qei_config.max_ticks;
     int const config_min_ticks = INT_MIN;
@@ -88,6 +90,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     int direction = 0;
     int qei_type = position_feedback_config.qei_config.number_of_channels;            // TODO use to disable sync for no-index
 
+    int pole_pairs = position_feedback_config.pole_pairs;
     int qei_crossover = (position_feedback_config.resolution * 19) / 100;
     int qei_count_per_hall = position_feedback_config.resolution;   // / position_feedback_config.qei_config.poles;
     int offset_fw = 0;
@@ -96,13 +99,26 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     int calib_bw_flag = 0;
     int sync_out = 0;
     int flag_index = 0;
+    unsigned int index_found =0;
     unsigned int new_pins_1;
 
     int qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
     int vel_previous_position = 0;
     int velocity = 0;
+    int velocity_buffer [8] = {0};
+    int index = 0;
 
     int notification = MOTCTRL_NTF_EMPTY;
+
+
+    int shift = position_feedback_config.resolution;
+    int shift_counter = 0;
+
+    while (!shift%2 && shift_counter < 16)
+    {
+        shift /= 2;
+        shift_counter ++;
+    }
 
     timer t_velocity;
     unsigned int ts_velocity;
@@ -135,6 +151,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                             v = lookup[new_pins][old_pins];
                             if (!v) {
                                 flag_index = 1;
+                                index_found = 1;
                                 ok = 1;
                                 position = 0;
                             } else {
@@ -191,6 +208,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                                 direction = 1;
                             }
                             previous_position = position;
+                            angle = ((position * pole_pairs* (1<<12))/ position_feedback_config.resolution) & ((1<<12)-1);
                         }
 
                         if (sync_out < 0) {
@@ -241,12 +259,19 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
+                shift = position_feedback_config.resolution;
+                shift_counter = 0;
+                while (!shift%2 && shift_counter < 16)
+                {
+                    shift /= 2;
+                    shift_counter ++;
+                }
                 qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
                 // max_count_actual = position_feedback_config.qei_config.max_ticks;
                 qei_type = position_feedback_config.qei_config.number_of_channels;
                 qei_crossover = (position_feedback_config.resolution * 19) / 100;
                 qei_count_per_hall = position_feedback_config.resolution;// / position_feedback_config.qei_config.poles;
-
+                pole_pairs = position_feedback_config.pole_pairs;
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {
@@ -255,6 +280,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 break;
 
             case i_position_feedback[int i].get_angle() -> unsigned int out_angle:
+                    out_angle = angle;
                 break;
 
             case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int out_status:
@@ -278,11 +304,25 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
                 int difference_velocity = count - vel_previous_position;
                 if (difference_velocity < qei_crossover_velocity && difference_velocity > -qei_crossover_velocity)
+                {
                     velocity = velocity_compute(difference_velocity, position_feedback_config.velocity_compute_period, position_feedback_config.resolution);
+//                    velocity = filter(velocity_buffer, index, 8, velocity);
+
+
+                }
+
 
                 vel_previous_position = count;
 
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, velocity, 0, 0, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/position_feedback_config.ifm_usec);
+                int singleturn = position % position_feedback_config.resolution;
+                if (singleturn < 0) {
+                    singleturn += position_feedback_config.resolution;
+                }
+                // set the singleturn position to a 16 bits format
+                singleturn = singleturn * (1 << (16 - shift_counter)) / shift;
+
+
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/position_feedback_config.ifm_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);

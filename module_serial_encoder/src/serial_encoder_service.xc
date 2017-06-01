@@ -14,6 +14,7 @@
 #include <xscope.h>
 #include <mc_internal_constants.h>
 #include <filters.h>
+#include <stdio.h>
 
 extern char start_message[];
 
@@ -192,6 +193,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port, HallEncSelectPort * hal
     int timediff_long = 0;
     //position
     PositionState pos_state = {0};
+    int singleturn = 0;
     //timing
     timer t;
     unsigned int last_read = 0;
@@ -371,8 +373,27 @@ void serial_encoder_service(QEIHallPort * qei_hall_port, HallEncSelectPort * hal
                 }
             }
 
+            //format the sensor singleturn position as a 16-bit data
+            switch(sensor_type)
+            {
+            case REM_16MT_SENSOR:
+                singleturn = pos_state.position;
+                break;
+            case REM_14_SENSOR:
+                singleturn = pos_state.position << 2;
+                break;
+            case BISS_SENSOR:
+            case SSI_SENSOR:
+                if (position_feedback_config.biss_config.singleturn_resolution > 16) {
+                    singleturn = pos_state.position >> (position_feedback_config.biss_config.singleturn_resolution -16);
+                } else {
+                    singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
+                }
+                break;
+            }
+
             //send data to shared memory
-            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, velocity, pos_state.angle, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
+            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, singleturn, velocity, pos_state.angle, 0, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
 
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);

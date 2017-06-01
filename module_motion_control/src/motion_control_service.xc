@@ -20,6 +20,7 @@
 #include <refclk.h>
 #include <mc_internal_constants.h>
 #include <stdio.h>
+#include <cogging_torque_compensation.h>
 
 #define MAX_PERCENTAGE 100
 #define MIN_PERCENTAGE 0
@@ -107,6 +108,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     timer t;
     unsigned int ts;
 
+    int torque_measurement;
+    int torque_buffer [8] = {0};
+    int index = 0;
+
     // structure definition
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
@@ -131,6 +136,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double velocity_ref_k = 0;
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0;
     double velocity_k = 0.00;
+
+    //cogging compensation
+    CoggingTorqueParam ct_parameters;
+
+    init_cogging_torque_parameters(ct_parameters, 10);
 
     AutoTuneParam velocity_auto_tune;
 
@@ -240,6 +250,21 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double rc_rb = 0, ic_ib = 0, ib = 0, vb_va = 0;
     unsigned counter = 10000;
 
+    //QEI index calibration
+    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+    {
+        printf("Find encoder index \n");
+        int index_found = 0;
+        i_torque_control.enable_index_detection();
+        while (!index_found)
+        {
+            upstream_control_data = i_torque_control.update_upstream_control_data();
+            index_found = upstream_control_data.qei_index_found;
+        }
+        printf("Incremental encoder index found\n");
+        i_torque_control.disable_index_detection();
+    }
+
     //brake
     int special_brake_release_counter = BRAKE_RELEASE_DURATION+1;
     int special_brake_release_initial_position = 0;
@@ -251,6 +276,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     t :> update_brake_configuration_time;
     update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
     int update_brake_configuration_flag = 1;
+
+
+
+
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -319,6 +348,94 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         velocity_ref_in_k = velocity_ref_k;
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                    }
+                    //Recording function for the cogging torque
+                    if (motion_ctrl_config.enable_compensation_recording)
+                    {
+                        downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
+                        if (ct_parameters.delay_counter < (1000 * 1000 * POSITION_CONTROL_LOOP_PERIOD))
+                        {
+                            if (!ct_parameters.torque_recording_started)
+                            {
+                                ct_parameters.torque_recording_started = 1;
+                                ct_parameters.count_start = upstream_control_data.position;
+
+                                if (ct_parameters.velocity_reference < 0)
+                                {
+                                    if (ct_parameters.rotation_sign != -1)
+                                    {
+                                        ct_parameters.back_and_forth++;
+                                    }
+                                    ct_parameters.rotation_sign = -1;
+                                }
+                                else
+                                {
+                                    if (ct_parameters.rotation_sign != 1)
+                                    {
+                                        ct_parameters.back_and_forth++;
+                                    }
+                                    ct_parameters.rotation_sign = 1;
+                                }
+                            }
+                            if (((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign < ct_parameters.number_turns * motion_ctrl_config.resolution) || ct_parameters.remaining_cells != 0)
+                            {
+                                if (upstream_control_data.singleturn % ct_parameters.position_step)
+                                {
+                                    int index = upstream_control_data.singleturn / ct_parameters.position_step;
+                                    ct_parameters.torque_recording[index] += torque_measurement;
+                                    if (ct_parameters.counter_average[index] == 0)
+                                    {
+                                        ct_parameters.remaining_cells--;
+                                    }
+                                    ct_parameters.counter_average[index] ++;
+                                }
+                            }
+                            else {
+                                printf("Measurement done\n");
+                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+                                {
+                                    ct_parameters.torque_recording[i] /= ct_parameters.counter_average[i];
+                                    ct_parameters.counter_average[i] = 0;
+                                }
+
+
+                                motorcontrol_config = i_torque_control.get_config();
+                                if (ct_parameters.back_and_forth == 1)
+                                {
+                                    printf("\nFirst turn done\n");
+                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+                                    {
+                                        motorcontrol_config.torque_offset[i] = ct_parameters.torque_recording[i];
+                                        ct_parameters.torque_recording[i]= 0;
+                                    }
+                                    ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
+                                }
+                                else if(ct_parameters.back_and_forth == 2)
+                                {
+                                    printf("\nSecond turn done\n");
+                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+                                    {
+                                        motorcontrol_config.torque_offset[i] += ct_parameters.torque_recording[i];
+                                        motorcontrol_config.torque_offset[i] /= 2;
+                                        ct_parameters.torque_recording[i]= 0;
+                                    }
+                                    ct_parameters.rotation_sign = 0;
+                                    ct_parameters.back_and_forth = 0;
+                                    motion_ctrl_config.enable_compensation_recording = 0;
+                                    velocity_ref_k = 0;
+                                }
+                                ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
+                                i_torque_control.set_config(motorcontrol_config);
+                                ct_parameters.torque_recording_started = 0;
+                                ct_parameters.delay_counter = 0;
+                                i_torque_control.set_torque_control_enabled();
+                            }
+                        }
+                        else
+                        {
+                            ct_parameters.delay_counter ++;
+                        }
+
                     }
                 }
                 else if (position_enable_flag == 1)// position control
@@ -416,7 +533,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             min_position_orig = min_position;
                         }
                     }
-                    //increase limit by threashold
+                    //increase limit by threshold
                     max_position += POSITION_LIMIT_THRESHOLD;
                     min_position -= POSITION_LIMIT_THRESHOLD;
                 }
@@ -432,7 +549,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                     position_limit_reached = 0;
                 }
-
                 torque_ref_k += (double)(downstream_control_data.offset_torque);
 
                 //torque limit check
@@ -451,6 +567,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
                     }
                 }
+
+                torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -791,6 +909,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 position_enable_flag = 0;
                 i_torque_control.set_safe_torque_off_enabled();
                 break;
+
+
+        case i_motion_control[int i].enable_cogging_compensation(int flag):
+                if (flag)
+                {
+                    i_torque_control.enable_cogging_compensation();
+                }
+                else
+                {
+                    i_torque_control.disable_cogging_compensation();
+                }
+                break;
+
 
         case i_motion_control[int i].open_phase_detection() -> {float res_a, float res_b, float res_c}:
 

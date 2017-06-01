@@ -80,6 +80,22 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'a':
                 switch(mode_2)
                 {
+                case 'c' :
+                        printf("Start Cogging torque detection\n");
+                        i_motion_control.enable_velocity_ctrl();
+
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        motion_ctrl_config.enable_compensation_recording = 1;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                        while (motion_ctrl_config.enable_compensation_recording)
+                        {
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            delay_milliseconds(1);
+                        }
+                        i_motion_control.disable();
+                        printf("Cogging torque calibrated\n");
+                        break;
                 case 'o'://find motor commutation offset automatically
                          printf("Sending offset_detection command ...\n");
 
@@ -463,6 +479,20 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'e':
                 switch(mode_2)
                 {
+                case 'c':
+                        if (value == 1)
+                        {
+
+                            i_motion_control.enable_cogging_compensation(1);
+                            printf("cogging torque compensation enabled\n");
+                        }
+                        else
+                        {
+                            i_motion_control.enable_cogging_compensation(0);
+                            printf("cogging torque compensation disabled\n");
+                        }
+                        break;
+
                 case 'p':
                         if (value == 1)
                         {

@@ -274,25 +274,25 @@ int velocity_compute(int difference, int timediff, int resolution)
     return (difference * (60000000/timediff)) / resolution;
 }
 
-void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int velocity, int angle, int hall_state, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp)
+void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int position, int velocity, int angle, int hall_state, unsigned int qei_index_found, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp)
 {
     if (!isnull(i_shared_memory)) {
         switch(sensor_function)
         {
         case SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL:
-            i_shared_memory.write_angle_and_primary_feedback(angle, hall_state, count, velocity, sensor_error, last_sensor_error, timestamp);
+            i_shared_memory.write_angle_and_primary_feedback(angle, hall_state, qei_index_found, count, position, velocity, sensor_error, last_sensor_error, timestamp);
             break;
         case SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY:
-            i_shared_memory.write_angle_and_secondary_feedback(angle, hall_state, count, velocity, sensor_error, last_sensor_error, timestamp);
+            i_shared_memory.write_angle_and_secondary_feedback(angle, hall_state, qei_index_found, count, position, velocity, sensor_error, last_sensor_error, timestamp);
             break;
         case SENSOR_FUNCTION_MOTION_CONTROL:
-            i_shared_memory.write_primary_feedback(count, velocity, sensor_error, last_sensor_error, timestamp);
+            i_shared_memory.write_primary_feedback(count, position, velocity, sensor_error, last_sensor_error, timestamp);
             break;
         case SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY:
-            i_shared_memory.write_secondary_feedback(count, velocity, sensor_error, last_sensor_error, timestamp);
+            i_shared_memory.write_secondary_feedback(count, position, velocity, sensor_error, last_sensor_error, timestamp);
             break;
         case SENSOR_FUNCTION_COMMUTATION_ONLY:
-            i_shared_memory.write_angle(angle, hall_state, velocity, sensor_error, last_sensor_error);
+            i_shared_memory.write_angle(angle, hall_state, qei_index_found, velocity, sensor_error, last_sensor_error);
             break;
         }
     }
