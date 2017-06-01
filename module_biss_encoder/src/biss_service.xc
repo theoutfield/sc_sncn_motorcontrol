@@ -87,6 +87,29 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         }
     }
 
+    //wait for ack and start bits
+    while (read_limit && read_status != 2) {
+        if (clock_config) { //clock is output on a gpio port
+            *clock_port <:0;
+            *clock_port <:1;
+        } else { //clock is output on the hall_enc_select port leftmost 2 bits
+            hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
+            hall_enc_select_port->p_hall_enc_select <: position_feedback_config.biss_config.clock_port_config | hall_enc_select_config;
+        }
+        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
+
+        //check ack and start bits
+        if (read_status) { //ack received, start not received
+            if (bit) {//start bit received, set status to 2
+                read_status++;
+                read_limit = frame_length; //now we read exactly data_length+crc_length bits
+            }
+        } else if (bit == 0)  {//ack bit received, set status to 1
+            read_status++;
+        }
+        read_limit--;
+    }
+
     //read the raw data
     while (read_limit) {
         if (clock_config) { //clock is output on a gpio port
@@ -98,24 +121,15 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
         }
         bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
 
-        //check ack and start bits and save the data
-        if (read_status == 2) { //ack and start bit received, save data
-            if (bitindex == 32) { //byte full
-                data[byteindex] = readbuf; //save byte
-                byteindex++;                //change to next byte
-                readbuf = 0;
-                bitindex = 0;
-            }
-            readbuf = (readbuf << 1) | bit;
-            bitindex++;
-        } else if (read_status) { //ack received, start not received
-            if (bit) {//start bit received, set status to 2
-                read_status++;
-                read_limit = frame_length; //now we read exactly data_length+crc_length bits
-            }
-        } else if (bit == 0)  {//ack bit received, set status to 1
-            read_status++;
+        //save the data
+        if (bitindex == 32) { //byte full
+            data[byteindex] = readbuf; //save byte
+            byteindex++;                //change to next byte
+            readbuf = 0;
+            bitindex = 0;
         }
+        readbuf = (readbuf << 1) | bit;
+        bitindex++;
         read_limit--;
     }
 
