@@ -259,6 +259,13 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
+                shift = position_feedback_config.resolution;
+                shift_counter = 0;
+                while (!shift%2)
+                {
+                    shift /= 2;
+                    shift_counter ++;
+                }
                 qei_crossover_velocity = position_feedback_config.resolution - position_feedback_config.resolution / 10;
                 // max_count_actual = position_feedback_config.qei_config.max_ticks;
                 qei_type = position_feedback_config.qei_config.number_of_channels;
@@ -307,14 +314,14 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
                 vel_previous_position = count;
 
-                // the singeturn position must be > 0
-                int singleturn = position;
-                while (singleturn < 0)
-                {
+                int singleturn = position % position_feedback_config.resolution;
+                if (singleturn < 0) {
                     singleturn += position_feedback_config.resolution;
                 }
                 // set the singleturn position to a 16 bits format
                 singleturn = singleturn * (1 << (16 - shift_counter)) / shift;
+
+
                 write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/position_feedback_config.ifm_usec);
 
                 //gpio

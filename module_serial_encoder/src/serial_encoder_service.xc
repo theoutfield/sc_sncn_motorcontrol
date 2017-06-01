@@ -375,13 +375,18 @@ void serial_encoder_service(QEIHallPort * qei_hall_port, HallEncSelectPort * hal
             }
 
             //format the sensor singleturn position as a 16-bit data
-            if (sensor_type == BISS_SENSOR) {
-
-                singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
-            }
-            else if (sensor_type == REM_14_SENSOR)
+            switch(sensor_type)
             {
+            case REM_16MT_SENSOR:
+                singleturn = pos_state.position;
+                break;
+            case REM_14_SENSOR:
                 singleturn = pos_state.position << 2;
+                break;
+            case BISS_SENSOR:
+            case SSI_SENSOR:
+                singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
+                break;
             }
 
             //send data to shared memory

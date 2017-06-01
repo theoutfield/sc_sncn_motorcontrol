@@ -228,6 +228,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
+                singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
                 position_feedback_config.ifm_usec = ifm_usec;
                 hv.hall_pole_pairs = position_feedback_config.pole_pairs;
                 hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
@@ -426,7 +427,12 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 }
                 last_angle = angle_out;
 
-                singleturn = (count % singleturn_resolution )* 16 / position_feedback_config.pole_pairs;
+                singleturn = count % singleturn_resolution;
+                if (singleturn < 0) {
+                    singleturn += singleturn_resolution;
+                }
+                // set the singleturn position to a 16 bits format
+                singleturn = (singleturn * 16) / position_feedback_config.pole_pairs; // singleturn = (singleturn * 2**16) / (2**12 * pole_pairs)
 
                 tx :> time1;
                 write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn, speed_out, angle_out, hall_state_new, 0, SENSOR_NO_ERROR, SENSOR_NO_ERROR, time1/position_feedback_config.ifm_usec);
