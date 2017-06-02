@@ -84,13 +84,13 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int
     nl_pos_ctrl_auto_tune.err=0.00;
     nl_pos_ctrl_auto_tune.err_energy=0.00;
     nl_pos_ctrl_auto_tune.err_energy_int    =0.00;
-    nl_pos_ctrl_auto_tune.err_energy_int_max=0.00;
+    nl_pos_ctrl_auto_tune.err_energy_int_max    = ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * nl_pos_ctrl_auto_tune.counter_max;
     nl_pos_ctrl_auto_tune.dynamic_error_energy_int_max=0.00;
 
     nl_pos_ctrl_auto_tune.err_ss=0.00;
     nl_pos_ctrl_auto_tune.err_energy_ss=0.00;
     nl_pos_ctrl_auto_tune.err_energy_ss_int=0.00;
-    nl_pos_ctrl_auto_tune.err_energy_ss_int_min=0.00;
+    nl_pos_ctrl_auto_tune.err_energy_ss_int_min = nl_pos_ctrl_auto_tune.err_energy_int_max /10;// we are considering the last 10% of the error!
 
     nl_pos_ctrl_auto_tune.step1_counter=0;
     nl_pos_ctrl_auto_tune.step1_completed=0;
@@ -122,30 +122,21 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
 
     if(nl_pos_ctrl_auto_tune.activate==0)
     {
-        //measure the current position (as the middle point of ocsilation):
         nl_pos_ctrl_auto_tune.position_init = position_k;
 
-        //initialize pid variables
         motion_ctrl_config.position_kp = 10000 ;
         motion_ctrl_config.position_ki = 1000  ;
         motion_ctrl_config.position_kd = 40000 ;
         motion_ctrl_config.position_integral_limit = 1;
         motion_ctrl_config.moment_of_inertia       = 0;
 
-        nl_pos_ctrl_auto_tune.err_energy_int_max = ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * nl_pos_ctrl_auto_tune.counter_max;
-        nl_pos_ctrl_auto_tune.err_energy_ss_int_min = nl_pos_ctrl_auto_tune.err_energy_int_max /10;// we are considering the last 10% of the error!
-
-
         nl_pos_ctrl_auto_tune.activate = 1;
         nl_pos_ctrl_auto_tune.counter=0;
     }
 
-
     if(nl_pos_ctrl_auto_tune.counter==nl_pos_ctrl_auto_tune.counter_max)
     {
-        /*
-         * change the reference value in each round, and update the flag of rising edge
-         */
+
         if(nl_pos_ctrl_auto_tune.position_ref == (nl_pos_ctrl_auto_tune.position_init + nl_pos_ctrl_auto_tune.step_amplitude))
         {
             nl_pos_ctrl_auto_tune.position_ref = nl_pos_ctrl_auto_tune.position_init - nl_pos_ctrl_auto_tune.step_amplitude;
@@ -156,8 +147,6 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
             nl_pos_ctrl_auto_tune.position_ref = nl_pos_ctrl_auto_tune.position_init + nl_pos_ctrl_auto_tune.step_amplitude;
             nl_pos_ctrl_auto_tune.rising_edge=1;
         }
-
-
 
         /*
          * *********************** PHASE ONE OF CONSTANT CHANGES **************
