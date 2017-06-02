@@ -22,6 +22,9 @@
 #include <stdio.h>
 
 
+#define AUTO_TUNE_STEP_AMPLITUDE    20000
+#define AUTO_TUNE_COUNTER_MAX       3000
+
 /**
  * @brief Structure type containing auto_tuning parameters of velocity/position controllers
  */
@@ -67,28 +70,28 @@ typedef struct {
 /**
  *
  **/
-int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune)
+int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int step_amplitude, int counter_max)
 {
     nl_pos_ctrl_auto_tune.position_init = 0.00;
-    nl_pos_ctrl_auto_tune.position_ref     = 0.00;
+    nl_pos_ctrl_auto_tune.position_ref  = 0.00;
 
     nl_pos_ctrl_auto_tune.activated=0;
     nl_pos_ctrl_auto_tune.counter=0;
-    nl_pos_ctrl_auto_tune.step_amplitude = 20000.00;
+    nl_pos_ctrl_auto_tune.counter_max=counter_max;
+
+    nl_pos_ctrl_auto_tune.step_amplitude = step_amplitude;
 
     nl_pos_ctrl_auto_tune.err=0.00;
     nl_pos_ctrl_auto_tune.err_energy=0.00;
-    nl_pos_ctrl_auto_tune.err_ss=0.00;
-    nl_pos_ctrl_auto_tune.err_energy_ss=0.00;
-
     nl_pos_ctrl_auto_tune.err_energy_int    =0.00;
-    nl_pos_ctrl_auto_tune.err_energy_ss_int=0.00;
-    nl_pos_ctrl_auto_tune.err_energy_ss_int_min=0.00;
-
     nl_pos_ctrl_auto_tune.err_energy_int_max=0.00;
     nl_pos_ctrl_auto_tune.dynamic_error_energy_int_max=0.00;
 
-    nl_pos_ctrl_auto_tune.counter_max=3000;
+    nl_pos_ctrl_auto_tune.err_ss=0.00;
+    nl_pos_ctrl_auto_tune.err_energy_ss=0.00;
+    nl_pos_ctrl_auto_tune.err_energy_ss_int=0.00;
+    nl_pos_ctrl_auto_tune.err_energy_ss_int_min=0.00;
+
 
 
 
@@ -143,7 +146,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
         nl_pos_ctrl_auto_tune.err_energy_ss_int_min = nl_pos_ctrl_auto_tune.err_energy_int_max /10;// we are considering the last 10% of the error!
 
 
-/*        nl_position_control_reset(nl_pos_ctrl);
+        /*        nl_position_control_reset(nl_pos_ctrl);
         nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);*/
 
         nl_pos_ctrl_auto_tune.activated = 1;
@@ -287,7 +290,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
                 motion_ctrl_config.position_ki += 10;
         }
 
-/*        nl_position_control_reset(nl_pos_ctrl);
+        /*        nl_position_control_reset(nl_pos_ctrl);
         nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);*/
 
         nl_pos_ctrl_auto_tune.overshoot=0;
@@ -467,7 +470,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     motion_ctrl_config.position_control_autotune =0;
 
 
-    init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune);
+    init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, AUTO_TUNE_STEP_AMPLITUDE, AUTO_TUNE_COUNTER_MAX);
     //***********************************************************************************************
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
