@@ -249,6 +249,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int nr_measur = 0;
     double rc_rb = 0, ic_ib = 0, ib = 0, vb_va = 0;
     unsigned counter = 10000;
+    float open_phase[NR_PHASES] = { 0 };
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
@@ -569,6 +570,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
 
                 torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
+
+                // check for open phase error
+                if (open_phase[A] >= 4)
+                    upstream_control_data.error_status = PHASE_FAILURE_L1;
+                else if (open_phase[B] >= 4)
+                    upstream_control_data.error_status = PHASE_FAILURE_L2;
+                else if (open_phase[C] >= 4)
+                    upstream_control_data.error_status = PHASE_FAILURE_L3;
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -964,6 +973,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 res_b = -res_b;
                             if (res_c < 0)
                                 res_c = -res_c;
+
+                            open_phase[A] = res_a;
+                            open_phase[B] = res_b;
+                            open_phase[C] = res_c;
 
                             phase_voltage_percentage[A] = 0;
                             phase_voltage_percentage[B] = 0;
