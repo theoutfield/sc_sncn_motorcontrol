@@ -24,7 +24,7 @@
 
 #define AUTO_TUNE_STEP_AMPLITUDE    20000
 #define AUTO_TUNE_COUNTER_MAX       3000
-#define PER_THOUSAND_OVERSHOOT      10.00
+#define PER_THOUSAND_OVERSHOOT      10
 
 /**
  * @brief Structure type containing auto_tuning parameters of velocity/position controllers
@@ -173,15 +173,14 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
         else if(nl_pos_ctrl_auto_tune.step1_completed==1)
         {
             /*
-             * decrease the integral part to reduce the overshoot value
+             * damp oscillation
              */
             if(nl_pos_ctrl_auto_tune.overshoot_max<((nl_pos_ctrl_auto_tune.overshot_per_thousand*nl_pos_ctrl_auto_tune.step_amplitude)/1000))
             {
                 nl_pos_ctrl_auto_tune.overshoot_counter++;
 
                 /*
-                 * save the minimum overshoot value while we are reducing i part.
-                 * this value will be used to avoid vibration in the next steps of tuning
+                 * save overshoot min over the first round
                  */
                 if(nl_pos_ctrl_auto_tune.overshoot_max<nl_pos_ctrl_auto_tune.overshoot_min && nl_pos_ctrl_auto_tune.overshoot_max!=0 && nl_pos_ctrl_auto_tune.overshoot_1st_round_damped==0)
                     nl_pos_ctrl_auto_tune.overshoot_min = nl_pos_ctrl_auto_tune.overshoot_max;
@@ -242,7 +241,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
                     motion_ctrl_config.position_kd /= 1500;
 
                     printf("END OF POSITION CONTROL TUNING \n");
-                    printf("kp:%i ki:%i kd:%i j:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.moment_of_inertia);
+                    printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                 }
 
 
@@ -673,6 +672,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                                printf("kp:%i ki:%i kd:%i j:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.moment_of_inertia);
+
                             }
 
 
