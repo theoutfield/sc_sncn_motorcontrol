@@ -24,6 +24,7 @@
 
 #define AUTO_TUNE_STEP_AMPLITUDE    20000
 #define AUTO_TUNE_COUNTER_MAX       3000
+#define PER_THOUSAND_OVERSHOOT      10.00
 
 /**
  * @brief Structure type containing auto_tuning parameters of velocity/position controllers
@@ -57,6 +58,7 @@ typedef struct {
     double overshoot;
     double overshoot_max;
     double overshoot_min;
+    double overshot_per_thousand;
     int overshoot_counter;
     int overshoot_1st_round_damped;
 
@@ -70,7 +72,7 @@ typedef struct {
 /**
  *
  **/
-int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int step_amplitude, int counter_max)
+int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int step_amplitude, int counter_max, int overshot_per_thousand)
 {
     nl_pos_ctrl_auto_tune.position_init = 0.00;
     nl_pos_ctrl_auto_tune.position_ref  = 0.00;
@@ -100,6 +102,7 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int
     nl_pos_ctrl_auto_tune.overshoot=0.00;
     nl_pos_ctrl_auto_tune.overshoot_max=0.00;
     nl_pos_ctrl_auto_tune.overshoot_min=nl_pos_ctrl_auto_tune.step_amplitude;
+    nl_pos_ctrl_auto_tune.overshot_per_thousand = ((double)(overshot_per_thousand));
     nl_pos_ctrl_auto_tune.overshoot_counter=0;
     nl_pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
 
@@ -172,7 +175,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
             /*
              * decrease the integral part to reduce the overshoot value
              */
-            if(nl_pos_ctrl_auto_tune.overshoot_max<((10*nl_pos_ctrl_auto_tune.step_amplitude)/1000))
+            if(nl_pos_ctrl_auto_tune.overshoot_max<((nl_pos_ctrl_auto_tune.overshot_per_thousand*nl_pos_ctrl_auto_tune.step_amplitude)/1000))
             {
                 nl_pos_ctrl_auto_tune.overshoot_counter++;
 
@@ -431,12 +434,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     int step_amplitude = AUTO_TUNE_STEP_AMPLITUDE;
     int counter_max    = AUTO_TUNE_COUNTER_MAX   ;
+    int per_thousand_overshoot = PER_THOUSAND_OVERSHOOT;
 
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
 
 
-    init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, AUTO_TUNE_STEP_AMPLITUDE, AUTO_TUNE_COUNTER_MAX);
+    init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, step_amplitude, counter_max, per_thousand_overshoot);
     //***********************************************************************************************
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -660,7 +664,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         {
                             if(nl_pos_ctrl_auto_tune.activate==0)
                             {
-                                init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, step_amplitude, counter_max);
+                                init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, step_amplitude, counter_max, per_thousand_overshoot);
                             }
 
                             nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, motion_ctrl_config, position_k);
