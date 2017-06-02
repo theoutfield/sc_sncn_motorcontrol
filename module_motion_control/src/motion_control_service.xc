@@ -31,17 +31,12 @@ typedef struct {
     double position_ref;
     int rising_edge;
 
-
     int activated;
     int counter;
     int counter_max;
 
     int step1_counter;
     int step1_completed;
-
-
-
-
 
     double step_amplitude;
 
@@ -51,33 +46,18 @@ typedef struct {
     double err_energy_int_max;
     double dynamic_error_energy_int_max;
 
-
     double err_ss;
     double err_energy_ss;
     double err_energy_ss_int;
     double err_energy_ss_int_min;
 
-
-
-
-
-
-
-
-
-
-
     double overshoot;
     double overshoot_max;
-    double minimum_overshoot_while_reducing_ki_for_1st_round;
-    int first_overshoot_reduction_round_completed;
-
+    double overshoot_min;
     int overshoot_counter;
+    int overshoot_1st_round_damped;
 
-    int rise_time_counter;
     int rise_time;
-    int rise_time_min_temp;
-    int rise_time_min_opt;
     int rise_time_opt;
 
     int tuning_process_ended;
@@ -122,15 +102,12 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune)
 
     nl_pos_ctrl_auto_tune.overshoot=0.00;
     nl_pos_ctrl_auto_tune.overshoot_max=0.00;
-    nl_pos_ctrl_auto_tune.minimum_overshoot_while_reducing_ki_for_1st_round=nl_pos_ctrl_auto_tune.step_amplitude;
-    nl_pos_ctrl_auto_tune.first_overshoot_reduction_round_completed=0;
+    nl_pos_ctrl_auto_tune.overshoot_min=nl_pos_ctrl_auto_tune.step_amplitude;
+    nl_pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
 
     nl_pos_ctrl_auto_tune.overshoot_counter=0;
 
-    nl_pos_ctrl_auto_tune.rise_time_counter=0;
     nl_pos_ctrl_auto_tune.rise_time=0;
-    nl_pos_ctrl_auto_tune.rise_time_min_temp=0;
-    nl_pos_ctrl_auto_tune.rise_time_min_opt=0;
     nl_pos_ctrl_auto_tune.rise_time_opt=0;
 
     nl_pos_ctrl_auto_tune.tuning_process_ended=0;
@@ -237,8 +214,8 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
                  * save the minimum overshoot value while we are reducing i part.
                  * this value will be used to avoid vibration in the next steps of tuning
                  */
-                if(nl_pos_ctrl_auto_tune.overshoot_max<nl_pos_ctrl_auto_tune.minimum_overshoot_while_reducing_ki_for_1st_round && nl_pos_ctrl_auto_tune.overshoot_max!=0 && nl_pos_ctrl_auto_tune.first_overshoot_reduction_round_completed==0)
-                    nl_pos_ctrl_auto_tune.minimum_overshoot_while_reducing_ki_for_1st_round = nl_pos_ctrl_auto_tune.overshoot_max;
+                if(nl_pos_ctrl_auto_tune.overshoot_max<nl_pos_ctrl_auto_tune.overshoot_min && nl_pos_ctrl_auto_tune.overshoot_max!=0 && nl_pos_ctrl_auto_tune.overshoot_1st_round_damped==0)
+                    nl_pos_ctrl_auto_tune.overshoot_min = nl_pos_ctrl_auto_tune.overshoot_max;
 
             }
             else
@@ -255,12 +232,12 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
             /*
              * ovreshoot is low enough for 10 consequtive times after the reduction of ki
              * - update the energy of error
-             * - for the first time, set the first_overshoot_reduction_round_completed to 1.
+             * - for the first time, set the overshoot_1st_round_damped to 1.
              */
             if(nl_pos_ctrl_auto_tune.overshoot_counter==10)
             {
                 nl_pos_ctrl_auto_tune.dynamic_error_energy_int_max = nl_pos_ctrl_auto_tune.err_energy_int;
-                nl_pos_ctrl_auto_tune.first_overshoot_reduction_round_completed=1;
+                nl_pos_ctrl_auto_tune.overshoot_1st_round_damped=1;
             }
 
             /*
@@ -324,9 +301,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
         nl_pos_ctrl_auto_tune.err_energy_ss =0.00;
         nl_pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
 
-        nl_pos_ctrl_auto_tune.rise_time_counter=0;
         nl_pos_ctrl_auto_tune.rise_time = 0;
-        nl_pos_ctrl_auto_tune.rise_time_min_temp = 0;
 
         nl_pos_ctrl_auto_tune.counter=0;
     }
@@ -752,7 +727,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         xscope_int(ERROR_ENERGY_STEADY_STATE_MIN, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int_min)));
                         xscope_int(RISE_TIME, nl_pos_ctrl_auto_tune.rise_time);
                         xscope_int(RISE_TIME_OPT, nl_pos_ctrl_auto_tune.rise_time_opt);
-                        //                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
+                        //                            xscope_int(OVERSHOOT_OPT_KI, overshoot_min);
                         //xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
                         //                            xscope_int(OVERSHOOT_MAX, (int)(position_ref-initial_position+overshoot_max));
                         xscope_int(POSITION_CMD, (int)(nl_pos_ctrl_auto_tune.position_ref-nl_pos_ctrl_auto_tune.position_init)-20000);
