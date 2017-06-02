@@ -22,6 +22,37 @@
 #include <stdio.h>
 
 
+/**
+ * @brief Structure type containing auto_tuning parameters of velocity/position controllers
+ */
+typedef struct {
+
+    int tempo;
+
+} NLPosCtrlAutoTuneParam;
+
+/**
+ *
+ *  */
+int init_nl_position_auto_tuner(AutoTuneParam &velocity_auto_tune, int velocity_ref, double settling_time)
+{
+
+
+    return 0;
+}
+
+
+/**
+ *
+ *  */
+int nl_position_controller_auto_tune(AutoTuneParam &velocity_auto_tune, double &velocity_ref_in_k, double velocity_k, int period)
+{
+
+    return 0;
+}
+
+
+
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque, MotionControlError &motion_control_error)
 {
     int steps = 8;
@@ -328,7 +359,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         torque_ref_k = downstream_control_data.torque_cmd;
                     }
-
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
