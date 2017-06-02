@@ -148,13 +148,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
             nl_pos_ctrl_auto_tune.rising_edge=1;
         }
 
-        /*
-         * *********************** PHASE ONE OF CONSTANT CHANGES **************
-         *
-         * increase the integral limit until the real position follows the reference position.
-         * initialize the value of rise_time_opt with counter_max (3000)
-         */
-        if(nl_pos_ctrl_auto_tune.step1_completed==0)
+        if(nl_pos_ctrl_auto_tune.step1_completed==0) // force the load to follow reference value
         {
             if(nl_pos_ctrl_auto_tune.err_energy_int < (nl_pos_ctrl_auto_tune.err_energy_int_max/10))
             {
@@ -172,15 +166,8 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
                 nl_pos_ctrl_auto_tune.rise_time_opt = nl_pos_ctrl_auto_tune.counter_max;
 
             }
-
         }
-
-
-
-        /*
-         * *********************** PHASE TWO OF CONSTANT CHANGES **************
-         */
-        if(nl_pos_ctrl_auto_tune.step1_completed==1)
+        else if(nl_pos_ctrl_auto_tune.step1_completed==1)
         {
             /*
              * decrease the integral part to reduce the overshoot value
