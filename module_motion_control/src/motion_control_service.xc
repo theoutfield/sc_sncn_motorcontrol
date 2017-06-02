@@ -34,7 +34,7 @@ typedef struct {
     double position_ref;
     int rising_edge;
 
-    int activated;
+    int activate;
     int counter;
     int counter_max;
 
@@ -75,7 +75,7 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int
     nl_pos_ctrl_auto_tune.position_init = 0.00;
     nl_pos_ctrl_auto_tune.position_ref  = 0.00;
 
-    nl_pos_ctrl_auto_tune.activated=0;
+    nl_pos_ctrl_auto_tune.activate=0;
     nl_pos_ctrl_auto_tune.counter=0;
     nl_pos_ctrl_auto_tune.counter_max=counter_max;
 
@@ -92,29 +92,21 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int
     nl_pos_ctrl_auto_tune.err_energy_ss_int=0.00;
     nl_pos_ctrl_auto_tune.err_energy_ss_int_min=0.00;
 
-
-
-
     nl_pos_ctrl_auto_tune.step1_counter=0;
     nl_pos_ctrl_auto_tune.step1_completed=0;
-
-
-
 
     nl_pos_ctrl_auto_tune.rising_edge=0;
 
     nl_pos_ctrl_auto_tune.overshoot=0.00;
     nl_pos_ctrl_auto_tune.overshoot_max=0.00;
     nl_pos_ctrl_auto_tune.overshoot_min=nl_pos_ctrl_auto_tune.step_amplitude;
-    nl_pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
-
     nl_pos_ctrl_auto_tune.overshoot_counter=0;
+    nl_pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
 
     nl_pos_ctrl_auto_tune.rise_time=0;
     nl_pos_ctrl_auto_tune.rise_time_opt=0;
 
     nl_pos_ctrl_auto_tune.tuning_process_ended=0;
-
 
     return 0;
 }
@@ -128,10 +120,8 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
 
     nl_pos_ctrl_auto_tune.counter++;
 
-    if(nl_pos_ctrl_auto_tune.activated==0)
+    if(nl_pos_ctrl_auto_tune.activate==0)
     {
-
-
         //measure the current position (as the middle point of ocsilation):
         nl_pos_ctrl_auto_tune.position_init = position_k;
 
@@ -146,10 +136,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
         nl_pos_ctrl_auto_tune.err_energy_ss_int_min = nl_pos_ctrl_auto_tune.err_energy_int_max /10;// we are considering the last 10% of the error!
 
 
-        /*        nl_position_control_reset(nl_pos_ctrl);
-        nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);*/
-
-        nl_pos_ctrl_auto_tune.activated = 1;
+        nl_pos_ctrl_auto_tune.activate = 1;
         nl_pos_ctrl_auto_tune.counter=0;
     }
 
@@ -263,7 +250,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
                 {
                     nl_pos_ctrl_auto_tune.tuning_process_ended=1;
                     motion_ctrl_config.position_control_autotune = 0;
-                    nl_pos_ctrl_auto_tune.activated=0;
+                    nl_pos_ctrl_auto_tune.activate=0;
 
                     motion_ctrl_config.position_kp *= motion_ctrl_config.position_integral_limit ;
                     motion_ctrl_config.position_ki *= motion_ctrl_config.position_integral_limit;
@@ -465,6 +452,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     //**************************************************************************
     //**************************************************************************
     NLPosCtrlAutoTuneParam nl_pos_ctrl_auto_tune;
+
+    int step_amplitude = AUTO_TUNE_STEP_AMPLITUDE;
+    int counter_max    = AUTO_TUNE_COUNTER_MAX   ;
 
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
@@ -692,11 +682,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                         if(motion_ctrl_config.position_control_autotune == 1)
                         {
-
-                            //*************************************************************
-                            //*************************************************************
+                            if(nl_pos_ctrl_auto_tune.activate==0)
+                            {
+                                init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, step_amplitude, counter_max);
+                            }
 
                             nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+
                             if(nl_pos_ctrl_auto_tune.counter==0)
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
