@@ -33,8 +33,8 @@ typedef struct {
 
 /**
  *
- *  */
-int init_nl_position_auto_tuner(AutoTuneParam &velocity_auto_tune, int velocity_ref, double settling_time)
+ **/
+int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune)
 {
 
 
@@ -44,8 +44,8 @@ int init_nl_position_auto_tuner(AutoTuneParam &velocity_auto_tune, int velocity_
 
 /**
  *
- *  */
-int nl_position_controller_auto_tune(AutoTuneParam &velocity_auto_tune, double &velocity_ref_in_k, double velocity_k, int period)
+ **/
+int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune)
 {
 
     return 0;
@@ -167,6 +167,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
 
+    //**************************************************************************
+    //**************************************************************************
+    //**************************************************************************
+    NLPosCtrlAutoTuneParam nl_pos_ctrl_auto_tune;
+
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
 
@@ -231,6 +236,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     int tuning_process_ended=0;
 
+    init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune);
+    //***********************************************************************************************
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
@@ -451,8 +458,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                         if(motion_ctrl_config.position_control_autotune == 1)
                         {
+
+                            //*************************************************************
+                            //*************************************************************
+
                             if(tuning_procedure==0)
                             {
+                                init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune);
+
+
                                 //measure the current position (as the middle point of ocsilation):
                                 tuning_initial_position = position_k;
 
