@@ -27,17 +27,19 @@
  */
 typedef struct {
 
-    double tuning_initial_position;
-    double tuning_position_ref;
+    double position_init;
+    double position_ref;
 
-    int tuning_procedure;
-    int tuning_counter;
-    double tuning_oscillation_range;
+    int activated;
+    int counter;
+
+    double step_amplitude;
 
     double error;
     double error_energy;
-    double error_steady_state;
-    double error_energy_steady_state;
+
+    double error_ss;
+    double error_energy_ss;
 
     double error_energy_integral;
     double steady_state_error_energy_integral;
@@ -96,18 +98,17 @@ typedef struct {
  **/
 int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune)
 {
+    nl_pos_ctrl_auto_tune.position_init = 0.00;
+    nl_pos_ctrl_auto_tune.position_ref     = 0.00;
 
-    nl_pos_ctrl_auto_tune.tuning_initial_position = 0.00;
-    nl_pos_ctrl_auto_tune.tuning_position_ref      = 0.00;
-
-    nl_pos_ctrl_auto_tune.tuning_procedure=0;
-    nl_pos_ctrl_auto_tune.tuning_counter=0;
-    nl_pos_ctrl_auto_tune.tuning_oscillation_range = 20000.00;
+    nl_pos_ctrl_auto_tune.activated=0;
+    nl_pos_ctrl_auto_tune.counter=0;
+    nl_pos_ctrl_auto_tune.step_amplitude = 20000.00;
 
     nl_pos_ctrl_auto_tune.error=0.00;
     nl_pos_ctrl_auto_tune.error_energy=0.00;
-    nl_pos_ctrl_auto_tune.error_steady_state=0.00;
-    nl_pos_ctrl_auto_tune.error_energy_steady_state=0.00;
+    nl_pos_ctrl_auto_tune.error_ss=0.00;
+    nl_pos_ctrl_auto_tune.error_energy_ss=0.00;
 
     nl_pos_ctrl_auto_tune.error_energy_integral    =0.00;
     nl_pos_ctrl_auto_tune.steady_state_error_energy_integral=0.00;
@@ -147,7 +148,7 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune)
 
     nl_pos_ctrl_auto_tune.overshoot=0.00;
     nl_pos_ctrl_auto_tune.overshoot_max=0.00;
-    nl_pos_ctrl_auto_tune.minimum_overshoot_while_reducing_ki_for_1st_round=nl_pos_ctrl_auto_tune.tuning_oscillation_range;
+    nl_pos_ctrl_auto_tune.minimum_overshoot_while_reducing_ki_for_1st_round=nl_pos_ctrl_auto_tune.step_amplitude;
     nl_pos_ctrl_auto_tune.first_overshoot_reduction_round_completed=0;
 
     nl_pos_ctrl_auto_tune.overshoot_counter=0;
@@ -171,14 +172,14 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune)
 int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k)
 {
 
-    nl_pos_ctrl_auto_tune.tuning_counter++;
+    nl_pos_ctrl_auto_tune.counter++;
 
-    if(nl_pos_ctrl_auto_tune.tuning_procedure==0)
+    if(nl_pos_ctrl_auto_tune.activated==0)
     {
 
 
         //measure the current position (as the middle point of ocsilation):
-        nl_pos_ctrl_auto_tune.tuning_initial_position = position_k;
+        nl_pos_ctrl_auto_tune.position_init = position_k;
 
         //initialize pid variables
         motion_ctrl_config.position_kp = 10000 ;
@@ -187,31 +188,31 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
         motion_ctrl_config.position_integral_limit = 1;
         motion_ctrl_config.moment_of_inertia       = 0;
 
-        nl_pos_ctrl_auto_tune.error_energy_integral_max = ((2*nl_pos_ctrl_auto_tune.tuning_oscillation_range)/1000) * ((2*nl_pos_ctrl_auto_tune.tuning_oscillation_range)/1000) * nl_pos_ctrl_auto_tune.number_of_samples;
+        nl_pos_ctrl_auto_tune.error_energy_integral_max = ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * nl_pos_ctrl_auto_tune.number_of_samples;
         nl_pos_ctrl_auto_tune.steady_state_error_energy_integral_min = nl_pos_ctrl_auto_tune.error_energy_integral_max /10;// we are considering the last 10% of the error!
 
 
 /*        nl_position_control_reset(nl_pos_ctrl);
         nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);*/
 
-        nl_pos_ctrl_auto_tune.tuning_procedure = 1;
-        nl_pos_ctrl_auto_tune.tuning_counter=0;
+        nl_pos_ctrl_auto_tune.activated = 1;
+        nl_pos_ctrl_auto_tune.counter=0;
     }
 
 
-    if(nl_pos_ctrl_auto_tune.tuning_counter==nl_pos_ctrl_auto_tune.number_of_samples)
+    if(nl_pos_ctrl_auto_tune.counter==nl_pos_ctrl_auto_tune.number_of_samples)
     {
         /*
          * change the reference value in each round, and update the flag of rising edge
          */
-        if(nl_pos_ctrl_auto_tune.tuning_position_ref == (nl_pos_ctrl_auto_tune.tuning_initial_position + nl_pos_ctrl_auto_tune.tuning_oscillation_range))
+        if(nl_pos_ctrl_auto_tune.position_ref == (nl_pos_ctrl_auto_tune.position_init + nl_pos_ctrl_auto_tune.step_amplitude))
         {
-            nl_pos_ctrl_auto_tune.tuning_position_ref = nl_pos_ctrl_auto_tune.tuning_initial_position - nl_pos_ctrl_auto_tune.tuning_oscillation_range;
+            nl_pos_ctrl_auto_tune.position_ref = nl_pos_ctrl_auto_tune.position_init - nl_pos_ctrl_auto_tune.step_amplitude;
             nl_pos_ctrl_auto_tune.tuning_reference_rising_edge=0;
         }
         else
         {
-            nl_pos_ctrl_auto_tune.tuning_position_ref = nl_pos_ctrl_auto_tune.tuning_initial_position + nl_pos_ctrl_auto_tune.tuning_oscillation_range;
+            nl_pos_ctrl_auto_tune.position_ref = nl_pos_ctrl_auto_tune.position_init + nl_pos_ctrl_auto_tune.step_amplitude;
             nl_pos_ctrl_auto_tune.tuning_reference_rising_edge=1;
         }
 
@@ -254,7 +255,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
             /*
              * decrease the integral part to reduce the overshoot value
              */
-            if(nl_pos_ctrl_auto_tune.overshoot_max<((10*nl_pos_ctrl_auto_tune.tuning_oscillation_range)/1000))
+            if(nl_pos_ctrl_auto_tune.overshoot_max<((10*nl_pos_ctrl_auto_tune.step_amplitude)/1000))
             {
                 nl_pos_ctrl_auto_tune.overshoot_counter++;
 
@@ -308,7 +309,7 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
                 {
                     nl_pos_ctrl_auto_tune.tuning_process_ended=1;
                     motion_ctrl_config.position_control_autotune = 0;
-                    nl_pos_ctrl_auto_tune.tuning_procedure=0;
+                    nl_pos_ctrl_auto_tune.activated=0;
 
                     motion_ctrl_config.position_kp *= motion_ctrl_config.position_integral_limit ;
                     motion_ctrl_config.position_ki *= motion_ctrl_config.position_integral_limit;
@@ -345,21 +346,21 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
         nl_pos_ctrl_auto_tune.error_energy =0.00;
         nl_pos_ctrl_auto_tune.error_energy_integral=0.00;
 
-        nl_pos_ctrl_auto_tune.error_steady_state=0.00;
-        nl_pos_ctrl_auto_tune.error_energy_steady_state =0.00;
+        nl_pos_ctrl_auto_tune.error_ss=0.00;
+        nl_pos_ctrl_auto_tune.error_energy_ss =0.00;
         nl_pos_ctrl_auto_tune.steady_state_error_energy_integral = 0.00;
 
         nl_pos_ctrl_auto_tune.rise_time_counter=0;
         nl_pos_ctrl_auto_tune.rise_time = 0;
         nl_pos_ctrl_auto_tune.rise_time_min_temp = 0;
 
-        nl_pos_ctrl_auto_tune.tuning_counter=0;
+        nl_pos_ctrl_auto_tune.counter=0;
     }
 
     /*
      * measurement of error energy
      */
-    nl_pos_ctrl_auto_tune.error = (nl_pos_ctrl_auto_tune.tuning_position_ref - position_k)/1000.00;
+    nl_pos_ctrl_auto_tune.error = (nl_pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
     nl_pos_ctrl_auto_tune.error_energy = nl_pos_ctrl_auto_tune.error * nl_pos_ctrl_auto_tune.error;
     nl_pos_ctrl_auto_tune.error_energy_integral += nl_pos_ctrl_auto_tune.error_energy;
 
@@ -369,24 +370,24 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
      */
     if(nl_pos_ctrl_auto_tune.tuning_reference_rising_edge==1)
     {
-        nl_pos_ctrl_auto_tune.overshoot = position_k - nl_pos_ctrl_auto_tune.tuning_position_ref;
+        nl_pos_ctrl_auto_tune.overshoot = position_k - nl_pos_ctrl_auto_tune.position_ref;
 
         if(nl_pos_ctrl_auto_tune.overshoot > nl_pos_ctrl_auto_tune.overshoot_max)
             nl_pos_ctrl_auto_tune.overshoot_max=nl_pos_ctrl_auto_tune.overshoot;
 
-        if(position_k > (nl_pos_ctrl_auto_tune.tuning_initial_position+(60*nl_pos_ctrl_auto_tune.tuning_oscillation_range)/100)  && nl_pos_ctrl_auto_tune.rise_time==0)
-            nl_pos_ctrl_auto_tune.rise_time = nl_pos_ctrl_auto_tune.tuning_counter;
+        if(position_k > (nl_pos_ctrl_auto_tune.position_init+(60*nl_pos_ctrl_auto_tune.step_amplitude)/100)  && nl_pos_ctrl_auto_tune.rise_time==0)
+            nl_pos_ctrl_auto_tune.rise_time = nl_pos_ctrl_auto_tune.counter;
 
     }
 
     /*
      * measurement of error energy after steady state
      */
-    if((90*nl_pos_ctrl_auto_tune.number_of_samples)/100<nl_pos_ctrl_auto_tune.tuning_counter && nl_pos_ctrl_auto_tune.tuning_counter<(98*nl_pos_ctrl_auto_tune.number_of_samples)/100 && nl_pos_ctrl_auto_tune.tuning_reference_rising_edge==1)
+    if((90*nl_pos_ctrl_auto_tune.number_of_samples)/100<nl_pos_ctrl_auto_tune.counter && nl_pos_ctrl_auto_tune.counter<(98*nl_pos_ctrl_auto_tune.number_of_samples)/100 && nl_pos_ctrl_auto_tune.tuning_reference_rising_edge==1)
     {
-        nl_pos_ctrl_auto_tune.error_steady_state = (nl_pos_ctrl_auto_tune.tuning_position_ref - position_k);
-        nl_pos_ctrl_auto_tune.error_energy_steady_state = nl_pos_ctrl_auto_tune.error_steady_state * nl_pos_ctrl_auto_tune.error_steady_state;
-        nl_pos_ctrl_auto_tune.steady_state_error_energy_integral += nl_pos_ctrl_auto_tune.error_energy_steady_state;
+        nl_pos_ctrl_auto_tune.error_ss = (nl_pos_ctrl_auto_tune.position_ref - position_k);
+        nl_pos_ctrl_auto_tune.error_energy_ss = nl_pos_ctrl_auto_tune.error_ss * nl_pos_ctrl_auto_tune.error_ss;
+        nl_pos_ctrl_auto_tune.steady_state_error_energy_integral += nl_pos_ctrl_auto_tune.error_energy_ss;
     }
 
     return 0;
@@ -516,66 +517,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
 
-    //double tuning_initial_position = 0.00;
-    //double tuning_position_ref      = 0.00;
-    //
-    //int tuning_procedure=0;
-    //int tuning_counter=0;
-    //double tuning_oscillation_range = 20000.00;
-    //
-    //double error=0.00, error_energy=0.00;
-    //double error_steady_state=0.00, error_energy_steady_state=0.00;
-    //
-    //double error_energy_integral    =0.00;
-    //double steady_state_error_energy_integral=0.00;
-    //double steady_state_error_energy_integral_min=0.00;
-    //
-    //double error_energy_integral_max=0.00;
-    //double third_step_error_energy_integral_max = 0.00;
-    //double dynamic_step_error_energy_integral_max=0.00;
-    //
-    //double tuning_kp_opt=0.00;
-    //double tuning_ki_opt=0.00;
-    //double tuning_kd_opt=0.00;
-    //double tuning_kl_opt=0.00;
-    //
-    //double tuning_kp_temp=0.00;
-    //double tuning_ki_temp=0.00;
-    //double tuning_kd_temp=0.00;
-    //double tuning_kl_temp=0.00;
-    //
-    //int number_of_samples=3000;
-    //
-    //int tuning_kl_first_try_completed=0;
-    //
-    //int error_energy_integral_counter=0;
-    //
-    //int first_tuning_step_counter=0;
-    //int first_tuning_step_completed=0;
-    //
-    //int  second_tuning_step_counter=0;
-    //int  second_tuning_step_completed=0;
-    //
-    //int  third_tuning_step_counter=0;
-    //int  third_tuning_step_completed=0;
-    //
-    //
-    //int tuning_reference_rising_edge=0;
-    //
-    //double overshoot=0.00;
-    //double overshoot_max=0.00;
-    //double minimum_overshoot_while_reducing_ki_for_1st_round=tuning_oscillation_range;
-    //int    first_overshoot_reduction_round_completed=0;
-    //
-    //int overshoot_counter=0;
-    //
-    //int rise_time_counter=0;
-    //int rise_time=0;
-    //int rise_time_min_temp=0;
-    //int rise_time_min_opt=0;
-    //int rise_time_opt=0;
-    //
-    //int tuning_process_ended=0;
 
     init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune);
     //***********************************************************************************************
@@ -804,7 +745,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             //*************************************************************
 
                             nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, motion_ctrl_config, position_k);
-                            if(nl_pos_ctrl_auto_tune.tuning_counter==0)
+                            if(nl_pos_ctrl_auto_tune.counter==0)
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
@@ -814,7 +755,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             /*
                              * position controller
                              */
-                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, nl_pos_ctrl_auto_tune.tuning_position_ref, position_k_1, position_k);
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, nl_pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
                         }
                         //*************************  END OF AUTOMATIC TUNING  *************************
                         else
@@ -841,11 +782,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         xscope_int(RISE_TIME_OPT, nl_pos_ctrl_auto_tune.rise_time_opt);
                         //                            xscope_int(OVERSHOOT_OPT_KI, minimum_overshoot_while_reducing_ki_for_1st_round);
                         //xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
-                        //                            xscope_int(OVERSHOOT_MAX, (int)(tuning_position_ref-tuning_initial_position+overshoot_max));
-                        xscope_int(POSITION_CMD, (int)(nl_pos_ctrl_auto_tune.tuning_position_ref-nl_pos_ctrl_auto_tune.tuning_initial_position)-20000);
-                        xscope_int(POSITION,     (int)(position_k-nl_pos_ctrl_auto_tune.tuning_initial_position)-20000);
+                        //                            xscope_int(OVERSHOOT_MAX, (int)(position_ref-initial_position+overshoot_max));
+                        xscope_int(POSITION_CMD, (int)(nl_pos_ctrl_auto_tune.position_ref-nl_pos_ctrl_auto_tune.position_init)-20000);
+                        xscope_int(POSITION,     (int)(position_k-nl_pos_ctrl_auto_tune.position_init)-20000);
                         //                            xscope_int(RISING_EDGE, (1000*tuning_reference_rising_edge));
-                        //                xscope_int(TUNING_COUNTER, tuning_counter);
+                        //                xscope_int(TUNING_COUNTER, counter);
                         //                xscope_int(KP, ((int)(tuning_kp_opt)));
                         //                xscope_int(KD, ((int)(tuning_kd_opt)));
                         xscope_int(KL, motion_ctrl_config.position_integral_limit);
