@@ -28,7 +28,7 @@
 #define RISE_TIME_FREEDOM_PERCENT   300
 
 /**
- * @brief Structure type containing auto_tuning parameters of velocity/position controllers
+ * @brief Structure type containing auto_tuning parameters of nonlinear position controller
  */
 typedef struct {
 
@@ -72,8 +72,16 @@ typedef struct {
 } NLPosCtrlAutoTuneParam;
 
 /**
+ * @brief function to initialize the structure of automatic tuner for nonlinear position controller.
  *
- **/
+ * @param nl_pos_ctrl_auto_tune         structure of type NLPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param step_amplitude Communication  The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
+ * @param counter_max                   The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
+ * @param overshot_per_thousand         Overshoot limit while tuning (it is set as per thousand of step amplitude)
+ * @param rise_time_freedom_percent     This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.
+ *
+ * @return void
+ *  */
 int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int step_amplitude, int counter_max, int overshot_per_thousand, int rise_time_freedom_percent)
 {
     nl_pos_ctrl_auto_tune.position_init = 0.00;
@@ -119,8 +127,14 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int
 
 
 /**
+ * @brief function to automatically tune the nonlinear position controller.
  *
- **/
+ * @param motion_ctrl_config            Structure containing all parameters of motion control service
+ * @param nl_pos_ctrl_auto_tune         structure of type NLPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param position_k                    The actual position of the system while (double)
+ *
+ * @return void
+ *  */
 int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k)
 {
 
@@ -373,10 +387,11 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
+ * @param motion_ctrl_config            Structure containing all parameters of motion control service
  * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
- * @param i_torque_control Communication  interface to the Motor Control Service.
- * @param i_motion_control[3]         array of MotionControlInterfaces to communicate with upto 3 clients
- * @param i_update_brake                Interface to update brake configuration in PWM service
+ * @param i_torque_control Communication    interface to the Motor Control Service.
+ * @param i_motion_control[3]               array of MotionControlInterfaces to communicate with upto 3 clients
+ * @param i_update_brake                    Interface to update brake configuration in PWM service
  *
  * @return void
  *  */
@@ -678,7 +693,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 printf("rise_time_opt:%d \n",  nl_pos_ctrl_auto_tune.rise_time_opt);
 
                             }
-
 
                             /*
                              * position controller
