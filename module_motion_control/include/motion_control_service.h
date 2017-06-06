@@ -101,6 +101,10 @@ typedef struct {
     int position_integral_limit;        /**< Parameter for integral limit of position pid controller */
 
     int position_control_autotune;      /**< Parameter for enabling/disabling automatic tuning of position controller*/
+    int step_amplitude_autotune;        /**< The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.*/
+    int counter_max_autotune;           /**< The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.*/
+    int per_thousand_overshoot_autotune;      /**< Overshoot limit while tuning (it is set as per thousand of step amplitude)*/
+    int rise_time_freedom_percent_autotune;   /**< This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.*/
 
     int velocity_kp;                    /**< Parameter for velocity controller P-constant */
     int velocity_ki;                    /**< Parameter for velocity controller I-constant */
