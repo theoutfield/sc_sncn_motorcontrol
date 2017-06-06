@@ -66,7 +66,7 @@ The app uses commands up to 3 characters with an optional value. The command are
 - ``tsp``: do a torque step command with profiler
 - ``tss``: activate the torque safe mode. in this mode all the phases are disconnected and the motor can turn freely (usefull if you want to turn it by hand).
 - ``r``: reverse the current torque or velocity command
-- ``g``: start the detection of open circuit in phases. Open circuit is detected based on measurement of resistance in phases. If the open circuit is detected, message about the open circuit is printed and phases of the motor should be checked.  
+- ``g``: start the detection of open circuit in phases. Open circuit is detected based on measurement of resistance in phases. If the open circuit is detected, message about the open circuit is printed, open phase failure error can be visible in fault code field on xscope. Phases of the motor should be checked.  
 - ``d``: toggle the motion polarity. It reverse the position/velocity/torque commands and feedback in the motion controller. Which will make you motor turn the other direction.
 - ``j``: print profilers parameters
 - ``ja``: set profiler acceleration
@@ -102,6 +102,8 @@ The data displayed with XScope is:
 - sensor error: the sensor error code (the value is multiplied by 100 for better display)
 - V DC: the DC bus voltage
 - I DC: the DC bus current
+- I B: phase B current
+- I C: phase C current
 - temperature
 
 
@@ -130,7 +132,7 @@ Quick How-to
   - `SENSOR_x_VELOCITY_COMPUTE_PERIOD`
   - `SENSOR_x_POLARITY`
 
-  For exemple here we set the `Sensor 1` as `REM 16MT`. We set the sensor function to both commutation and motion control. We set the resolution. We set the velocity compute period to the default value for this sensor (can be found in **sensor_config.h**). And we set the polarity to normal. We don't need a second sensor so we set the second sensor function to disabled.
+  For example here we set the `Sensor 1` as `REM 16MT`. We set the sensor function to both commutation and motion control. We set the resolution. We set the velocity compute period to the default value for this sensor (can be found in **sensor_config.h**). And we set the polarity to normal. We don't need a second sensor so we set the second sensor function to disabled.
 
    .. code-block:: C
                 
