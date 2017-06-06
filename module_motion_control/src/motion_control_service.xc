@@ -385,14 +385,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             {
                                 printf("END OF POSITION CONTROL TUNING \n");
                                 printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
-                                printf("rise_time_opt:%d \n",  nl_pos_ctrl_auto_tune.rise_time_opt);
                             }
 
                             if(nl_pos_ctrl_auto_tune.counter==0)
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-                                printf("rise_time_opt:%d  rise_time:%d  ki: %i  \n", nl_pos_ctrl_auto_tune.rise_time_opt, nl_pos_ctrl_auto_tune.rise_time,  motion_ctrl_config.position_ki);
+                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                printf("rise_time_opt:%d \n",  nl_pos_ctrl_auto_tune.rise_time_opt);
                             }
 
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, nl_pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
@@ -545,7 +545,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 //xscope_int(TIME_LOOP, (time_loop/app_tile_usec));
                 //xscope_int(TIME_USED, (time_used/app_tile_usec));
 
-                if((time_used/app_tile_usec)>320)
+                if((time_used/app_tile_usec)>325)
                 {
                     while(1)
                     {
