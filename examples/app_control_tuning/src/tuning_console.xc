@@ -77,6 +77,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
         //automatic tuning
         case 'a':
+                motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
                 case 'o'://find motor commutation offset automatically
@@ -147,63 +148,88 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
 
                 case 'p'://calculate optimal pid parameters for position controllers
-
-                        if (value == 1)
+                        switch(mode_3)//settings for auto-tuner of position controller
                         {
-                            //i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
-                            //printf("simple PID pos ctrl enabled\n");
-                        }
-                        else if (value == 2)
-                        {
-                            //i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
-                            //printf("vel.-cascaded pos ctrl enabled\n");
-                        }
-                        else if (value == 3)
-                        {
-                            // set kp, ki and kd equal to 0 for velocity controller:
-                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        case 'a'://amplitude
+                                motion_ctrl_config.step_amplitude_autotune = value;
 
-                            motion_ctrl_config.position_kp = 0;
-                            motion_ctrl_config.position_ki = 0;
-                            motion_ctrl_config.position_kd = 0;
-                            motion_ctrl_config.position_integral_limit = 1000;
-                            motion_ctrl_config.moment_of_inertia       = 0;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        case 'p'://period
+                                motion_ctrl_config.counter_max_autotune   = value;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        case 'o'://overshoot
+                                motion_ctrl_config.per_thousand_overshoot_autotune = value;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        case 'r'://rise time
+                                motion_ctrl_config.rise_time_freedom_percent_autotune = value;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        default:
+                                if (value == 1)
+                                 {
+                                     //i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                                     //printf("simple PID pos ctrl enabled\n");
+                                 }
+                                 else if (value == 2)
+                                 {
+                                     //i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                                     //printf("vel.-cascaded pos ctrl enabled\n");
+                                 }
+                                 else if (value == 3)
+                                 {
+                                     // set kp, ki and kd equal to 0 for velocity controller:
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
 
-                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                     motion_ctrl_config.position_kp = 0;
+                                     motion_ctrl_config.position_ki = 0;
+                                     motion_ctrl_config.position_kd = 0;
+                                     motion_ctrl_config.position_integral_limit = 1000;
+                                     motion_ctrl_config.moment_of_inertia       = 0;
 
-                            motion_ctrl_config = i_motion_control.get_motion_control_config();
-                            printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",  motion_ctrl_config.position_kp,
-                                    motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
-                                    motion_ctrl_config.position_integral_limit);
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
 
-                            i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
-                            printf("Nonlinear pos ctrl enabled\n");
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",  motion_ctrl_config.position_kp,
+                                             motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                             motion_ctrl_config.position_integral_limit);
 
-                            downstream_control_data.offset_torque = 0;
+                                     i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                                     printf("Nonlinear pos ctrl enabled\n");
 
-                            // set the velocity pid tuning flag to 1
-                            motion_ctrl_config = i_motion_control.get_motion_control_config();
-                            motion_ctrl_config.position_control_autotune = 1;
-                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                     downstream_control_data.offset_torque = 0;
 
-                            motion_ctrl_config = i_motion_control.get_motion_control_config();
-                            printf("position pid tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
+                                     // set the velocity pid tuning flag to 1
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     motion_ctrl_config.position_control_autotune = 1;
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
 
-                            // end of automatic velocity controller tuning
-                        }
-                        else
-                        {
-                            //i_motion_control.disable();
-                            //brake_flag = 0;
-                            //printf("position ctrl disabled\n");
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("position pid tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
+
+                                     // end of automatic velocity controller tuning
+                                 }
+                                break;
                         }
                         break;
-
-
-                        break;
-
-                 default:
-                         break;
                  }
 
                 break;
