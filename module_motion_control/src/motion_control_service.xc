@@ -48,7 +48,7 @@ typedef struct {
     double err_energy;
     double err_energy_int;
     double err_energy_int_max;
-    double dynamic_error_energy_int_max;
+    double dynamic_err_energy_int_max;
 
     double err_ss;
     double err_energy_ss;
@@ -87,7 +87,7 @@ int init_nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, int
     nl_pos_ctrl_auto_tune.err_energy=0.00;
     nl_pos_ctrl_auto_tune.err_energy_int    =0.00;
     nl_pos_ctrl_auto_tune.err_energy_int_max    = ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * ((2*nl_pos_ctrl_auto_tune.step_amplitude)/1000) * nl_pos_ctrl_auto_tune.counter_max;
-    nl_pos_ctrl_auto_tune.dynamic_error_energy_int_max=0.00;
+    nl_pos_ctrl_auto_tune.dynamic_err_energy_int_max=0.00;
 
     nl_pos_ctrl_auto_tune.err_ss=0.00;
     nl_pos_ctrl_auto_tune.err_energy_ss=0.00;
@@ -198,13 +198,12 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
             }
 
             /*
-             * ovreshoot is low enough for 10 consequtive times after the reduction of ki
-             * - update the energy of error
+             * - update the error energy
              * - for the first time, set the overshoot_1st_round_damped to 1.
              */
             if(nl_pos_ctrl_auto_tune.overshoot_counter==10)
             {
-                nl_pos_ctrl_auto_tune.dynamic_error_energy_int_max = nl_pos_ctrl_auto_tune.err_energy_int;
+                nl_pos_ctrl_auto_tune.dynamic_err_energy_int_max = nl_pos_ctrl_auto_tune.err_energy_int;
                 nl_pos_ctrl_auto_tune.overshoot_1st_round_damped=1;
             }
 
@@ -213,12 +212,13 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
              */
             if(nl_pos_ctrl_auto_tune.overshoot_counter>10)
             {
-                if(nl_pos_ctrl_auto_tune.err_energy_int > (nl_pos_ctrl_auto_tune.dynamic_error_energy_int_max/10) && nl_pos_ctrl_auto_tune.tuning_process_ended==0 )
+                if(nl_pos_ctrl_auto_tune.err_energy_int > (nl_pos_ctrl_auto_tune.dynamic_err_energy_int_max/10) && nl_pos_ctrl_auto_tune.tuning_process_ended==0 )
                 {
-                    motion_ctrl_config.position_integral_limit += 200;
+                    motion_ctrl_config.position_integral_limit += 100;
                 }
 
-                if(nl_pos_ctrl_auto_tune.rise_time<nl_pos_ctrl_auto_tune.rise_time_opt && nl_pos_ctrl_auto_tune.rise_time!=0) nl_pos_ctrl_auto_tune.rise_time_opt = nl_pos_ctrl_auto_tune.rise_time;
+                if(nl_pos_ctrl_auto_tune.rise_time<nl_pos_ctrl_auto_tune.rise_time_opt && nl_pos_ctrl_auto_tune.rise_time!=0)
+                    nl_pos_ctrl_auto_tune.rise_time_opt = nl_pos_ctrl_auto_tune.rise_time;
 
                 if(nl_pos_ctrl_auto_tune.err_energy_ss_int<nl_pos_ctrl_auto_tune.err_energy_ss_int_min && nl_pos_ctrl_auto_tune.err_energy_ss_int!=0)
                     nl_pos_ctrl_auto_tune.err_energy_ss_int_min = nl_pos_ctrl_auto_tune.err_energy_ss_int;
@@ -672,8 +672,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-                                printf("kp:%i ki:%i kd:%i j:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.moment_of_inertia);
-
+                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                             }
 
 
