@@ -572,11 +572,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
 
                 // check for open phase error
-                if (open_phase[A] >= 4)
+                if (open_phase[A] >= 5)
                     upstream_control_data.error_status = PHASE_FAILURE_L1;
-                else if (open_phase[B] >= 4)
+                else if (open_phase[B] >= 5)
                     upstream_control_data.error_status = PHASE_FAILURE_L2;
-                else if (open_phase[C] >= 4)
+                else if (open_phase[C] >= 5)
                     upstream_control_data.error_status = PHASE_FAILURE_L3;
 
 #ifdef XSCOPE_POSITION_CTRL
@@ -596,6 +596,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
                 xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
+                xscope_int(I_B, upstream_control_data.I_b);
+                xscope_int(I_C, upstream_control_data.I_c);
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
                 xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
@@ -936,6 +938,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 nr_measur = 0;
                 start = 0;
+                z = 0;
                 i_torque_control.set_torque_control_disabled();
                 i_torque_control.start_system_eval();
 
@@ -947,14 +950,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     switch (nr_measur)
                     {
                         case 1:
-                            phase_voltage_percentage[A] = 30;
+                            phase_voltage_percentage[A] = 40;
                             phase_voltage_percentage[B] = 50;
                             phase_voltage_percentage[C] = 50;
                             break;
 
                         case 2:
                             phase_voltage_percentage[A] = 50;
-                            phase_voltage_percentage[B] = 30;
+                            phase_voltage_percentage[B] = 40;
                             phase_voltage_percentage[C] = 50;
                             rc_rb = I[B]/I[C];   // Rc/Rb
                             ic_ib = -I[C] - I[B];
