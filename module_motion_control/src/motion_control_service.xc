@@ -392,8 +392,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
-                                printf("rise_time_opt:%d \n",  nl_pos_ctrl_auto_tune.rise_time_opt);
+                                printf("ki:%i kl:%d rise_time_opt:%d\n",  motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit, nl_pos_ctrl_auto_tune.rise_time_opt);
                             }
 
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, nl_pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
