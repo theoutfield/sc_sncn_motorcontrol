@@ -227,6 +227,9 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                                      // end of automatic velocity controller tuning
                                  }
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
                                 break;
                         }
                         break;

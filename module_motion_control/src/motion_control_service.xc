@@ -574,6 +574,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     i_torque_control.set_torque_control_disabled();
                 }
 
+                motion_ctrl_config.position_control_autotune =0;
+                nl_pos_ctrl_auto_tune.activate=0;
+
                 break;
 
         case i_motion_control[int i].enable_position_ctrl(int in_pos_control_mode):
