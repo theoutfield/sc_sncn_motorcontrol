@@ -110,6 +110,9 @@ typedef enum {
 
     //standard defined faults (IEC-61800)
     DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1 = 0X2221,
+    PHASE_FAILURE_L1                            = 0X3131,
+    PHASE_FAILURE_L2                            = 0X3132,
+    PHASE_FAILURE_L3                            = 0X3133,
     OVER_VOLTAGE_NO_1                           = 0X3211,
     UNDER_VOLTAGE_NO_1                          = 0X3221,
     EXCESS_TEMPERATURE_DRIVE                    = 0X4310,
