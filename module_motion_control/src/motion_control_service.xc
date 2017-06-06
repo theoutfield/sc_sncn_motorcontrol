@@ -217,9 +217,6 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
                     motion_ctrl_config.position_integral_limit += 100;
                 }
 
-                if(nl_pos_ctrl_auto_tune.rise_time<nl_pos_ctrl_auto_tune.rise_time_opt && nl_pos_ctrl_auto_tune.rise_time!=0)
-                    nl_pos_ctrl_auto_tune.rise_time_opt = nl_pos_ctrl_auto_tune.rise_time;
-
                 if(nl_pos_ctrl_auto_tune.err_energy_ss_int<nl_pos_ctrl_auto_tune.err_energy_ss_int_min && nl_pos_ctrl_auto_tune.err_energy_ss_int!=0)
                     nl_pos_ctrl_auto_tune.err_energy_ss_int_min = nl_pos_ctrl_auto_tune.err_energy_ss_int;
 
@@ -242,15 +239,16 @@ int nl_pos_ctrl_autotune(NLPosCtrlAutoTuneParam &nl_pos_ctrl_auto_tune, MotionCo
 
                     printf("END OF POSITION CONTROL TUNING \n");
                     printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                    printf("rise_time_opt:%d \n",  nl_pos_ctrl_auto_tune.rise_time_opt);
                 }
-
-
-
             }
 
             /*
              * do not decreas ki when rise-time decreases.
              */
+            if(nl_pos_ctrl_auto_tune.rise_time<nl_pos_ctrl_auto_tune.rise_time_opt && nl_pos_ctrl_auto_tune.rise_time!=0)
+                nl_pos_ctrl_auto_tune.rise_time_opt = nl_pos_ctrl_auto_tune.rise_time;
+
             if(nl_pos_ctrl_auto_tune.rise_time > (150*nl_pos_ctrl_auto_tune.rise_time_opt)/100)
                 motion_ctrl_config.position_ki += 10;
         }
@@ -673,6 +671,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
                                 printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                printf("rise_time_opt:%d \n",  nl_pos_ctrl_auto_tune.rise_time_opt);
+
                             }
 
 
@@ -829,7 +829,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 //xscope_int(TIME_LOOP, (time_loop/app_tile_usec));
                 //xscope_int(TIME_USED, (time_used/app_tile_usec));
 
-                if((time_used/app_tile_usec)>290)
+                if((time_used/app_tile_usec)>320)
                 {
                     while(1)
                     {
