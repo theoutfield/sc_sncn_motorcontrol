@@ -415,8 +415,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         //                            xscope_int(ERR_ENG, ((int)(error_energy)));
                         //                            xscope_int(ERR_ENG_INTEGRAL, ((int)(error_energy_int)));
                         //                            xscope_int(ERR_ENG_INTEGRAL_MAX, ((int)(error_energy_int_max)));
-                        xscope_int(ERR_ENG_SS, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int)));
-                        //xscope_int(ERR_ENG_SS_MIN, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int_min)));
+                        xscope_int(ERR_ENG_SS_INT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int)));
+                        xscope_int(ERR_ENG_SS_INT_MIN, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int_min+1000)));
                         xscope_int(ERR_ENG_SS_LIMIT_SOFT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_limit_soft)));
                         //xscope_int(RISE_TIME, nl_pos_ctrl_auto_tune.rise_time);
                         //xscope_int(RISE_TIME_OPT, nl_pos_ctrl_auto_tune.rise_time_opt);
