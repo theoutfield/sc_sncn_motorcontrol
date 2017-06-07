@@ -1,6 +1,17 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+3.1
+---
+
+  Known Issues:
+    * REM 16MT sensor does not work with Core C21 and DC1K with long cables (more than 15 cm).
+
+    This is probably caused by differences in traces length between the GPIO ports used for SPI. A workaround is to flip the Clock (GPIO 1) and the MISO (GPIO 2) pins. For this you need to modify or make a new cable with the two wires flipped
+    and also flip the definitions of GPIO ports 1 and 2 in the IFM module's bsp file.
+      
+
+
 3.0.2
 -----
 
