@@ -388,7 +388,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-                                printf("ki:%i kl:%d rise_time_opt:%d\n",  motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit, nl_pos_ctrl_auto_tune.rise_time_opt);
+                                printf("ActSt:%i StCt:%i EnSS:%i EnSSMin:%i EnSSMinLimSoft:%i Ki:%i Kl:%i\n",
+                                        nl_pos_ctrl_auto_tune.active_step, nl_pos_ctrl_auto_tune.active_step_counter,
+                                        ((int)nl_pos_ctrl_auto_tune.err_energy_ss_int), ((int)nl_pos_ctrl_auto_tune.err_energy_ss_int_min), ((int)nl_pos_ctrl_auto_tune.err_energy_ss_limit_soft),
+                                        motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit);
                             }
 
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, nl_pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
@@ -479,12 +482,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-                xscope_int(ACTIVE_STEP, (1000*nl_pos_ctrl_auto_tune.active_step));
-                xscope_int(ACTIVE_STEP_COUNTER, (500*nl_pos_ctrl_auto_tune.active_step_counter));
-                xscope_int(ERR_ENG_SS_INT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int)));
-                xscope_int(ERR_ENG_SS_INT_MIN, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int_min+1000)));
-                xscope_int(ERR_ENG_SS_LIMIT_SOFT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_limit_soft)));
-
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
@@ -509,7 +506,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 #endif
 
 
-                if((time_used/app_tile_usec)>325)
+                if((time_used/app_tile_usec)>330)
                 {
                     while(1)
                     {
