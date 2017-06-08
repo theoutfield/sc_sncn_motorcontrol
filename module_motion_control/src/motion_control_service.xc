@@ -380,18 +380,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
-                                printf("END OF POSITION CONTROL TUNING \n");
-                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                //printf("END OF POSITION CONTROL TUNING \n");
+                                //printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                motion_ctrl_config.velocity_integral_limit=123456;
                             }
 
                             if(nl_pos_ctrl_auto_tune.counter==0)
                             {
                                 nl_position_control_reset(nl_pos_ctrl);
                                 nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-                                printf("ActSt:%i StCt:%i EnSS:%i EnSSMin:%i EnSSMinLimSoft:%i Ki:%i Kl:%i\n",
-                                        nl_pos_ctrl_auto_tune.active_step, nl_pos_ctrl_auto_tune.active_step_counter,
-                                        ((int)nl_pos_ctrl_auto_tune.err_energy_ss_int), ((int)nl_pos_ctrl_auto_tune.err_energy_ss_int_min), ((int)nl_pos_ctrl_auto_tune.err_energy_ss_limit_soft),
-                                        motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit);
+                                //printf("ActSt:%i StCt:%i EnSS:%i EnSSMin:%i EnSSMinLimSoft:%i Ki:%i Kl:%i\n",
+                                //        nl_pos_ctrl_auto_tune.active_step, nl_pos_ctrl_auto_tune.active_step_counter,
+                                //        ((int)nl_pos_ctrl_auto_tune.err_energy_ss_int), ((int)nl_pos_ctrl_auto_tune.err_energy_ss_int_min), ((int)nl_pos_ctrl_auto_tune.err_energy_ss_limit_soft),
+                                //        motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit);
                             }
 
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, nl_pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
