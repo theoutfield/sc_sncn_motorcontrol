@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        40000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        10000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
@@ -81,17 +81,17 @@
 //////////////////////////////////////////////
 // Warning!!! This parameter alters PWM switching frequency.
 // Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
-#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile.
+#define IFM_TILE_USEC       USEC_STD      // Number of ticks in a microsecond for IFM Tile.
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
-#define DC_BUS_VOLTAGE             48 //Warning! This parameter is used as well as a base for brake voltage configuration
+#define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 20
+#define APPLIED_TUNING_TORQUE_PERCENT 80
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    0
+#define COMMUTATION_ANGLE_OFFSET    800
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -119,15 +119,15 @@
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
-#define VELOCITY_Kp                             700000
-#define VELOCITY_Ki                             20000
+#define VELOCITY_Kp                             0
+#define VELOCITY_Ki                             0
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             20000
-#define POSITION_Ki                             500
-#define POSITION_Kd                             41000
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
