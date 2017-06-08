@@ -126,6 +126,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     //autotune initialization
     init_velocity_auto_tuner(velocity_auto_tune, TUNING_VELOCITY, SETTLING_TIME);
 
+    motion_ctrl_config.enable_velocity_auto_tuner == 0;
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
@@ -522,6 +523,8 @@ break;
                     i_torque_control.set_torque_control_disabled();
                 }
 
+                motion_ctrl_config.position_control_autotune =0;
+                nl_pos_ctrl_auto_tune.activate=0;
                 break;
 
         case i_motion_control[int i].enable_position_ctrl(int in_pos_control_mode):
@@ -566,6 +569,18 @@ break;
                 downstream_control_data.offset_torque = 0;
 
                 pid_reset(velocity_control_pid_param);
+
+                pid_init(velocity_control_pid_param);
+                if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
+                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
+                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+                if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
+                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
+                pid_set_parameters(
+                        (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
+                        (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
+                        POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
