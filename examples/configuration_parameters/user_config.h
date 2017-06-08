@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        10000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        60000    //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)

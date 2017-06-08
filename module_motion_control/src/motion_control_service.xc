@@ -138,16 +138,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
 
-    //**************************************************************************
-    //**************************************************************************
-    //**************************************************************************
     NLPosCtrlAutoTuneParam nl_pos_ctrl_auto_tune;
 
     motion_ctrl_config.step_amplitude_autotune  = AUTO_TUNE_STEP_AMPLITUDE;
     motion_ctrl_config.counter_max_autotune     = AUTO_TUNE_COUNTER_MAX   ;
     motion_ctrl_config.per_thousand_overshoot_autotune   = PER_THOUSAND_OVERSHOOT;
     motion_ctrl_config.rise_time_freedom_percent_autotune= RISE_TIME_FREEDOM_PERCENT;
-
 
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
@@ -402,35 +398,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         {
                             torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                         }
-
-
-                        /*
-                         * XSCOPE CALLS
-                         */
-                        //                            xscope_int(FIRST_STEP_COUNTER, (1000*step1_counter));
-                        xscope_int(ACTIVE_STEP, (1000*nl_pos_ctrl_auto_tune.active_step));
-                        xscope_int(ACTIVE_STEP_COUNTER, (500*nl_pos_ctrl_auto_tune.active_step_counter));
-                        //xscope_int(KI, motion_ctrl_config.position_ki);
-                        //                            xscope_int(ERROR, ((int)(error)));
-                        //                            xscope_int(ERR_ENG, ((int)(error_energy)));
-                        //                            xscope_int(ERR_ENG_INTEGRAL, ((int)(error_energy_int)));
-                        //                            xscope_int(ERR_ENG_INTEGRAL_MAX, ((int)(error_energy_int_max)));
-                        xscope_int(ERR_ENG_SS_INT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int)));
-                        xscope_int(ERR_ENG_SS_INT_MIN, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int_min+1000)));
-                        xscope_int(ERR_ENG_SS_LIMIT_SOFT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_limit_soft)));
-                        //xscope_int(RISE_TIME, nl_pos_ctrl_auto_tune.rise_time);
-                        //xscope_int(RISE_TIME_OPT, nl_pos_ctrl_auto_tune.rise_time_opt);
-                        //                            xscope_int(OVERSHOOT_OPT_KI, overshoot_min);
-                        //xscope_int(TUNING_PROCESS_ENDED, tuning_process_ended*1000);
-                        //                            xscope_int(OVERSHOOT_MAX, (int)(position_ref-initial_position+overshoot_max));
-                        xscope_int(POSITION_CMD, (int)(nl_pos_ctrl_auto_tune.position_ref-nl_pos_ctrl_auto_tune.position_init)-20000);
-                        xscope_int(POSITION,     (int)(position_k-nl_pos_ctrl_auto_tune.position_init)-20000);
-                        //                            xscope_int(RISING_EDGE, (1000*rising_edge));
-                        //                xscope_int(TUNING_COUNTER, counter);
-                        //                xscope_int(KP, ((int)(tuning_kp_opt)));
-                        //                xscope_int(KD, ((int)(tuning_kd_opt)));
-                        //xscope_int(KL, motion_ctrl_config.position_integral_limit);
-                        //                xscope_int(TORQUE_REF, torque_ref_k);
                     }
                 }
 
@@ -512,14 +479,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
+                xscope_int(ACTIVE_STEP, (1000*nl_pos_ctrl_auto_tune.active_step));
+                xscope_int(ACTIVE_STEP_COUNTER, (500*nl_pos_ctrl_auto_tune.active_step_counter));
+                xscope_int(ERR_ENG_SS_INT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int)));
+                xscope_int(ERR_ENG_SS_INT_MIN, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_int_min+1000)));
+                xscope_int(ERR_ENG_SS_LIMIT_SOFT, ((int)(nl_pos_ctrl_auto_tune.err_energy_ss_limit_soft)));
 
-
-
-
-
-
-
-                /*
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
@@ -542,10 +507,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
-                 */
-                //xscope_int(TIME_FREE, (time_free/app_tile_usec));
-                //xscope_int(TIME_LOOP, (time_loop/app_tile_usec));
-                //xscope_int(TIME_USED, (time_used/app_tile_usec));
+
 
                 if((time_used/app_tile_usec)>325)
                 {
