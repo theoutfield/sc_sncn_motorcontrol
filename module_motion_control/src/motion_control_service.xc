@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include <controllers.h>
+#include <auto_tune.h>
 #include <profile.h>
 #include <filters.h>
 
@@ -93,6 +94,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 {
     timer t;
     unsigned int ts;
+    unsigned time_start=0, time_start_old=0, time_loop=0, time_end=0, time_free=0, time_used=0;
 
     // structure definition
     UpstreamControlData upstream_control_data;
@@ -119,11 +121,27 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0;
     double velocity_k = 0.00;
 
+    AutoTuneParam velocity_auto_tune;
+
+    //autotune initialization
+    init_velocity_auto_tuner(velocity_auto_tune, TUNING_VELOCITY, SETTLING_TIME);
+
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
     double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
+
+    NLPosCtrlAutoTuneParam nl_pos_ctrl_auto_tune;
+
+    motion_ctrl_config.step_amplitude_autotune  = AUTO_TUNE_STEP_AMPLITUDE;
+    motion_ctrl_config.counter_max_autotune     = AUTO_TUNE_COUNTER_MAX   ;
+    motion_ctrl_config.per_thousand_overshoot_autotune   = PER_THOUSAND_OVERSHOOT;
+    motion_ctrl_config.rise_time_freedom_percent_autotune= RISE_TIME_FREEDOM_PERCENT;
+
+    motion_ctrl_config.position_control_autotune =0;
+
+    init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, motion_ctrl_config);
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
@@ -229,6 +247,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         {
         case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
 
+                time_start_old = time_start;
+                t :> time_start;
+                time_loop = time_start - time_start_old;
+                time_free = time_start - time_end;
+
+
                 upstream_control_data = i_torque_control.update_upstream_control_data();
 
                 velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
@@ -251,7 +275,31 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    if(motion_ctrl_config.enable_profiler==1)
+                    if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
+                    {
+
+                        velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
+
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
+                        if(velocity_auto_tune.enable == 0)
+                        {
+                            torque_ref_k=0;
+                            torque_enable_flag   =0;
+                            velocity_enable_flag =0;
+                            position_enable_flag =0;
+                            i_torque_control.set_torque_control_disabled();
+
+                            motion_ctrl_config.enable_velocity_auto_tuner = 0;
+
+                            printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
+
+                            motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
+                            motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
+                            motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
+                        }
+                    }
+                    else if(motion_ctrl_config.enable_profiler==1)
                     {
                         velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         velocity_ref_in_k_1n = velocity_ref_in_k;
@@ -313,7 +361,36 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                     else if (pos_control_mode == NL_POSITION_CONTROLLER)
                     {
-                        torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+
+                        if(motion_ctrl_config.position_control_autotune == 1)
+                        {
+                            if(nl_pos_ctrl_auto_tune.activate==0)
+                            {
+                                init_nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, motion_ctrl_config);
+                            }
+
+                            nl_pos_ctrl_autotune(nl_pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+
+                            if(motion_ctrl_config.position_control_autotune == 0)
+                            {
+                                printf("END OF POSITION CONTROL TUNING \n");
+                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                            }
+
+                            if(nl_pos_ctrl_auto_tune.counter==0)
+                            {
+                                nl_position_control_reset(nl_pos_ctrl);
+                                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                                printf("ki:%i kl:%d rise_time_opt:%d\n",  motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit, nl_pos_ctrl_auto_tune.rise_time_opt);
+                            }
+
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, nl_pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
+
+                        }
+                        else
+                        {
+                            torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+                        }
                     }
                 }
 
@@ -417,6 +494,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
 
+                if((time_used/app_tile_usec)>325)
+                {
+                    while(1)
+                    {
+                        printf("TIMING ERROR \n");
+                    }
+                }
+
+                t :> time_end;
+                time_used = time_end - time_start;
 
 break;
 
