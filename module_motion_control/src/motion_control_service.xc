@@ -188,7 +188,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int temperature_ratio = motorcontrol_config.temperature_ratio;
 
     lt_position_control_reset(lt_pos_ctrl);
-    lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+    lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+            motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+            motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
+
 
     pid_init(velocity_control_pid_param);
     if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
@@ -389,8 +392,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             if(lt_pos_ctrl_auto_tune.counter==0)
                             {
                                 lt_position_control_reset(lt_pos_ctrl);
-                                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-                                //printf("ActSt:%i StCt:%i EnSS:%i EnSSMin:%i EnSSMinLimSoft:%i Ki:%i Kl:%i\n",
+                                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);                                //printf("ActSt:%i StCt:%i EnSS:%i EnSSMin:%i EnSSMinLimSoft:%i Ki:%i Kl:%i\n",
                                 //        lt_pos_ctrl_auto_tune.active_step, lt_pos_ctrl_auto_tune.active_step_counter,
                                 //        ((int)lt_pos_ctrl_auto_tune.err_energy_ss_int), ((int)lt_pos_ctrl_auto_tune.err_energy_ss_int_min), ((int)lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft),
                                 //        motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit);
@@ -558,7 +562,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 //reset pid
                 lt_position_control_reset(lt_pos_ctrl);
-                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 pid_reset(position_control_pid_param);
 
 
@@ -694,8 +700,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
 
                 lt_position_control_reset(lt_pos_ctrl);
-                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 //reset error
                 motion_control_error = MOTION_CONTROL_NO_ERROR;
                 break;
@@ -740,7 +747,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].set_j(int j):
                 motion_ctrl_config.moment_of_inertia = j;
-                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
         case i_motion_control[int i].set_torque(int in_target_torque):
