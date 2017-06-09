@@ -519,7 +519,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 #endif
 
 
-                if((time_used/app_tile_usec)>330)
+                if((time_used/app_tile_usec)>300)
                 {
                         printf("TIMING ERROR \n");
                 }
