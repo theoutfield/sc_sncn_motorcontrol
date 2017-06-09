@@ -212,7 +212,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                              motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
                                              motion_ctrl_config.position_integral_limit);
 
-                                     i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                                     i_motion_control.enable_position_ctrl(LT_POSITION_CONTROLLER);
                                      printf("Nonlinear pos ctrl enabled\n");
 
                                      downstream_control_data.offset_torque = 0;
@@ -539,7 +539,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         }
                         else if (value == 3)
                         {
-                            i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
+                            i_motion_control.enable_position_ctrl(LT_POSITION_CONTROLLER);
                             printf("Nonlinear pos ctrl enabled\n");
                         }
                         else
