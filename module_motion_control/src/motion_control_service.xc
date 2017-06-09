@@ -379,7 +379,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 init_lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, motion_ctrl_config.counter_max_autotune, motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
                             }
 
-                            lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+
+                            lt_pos_ctrl_auto_tune.auto_tune=  motion_ctrl_config.position_control_autotune;
+                            lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, position_k);
+                            motion_ctrl_config.position_kp = lt_pos_ctrl_auto_tune.kp;
+                            motion_ctrl_config.position_ki = lt_pos_ctrl_auto_tune.ki;
+                            motion_ctrl_config.position_kd = lt_pos_ctrl_auto_tune.kd;
+                            motion_ctrl_config.position_integral_limit = lt_pos_ctrl_auto_tune.kl;
+                            motion_ctrl_config.moment_of_inertia       = lt_pos_ctrl_auto_tune.j;
+                            motion_ctrl_config.position_control_autotune = lt_pos_ctrl_auto_tune.auto_tune;
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
@@ -513,10 +521,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 if((time_used/app_tile_usec)>330)
                 {
-                    while(1)
-                    {
                         printf("TIMING ERROR \n");
-                    }
                 }
 
                 t :> time_end;
