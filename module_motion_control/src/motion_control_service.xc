@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include <controllers.h>
+#include <limited_torque_position_control.h>
 
 #include <profile.h>
 #include <auto_tune.h>
