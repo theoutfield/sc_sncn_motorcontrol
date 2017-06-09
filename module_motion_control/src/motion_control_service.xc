@@ -108,7 +108,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     PIDparam position_control_pid_param;
 
-    NonlinearPositionControl lt_pos_ctrl;
+    LimitedTorquePosCtrl lt_pos_ctrl;
 
 
     // variable definition
@@ -139,7 +139,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
 
-    NLPosCtrlAutoTuneParam lt_pos_ctrl_auto_tune;
+    LTPosCtrlAutoTuneParam lt_pos_ctrl_auto_tune;
 
     motion_ctrl_config.step_amplitude_autotune  = AUTO_TUNE_STEP_AMPLITUDE;
     motion_ctrl_config.counter_max_autotune     = AUTO_TUNE_COUNTER_MAX   ;
@@ -367,7 +367,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
                         torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                     }
-                    else if (pos_control_mode == NL_POSITION_CONTROLLER)
+                    else if (pos_control_mode == LT_POSITION_CONTROLLER)
                     {
 
                         if(motion_ctrl_config.position_control_autotune == 1)
