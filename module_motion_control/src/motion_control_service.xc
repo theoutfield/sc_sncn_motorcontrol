@@ -149,8 +149,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
 
-
-    init_lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, motion_ctrl_config);
+    init_lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, motion_ctrl_config.counter_max_autotune, motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
     //***********************************************************************************************
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -377,7 +376,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         {
                             if(lt_pos_ctrl_auto_tune.activate==0)
                             {
-                                init_lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, motion_ctrl_config);
+                                init_lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, motion_ctrl_config.counter_max_autotune, motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
                             }
 
                             lt_pos_ctrl_autotune(lt_pos_ctrl_auto_tune, motion_ctrl_config, position_k);
