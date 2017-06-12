@@ -448,6 +448,12 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         default:
                                 break;
                         }
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",
+                                motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd,
+                                motion_ctrl_config.velocity_integral_limit);
+                        break;
 
                 case 't': //torque
                         switch(mode_3)
@@ -456,11 +462,12 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                             motion_ctrl_config.filter = value;
                                 break;
                         default:
+                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            printf("filter cut-off freq:%d\n", motion_ctrl_config.filter);
                                 break;
                         }
-                        i_motion_control.set_motion_control_config(motion_ctrl_config);
-                        motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        printf("filter cut-off freq:%d\n", motion_ctrl_config.filter);
+
                         break;
 
                 default:
