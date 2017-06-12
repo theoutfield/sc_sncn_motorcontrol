@@ -125,6 +125,8 @@ typedef struct {
     int pull_brake_voltage;             /**< Parameter for setting the voltage for pulling the brake out! */
     int pull_brake_time;                /**< Parameter for setting the time of brake pulling */
     int hold_brake_voltage;             /**< Parameter for setting the brake voltage after it is pulled */
+
+    int filter;
 } MotionControlConfig;
 
 /**
