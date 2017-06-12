@@ -100,6 +100,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     unsigned int ts;
     unsigned time_start=0, time_start_old=0, time_loop=0, time_end=0, time_free=0, time_used=0;
 
+    SecondOrderLPfilterParam torque_filter_param;
+    second_order_LP_filter_init(200000, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
+    double filter_input=0.00, filter_outptu=0.00;
+
     // structure definition
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
@@ -402,6 +406,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
                                         motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
                                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);                                //printf("ActSt:%i StCt:%i EnSS:%i EnSSMin:%i EnSSMinLimSoft:%i Ki:%i Kl:%i\n",
+                                //printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                                 //        lt_pos_ctrl_auto_tune.active_step, lt_pos_ctrl_auto_tune.active_step_counter,
                                 //        ((int)lt_pos_ctrl_auto_tune.err_energy_ss_int), ((int)lt_pos_ctrl_auto_tune.err_energy_ss_int_min), ((int)lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft),
                                 //        motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit);
@@ -484,7 +489,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 else if (torque_ref_k < (-motion_ctrl_config.max_torque))
                     torque_ref_k = (-motion_ctrl_config.max_torque);
 
-                i_torque_control.set_torque(((int)(torque_ref_k)));
+                filter_input  =  ((double)(torque_ref_k));
+                filter_output = second_order_LP_filter_update(&filter_input, torque_filter_param);
+
+                i_torque_control.set_torque(((int)(filter_output)));
 
                 //update brake config when ready
                 if (update_brake_configuration_flag && timeafter(ts, update_brake_configuration_time)) {
