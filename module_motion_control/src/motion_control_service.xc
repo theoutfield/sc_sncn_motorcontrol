@@ -101,8 +101,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     unsigned time_start=0, time_start_old=0, time_loop=0, time_end=0, time_free=0, time_used=0;
 
     SecondOrderLPfilterParam torque_filter_param;
-    second_order_LP_filter_init(200000, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
-    double filter_input=0.00, filter_outptu=0.00;
+    second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
+    double filter_input=0.00, filter_output=0.00;
 
     // structure definition
     UpstreamControlData upstream_control_data;
@@ -492,6 +492,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 filter_input  =  ((double)(torque_ref_k));
                 filter_output = second_order_LP_filter_update(&filter_input, torque_filter_param);
 
+                //i_torque_control.set_torque(((int)(torque_ref_k)));
                 i_torque_control.set_torque(((int)(filter_output)));
 
                 //update brake config when ready
@@ -717,6 +718,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 //reset error
                 motion_control_error = MOTION_CONTROL_NO_ERROR;
+
+                second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
+
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:

@@ -137,6 +137,7 @@
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY           MOTION_POLARITY_NORMAL
 
+#define FILTER_CUT_OFF_FREQ     1000000;//cut-off frequency of filter in motion control service
 
 /////////////////////////////////////////////////
 //////  PROFILES AND LIMITS CONFIGURATION
