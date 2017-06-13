@@ -265,15 +265,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int min_pos = 0, max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0;
     int min_angle = 0, max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0;
     int old_position, old_angle;
-    int index_v = 0, filter_vel = 0, velocity_arr[100];
-    int index_d = 0, start_d = 0, filter_diff = 0, difference_arr[100];
+    int index_v = 0, filter_vel = 0, velocity_arr[FILTER];
+    int index_d = 0, start_d = 0, filter_diff = 0, difference_arr[FILTER];
     int difference = 0;
     int hall_state_ch[NR_PHASES] = { 0 };
     int hall_state_old, hall_order = 0;
 
     i_torque_control.enable_index_detection();
 
-    while(counter < 50000)
+    while(counter < 5000)
     {
         upstream_control_data = i_torque_control.update_upstream_control_data();
         count = upstream_control_data.position;
@@ -408,12 +408,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             for (int i = 0; i < FILTER; i++)
                 filter_diff += difference_arr[i];
             filter_diff /= FILTER;
-
             if (filter_diff < 0)
                 filter_diff = -filter_diff;
         }
 
-        if (counter == 50000)
+        if (counter == 5000)
         {
             printf("%d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, position_ctr);
             if (mean_pos-real_mean_pos < 20 && mean_pos-real_mean_pos > -20 && max_pos > 60000
@@ -459,6 +458,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     printf("Readings from hall channels are not in the right order 315462 or 264513\n");
             }
         }
+
+        delay_milliseconds(1);
     }
 
     i_torque_control.disable_index_detection();
