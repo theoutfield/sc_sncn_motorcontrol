@@ -332,10 +332,40 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                     lt_pos_ctrl_auto_tune.kvi = (lt_pos_ctrl_auto_tune.kvi*110)/100;
                 }
 
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int>lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                         lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int_min+lt_pos_ctrl_auto_tune.err_energy_ss_int)/2;
+
                 if(lt_pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP4;
                     lt_pos_ctrl_auto_tune.kvi = (lt_pos_ctrl_auto_tune.kvi*90)/100;
+                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min =
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
+            //increase kpp until it starts to vibrate
+            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP4)// step 4
+            {
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (2*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))
+                {
+                    lt_pos_ctrl_auto_tune.kpp = (lt_pos_ctrl_auto_tune.kpp*1010)/1000;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (2*lt_pos_ctrl_auto_tune.err_energy_ss_int+lt_pos_ctrl_auto_tune.err_energy_ss_int_min)/3;
+
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP5;
+
+                    lt_pos_ctrl_auto_tune.kpp = (lt_pos_ctrl_auto_tune.kpp*90)/100;
+
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
