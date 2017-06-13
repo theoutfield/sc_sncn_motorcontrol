@@ -191,8 +191,41 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                  }
                                  else if (value == 2)
                                  {
-                                     //i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
-                                     //printf("vel.-cascaded pos ctrl enabled\n");
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+
+                                     motion_ctrl_config.velocity_kp = 0;
+                                     motion_ctrl_config.velocity_ki = 0;
+                                     motion_ctrl_config.velocity_kd = 0;
+                                     motion_ctrl_config.velocity_integral_limit = 10000000;
+
+                                     motion_ctrl_config.position_kp = 0;
+                                     motion_ctrl_config.position_ki = 0;
+                                     motion_ctrl_config.position_kd = 0;
+                                     motion_ctrl_config.position_integral_limit = 10000000;
+                                     motion_ctrl_config.moment_of_inertia       = 0;
+
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("Kpp:%d Kpi:%d Kpd:%d kpl:%d\n",  motion_ctrl_config.position_kp,
+                                             motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                             motion_ctrl_config.position_integral_limit);
+                                     printf("Kvp:%d Kvi:%d Kvd:%d kvl:%d\n",  motion_ctrl_config.velocity_kp,
+                                             motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd);
+
+                                     i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                                     printf("cascaded-pid ctrl enabled\n");
+
+                                     downstream_control_data.offset_torque = 0;
+
+                                     // set the velocity pid tuning flag to 1
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     motion_ctrl_config.position_control_autotune = 1;
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("controller tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
+
                                  }
                                  else if (value == 3)
                                  {
@@ -223,7 +256,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                      i_motion_control.set_motion_control_config(motion_ctrl_config);
 
                                      motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                     printf("position pid tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
+                                     printf("controller tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
 
                                      // end of automatic velocity controller tuning
                                  }

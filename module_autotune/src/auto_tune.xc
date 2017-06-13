@@ -227,10 +227,10 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
         {
             lt_pos_ctrl_auto_tune.position_init = position_k;
 
-            lt_pos_ctrl_auto_tune.kp = 10000 ;
-            lt_pos_ctrl_auto_tune.ki = 1000  ;
-            lt_pos_ctrl_auto_tune.kd = 40000 ;
-            lt_pos_ctrl_auto_tune.kl = 1;
+            lt_pos_ctrl_auto_tune.kpp = 10000 ;
+            lt_pos_ctrl_auto_tune.kpi = 1000  ;
+            lt_pos_ctrl_auto_tune.kpd = 40000 ;
+            lt_pos_ctrl_auto_tune.kpl = 1;
             lt_pos_ctrl_auto_tune.j  = 0;
 
             lt_pos_ctrl_auto_tune.activate = 1;
@@ -259,7 +259,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kl += 50;
+                    lt_pos_ctrl_auto_tune.kpl += 50;
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
@@ -279,10 +279,10 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 else
                 {
                     if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-                        lt_pos_ctrl_auto_tune.ki = (lt_pos_ctrl_auto_tune.ki*100)/120;
+                        lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*100)/120;
 
-                    if(lt_pos_ctrl_auto_tune.ki<10 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-                        lt_pos_ctrl_auto_tune.ki = 10;
+                    if(lt_pos_ctrl_auto_tune.kpi<10 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+                        lt_pos_ctrl_auto_tune.kpi = 10;
 
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
@@ -300,7 +300,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
             {
                 if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
                 {
-                    lt_pos_ctrl_auto_tune.kl+=100;
+                    lt_pos_ctrl_auto_tune.kpl+=100;
                 }
                 else
                 {
@@ -314,7 +314,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 if(lt_pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP4;
-                    lt_pos_ctrl_auto_tune.kl= (lt_pos_ctrl_auto_tune.kl*100)/140;
+                    lt_pos_ctrl_auto_tune.kpl= (lt_pos_ctrl_auto_tune.kpl*100)/140;
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
@@ -328,11 +328,11 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 else
                 {
                     if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-                        lt_pos_ctrl_auto_tune.ki -= 5;
+                        lt_pos_ctrl_auto_tune.kpi -= 5;
 
-                    if(lt_pos_ctrl_auto_tune.ki<5 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+                    if(lt_pos_ctrl_auto_tune.kpi<5 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
                     {
-                        lt_pos_ctrl_auto_tune.ki = 5;
+                        lt_pos_ctrl_auto_tune.kpi = 5;
                         lt_pos_ctrl_auto_tune.active_step_counter++;
                     }
                     else
@@ -354,7 +354,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
 
                 if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
                 {
-                    lt_pos_ctrl_auto_tune.kl+=50;
+                    lt_pos_ctrl_auto_tune.kpl+=50;
                 }
                 else
                 {
@@ -372,15 +372,15 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                     lt_pos_ctrl_auto_tune.auto_tune = 0;
                     lt_pos_ctrl_auto_tune.activate=0;
 
-                    lt_pos_ctrl_auto_tune.kp *= lt_pos_ctrl_auto_tune.kl;
-                    lt_pos_ctrl_auto_tune.ki *= lt_pos_ctrl_auto_tune.kl;
-                    lt_pos_ctrl_auto_tune.kd *= lt_pos_ctrl_auto_tune.kl;
+                    lt_pos_ctrl_auto_tune.kpp *= lt_pos_ctrl_auto_tune.kpl;
+                    lt_pos_ctrl_auto_tune.kpi *= lt_pos_ctrl_auto_tune.kpl;
+                    lt_pos_ctrl_auto_tune.kpd *= lt_pos_ctrl_auto_tune.kpl;
                     lt_pos_ctrl_auto_tune.j       = 0;
-                    lt_pos_ctrl_auto_tune.kl = 1000;
+                    lt_pos_ctrl_auto_tune.kpl = 1000;
 
-                    lt_pos_ctrl_auto_tune.kp /= 1000;
-                    lt_pos_ctrl_auto_tune.ki /= 1000;
-                    lt_pos_ctrl_auto_tune.kd /= 1000;
+                    lt_pos_ctrl_auto_tune.kpp /= 1000;
+                    lt_pos_ctrl_auto_tune.kpi /= 1000;
+                    lt_pos_ctrl_auto_tune.kpd /= 1000;
 
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }

@@ -106,11 +106,17 @@ typedef struct {
     int active_step_counter;
     int active_step;
 
-    int kp;
-    int ki;
-    int kd;
-    int kl;
+    int kvp;
+    int kvi;
+    int kvd;
+    int kvl;
+
+    int kpp;
+    int kpi;
+    int kpd;
+    int kpl;
     int j;
+
     int auto_tune;
 
     double step_amplitude;
