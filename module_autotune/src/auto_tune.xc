@@ -140,3 +140,303 @@ int velocity_controller_auto_tune(AutoTuneParam &velocity_auto_tune, double &vel
 
     return 0;
 }
+
+
+
+/**
+ * @brief function to initialize the structure of automatic tuner for limited torque position controller.
+ *
+ * @param lt_pos_ctrl_auto_tune         structure of type LTPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param step_amplitude Communication  The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
+ * @param counter_max                   The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
+ * @param overshot_per_thousand         Overshoot limit while tuning (it is set as per thousand of step amplitude)
+ * @param rise_time_freedom_percent     This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.
+ *
+ * @return void
+ *  */
+int init_lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, int controller_type, int counter_max_autotune, int step_amplitude_autotune, int per_thousand_overshoot_autotune, int rise_time_freedom_percent_autotune)
+{
+    lt_pos_ctrl_auto_tune.controller = controller_type;
+
+    lt_pos_ctrl_auto_tune.position_init = 0.00;
+    lt_pos_ctrl_auto_tune.position_ref  = 0.00;
+    lt_pos_ctrl_auto_tune.auto_tune  = 0;
+
+    lt_pos_ctrl_auto_tune.activate=0;
+    lt_pos_ctrl_auto_tune.counter=0;
+    lt_pos_ctrl_auto_tune.counter_max=counter_max_autotune;
+
+    lt_pos_ctrl_auto_tune.step_amplitude = step_amplitude_autotune;
+
+    lt_pos_ctrl_auto_tune.err=0.00;
+    lt_pos_ctrl_auto_tune.err_energy=0.00;
+    lt_pos_ctrl_auto_tune.err_energy_int    =0.00;
+    lt_pos_ctrl_auto_tune.err_energy_int_max    = ((2*lt_pos_ctrl_auto_tune.step_amplitude)/1000) * ((2*lt_pos_ctrl_auto_tune.step_amplitude)/1000) * lt_pos_ctrl_auto_tune.counter_max;
+    lt_pos_ctrl_auto_tune.dynamic_err_energy_int_max=0.00;
+
+    lt_pos_ctrl_auto_tune.err_ss=0.00;
+    lt_pos_ctrl_auto_tune.err_energy_ss=0.00;
+    lt_pos_ctrl_auto_tune.err_energy_ss_int=0.00;
+    //steady state error is measured between 90% and 98% of the period, and its min value is when real position is having a margin of 0.01 with reference position
+    lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft = (((lt_pos_ctrl_auto_tune.step_amplitude)/100) * ((lt_pos_ctrl_auto_tune.step_amplitude)/100) * lt_pos_ctrl_auto_tune.counter_max * 8.00) /100.00;
+    lt_pos_ctrl_auto_tune.err_energy_ss_int_min    = lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft;
+    lt_pos_ctrl_auto_tune.err_energy_ss_int_min_counter=0;
+
+    lt_pos_ctrl_auto_tune.active_step_counter=0;
+    if(lt_pos_ctrl_auto_tune.controller==LIMITED_TORQUE)
+        lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP1;
+    else if(lt_pos_ctrl_auto_tune.controller==CASCADED)
+        lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP1;
+
+    lt_pos_ctrl_auto_tune.rising_edge=0;
+
+    lt_pos_ctrl_auto_tune.overshoot=0.00;
+    lt_pos_ctrl_auto_tune.overshoot_max=0.00;
+    lt_pos_ctrl_auto_tune.overshoot_min=lt_pos_ctrl_auto_tune.step_amplitude;
+    lt_pos_ctrl_auto_tune.overshot_per_thousand = ((double)(per_thousand_overshoot_autotune));
+    lt_pos_ctrl_auto_tune.overshoot_counter=0;
+    lt_pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
+
+    lt_pos_ctrl_auto_tune.rise_time=0;
+    lt_pos_ctrl_auto_tune.rise_time_opt=0;
+    lt_pos_ctrl_auto_tune.rise_time_freedom_percent=rise_time_freedom_percent_autotune;
+
+    lt_pos_ctrl_auto_tune.tuning_process_ended=0;
+
+    return 0;
+}
+
+
+/**
+ * @brief function to automatically tune the limited torque position controller.
+ *
+ * @param lt_pos_ctrl_auto_tune            Structure containing all parameters of motion control service
+ * @param lt_pos_ctrl_auto_tune         structure of type LTPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param position_k                    The actual position of the system while (double)
+ *
+ * @return void
+ *  */
+int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double position_k)
+{
+
+    lt_pos_ctrl_auto_tune.counter++;
+
+    if(lt_pos_ctrl_auto_tune.controller == LIMITED_TORQUE)
+    {
+        if(lt_pos_ctrl_auto_tune.activate==0)
+        {
+            lt_pos_ctrl_auto_tune.position_init = position_k;
+
+            lt_pos_ctrl_auto_tune.kp = 10000 ;
+            lt_pos_ctrl_auto_tune.ki = 1000  ;
+            lt_pos_ctrl_auto_tune.kd = 40000 ;
+            lt_pos_ctrl_auto_tune.kl = 1;
+            lt_pos_ctrl_auto_tune.j  = 0;
+
+            lt_pos_ctrl_auto_tune.activate = 1;
+            lt_pos_ctrl_auto_tune.counter=0;
+        }
+
+        if(lt_pos_ctrl_auto_tune.counter==lt_pos_ctrl_auto_tune.counter_max)
+        {
+            //change of reference value in each cycle
+            if(lt_pos_ctrl_auto_tune.position_ref == (lt_pos_ctrl_auto_tune.position_init + lt_pos_ctrl_auto_tune.step_amplitude))
+            {
+                lt_pos_ctrl_auto_tune.position_ref = lt_pos_ctrl_auto_tune.position_init - lt_pos_ctrl_auto_tune.step_amplitude;
+                lt_pos_ctrl_auto_tune.rising_edge=0;
+            }
+            else
+            {
+                lt_pos_ctrl_auto_tune.position_ref = lt_pos_ctrl_auto_tune.position_init + lt_pos_ctrl_auto_tune.step_amplitude;
+                lt_pos_ctrl_auto_tune.rising_edge=1;
+            }
+
+            if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP1)//step 1
+            {
+                if(lt_pos_ctrl_auto_tune.err_energy_int < (lt_pos_ctrl_auto_tune.err_energy_int_max/10))
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.kl += 50;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP2;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
+            if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP2)//step 2
+            {
+                if(lt_pos_ctrl_auto_tune.overshoot_max<((100*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft)
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+                        lt_pos_ctrl_auto_tune.ki = (lt_pos_ctrl_auto_tune.ki*100)/120;
+
+                    if(lt_pos_ctrl_auto_tune.ki<10 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+                        lt_pos_ctrl_auto_tune.ki = 10;
+
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP3;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+
+                }
+
+            }
+
+            if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP3)// step 3
+            {
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                {
+                    lt_pos_ctrl_auto_tune.kl+=100;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
+
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP4;
+                    lt_pos_ctrl_auto_tune.kl= (lt_pos_ctrl_auto_tune.kl*100)/140;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
+            if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP4)//step 4
+            {
+                if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<(lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft))
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+                        lt_pos_ctrl_auto_tune.ki -= 5;
+
+                    if(lt_pos_ctrl_auto_tune.ki<5 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+                    {
+                        lt_pos_ctrl_auto_tune.ki = 5;
+                        lt_pos_ctrl_auto_tune.active_step_counter++;
+                    }
+                    else
+                        lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP5;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+
+                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min    = lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft;
+                }
+
+            }
+
+            if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP5)// step 5
+            {
+
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                {
+                    lt_pos_ctrl_auto_tune.kl+=50;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4.00;
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=END;
+
+                    lt_pos_ctrl_auto_tune.tuning_process_ended=1;
+                    lt_pos_ctrl_auto_tune.auto_tune = 0;
+                    lt_pos_ctrl_auto_tune.activate=0;
+
+                    lt_pos_ctrl_auto_tune.kp *= lt_pos_ctrl_auto_tune.kl;
+                    lt_pos_ctrl_auto_tune.ki *= lt_pos_ctrl_auto_tune.kl;
+                    lt_pos_ctrl_auto_tune.kd *= lt_pos_ctrl_auto_tune.kl;
+                    lt_pos_ctrl_auto_tune.j       = 0;
+                    lt_pos_ctrl_auto_tune.kl = 1000;
+
+                    lt_pos_ctrl_auto_tune.kp /= 1000;
+                    lt_pos_ctrl_auto_tune.ki /= 1000;
+                    lt_pos_ctrl_auto_tune.kd /= 1000;
+
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
+            lt_pos_ctrl_auto_tune.overshoot=0;
+            lt_pos_ctrl_auto_tune.overshoot_max=0;
+
+            lt_pos_ctrl_auto_tune.err=0.00;
+            lt_pos_ctrl_auto_tune.err_energy =0.00;
+            lt_pos_ctrl_auto_tune.err_energy_int=0.00;
+
+            lt_pos_ctrl_auto_tune.err_ss=0.00;
+            lt_pos_ctrl_auto_tune.err_energy_ss =0.00;
+            lt_pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
+
+            lt_pos_ctrl_auto_tune.rise_time = 0;
+
+            lt_pos_ctrl_auto_tune.counter=0;
+        }
+    }
+    /*
+     * measurement of error energy
+     */
+    lt_pos_ctrl_auto_tune.err = (lt_pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
+    lt_pos_ctrl_auto_tune.err_energy = lt_pos_ctrl_auto_tune.err * lt_pos_ctrl_auto_tune.err;
+    lt_pos_ctrl_auto_tune.err_energy_int += lt_pos_ctrl_auto_tune.err_energy;
+
+    /*
+     * measurement of overshoot and rise time
+     */
+    if(lt_pos_ctrl_auto_tune.rising_edge==1)
+    {
+        lt_pos_ctrl_auto_tune.overshoot = position_k - lt_pos_ctrl_auto_tune.position_ref;
+
+        if(lt_pos_ctrl_auto_tune.overshoot > lt_pos_ctrl_auto_tune.overshoot_max)
+            lt_pos_ctrl_auto_tune.overshoot_max=lt_pos_ctrl_auto_tune.overshoot;
+
+        if(position_k > (lt_pos_ctrl_auto_tune.position_init+(60*lt_pos_ctrl_auto_tune.step_amplitude)/100)  && lt_pos_ctrl_auto_tune.rise_time==0)
+            lt_pos_ctrl_auto_tune.rise_time = lt_pos_ctrl_auto_tune.counter;
+
+    }
+
+    /*
+     * measurement of error energy after steady state
+     */
+    if((90*lt_pos_ctrl_auto_tune.counter_max)/100<lt_pos_ctrl_auto_tune.counter && lt_pos_ctrl_auto_tune.counter<(98*lt_pos_ctrl_auto_tune.counter_max)/100 && lt_pos_ctrl_auto_tune.rising_edge==1)
+    {
+        lt_pos_ctrl_auto_tune.err_ss = (lt_pos_ctrl_auto_tune.position_ref - position_k);
+        lt_pos_ctrl_auto_tune.err_energy_ss = lt_pos_ctrl_auto_tune.err_ss * lt_pos_ctrl_auto_tune.err_ss;
+        lt_pos_ctrl_auto_tune.err_energy_ss_int += lt_pos_ctrl_auto_tune.err_energy_ss;
+    }
+
+    return 0;
+}
+
+
+
+
