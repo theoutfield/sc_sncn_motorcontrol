@@ -369,6 +369,28 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
+
+            //increase kpi until overshoot is more than 10%
+            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP5)//step 3
+            {
+                if(lt_pos_ctrl_auto_tune.overshoot_max>((100*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*110)/100;
+                }
+
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP6;
+                    lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*90)/100;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
             //
             //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP3)// step 3
             //    {
