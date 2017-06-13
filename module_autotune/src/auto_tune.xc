@@ -271,10 +271,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                     else
                         lt_pos_ctrl_auto_tune.kvp += 10000;
 
-                    if(lt_pos_ctrl_auto_tune.kvp<1000000)
                         lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
-                    else
-                        lt_pos_ctrl_auto_tune.kpp=100000;
 
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
@@ -282,6 +279,43 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 if(lt_pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP2;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int>lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int_min+lt_pos_ctrl_auto_tune.err_energy_ss_int)/2;
+            }
+
+
+            //increase kvp until it starts to vibrate
+            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP2)// step 2
+            {
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (3*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)/2)
+                {
+                    lt_pos_ctrl_auto_tune.kvp = (lt_pos_ctrl_auto_tune.kvp*1010)/1000;
+                    lt_pos_ctrl_auto_tune.kvi = lt_pos_ctrl_auto_tune.kvp/10000;
+
+                    lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
+                    lt_pos_ctrl_auto_tune.kpi = lt_pos_ctrl_auto_tune.kpp/10000;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+
+                if(100<lt_pos_ctrl_auto_tune.err_energy_ss_int && lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (2*lt_pos_ctrl_auto_tune.err_energy_ss_int+lt_pos_ctrl_auto_tune.err_energy_ss_int_min)/3;
+
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP3;
+
+                    lt_pos_ctrl_auto_tune.kvp=(lt_pos_ctrl_auto_tune.kvp*90)/100;
+                    lt_pos_ctrl_auto_tune.kvi = lt_pos_ctrl_auto_tune.kvp/10000;
+                    lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
+                    lt_pos_ctrl_auto_tune.kpi = lt_pos_ctrl_auto_tune.kpp/10000;
+
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }

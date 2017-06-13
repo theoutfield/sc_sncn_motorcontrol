@@ -426,9 +426,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
                                         POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
+                                printf("step: %d  \n", lt_pos_ctrl_auto_tune.active_step);
                                 printf("kpp:%i kpi:%i kpd:%i kpl:%d \n",    motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                                 printf("kvp:%i kvi:%i kvd:%i kvl:%d \n\n",  motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
-
                             }
 
                             velocity_ref_k =pid_update(lt_pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
@@ -574,31 +574,37 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-#ifdef XSCOPE_POSITION_CTRL
-                xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(POSITION, upstream_control_data.position);
-                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
-                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
-                xscope_int(TORQUE,   upstream_control_data.computed_torque);
-                xscope_int(POSITION_CMD, (int)position_ref_in_k);
-                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
-                xscope_int(TORQUE_CMD, torque_ref_k);
-                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
-                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-#endif
-
-#ifdef XSCOPE_ANALOGUE_MEASUREMENT
-                xscope_int(V_DC, upstream_control_data.V_dc);
-                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
-                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
-                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
-                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
-                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
-#endif
+                xscope_int(POSITION, ((int)(position_k-lt_pos_ctrl_auto_tune.position_init)));
+                xscope_int(POSITION_CMD, ((int)(lt_pos_ctrl_auto_tune.position_ref-lt_pos_ctrl_auto_tune.position_init)));
+                xscope_int(ERR_ENG_SS_INT, (int)(lt_pos_ctrl_auto_tune.err_energy_ss_int));
+                xscope_int(ERR_ENG_SS_INT_MIN, (int)(lt_pos_ctrl_auto_tune.err_energy_ss_int_min));
 
 
-                if((time_used/app_tile_usec)>300)
+//#ifdef XSCOPE_POSITION_CTRL
+//                xscope_int(VELOCITY, upstream_control_data.velocity);
+//                xscope_int(POSITION, upstream_control_data.position);
+//                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
+//                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
+//                xscope_int(TORQUE,   upstream_control_data.computed_torque);
+//                xscope_int(POSITION_CMD, (int)position_ref_in_k);
+//                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
+//                xscope_int(TORQUE_CMD, torque_ref_k);
+//                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
+//                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
+//#endif
+//
+//#ifdef XSCOPE_ANALOGUE_MEASUREMENT
+//                xscope_int(V_DC, upstream_control_data.V_dc);
+//                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
+//                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
+//                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
+//                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
+//                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
+//                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+//#endif
+
+
+                if((time_used/app_tile_usec)>330)
                 {
                     printf("TIMING ERROR \n");
                 }

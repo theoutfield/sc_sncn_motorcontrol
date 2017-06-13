@@ -50,9 +50,9 @@
 	<Probe name="ERR_ENG" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="ERR_ENG_INTEGRAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="ERR_ENG_INTEGRAL_MAX" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="ERR_ENG_SS_INT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="ERR_ENG_SS_INT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="ERR_ENG_SS_LIMIT_SOFT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="ERR_ENG_SS_INT_MIN" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="ERR_ENG_SS_INT_MIN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 	<Probe name="ACTIVE_STEP" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="ACTIVE_STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="FIRST_STEP_COMPLETED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
