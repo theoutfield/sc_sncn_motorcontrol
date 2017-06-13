@@ -230,12 +230,6 @@ int main(void)
                 motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                 motorcontrol_config.commutation_sensor=REM_16MT_SENSOR;
                 motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
-                motorcontrol_config.hall_state_angle[0]=0;
-                motorcontrol_config.hall_state_angle[1]=0;
-                motorcontrol_config.hall_state_angle[2]=0;
-                motorcontrol_config.hall_state_angle[3]=0;
-                motorcontrol_config.hall_state_angle[4]=0;
-                motorcontrol_config.hall_state_angle[5]=0;
                 motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
                 motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
                 motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;

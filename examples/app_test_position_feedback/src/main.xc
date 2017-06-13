@@ -255,6 +255,12 @@ int main(void)
                 position_feedback_config_1.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
 
                 position_feedback_config_1.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+                position_feedback_config_1.hall_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
 
                 position_feedback_config_1.gpio_config[0] = GPIO_INPUT;
                 position_feedback_config_1.gpio_config[1] = GPIO_OUTPUT;
