@@ -257,140 +257,150 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 lt_pos_ctrl_auto_tune.rising_edge=1;
             }
 
-        //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP1)//step 1
-        //    {
-        //        if(lt_pos_ctrl_auto_tune.err_energy_int < (lt_pos_ctrl_auto_tune.err_energy_int_max/10))
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step_counter++;
-        //        }
-        //        else
-        //        {
-        //            lt_pos_ctrl_auto_tune.kpl += 50;
-        //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //        }
-        //
-        //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP2;
-        //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //        }
-        //    }
-        //
-        //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP2)//step 2
-        //    {
-        //        if(lt_pos_ctrl_auto_tune.overshoot_max<((100*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft)
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step_counter++;
-        //        }
-        //        else
-        //        {
-        //            if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-        //                lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*100)/120;
-        //
-        //            if(lt_pos_ctrl_auto_tune.kpi<10 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-        //                lt_pos_ctrl_auto_tune.kpi = 10;
-        //
-        //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //        }
-        //
-        //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP3;
-        //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //
-        //        }
-        //
-        //    }
-        //
-        //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP3)// step 3
-        //    {
-        //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-        //        {
-        //            lt_pos_ctrl_auto_tune.kpl+=100;
-        //        }
-        //        else
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step_counter++;
-        //        }
-        //
-        //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-        //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
-        //
-        //
-        //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP4;
-        //            lt_pos_ctrl_auto_tune.kpl= (lt_pos_ctrl_auto_tune.kpl*100)/140;
-        //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //        }
-        //    }
-        //
-        //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP4)//step 4
-        //    {
-        //        if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<(lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft))
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step_counter++;
-        //        }
-        //        else
-        //        {
-        //            if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-        //                lt_pos_ctrl_auto_tune.kpi -= 5;
-        //
-        //            if(lt_pos_ctrl_auto_tune.kpi<5 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-        //            {
-        //                lt_pos_ctrl_auto_tune.kpi = 5;
-        //                lt_pos_ctrl_auto_tune.active_step_counter++;
-        //            }
-        //            else
-        //                lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //        }
-        //
-        //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP5;
-        //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //
-        //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min    = lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft;
-        //        }
-        //
-        //    }
-        //
-        //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP5)// step 5
-        //    {
-        //
-        //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-        //        {
-        //            lt_pos_ctrl_auto_tune.kpl+=50;
-        //        }
-        //        else
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step_counter++;
-        //        }
-        //
-        //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-        //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4.00;
-        //
-        //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-        //        {
-        //            lt_pos_ctrl_auto_tune.active_step=END;
-        //
-        //            lt_pos_ctrl_auto_tune.tuning_process_ended=1;
-        //            lt_pos_ctrl_auto_tune.auto_tune = 0;
-        //            lt_pos_ctrl_auto_tune.activate=0;
-        //
-        //            lt_pos_ctrl_auto_tune.kpp *= lt_pos_ctrl_auto_tune.kpl;
-        //            lt_pos_ctrl_auto_tune.kpi *= lt_pos_ctrl_auto_tune.kpl;
-        //            lt_pos_ctrl_auto_tune.kpd *= lt_pos_ctrl_auto_tune.kpl;
-        //            lt_pos_ctrl_auto_tune.j       = 0;
-        //            lt_pos_ctrl_auto_tune.kpl = 1000;
-        //
-        //            lt_pos_ctrl_auto_tune.kpp /= 1000;
-        //            lt_pos_ctrl_auto_tune.kpi /= 1000;
-        //            lt_pos_ctrl_auto_tune.kpd /= 1000;
-        //
-        //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-        //        }
-        //    }
+            // force the load to follow the reference value
+            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP1)//step 1
+            {
+                if(lt_pos_ctrl_auto_tune.err_energy_int < (lt_pos_ctrl_auto_tune.err_energy_int_max/10))
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    if(lt_pos_ctrl_auto_tune.active_step_counter==0)
+                        lt_pos_ctrl_auto_tune.kvp += 50000;
+                    else
+                        lt_pos_ctrl_auto_tune.kvp += 10000;
+
+                    if(lt_pos_ctrl_auto_tune.kvp<1000000)
+                        lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
+                    else
+                        lt_pos_ctrl_auto_tune.kpp=100000;
+
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP2;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
+            //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP2)//step 2
+            //    {
+            //        if(lt_pos_ctrl_auto_tune.overshoot_max<((100*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft)
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step_counter++;
+            //        }
+            //        else
+            //        {
+            //            if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+            //                lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*100)/120;
+            //
+            //            if(lt_pos_ctrl_auto_tune.kpi<10 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+            //                lt_pos_ctrl_auto_tune.kpi = 10;
+            //
+            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
+            //        }
+            //
+            //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP3;
+            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
+            //
+            //        }
+            //
+            //    }
+            //
+            //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP3)// step 3
+            //    {
+            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+            //        {
+            //            lt_pos_ctrl_auto_tune.kpl+=100;
+            //        }
+            //        else
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step_counter++;
+            //        }
+            //
+            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+            //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
+            //
+            //
+            //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP4;
+            //            lt_pos_ctrl_auto_tune.kpl= (lt_pos_ctrl_auto_tune.kpl*100)/140;
+            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
+            //        }
+            //    }
+            //
+            //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP4)//step 4
+            //    {
+            //        if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<(lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft))
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step_counter++;
+            //        }
+            //        else
+            //        {
+            //            if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+            //                lt_pos_ctrl_auto_tune.kpi -= 5;
+            //
+            //            if(lt_pos_ctrl_auto_tune.kpi<5 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+            //            {
+            //                lt_pos_ctrl_auto_tune.kpi = 5;
+            //                lt_pos_ctrl_auto_tune.active_step_counter++;
+            //            }
+            //            else
+            //                lt_pos_ctrl_auto_tune.active_step_counter=0;
+            //        }
+            //
+            //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP5;
+            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
+            //
+            //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min    = lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft;
+            //        }
+            //
+            //    }
+            //
+            //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP5)// step 5
+            //    {
+            //
+            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+            //        {
+            //            lt_pos_ctrl_auto_tune.kpl+=50;
+            //        }
+            //        else
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step_counter++;
+            //        }
+            //
+            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+            //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4.00;
+            //
+            //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+            //        {
+            //            lt_pos_ctrl_auto_tune.active_step=END;
+            //
+            //            lt_pos_ctrl_auto_tune.tuning_process_ended=1;
+            //            lt_pos_ctrl_auto_tune.auto_tune = 0;
+            //            lt_pos_ctrl_auto_tune.activate=0;
+            //
+            //            lt_pos_ctrl_auto_tune.kpp *= lt_pos_ctrl_auto_tune.kpl;
+            //            lt_pos_ctrl_auto_tune.kpi *= lt_pos_ctrl_auto_tune.kpl;
+            //            lt_pos_ctrl_auto_tune.kpd *= lt_pos_ctrl_auto_tune.kpl;
+            //            lt_pos_ctrl_auto_tune.j       = 0;
+            //            lt_pos_ctrl_auto_tune.kpl = 1000;
+            //
+            //            lt_pos_ctrl_auto_tune.kpp /= 1000;
+            //            lt_pos_ctrl_auto_tune.kpi /= 1000;
+            //            lt_pos_ctrl_auto_tune.kpd /= 1000;
+            //
+            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
+            //        }
+            //    }
 
             lt_pos_ctrl_auto_tune.overshoot=0;
             lt_pos_ctrl_auto_tune.overshoot_max=0;

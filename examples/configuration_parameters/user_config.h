@@ -122,17 +122,17 @@
 #define VELOCITY_Kp                             0
 #define VELOCITY_Ki                             0
 #define VELOCITY_Kd                             0
-#define VELOCITY_INTEGRAL_LIMIT                 1000000
+#define VELOCITY_INTEGRAL_LIMIT                 0
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
+#define POSITION_Kp                             65000
+#define POSITION_Ki                             487
+#define POSITION_Kd                             260000
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
 //     "1000"                 in case of using position controller in "LT_POSITION_CONTROLLER"               mode
-#define POSITION_INTEGRAL_LIMIT                 10000000
+#define POSITION_INTEGRAL_LIMIT                 1000
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY           MOTION_POLARITY_NORMAL
