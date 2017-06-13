@@ -134,7 +134,6 @@ typedef struct {
     int ifm_tile_usec;
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int hall_state[6];                       /**< Hall port state while being in sector [1-6] */
-    int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
 
     //variables added to be used in motor_control_service
     int pole_pairs;                        /**< motor pole pair*/
