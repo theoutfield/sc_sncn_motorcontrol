@@ -371,7 +371,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
             }
 
             //increase kpi until overshoot is more than 10%
-            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP5)//step 3
+            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP5)//step 5
             {
                 if(lt_pos_ctrl_auto_tune.overshoot_max>((100*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
@@ -387,6 +387,28 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 {
                     lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP6;
                     lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*90)/100;
+                    lt_pos_ctrl_auto_tune.kpl = 10000;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+
+                }
+            }
+
+            //reduce kpl until overshoot is less than 2%
+            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP6)//step 6
+            {
+                if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.kpl = (lt_pos_ctrl_auto_tune.kpl*70)/100;
+                }
+
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=END;
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
