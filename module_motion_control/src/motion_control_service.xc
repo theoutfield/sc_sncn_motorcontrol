@@ -415,18 +415,18 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         if (counter == 50000)
         {
-            printf("%d %d %d\n", mean_pos, real_mean_pos, position_ctr);
+            printf("%d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, position_ctr);
             if (mean_pos-real_mean_pos < 20 && mean_pos-real_mean_pos > -20 && max_pos > 60000
                     && tq_pos - real_tq_pos < 20 && tq_pos - real_tq_pos > -20
-                    && position_ctr > 4000)
+                    && position_ctr > 2000)
                 printf("Position is ok\n");
             else
                 printf("Position is not ok\n");
 
-            printf("%d %d %d\n", mean_angle, real_mean_angle, angle_ctr);
+            printf("%d %d %d %d %d\n", mean_angle, real_mean_angle, tq_angle, real_tq_angle, angle_ctr);
             if (mean_angle-real_mean_angle < 20 && mean_angle-real_mean_angle > -20
                     && tq_angle - real_tq_angle < 20 && tq_angle - real_tq_angle > -20
-                    && max_angle > 3000 && angle_ctr > 4000)
+                    && max_angle > 4000 && angle_ctr > 2000)
                 printf("Angle is ok\n");
             else
                 printf("Angle is not ok\n");
