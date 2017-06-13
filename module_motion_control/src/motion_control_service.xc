@@ -286,7 +286,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         {
             old_position = position;
             old_angle = angle;
-            hall_state_old = hall_state;
+            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                    hall_state_old = hall_state;
         }
         else
         {
@@ -302,45 +303,48 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 ++angle_ctr;
             }
 
-            if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
-                ++hall_state_ch[A];
-            if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
-                ++hall_state_ch[B];
-            if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
-                ++hall_state_ch[C];
-
-            if (hall_state != hall_state_old)
+            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
             {
-                switch (hall_state_old)
-                {
-                case 1:
-                    if (hall_state != 5 && hall_state != 3)
-                        ++hall_order;
-                    break;
-                case 2:
-                    if (hall_state != 3 && hall_state != 6)
-                        ++hall_order;
-                    break;
-                case 3:
-                    if (hall_state != 1 && hall_state != 2)
-                        ++hall_order;
-                    break;
-                case 4:
-                    if (hall_state != 6 && hall_state != 5)
-                        ++hall_order;
-                    break;
-                case 5:
-                    if (hall_state != 4 && hall_state != 1)
-                        ++hall_order;
-                    break;
-                case 6:
-                    if (hall_state != 2 && hall_state != 4)
-                        ++hall_order;
-                    break;
-                }
-            }
+                if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
+                    ++hall_state_ch[A];
+                if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
+                    ++hall_state_ch[B];
+                if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
+                    ++hall_state_ch[C];
 
-            hall_state_old = hall_state;
+                if (hall_state != hall_state_old)
+                {
+                    switch (hall_state_old)
+                    {
+                    case 1:
+                        if (hall_state != 5 && hall_state != 3)
+                            ++hall_order;
+                        break;
+                    case 2:
+                        if (hall_state != 3 && hall_state != 6)
+                            ++hall_order;
+                        break;
+                    case 3:
+                        if (hall_state != 1 && hall_state != 2)
+                            ++hall_order;
+                        break;
+                    case 4:
+                        if (hall_state != 6 && hall_state != 5)
+                            ++hall_order;
+                        break;
+                    case 5:
+                        if (hall_state != 4 && hall_state != 1)
+                            ++hall_order;
+                        break;
+                    case 6:
+                        if (hall_state != 2 && hall_state != 4)
+                            ++hall_order;
+                        break;
+                    }
+                }
+
+                hall_state_old = hall_state;
+            }
         }
 
         if (angle > max_angle)
@@ -434,23 +438,26 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             else
                 printf("Velocity is not ok\n");
 
-            if (hall_state_ch[A])
-                printf("Hall A signal ok\n");
-            else
-                printf("Hall A signal is not ok\n");
-            if (hall_state_ch[B])
-                printf("Hall B signal ok\n");
-            else
-                printf("Hall B signal is not ok\n");
-            if (hall_state_ch[C])
-                printf("Hall C signal ok\n");
-            else
-                printf("Hall C signal is not ok\n");
+            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+            {
+                if (hall_state_ch[A])
+                    printf("Hall A signal ok\n");
+                else
+                    printf("Hall A signal is not ok\n");
+                if (hall_state_ch[B])
+                    printf("Hall B signal ok\n");
+                else
+                    printf("Hall B signal is not ok\n");
+                if (hall_state_ch[C])
+                    printf("Hall C signal ok\n");
+                else
+                    printf("Hall C signal is not ok\n");
 
-            if (hall_order == 0 && (hall_state_ch[A] && hall_state_ch[B] && hall_state_ch[C]))
-                printf("Readings from hall channels are in the right order 315462 or 264513\n");
-            else
-                printf("Readings from hall channels are not in the right order 315462 or 264513\n");
+                if (hall_order == 0 && (hall_state_ch[A] && hall_state_ch[B] && hall_state_ch[C]))
+                    printf("Readings from hall channels are in the right order 315462 or 264513\n");
+                else
+                    printf("Readings from hall channels are not in the right order 315462 or 264513\n");
+            }
         }
     }
 
@@ -482,7 +489,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     t :> update_brake_configuration_time;
     update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
     int update_brake_configuration_flag = 1;
-
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
