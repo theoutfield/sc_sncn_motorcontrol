@@ -330,11 +330,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 printf("Resistance in phase B = %.2f Om\n", res_b);
                 printf("Resistance in phase C = %.2f Om\n", res_c);
 
-                if (res_a >= 5)
+                if (res_a >= 3)
                     printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
-                else if (res_b >= 5)
+                else if (res_b >= 3)
                     printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
-                else if(res_c >= 5)
+                else if(res_c >= 3)
                     printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
                 else
                     printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
