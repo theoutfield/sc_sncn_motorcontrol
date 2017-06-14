@@ -241,6 +241,8 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
 
             lt_pos_ctrl_auto_tune.activate = 1;
             lt_pos_ctrl_auto_tune.counter=0;
+
+            lt_pos_ctrl_auto_tune.counter_max=lt_pos_ctrl_auto_tune.counter_max/3;
         }
 
         if(lt_pos_ctrl_auto_tune.counter==lt_pos_ctrl_auto_tune.counter_max)
@@ -290,9 +292,9 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
             //increase kvp until it starts to vibrate
             if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP2)// step 2
             {
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (3*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)/2)
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (5*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))
                 {
-                    lt_pos_ctrl_auto_tune.kvp = (lt_pos_ctrl_auto_tune.kvp*1005)/1000;
+                    lt_pos_ctrl_auto_tune.kvp = (lt_pos_ctrl_auto_tune.kvp*1010)/1000;
                     lt_pos_ctrl_auto_tune.kvi = lt_pos_ctrl_auto_tune.kvp/10000;
 
                     lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
@@ -319,7 +321,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
-
+/*
             //increase kvi until overshoot is less than 1%
             if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP3)//step 3
             {
@@ -413,96 +415,17 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 }
             }
 
-            //
-            //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP3)// step 3
-            //    {
-            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-            //        {
-            //            lt_pos_ctrl_auto_tune.kpl+=100;
-            //        }
-            //        else
-            //        {
-            //            lt_pos_ctrl_auto_tune.active_step_counter++;
-            //        }
-            //
-            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-            //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
-            //
-            //
-            //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-            //        {
-            //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP4;
-            //            lt_pos_ctrl_auto_tune.kpl= (lt_pos_ctrl_auto_tune.kpl*100)/140;
-            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-            //        }
-            //    }
-            //
-            //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP4)//step 4
-            //    {
-            //        if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<(lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft))
-            //        {
-            //            lt_pos_ctrl_auto_tune.active_step_counter++;
-            //        }
-            //        else
-            //        {
-            //            if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-            //                lt_pos_ctrl_auto_tune.kpi -= 5;
-            //
-            //            if(lt_pos_ctrl_auto_tune.kpi<5 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-            //            {
-            //                lt_pos_ctrl_auto_tune.kpi = 5;
-            //                lt_pos_ctrl_auto_tune.active_step_counter++;
-            //            }
-            //            else
-            //                lt_pos_ctrl_auto_tune.active_step_counter=0;
-            //        }
-            //
-            //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-            //        {
-            //            lt_pos_ctrl_auto_tune.active_step=LT_POS_CTRL_STEP5;
-            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-            //
-            //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min    = lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft;
-            //        }
-            //
-            //    }
-            //
-            //    if(lt_pos_ctrl_auto_tune.active_step==LT_POS_CTRL_STEP5)// step 5
-            //    {
-            //
-            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-            //        {
-            //            lt_pos_ctrl_auto_tune.kpl+=50;
-            //        }
-            //        else
-            //        {
-            //            lt_pos_ctrl_auto_tune.active_step_counter++;
-            //        }
-            //
-            //        if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-            //            lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4.00;
-            //
-            //        if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-            //        {
-            //            lt_pos_ctrl_auto_tune.active_step=END;
-            //
-            //            lt_pos_ctrl_auto_tune.tuning_process_ended=1;
-            //            lt_pos_ctrl_auto_tune.auto_tune = 0;
-            //            lt_pos_ctrl_auto_tune.activate=0;
-            //
-            //            lt_pos_ctrl_auto_tune.kpp *= lt_pos_ctrl_auto_tune.kpl;
-            //            lt_pos_ctrl_auto_tune.kpi *= lt_pos_ctrl_auto_tune.kpl;
-            //            lt_pos_ctrl_auto_tune.kpd *= lt_pos_ctrl_auto_tune.kpl;
-            //            lt_pos_ctrl_auto_tune.j       = 0;
-            //            lt_pos_ctrl_auto_tune.kpl = 1000;
-            //
-            //            lt_pos_ctrl_auto_tune.kpp /= 1000;
-            //            lt_pos_ctrl_auto_tune.kpi /= 1000;
-            //            lt_pos_ctrl_auto_tune.kpd /= 1000;
-            //
-            //            lt_pos_ctrl_auto_tune.active_step_counter=0;
-            //        }
-            //    }
+            //end the application
+            if(lt_pos_ctrl_auto_tune.active_step==END)//step 7
+            {
+                lt_pos_ctrl_auto_tune.tuning_process_ended=1;
+                lt_pos_ctrl_auto_tune.auto_tune = 0;
+                lt_pos_ctrl_auto_tune.activate=0;
+
+
+                lt_pos_ctrl_auto_tune.active_step_counter=0;
+            }
+*/
 
             lt_pos_ctrl_auto_tune.overshoot=0;
             lt_pos_ctrl_auto_tune.overshoot_max=0;
