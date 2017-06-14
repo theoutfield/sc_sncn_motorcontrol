@@ -432,7 +432,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
             printf("%d %d\n", filter_vel, filter_diff);
             if (filter_vel && ((filter_vel > filter_diff && filter_vel - filter_diff < 20) ||
-                    (filter_diff > filter_vel && filter_diff - filter_vel < 20)))
+                    (filter_diff > filter_vel && filter_diff - filter_vel < 20) || (filter_vel == filter_diff)))
                 printf("Velocity is ok\n");
             else
                 printf("Velocity is not ok\n");
