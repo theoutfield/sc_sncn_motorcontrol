@@ -272,6 +272,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 qei_crossover = (position_feedback_config.resolution * 19) / 100;
                 qei_count_per_hall = position_feedback_config.resolution;// / position_feedback_config.qei_config.poles;
                 pole_pairs = position_feedback_config.pole_pairs;
+                write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {

@@ -344,6 +344,21 @@ void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &positi
     }
 }
 
+
+int write_hall_state_angle_shared_memory(PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory)
+{
+    if (!isnull(i_shared_memory)) {
+        if (position_feedback_config.sensor_function == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL ||
+            position_feedback_config.sensor_function == SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY ||
+            position_feedback_config.sensor_function == SENSOR_FUNCTION_COMMUTATION_ONLY)
+        {
+            i_shared_memory.write_hall_state_angle(position_feedback_config.hall_config.hall_state_angle);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_hall_port_2, HallEncSelectPort &?hall_enc_select_port, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
                                PositionFeedbackConfig &position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
@@ -403,6 +418,11 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
             }
         }
 
+        //write hall state angle to shared memory for sensor 1 if used for commutation
+        int hall_state_angle_written = 0;
+        hall_state_angle_written = write_hall_state_angle_shared_memory(position_feedback_config_1, i_shared_memory_1);
+        hall_state_angle_written = write_hall_state_angle_shared_memory(position_feedback_config_1, i_shared_memory_2);
+
         //checks ports sensor 2
         if (!isnull(position_feedback_config_2)) {
             //check an configure ports, set to fallback service if incorrect configuration
@@ -442,6 +462,12 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                 }
                 break;
             }
+
+            //write hall state angle to shared memory if sensor 2 is used for commutation
+            if (hall_state_angle_written == 0) {
+                hall_state_angle_written = write_hall_state_angle_shared_memory(position_feedback_config_2, i_shared_memory_1);
+                hall_state_angle_written = write_hall_state_angle_shared_memory(position_feedback_config_2, i_shared_memory_2);
+            }
         }
 
         //checks ports sensor 1
@@ -468,6 +494,15 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                 (*spi_ports_1).spi_interface.mosi = reconfigure_port(move(gpio_ports[3]), out buffered port:8);
                 spi_ports_2 = move(spi_ports_1);
                 spi_on = 1;
+            }
+        }
+
+        //write hall state angle to shared memory for sensor 1 if not written before
+        if (hall_state_angle_written == 0) {
+            if (!isnull(i_shared_memory_1)) {
+                i_shared_memory_1.write_hall_state_angle(position_feedback_config_1.hall_config.hall_state_angle);
+            } else if (!isnull(i_shared_memory_2)) {
+                i_shared_memory_2.write_hall_state_angle(position_feedback_config_1.hall_config.hall_state_angle);
             }
         }
 

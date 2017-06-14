@@ -331,5 +331,14 @@ void gpio_write(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedb
  */
 void gpio_shared_memory(port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory, int service_number);
 
+/**
+ * @brief Write hall state angle to the shared memory
+ *
+ * @param position_feedback_config The position feedback service configuration
+ * @param i_shared_memory The client interface to the shared memory
+ *
+ * @return 1 if the data is written
+ */
+int write_hall_state_angle_shared_memory(PositionFeedbackConfig &position_feedback_config, client interface shared_memory_interface ?i_shared_memory);
 
 #endif
