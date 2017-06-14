@@ -229,7 +229,6 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
         {
             lt_pos_ctrl_auto_tune.position_init = position_k;
 
-
             lt_pos_ctrl_auto_tune.kpp = 0 ;
             lt_pos_ctrl_auto_tune.kpi = 0 ;
             lt_pos_ctrl_auto_tune.kpd = 0 ;
@@ -291,10 +290,10 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
             }
 
 
-            //increase kvp until it starts to vibrate
+            //increase kvp until it starts to vibrate or overshoot > 2%
             if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP2)// step 2
             {
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (5*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))
+                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (5*lt_pos_ctrl_auto_tune.err_energy_ss_int_min) && lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
                     lt_pos_ctrl_auto_tune.kvp = (lt_pos_ctrl_auto_tune.kvp*1005)/1000;
                     lt_pos_ctrl_auto_tune.kvi = lt_pos_ctrl_auto_tune.kvp/10000;
@@ -352,6 +351,26 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
+
+//            //reduce kvl until overshoot is less than 2%
+//            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP3_5)//step 6
+//            {
+//                if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+//                {
+//                    lt_pos_ctrl_auto_tune.active_step_counter++;
+//                }
+//                else
+//                {
+//                    lt_pos_ctrl_auto_tune.kvl = (lt_pos_ctrl_auto_tune.kvl*90)/100;
+//                }
+//
+//
+//                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+//                {
+//                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP4;
+//                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+//                }
+//            }
 
             //increase kpp until it starts to vibrate
             if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP4)// step 4
