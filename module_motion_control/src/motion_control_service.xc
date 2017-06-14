@@ -262,11 +262,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int hall_state = 0;
 
     unsigned position_ctr = 0, angle_ctr = 0;
-    int min_pos = 0, max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0;
-    int min_angle = 0, max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0;
+    int max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0;
+    int max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0;
     int old_position, old_angle;
-    int index_v = 0, filter_vel = 0, velocity_arr[FILTER];
-    int index_d = 0, start_d = 0, filter_diff = 0, difference_arr[FILTER];
+    int index_v = 0, velocity_arr[FILTER];
+    int index_d = 0, start_d = 0, difference_arr[FILTER];
+    int filter_diff = 0, filter_vel = 0;
     int difference = 0;
     int hall_state_ch[NR_PHASES] = { 0 };
     int hall_state_old, hall_order = 0;
@@ -347,10 +348,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             }
         }
 
-        if (angle > max_angle)
+        if (angle > max_angle && angle > 4000)
         {
             max_angle = angle;
-            mean_angle = (max_angle + min_angle) / 2;
+            mean_angle = max_angle / 2;
             tq_angle = (max_angle + mean_angle) / 2;
         }
         else if (angle > mean_angle - 20 && angle < mean_angle + 20)
@@ -362,10 +363,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             real_tq_angle = angle;
         }
 
-        if (position > max_pos)
+        if (position > max_pos && position > 60000)
         {
             max_pos = position;
-            mean_pos = (max_pos + min_pos) / 2;
+            mean_pos = max_pos / 2;
             tq_pos = (max_pos + mean_pos) / 2;
         }
         else if (position > mean_pos -20 && position < mean_pos + 20)
@@ -429,13 +430,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 printf("Angle is ok\n");
             else
                 printf("Angle is not ok\n");
-
-            printf("%d %d\n", filter_vel, filter_diff);
-            if (filter_vel && ((filter_vel > filter_diff && filter_vel - filter_diff < 20) ||
-                    (filter_diff > filter_vel && filter_diff - filter_vel < 20) || (filter_vel == filter_diff)))
-                printf("Velocity is ok\n");
-            else
-                printf("Velocity is not ok\n");
 
             if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
             {
@@ -788,6 +782,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 else if (open_phase[C] >= 5)
                     upstream_control_data.error_status = PHASE_FAILURE_L3;
 
+
+                if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
+                    upstream_control_data.error_status = SPEED_FAULT;
+
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
@@ -1000,6 +998,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 upstream_control_data_out = i_torque_control.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
 
+                if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
+                    upstream_control_data_out.error_status = SPEED_FAULT;
+
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                 {
@@ -1120,6 +1121,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
+                filter_vel = 0;
+                filter_diff = 0;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
