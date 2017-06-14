@@ -342,35 +342,37 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
 
                 if(lt_pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP4;
+                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP3_5;
                     lt_pos_ctrl_auto_tune.kvi = (lt_pos_ctrl_auto_tune.kvi*90)/100;
 
                     lt_pos_ctrl_auto_tune.counter_max/=3;
                     lt_pos_ctrl_auto_tune.err_energy_ss_int_min/=3;
 
+                    lt_pos_ctrl_auto_tune.kvl = 100000;
+
                     lt_pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
-//            //reduce kvl until overshoot is less than 2%
-//            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP3_5)//step 6
-//            {
-//                if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
-//                {
-//                    lt_pos_ctrl_auto_tune.active_step_counter++;
-//                }
-//                else
-//                {
-//                    lt_pos_ctrl_auto_tune.kvl = (lt_pos_ctrl_auto_tune.kvl*90)/100;
-//                }
-//
-//
-//                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-//                {
-//                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP4;
-//                    lt_pos_ctrl_auto_tune.active_step_counter=0;
-//                }
-//            }
+            //reduce kvl until overshoot is less than 2%
+            if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP3_5)//step 3.5
+            {
+                if(lt_pos_ctrl_auto_tune.overshoot_max<((30*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                {
+                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    lt_pos_ctrl_auto_tune.kvl = (lt_pos_ctrl_auto_tune.kvl*90)/100;
+                }
+
+
+                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    lt_pos_ctrl_auto_tune.active_step=CASCADED_POS_CTRL_STEP4;
+                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
 
             //increase kpp until it starts to vibrate
             if(lt_pos_ctrl_auto_tune.active_step==CASCADED_POS_CTRL_STEP4)// step 4
@@ -431,7 +433,7 @@ int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double p
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kpl = (lt_pos_ctrl_auto_tune.kpl*80)/100;
+                    lt_pos_ctrl_auto_tune.kpl = (lt_pos_ctrl_auto_tune.kpl*95)/100;
                 }
 
 
