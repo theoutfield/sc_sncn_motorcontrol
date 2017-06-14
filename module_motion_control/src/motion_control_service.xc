@@ -263,7 +263,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     unsigned position_ctr = 0, angle_ctr = 0;
     int max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
-    int max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0;
+    int max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
     int old_position, old_angle;
     int index_v = 0, velocity_arr[FILTER];
     int index_d = 0, start_d = 0, difference = 0, difference_arr[FILTER];
@@ -352,15 +352,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             max_angle = angle;
             mean_angle = max_angle / 2;
             tq_angle = (max_angle + mean_angle) / 2;
+            fq_angle = mean_angle / 2;
         }
         else if (angle > mean_angle - 20 && angle < mean_angle + 20)
-        {
             real_mean_angle = angle;
-        }
         else if (angle > tq_angle - 20 && angle < tq_angle + 20)
-        {
             real_tq_angle = angle;
-        }
+        else if (angle > fq_angle - 20 && angle < fq_angle + 20)
+            real_fq_angle = angle;
 
         if (position > max_pos && position > 60000)
         {
@@ -375,8 +374,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             real_tq_pos = position;
         else if (position > fq_pos - 20 && position < fq_pos + 20)
             real_fq_pos = position;
-
-        ++counter;
 
         if (index_v < FILTER)
             velocity_arr[index_v++] = velocity;
@@ -411,37 +408,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 filter_diff = -filter_diff;
         }
 
-        if (counter == 5000)
-        {
-            printf("%d %d %d %d %d\n", mean_angle, real_mean_angle, tq_angle, real_tq_angle, angle_ctr);
-            if (mean_angle-real_mean_angle < 20 && mean_angle-real_mean_angle > -20
-                    && tq_angle - real_tq_angle < 20 && tq_angle - real_tq_angle > -20
-                    && max_angle > 4000 && angle_ctr > 2000)
-                printf("Angle is ok\n");
-            else
-                printf("Angle is not ok\n");
-
-            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-            {
-                if (hall_state_ch[A])
-                    printf("Hall A signal ok\n");
-                else
-                    printf("Hall A signal is not ok\n");
-                if (hall_state_ch[B])
-                    printf("Hall B signal ok\n");
-                else
-                    printf("Hall B signal is not ok\n");
-                if (hall_state_ch[C])
-                    printf("Hall C signal ok\n");
-                else
-                    printf("Hall C signal is not ok\n");
-
-                if (hall_order == 0 && (hall_state_ch[A] && hall_state_ch[B] && hall_state_ch[C]))
-                    printf("Readings from hall channels are in the right order 315462 or 264513\n");
-                else
-                    printf("Readings from hall channels are not in the right order 315462 or 264513\n");
-            }
-        }
+        ++counter;
 
         delay_milliseconds(1);
     }
@@ -783,6 +750,28 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                      || position_ctr < 2000  || max_pos < 60000)
                     upstream_control_data.error_status = POSITION_FAULT;
 
+                // check for angle error from the sensor
+                if ((mean_angle-real_mean_angle < -20 || mean_angle-real_mean_angle > 20)
+                        || (tq_angle - real_tq_angle < -20 || tq_angle - real_tq_angle > 20)
+                        || (fq_angle - real_fq_angle < -20 || fq_angle - real_fq_angle > 20)
+                        || max_angle < 4000 || angle_ctr < 2000)
+                {
+                    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                    else
+                        upstream_control_data.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                }
+
+                // check for the errors on Hall ports
+                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                {
+                    if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+
+                    if (hall_order)
+                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                }
+
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
@@ -997,12 +986,31 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
                     upstream_control_data_out.error_status = SPEED_FAULT;
-                printf("%d %d %d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, fq_pos, real_fq_pos, position_ctr, max_pos);
                 if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
                         || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
                         || (fq_pos - real_fq_pos < -20 || fq_pos - real_fq_pos > 20)
                         || position_ctr < 2000  || max_pos < 60000)
                     upstream_control_data_out.error_status = POSITION_FAULT;
+
+                if ((mean_angle-real_mean_angle < -20 || mean_angle-real_mean_angle > 20)
+                        || (tq_angle - real_tq_angle < -20 || tq_angle - real_tq_angle > 20)
+                        || (fq_angle - real_fq_angle < -20 || fq_angle - real_fq_angle > 20)
+                        || max_angle < 4000 || angle_ctr < 2000)
+                {
+                    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                        upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
+                    else
+                        upstream_control_data_out.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                }
+
+                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                {
+                    if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+
+                    if (hall_order)
+                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                }
 
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
@@ -1132,8 +1140,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 real_tq_pos = 0;
                 fq_pos = 0;
                 real_fq_pos = 0;
-                position_ctr = 4095;
+                position_ctr = 65535;
                 max_pos = 65535;
+                mean_angle = 0;
+                real_mean_angle = 0;
+                tq_angle  = 0;
+                real_tq_angle = 0;
+                fq_angle = 0;
+                real_fq_angle = 0;
+                max_angle =  4095;
+                angle_ctr = 4095;
+                hall_state_ch[A] = 1;
+                hall_state_ch[B] = 1;
+                hall_state_ch[C] = 1;
+                hall_order = 0;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
