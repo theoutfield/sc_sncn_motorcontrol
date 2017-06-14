@@ -262,13 +262,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int hall_state = 0;
 
     unsigned position_ctr = 0, angle_ctr = 0;
-    int max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0;
+    int max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
     int max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0;
     int old_position, old_angle;
     int index_v = 0, velocity_arr[FILTER];
-    int index_d = 0, start_d = 0, difference_arr[FILTER];
+    int index_d = 0, start_d = 0, difference = 0, difference_arr[FILTER];
     int filter_diff = 0, filter_vel = 0;
-    int difference = 0;
     int hall_state_ch[NR_PHASES] = { 0 };
     int hall_state_old, hall_order = 0;
 
@@ -368,15 +367,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             max_pos = position;
             mean_pos = max_pos / 2;
             tq_pos = (max_pos + mean_pos) / 2;
+            fq_pos = mean_pos / 2;
         }
         else if (position > mean_pos -20 && position < mean_pos + 20)
-        {
             real_mean_pos = position;
-        }
-        else if (position > tq_pos -20 && position < tq_pos + 20)
-        {
+        else if (position > tq_pos - 20 && position < tq_pos + 20)
             real_tq_pos = position;
-        }
+        else if (position > fq_pos - 20 && position < fq_pos + 20)
+            real_fq_pos = position;
 
         ++counter;
 
@@ -415,14 +413,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         if (counter == 5000)
         {
-            printf("%d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, position_ctr);
-            if (mean_pos-real_mean_pos < 20 && mean_pos-real_mean_pos > -20 && max_pos > 60000
-                    && tq_pos - real_tq_pos < 20 && tq_pos - real_tq_pos > -20
-                    && position_ctr > 2000)
-                printf("Position is ok\n");
-            else
-                printf("Position is not ok\n");
-
             printf("%d %d %d %d %d\n", mean_angle, real_mean_angle, tq_angle, real_tq_angle, angle_ctr);
             if (mean_angle-real_mean_angle < 20 && mean_angle-real_mean_angle > -20
                     && tq_angle - real_tq_angle < 20 && tq_angle - real_tq_angle > -20
@@ -782,9 +772,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 else if (open_phase[C] >= 5)
                     upstream_control_data.error_status = PHASE_FAILURE_L3;
 
-
+                // check for speed error from sensor
                 if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
                     upstream_control_data.error_status = SPEED_FAULT;
+
+                // check for position error from the sensor
+                if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
+                     || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
+                     || (fq_pos - real_fq_pos < -20 || fq_pos - real_fq_pos > 20)
+                     || position_ctr < 2000  || max_pos < 60000)
+                    upstream_control_data.error_status = POSITION_FAULT;
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -1000,6 +997,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
                     upstream_control_data_out.error_status = SPEED_FAULT;
+                printf("%d %d %d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, fq_pos, real_fq_pos, position_ctr, max_pos);
+                if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
+                        || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
+                        || (fq_pos - real_fq_pos < -20 || fq_pos - real_fq_pos > 20)
+                        || position_ctr < 2000  || max_pos < 60000)
+                    upstream_control_data_out.error_status = POSITION_FAULT;
 
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
@@ -1123,6 +1126,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 i_torque_control.reset_faults();
                 filter_vel = 0;
                 filter_diff = 0;
+                mean_pos = 0;
+                real_mean_pos = 0;
+                tq_pos = 0;
+                real_tq_pos = 0;
+                fq_pos = 0;
+                real_fq_pos = 0;
+                position_ctr = 4095;
+                max_pos = 65535;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
