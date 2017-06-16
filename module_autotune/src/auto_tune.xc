@@ -196,8 +196,6 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
     pos_ctrl_auto_tune.overshoot=0.00;
     pos_ctrl_auto_tune.overshoot_max=0.00;
 
-    pos_ctrl_auto_tune.tuning_process_ended=0;
-
     return 0;
 }
 
@@ -463,10 +461,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             //end the application
             if(pos_ctrl_auto_tune.active_step==END)//step 7
             {
-                pos_ctrl_auto_tune.tuning_process_ended=1;
                 pos_ctrl_auto_tune.auto_tune = 0;
                 pos_ctrl_auto_tune.activate=0;
-
 
                 pos_ctrl_auto_tune.active_step_counter=0;
             }
@@ -546,10 +542,9 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    if(pos_ctrl_auto_tune.tuning_process_ended==0)
-                        pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*100)/120;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*100)/120;
 
-                    if(pos_ctrl_auto_tune.kpi<10 && pos_ctrl_auto_tune.tuning_process_ended==0)
+                    if(pos_ctrl_auto_tune.kpi<10)
                         pos_ctrl_auto_tune.kpi = 10;
 
                     pos_ctrl_auto_tune.active_step_counter=0;
@@ -595,10 +590,9 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    if(pos_ctrl_auto_tune.tuning_process_ended==0)
-                        pos_ctrl_auto_tune.kpi -= 5;
+                    pos_ctrl_auto_tune.kpi -= 5;
 
-                    if(pos_ctrl_auto_tune.kpi<5 && pos_ctrl_auto_tune.tuning_process_ended==0)
+                    if(pos_ctrl_auto_tune.kpi<5)
                     {
                         pos_ctrl_auto_tune.kpi = 5;
                         pos_ctrl_auto_tune.active_step_counter++;
@@ -636,7 +630,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 {
                     pos_ctrl_auto_tune.active_step=END;
 
-                    pos_ctrl_auto_tune.tuning_process_ended=1;
                     pos_ctrl_auto_tune.auto_tune = 0;
                     pos_ctrl_auto_tune.activate=0;
 

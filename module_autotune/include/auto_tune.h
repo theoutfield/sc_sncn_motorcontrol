@@ -11,29 +11,98 @@
  *        Note: The dc-bus voltage should be high enough for the selected velocity.
  */
 #define TUNING_VELOCITY 1000 //[rpm]
-
 #define SETTLING_TIME   0.3  //preffered settling time for velocity controller [seconds]
 
+// parameters of position controller autotuner
+#define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
+#define AUTO_TUNE_COUNTER_MAX       1500  // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
+#define PER_THOUSAND_OVERSHOOT      10    // Overshoot limit while tuning (it is set as per thousand of step amplitude)
+
 /**
- * @brief Structure type containing auto_tuning parameters of velocity/position controllers
+ * @brief steps of position controller autotuning procedure
+ */
+typedef enum {
+    SIMPLE_PID      =1,
+    CASCADED        =2,
+    LIMITED_TORQUE  =3,
+
+    AUTO_TUNE_STEP_1=11,
+    AUTO_TUNE_STEP_2=12,
+    AUTO_TUNE_STEP_3=13,
+    AUTO_TUNE_STEP_4=14,
+    AUTO_TUNE_STEP_5=15,
+    AUTO_TUNE_STEP_6=16,
+    AUTO_TUNE_STEP_7=17,
+    AUTO_TUNE_STEP_8=18,
+    AUTO_TUNE_STEP_9=19,
+
+    END=50
+} AutotuneSteps;
+
+/**
+ * @brief Structure type containing auto_tuning parameters of velocity controller
  */
 typedef struct {
-    int enable;                     //flag for enable/disable auto tuner
-    int counter;                    // position feedback gain
-    int save_counter;               // counter for saving the speed values
-    double velocity_ref;            // reference of velocity in [rpm]
-    int array_length;               // length of measurement array
-    int  actual_velocity[1001];     // array containing measured actual velocity
-    double j;                       // moment of inertia
-    double f;                       // friction factor
+    int enable;
+    int counter;
+    int save_counter;
+    double velocity_ref;
+    int array_length;
+    int  actual_velocity[1001];
+    double j;
+    double f;
     double z;
     double st;
-
     double kp;
     double ki;
     double kd;
 } VelCtrlAutoTuneParam;
 
+/**
+ * @brief Structure type containing auto_tuning parameters of position controller
+ */
+typedef struct {
+    int    controller;
+    double position_init;
+    double position_ref;
+    int    rising_edge;
+
+    int activate;
+    int auto_tune;
+
+    int active_step_counter;
+    int active_step;
+
+    int counter;
+    int counter_max;
+
+    int kvp;
+    int kvi;
+    int kvd;
+    int kvl;
+
+    int kpp;
+    int kpi;
+    int kpd;
+    int kpl;
+    int j;
+
+    double step_amplitude;
+
+    double err;
+    double err_energy;
+    double err_energy_int;
+    double err_energy_int_max;
+
+    double err_ss;
+    double err_energy_ss;
+    double err_energy_ss_int;
+    double err_energy_ss_int_min;
+    double err_energy_ss_limit_soft;
+    double overshoot;
+    double overshoot_max;
+
+} PosCtrlAutoTuneParam;
 
 /**
  * @brief Initializes the structure of type VelCtrlAutoTuneParam to start the auto tuning procedure.
@@ -60,81 +129,9 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, int veloc
 int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,MotionControlConfig &motion_ctrl_config, double &velocity_ref_in_k, double velocity_k, int period);
 
 
-// position controller autotuner
-#define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
-#define AUTO_TUNE_COUNTER_MAX       1500  // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
-#define PER_THOUSAND_OVERSHOOT      10    // Overshoot limit while tuning (it is set as per thousand of step amplitude)
 
-/**
- * @brief different steps of autotuning function
- */
-typedef enum {
-    SIMPLE_PID=1,
-    CASCADED=2,
-    LIMITED_TORQUE=3,
 
-    AUTO_TUNE_STEP_1=11,
-    AUTO_TUNE_STEP_2=12,
-    AUTO_TUNE_STEP_3=13,
-    AUTO_TUNE_STEP_4=14,
-    AUTO_TUNE_STEP_5=15,
-    AUTO_TUNE_STEP_6=16,
-    AUTO_TUNE_STEP_7=17,
-    AUTO_TUNE_STEP_8=18,
-    AUTO_TUNE_STEP_9=19,
 
-    END=50
-} AutotuneSteps;
-
-/**
- * @brief Structure type containing auto_tuning parameters
- */
-typedef struct {
-
-    int controller;
-    double position_init;
-    double position_ref;
-    int rising_edge;
-
-    int activate;
-    int counter;
-    int counter_max;
-
-    int active_step_counter;
-    int active_step;
-
-    int kvp;
-    int kvi;
-    int kvd;
-    int kvl;
-
-    int kpp;
-    int kpi;
-    int kpd;
-    int kpl;
-    int j;
-
-    int auto_tune;
-
-    double step_amplitude;
-
-    double err;
-    double err_energy;
-    double err_energy_int;
-    double err_energy_int_max;
-
-    double err_ss;
-    double err_energy_ss;
-    double err_energy_ss_int;
-    double err_energy_ss_int_min;
-    double err_energy_ss_limit_soft;
-
-    double overshoot;
-    double overshoot_max;
-
-    int tuning_process_ended;
-
-} PosCtrlAutoTuneParam;
 
 
 /**
