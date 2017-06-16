@@ -237,7 +237,7 @@ interface MotionControlInterface
     /**
      * @brief return the value of phase resistances
      */
-    {float, float, float} open_phase_detection();
+    {int, float} open_phase_detection();
 
     /**
      * @brief responsible for data communication between torque controller and higher level controllers

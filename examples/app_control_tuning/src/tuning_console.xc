@@ -28,7 +28,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         tile_usec = USEC_FAST;
     }
 
-    float res_a, res_b, res_c;
+    float resistance;
+    int phase_error = 0;
 
     delay_ticks(100*1000*tile_usec);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
@@ -324,21 +325,20 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
        case 'g':
 
                 printf("detection of open circuit in phases started ...\n");
-                {res_a, res_b, res_c} = i_motion_control.open_phase_detection();
+                {phase_error, resistance} = i_motion_control.open_phase_detection();
 
-                printf("Resistance in phase A = %.2f Om\n", res_a);
-                printf("Resistance in phase B = %.2f Om\n", res_b);
-                printf("Resistance in phase C = %.2f Om\n", res_c);
-
-                if (res_a >= 3)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
-                else if (res_b >= 3)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
-                else if(res_c >= 3)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
-                else
-                    printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
-
+                printf(">>  PHASE RESISTANCE = %.2f Om\n", resistance);
+//
+//                if (phase_error == 1)
+//                    printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+//                else if (phase_error == 2)
+//                    printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+//                else if(phase_error == 3)
+//                    printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+//                else
+//                {
+//                    printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
+//                }
                 break;
 
         //reverse torque or velocity command
