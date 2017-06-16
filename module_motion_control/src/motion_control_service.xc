@@ -374,7 +374,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                             }
 
-
                             if(pos_ctrl_auto_tune.counter==0)
                             {
                                 pid_init(velocity_control_pid_param);
@@ -386,7 +385,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 printf("step: %d  \n", pos_ctrl_auto_tune.active_step);
                                 printf("kpp:%i kpi:%i kpd:%i kpl:%d \n",    motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                                 printf("kvp:%i kvi:%i kvd:%i kvl:%d \n\n",  motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
-
                             }
 
                             velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
@@ -412,10 +410,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 init_lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, LIMITED_TORQUE);
                             }
 
-
-                            pos_ctrl_auto_tune.auto_tune=  motion_ctrl_config.position_control_autotune;
                             lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
-
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
@@ -425,24 +420,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             if(pos_ctrl_auto_tune.counter==0)
                             {
-
-
                                 lt_position_control_reset(lt_pos_ctrl);
-
-                                motion_ctrl_config.position_kp = pos_ctrl_auto_tune.kpp;
-                                motion_ctrl_config.position_ki = pos_ctrl_auto_tune.kpi;
-                                motion_ctrl_config.position_kd = pos_ctrl_auto_tune.kpd;
-                                motion_ctrl_config.position_integral_limit = pos_ctrl_auto_tune.kpl;
-                                motion_ctrl_config.moment_of_inertia       = pos_ctrl_auto_tune.j;
-                                motion_ctrl_config.position_control_autotune = pos_ctrl_auto_tune.auto_tune;
-
                                 lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
                                         motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
-                                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);                                //printf("ActSt:%i StCt:%i EnSS:%i EnSSMin:%i EnSSMinLimSoft:%i Ki:%i Kl:%i\n",
-                                //printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
-                                //        pos_ctrl_auto_tune.active_step, pos_ctrl_auto_tune.active_step_counter,
-                                //        ((int)pos_ctrl_auto_tune.err_energy_ss_int), ((int)pos_ctrl_auto_tune.err_energy_ss_int_min), ((int)pos_ctrl_auto_tune.err_energy_ss_limit_soft),
-                                //        motion_ctrl_config.position_ki, motion_ctrl_config.position_integral_limit);
+                                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                             }
 
                             torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
