@@ -291,11 +291,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 {
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
-
                         velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
-
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-
                         if(velocity_auto_tune.enable == 0)
                         {
                             torque_ref_k=0;
@@ -369,9 +366,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 init_lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
                             }
 
-                            pos_ctrl_auto_tune.auto_tune=  motion_ctrl_config.position_control_autotune;
-
-                            lt_pos_ctrl_autotune(pos_ctrl_auto_tune, position_k);
+                            lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
@@ -379,49 +374,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                             }
 
+
                             if(pos_ctrl_auto_tune.counter==0)
                             {
-                                motion_ctrl_config.velocity_kp = pos_ctrl_auto_tune.kvp;
-                                motion_ctrl_config.velocity_ki = pos_ctrl_auto_tune.kvi;
-                                motion_ctrl_config.velocity_kd = pos_ctrl_auto_tune.kvd;
-                                motion_ctrl_config.velocity_integral_limit = pos_ctrl_auto_tune.kvl;
-
-                                motion_ctrl_config.position_kp = pos_ctrl_auto_tune.kpp;
-                                motion_ctrl_config.position_ki = pos_ctrl_auto_tune.kpi;
-                                motion_ctrl_config.position_kd = pos_ctrl_auto_tune.kpd;
-                                motion_ctrl_config.position_integral_limit = pos_ctrl_auto_tune.kpl;
-                                motion_ctrl_config.moment_of_inertia       = pos_ctrl_auto_tune.j;
-
-                                motion_ctrl_config.position_control_autotune = pos_ctrl_auto_tune.auto_tune;
-
-                                pid_reset(velocity_control_pid_param);
                                 pid_init(velocity_control_pid_param);
-                                if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
-                                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
-                                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
-                                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
-                                if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
-                                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
-                                pid_set_parameters(
-                                        (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
-                                        (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
-                                        POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-
-                                pid_reset(position_control_pid_param);
                                 pid_init(position_control_pid_param);
-                                if(motion_ctrl_config.position_kp<0)            motion_ctrl_config.position_kp=0;
-                                if(motion_ctrl_config.position_kp>100000000)    motion_ctrl_config.position_kp=100000000;
-                                if(motion_ctrl_config.position_ki<0)            motion_ctrl_config.position_ki=0;
-                                if(motion_ctrl_config.position_ki>100000000)    motion_ctrl_config.position_ki=100000000;
-                                if(motion_ctrl_config.position_kd<0)            motion_ctrl_config.position_kd=0;
-                                if(motion_ctrl_config.position_kd>100000000)    motion_ctrl_config.position_kd=100000000;
-                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki,
-                                        (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
-                                        POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+
+                                pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
                                 printf("step: %d  \n", pos_ctrl_auto_tune.active_step);
                                 printf("kpp:%i kpi:%i kpd:%i kpl:%d \n",    motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                                 printf("kvp:%i kvi:%i kvd:%i kvl:%d \n\n",  motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
+
                             }
 
                             velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
@@ -449,7 +414,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
                             pos_ctrl_auto_tune.auto_tune=  motion_ctrl_config.position_control_autotune;
-                            lt_pos_ctrl_autotune(pos_ctrl_auto_tune, position_k);
+                            lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
 
 
                             if(motion_ctrl_config.position_control_autotune == 0)

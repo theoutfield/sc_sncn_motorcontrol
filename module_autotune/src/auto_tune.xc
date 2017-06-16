@@ -221,8 +221,10 @@ int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionCo
  *
  * @return void
  *  */
-int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, double position_k)
+int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k)
 {
+
+    pos_ctrl_auto_tune.auto_tune =  motion_ctrl_config.position_control_autotune;
 
     pos_ctrl_auto_tune.counter++;
 
@@ -715,6 +717,27 @@ int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, double positi
         pos_ctrl_auto_tune.err_energy_ss_int += pos_ctrl_auto_tune.err_energy_ss;
     }
 
+
+
+
+
+    if(pos_ctrl_auto_tune.counter==0)
+    {
+        motion_ctrl_config.velocity_kp = pos_ctrl_auto_tune.kvp;
+        motion_ctrl_config.velocity_ki = pos_ctrl_auto_tune.kvi;
+        motion_ctrl_config.velocity_kd = pos_ctrl_auto_tune.kvd;
+        motion_ctrl_config.velocity_integral_limit = pos_ctrl_auto_tune.kvl;
+
+        motion_ctrl_config.position_kp = pos_ctrl_auto_tune.kpp;
+        motion_ctrl_config.position_ki = pos_ctrl_auto_tune.kpi;
+        motion_ctrl_config.position_kd = pos_ctrl_auto_tune.kpd;
+        motion_ctrl_config.position_integral_limit = pos_ctrl_auto_tune.kpl;
+        motion_ctrl_config.moment_of_inertia       = pos_ctrl_auto_tune.j;
+
+        motion_ctrl_config.position_control_autotune = pos_ctrl_auto_tune.auto_tune;
+
+
+    }
     return 0;
 }
 

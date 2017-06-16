@@ -170,7 +170,7 @@ int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionCo
  *
  * @return void
  *  */
-int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, double position_k);
+int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k);
 
 
 
