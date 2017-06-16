@@ -146,7 +146,7 @@ int velocity_controller_auto_tune(AutoTuneParam &velocity_auto_tune, double &vel
 /**
  * @brief function to initialize the structure of automatic tuner for limited torque position controller.
  *
- * @param lt_pos_ctrl_auto_tune         structure of type LTPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param pos_ctrl_auto_tune         structure of type PosCtrlAutoTuneParam which will be used during the tuning procedure
  * @param step_amplitude Communication  The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
  * @param counter_max                   The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
  * @param overshot_per_thousand         Overshoot limit while tuning (it is set as per thousand of step amplitude)
@@ -154,53 +154,53 @@ int velocity_controller_auto_tune(AutoTuneParam &velocity_auto_tune, double &vel
  *
  * @return void
  *  */
-int init_lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, int controller_type, int counter_max_autotune, int step_amplitude_autotune, int per_thousand_overshoot_autotune, int rise_time_freedom_percent_autotune)
+int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, int controller_type, int counter_max_autotune, int step_amplitude_autotune, int per_thousand_overshoot_autotune, int rise_time_freedom_percent_autotune)
 {
-    lt_pos_ctrl_auto_tune.controller = controller_type;
+    pos_ctrl_auto_tune.controller = controller_type;
 
-    lt_pos_ctrl_auto_tune.position_init = 0.00;
-    lt_pos_ctrl_auto_tune.position_ref  = 0.00;
-    lt_pos_ctrl_auto_tune.auto_tune  = 0;
+    pos_ctrl_auto_tune.position_init = 0.00;
+    pos_ctrl_auto_tune.position_ref  = 0.00;
+    pos_ctrl_auto_tune.auto_tune  = 0;
 
-    lt_pos_ctrl_auto_tune.activate=0;
-    lt_pos_ctrl_auto_tune.counter=0;
-    lt_pos_ctrl_auto_tune.counter_max=counter_max_autotune;
+    pos_ctrl_auto_tune.activate=0;
+    pos_ctrl_auto_tune.counter=0;
+    pos_ctrl_auto_tune.counter_max=counter_max_autotune;
 
-    lt_pos_ctrl_auto_tune.step_amplitude = step_amplitude_autotune;
-//    if(lt_pos_ctrl_auto_tune.controller==CASCADED)
-//        lt_pos_ctrl_auto_tune.step_amplitude /=4;
+    pos_ctrl_auto_tune.step_amplitude = step_amplitude_autotune;
+//    if(pos_ctrl_auto_tune.controller==CASCADED)
+//        pos_ctrl_auto_tune.step_amplitude /=4;
 
-    lt_pos_ctrl_auto_tune.err=0.00;
-    lt_pos_ctrl_auto_tune.err_energy=0.00;
-    lt_pos_ctrl_auto_tune.err_energy_int    =0.00;
-    lt_pos_ctrl_auto_tune.err_energy_int_max    = ((2*lt_pos_ctrl_auto_tune.step_amplitude)/1000) * ((2*lt_pos_ctrl_auto_tune.step_amplitude)/1000) * lt_pos_ctrl_auto_tune.counter_max;
-    lt_pos_ctrl_auto_tune.dynamic_err_energy_int_max=0.00;
+    pos_ctrl_auto_tune.err=0.00;
+    pos_ctrl_auto_tune.err_energy=0.00;
+    pos_ctrl_auto_tune.err_energy_int    =0.00;
+    pos_ctrl_auto_tune.err_energy_int_max    = ((2*pos_ctrl_auto_tune.step_amplitude)/1000) * ((2*pos_ctrl_auto_tune.step_amplitude)/1000) * pos_ctrl_auto_tune.counter_max;
+    pos_ctrl_auto_tune.dynamic_err_energy_int_max=0.00;
 
-    lt_pos_ctrl_auto_tune.err_ss=0.00;
-    lt_pos_ctrl_auto_tune.err_energy_ss=0.00;
-    lt_pos_ctrl_auto_tune.err_energy_ss_int=0.00;
+    pos_ctrl_auto_tune.err_ss=0.00;
+    pos_ctrl_auto_tune.err_energy_ss=0.00;
+    pos_ctrl_auto_tune.err_energy_ss_int=0.00;
     //steady state error is measured between 90% and 98% of the period, and its min value is when real position is having a margin of 0.01 with reference position
-    lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft = (((lt_pos_ctrl_auto_tune.step_amplitude)/100) * ((lt_pos_ctrl_auto_tune.step_amplitude)/100) * lt_pos_ctrl_auto_tune.counter_max * 8.00) /100.00;
-    lt_pos_ctrl_auto_tune.err_energy_ss_int_min    = lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft;
-    lt_pos_ctrl_auto_tune.err_energy_ss_int_min_counter=0;
+    pos_ctrl_auto_tune.err_energy_ss_limit_soft = (((pos_ctrl_auto_tune.step_amplitude)/100) * ((pos_ctrl_auto_tune.step_amplitude)/100) * pos_ctrl_auto_tune.counter_max * 8.00) /100.00;
+    pos_ctrl_auto_tune.err_energy_ss_int_min    = pos_ctrl_auto_tune.err_energy_ss_limit_soft;
+    pos_ctrl_auto_tune.err_energy_ss_int_min_counter=0;
 
-    lt_pos_ctrl_auto_tune.active_step_counter=0;
-    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_1;
+    pos_ctrl_auto_tune.active_step_counter=0;
+    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_1;
 
-    lt_pos_ctrl_auto_tune.rising_edge=0;
+    pos_ctrl_auto_tune.rising_edge=0;
 
-    lt_pos_ctrl_auto_tune.overshoot=0.00;
-    lt_pos_ctrl_auto_tune.overshoot_max=0.00;
-    lt_pos_ctrl_auto_tune.overshoot_min=lt_pos_ctrl_auto_tune.step_amplitude;
-    lt_pos_ctrl_auto_tune.overshot_per_thousand = ((double)(per_thousand_overshoot_autotune));
-    lt_pos_ctrl_auto_tune.overshoot_counter=0;
-    lt_pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
+    pos_ctrl_auto_tune.overshoot=0.00;
+    pos_ctrl_auto_tune.overshoot_max=0.00;
+    pos_ctrl_auto_tune.overshoot_min=pos_ctrl_auto_tune.step_amplitude;
+    pos_ctrl_auto_tune.overshot_per_thousand = ((double)(per_thousand_overshoot_autotune));
+    pos_ctrl_auto_tune.overshoot_counter=0;
+    pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
 
-    lt_pos_ctrl_auto_tune.rise_time=0;
-    lt_pos_ctrl_auto_tune.rise_time_opt=0;
-    lt_pos_ctrl_auto_tune.rise_time_freedom_percent=rise_time_freedom_percent_autotune;
+    pos_ctrl_auto_tune.rise_time=0;
+    pos_ctrl_auto_tune.rise_time_opt=0;
+    pos_ctrl_auto_tune.rise_time_freedom_percent=rise_time_freedom_percent_autotune;
 
-    lt_pos_ctrl_auto_tune.tuning_process_ended=0;
+    pos_ctrl_auto_tune.tuning_process_ended=0;
 
     return 0;
 }
@@ -209,504 +209,504 @@ int init_lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, int
 /**
  * @brief function to automatically tune the limited torque position controller.
  *
- * @param lt_pos_ctrl_auto_tune            Structure containing all parameters of motion control service
- * @param lt_pos_ctrl_auto_tune         structure of type LTPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param pos_ctrl_auto_tune            Structure containing all parameters of motion control service
+ * @param pos_ctrl_auto_tune         structure of type PosCtrlAutoTuneParam which will be used during the tuning procedure
  * @param position_k                    The actual position of the system while (double)
  *
  * @return void
  *  */
-int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double position_k)
+int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, double position_k)
 {
 
-    lt_pos_ctrl_auto_tune.counter++;
+    pos_ctrl_auto_tune.counter++;
 
-    if(lt_pos_ctrl_auto_tune.controller == CASCADED)
+    if(pos_ctrl_auto_tune.controller == CASCADED)
     {
-        if(lt_pos_ctrl_auto_tune.activate==0)
+        if(pos_ctrl_auto_tune.activate==0)
         {
-            lt_pos_ctrl_auto_tune.position_init = position_k;
+            pos_ctrl_auto_tune.position_init = position_k;
 
-            lt_pos_ctrl_auto_tune.kpp = 0 ;
-            lt_pos_ctrl_auto_tune.kpi = 0 ;
-            lt_pos_ctrl_auto_tune.kpd = 0 ;
-            lt_pos_ctrl_auto_tune.kpl = 10000000;
-            lt_pos_ctrl_auto_tune.j  = 0;
+            pos_ctrl_auto_tune.kpp = 0 ;
+            pos_ctrl_auto_tune.kpi = 0 ;
+            pos_ctrl_auto_tune.kpd = 0 ;
+            pos_ctrl_auto_tune.kpl = 10000000;
+            pos_ctrl_auto_tune.j  = 0;
 
-            lt_pos_ctrl_auto_tune.kvp = 0 ;
-            lt_pos_ctrl_auto_tune.kvi = 0 ;
-            lt_pos_ctrl_auto_tune.kvd = 0 ;
-            lt_pos_ctrl_auto_tune.kvl = 10000000;
+            pos_ctrl_auto_tune.kvp = 0 ;
+            pos_ctrl_auto_tune.kvi = 0 ;
+            pos_ctrl_auto_tune.kvd = 0 ;
+            pos_ctrl_auto_tune.kvl = 10000000;
 
-            lt_pos_ctrl_auto_tune.activate = 1;
-            lt_pos_ctrl_auto_tune.counter=0;
+            pos_ctrl_auto_tune.activate = 1;
+            pos_ctrl_auto_tune.counter=0;
 
-            lt_pos_ctrl_auto_tune.counter_max=lt_pos_ctrl_auto_tune.counter_max/3;
+            pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max/3;
         }
 
-        if(lt_pos_ctrl_auto_tune.counter==lt_pos_ctrl_auto_tune.counter_max)
+        if(pos_ctrl_auto_tune.counter==pos_ctrl_auto_tune.counter_max)
         {
             //change of reference value in each cycle
-            if(lt_pos_ctrl_auto_tune.position_ref == (lt_pos_ctrl_auto_tune.position_init + lt_pos_ctrl_auto_tune.step_amplitude))
+            if(pos_ctrl_auto_tune.position_ref == (pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude))
             {
-                lt_pos_ctrl_auto_tune.position_ref = lt_pos_ctrl_auto_tune.position_init - lt_pos_ctrl_auto_tune.step_amplitude;
-                lt_pos_ctrl_auto_tune.rising_edge=0;
+                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init - pos_ctrl_auto_tune.step_amplitude;
+                pos_ctrl_auto_tune.rising_edge=0;
             }
             else
             {
-                lt_pos_ctrl_auto_tune.position_ref = lt_pos_ctrl_auto_tune.position_init + lt_pos_ctrl_auto_tune.step_amplitude;
-                lt_pos_ctrl_auto_tune.rising_edge=1;
+                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude;
+                pos_ctrl_auto_tune.rising_edge=1;
             }
 
             // force the load to follow the reference value
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)//step 1
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)//step 1
             {
-                if(lt_pos_ctrl_auto_tune.err_energy_int < (lt_pos_ctrl_auto_tune.err_energy_int_max/10))
+                if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    if(lt_pos_ctrl_auto_tune.active_step_counter==0)
-                        lt_pos_ctrl_auto_tune.kvp += 50000;
+                    if(pos_ctrl_auto_tune.active_step_counter==0)
+                        pos_ctrl_auto_tune.kvp += 50000;
                     else
-                        lt_pos_ctrl_auto_tune.kvp += 10000;
+                        pos_ctrl_auto_tune.kvp += 10000;
 
-                        lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
+                        pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
 
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int>lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int_min+lt_pos_ctrl_auto_tune.err_energy_ss_int)/2;
+                if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int_min+pos_ctrl_auto_tune.err_energy_ss_int)/2;
             }
 
 
             //increase kvp until it starts to vibrate or overshoot > 2%
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)// step 2
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)// step 2
             {
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (5*lt_pos_ctrl_auto_tune.err_energy_ss_int_min) && lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                if(pos_ctrl_auto_tune.err_energy_ss_int < (5*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
-                    lt_pos_ctrl_auto_tune.kvp = (lt_pos_ctrl_auto_tune.kvp*1005)/1000;
-                    lt_pos_ctrl_auto_tune.kvi = lt_pos_ctrl_auto_tune.kvp/10000;
+                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*1005)/1000;
+                    pos_ctrl_auto_tune.kvi = pos_ctrl_auto_tune.kvp/10000;
 
-                    lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
-                    lt_pos_ctrl_auto_tune.kpi = lt_pos_ctrl_auto_tune.kpp/10000;
+                    pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
+                    pos_ctrl_auto_tune.kpi = pos_ctrl_auto_tune.kpp/10000;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
 
-                if(100<lt_pos_ctrl_auto_tune.err_energy_ss_int && lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (2*lt_pos_ctrl_auto_tune.err_energy_ss_int+lt_pos_ctrl_auto_tune.err_energy_ss_int_min)/3;
+                if(100<pos_ctrl_auto_tune.err_energy_ss_int && pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (2*pos_ctrl_auto_tune.err_energy_ss_int+pos_ctrl_auto_tune.err_energy_ss_int_min)/3;
 
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_3;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_3;
 
-                    lt_pos_ctrl_auto_tune.kvp=(lt_pos_ctrl_auto_tune.kvp*90)/100;
-                    lt_pos_ctrl_auto_tune.kvi = lt_pos_ctrl_auto_tune.kvp/10000;
-                    lt_pos_ctrl_auto_tune.kpp = lt_pos_ctrl_auto_tune.kvp/10;
-                    lt_pos_ctrl_auto_tune.kpi = lt_pos_ctrl_auto_tune.kpp/10000;
+                    pos_ctrl_auto_tune.kvp=(pos_ctrl_auto_tune.kvp*90)/100;
+                    pos_ctrl_auto_tune.kvi = pos_ctrl_auto_tune.kvp/10000;
+                    pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
+                    pos_ctrl_auto_tune.kpi = pos_ctrl_auto_tune.kpp/10000;
 
-                    lt_pos_ctrl_auto_tune.counter_max=lt_pos_ctrl_auto_tune.counter_max*3;
+                    pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max*3;
 
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
             //increase kvi until overshoot is less than 1%
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)//step 3
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)//step 3
             {
-                if(lt_pos_ctrl_auto_tune.overshoot_max>((10*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                if(pos_ctrl_auto_tune.overshoot_max>((10*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kvi = (lt_pos_ctrl_auto_tune.kvi*110)/100;
+                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*110)/100;
                 }
 
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int>lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-                         lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int_min+lt_pos_ctrl_auto_tune.err_energy_ss_int)/2;
+                if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_int_min)
+                         pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int_min+pos_ctrl_auto_tune.err_energy_ss_int)/2;
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
-                    lt_pos_ctrl_auto_tune.kvi = (lt_pos_ctrl_auto_tune.kvi*90)/100;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
+                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*90)/100;
 
-                    lt_pos_ctrl_auto_tune.counter_max/=3;
-                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min/=3;
+                    pos_ctrl_auto_tune.counter_max/=3;
+                    pos_ctrl_auto_tune.err_energy_ss_int_min/=3;
 
-                    lt_pos_ctrl_auto_tune.kvl = 100000;
+                    pos_ctrl_auto_tune.kvl = 100000;
 
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
             //reduce kvl until overshoot is less than 2%
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)//step 3.5
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)//step 3.5
             {
-                if(lt_pos_ctrl_auto_tune.overshoot_max<((30*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                if(pos_ctrl_auto_tune.overshoot_max<((30*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kvl = (lt_pos_ctrl_auto_tune.kvl*90)/100;
+                    pos_ctrl_auto_tune.kvl = (pos_ctrl_auto_tune.kvl*90)/100;
                 }
 
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
             //increase kpp until it starts to vibrate
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)// step 4
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)// step 4
             {
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (2*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))
+                if(pos_ctrl_auto_tune.err_energy_ss_int < (2*pos_ctrl_auto_tune.err_energy_ss_int_min))
                 {
-                    lt_pos_ctrl_auto_tune.kpp = (lt_pos_ctrl_auto_tune.kpp*1010)/1000;
-                    if(lt_pos_ctrl_auto_tune.kpp<100) lt_pos_ctrl_auto_tune.kpp =100;
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*1010)/1000;
+                    if(pos_ctrl_auto_tune.kpp<100) pos_ctrl_auto_tune.kpp =100;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
 
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (2*lt_pos_ctrl_auto_tune.err_energy_ss_int+lt_pos_ctrl_auto_tune.err_energy_ss_int_min)/3;
+                if(pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (2*pos_ctrl_auto_tune.err_energy_ss_int+pos_ctrl_auto_tune.err_energy_ss_int_min)/3;
 
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_6;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_6;
 
-                    lt_pos_ctrl_auto_tune.kpp = (lt_pos_ctrl_auto_tune.kpp*90)/100;
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*90)/100;
 
-                    lt_pos_ctrl_auto_tune.counter_max*=3;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.counter_max*=3;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
             //increase kpi until overshoot is more than 10%
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_6)//step 5
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_6)//step 5
             {
-                if(lt_pos_ctrl_auto_tune.overshoot_max>((100*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                if(pos_ctrl_auto_tune.overshoot_max>((100*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*110)/100;
-                    if(lt_pos_ctrl_auto_tune.kpi<10) lt_pos_ctrl_auto_tune.kpi=10;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;
+                    if(pos_ctrl_auto_tune.kpi<10) pos_ctrl_auto_tune.kpi=10;
                 }
 
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_7;
-                    lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*90)/100;
-                    lt_pos_ctrl_auto_tune.kpl = 10000;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_7;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*90)/100;
+                    pos_ctrl_auto_tune.kpl = 10000;
+                    pos_ctrl_auto_tune.active_step_counter=0;
 
                 }
             }
 
             //reduce kpl until overshoot is less than 5%
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_7)//step 6
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_7)//step 6
             {
-                if(lt_pos_ctrl_auto_tune.overshoot_max<((50*lt_pos_ctrl_auto_tune.step_amplitude)/1000))
+                if(pos_ctrl_auto_tune.overshoot_max<((50*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kpl = (lt_pos_ctrl_auto_tune.kpl*95)/100;
+                    pos_ctrl_auto_tune.kpl = (pos_ctrl_auto_tune.kpl*95)/100;
                 }
 
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_8;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_8;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
             //increase kpi until err_ss is low enough
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_8)//step 5
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_8)//step 5
             {
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < (100*100*8*lt_pos_ctrl_auto_tune.counter_max)/100)
+                if(pos_ctrl_auto_tune.err_energy_ss_int < (100*100*8*pos_ctrl_auto_tune.counter_max)/100)
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*110)/100;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;
                 }
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=END;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step=END;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
             //end the application
-            if(lt_pos_ctrl_auto_tune.active_step==END)//step 7
+            if(pos_ctrl_auto_tune.active_step==END)//step 7
             {
-                lt_pos_ctrl_auto_tune.tuning_process_ended=1;
-                lt_pos_ctrl_auto_tune.auto_tune = 0;
-                lt_pos_ctrl_auto_tune.activate=0;
+                pos_ctrl_auto_tune.tuning_process_ended=1;
+                pos_ctrl_auto_tune.auto_tune = 0;
+                pos_ctrl_auto_tune.activate=0;
 
 
-                lt_pos_ctrl_auto_tune.active_step_counter=0;
+                pos_ctrl_auto_tune.active_step_counter=0;
             }
 
 
-            if(lt_pos_ctrl_auto_tune.rising_edge==1)
+            if(pos_ctrl_auto_tune.rising_edge==1)
             {
-                lt_pos_ctrl_auto_tune.overshoot=0;
-                lt_pos_ctrl_auto_tune.overshoot_max=0;
+                pos_ctrl_auto_tune.overshoot=0;
+                pos_ctrl_auto_tune.overshoot_max=0;
             }
 
-            lt_pos_ctrl_auto_tune.err=0.00;
-            lt_pos_ctrl_auto_tune.err_energy =0.00;
-            lt_pos_ctrl_auto_tune.err_energy_int=0.00;
+            pos_ctrl_auto_tune.err=0.00;
+            pos_ctrl_auto_tune.err_energy =0.00;
+            pos_ctrl_auto_tune.err_energy_int=0.00;
 
-            lt_pos_ctrl_auto_tune.err_ss=0.00;
-            lt_pos_ctrl_auto_tune.err_energy_ss =0.00;
-            lt_pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
+            pos_ctrl_auto_tune.err_ss=0.00;
+            pos_ctrl_auto_tune.err_energy_ss =0.00;
+            pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
 
-            lt_pos_ctrl_auto_tune.rise_time = 0;
+            pos_ctrl_auto_tune.rise_time = 0;
 
-            lt_pos_ctrl_auto_tune.counter=0;
+            pos_ctrl_auto_tune.counter=0;
         }
     }
-    else if(lt_pos_ctrl_auto_tune.controller == LIMITED_TORQUE)
+    else if(pos_ctrl_auto_tune.controller == LIMITED_TORQUE)
     {
-        if(lt_pos_ctrl_auto_tune.activate==0)
+        if(pos_ctrl_auto_tune.activate==0)
         {
-            lt_pos_ctrl_auto_tune.position_init = position_k;
+            pos_ctrl_auto_tune.position_init = position_k;
 
-            lt_pos_ctrl_auto_tune.kpp = 10000 ;
-            lt_pos_ctrl_auto_tune.kpi = 1000  ;
-            lt_pos_ctrl_auto_tune.kpd = 40000 ;
-            lt_pos_ctrl_auto_tune.kpl = 1;
-            lt_pos_ctrl_auto_tune.j  = 0;
+            pos_ctrl_auto_tune.kpp = 10000 ;
+            pos_ctrl_auto_tune.kpi = 1000  ;
+            pos_ctrl_auto_tune.kpd = 40000 ;
+            pos_ctrl_auto_tune.kpl = 1;
+            pos_ctrl_auto_tune.j  = 0;
 
-            lt_pos_ctrl_auto_tune.activate = 1;
-            lt_pos_ctrl_auto_tune.counter=0;
+            pos_ctrl_auto_tune.activate = 1;
+            pos_ctrl_auto_tune.counter=0;
         }
 
-        if(lt_pos_ctrl_auto_tune.counter==lt_pos_ctrl_auto_tune.counter_max)
+        if(pos_ctrl_auto_tune.counter==pos_ctrl_auto_tune.counter_max)
         {
             //change of reference value in each cycle
-            if(lt_pos_ctrl_auto_tune.position_ref == (lt_pos_ctrl_auto_tune.position_init + lt_pos_ctrl_auto_tune.step_amplitude))
+            if(pos_ctrl_auto_tune.position_ref == (pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude))
             {
-                lt_pos_ctrl_auto_tune.position_ref = lt_pos_ctrl_auto_tune.position_init - lt_pos_ctrl_auto_tune.step_amplitude;
-                lt_pos_ctrl_auto_tune.rising_edge=0;
+                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init - pos_ctrl_auto_tune.step_amplitude;
+                pos_ctrl_auto_tune.rising_edge=0;
             }
             else
             {
-                lt_pos_ctrl_auto_tune.position_ref = lt_pos_ctrl_auto_tune.position_init + lt_pos_ctrl_auto_tune.step_amplitude;
-                lt_pos_ctrl_auto_tune.rising_edge=1;
+                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude;
+                pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)//step 1
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)//step 1
             {
-                if(lt_pos_ctrl_auto_tune.err_energy_int < (lt_pos_ctrl_auto_tune.err_energy_int_max/10))
+                if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.kpl += 50;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.kpl += 50;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
-                }
-            }
-
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)//step 2
-            {
-                if(lt_pos_ctrl_auto_tune.overshoot_max<((100*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft)
-                {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
-                }
-                else
-                {
-                    if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-                        lt_pos_ctrl_auto_tune.kpi = (lt_pos_ctrl_auto_tune.kpi*100)/120;
-
-                    if(lt_pos_ctrl_auto_tune.kpi<10 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-                        lt_pos_ctrl_auto_tune.kpi = 10;
-
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
-                }
-
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-                {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_3;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
-
-                }
-
-            }
-
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)// step 3
-            {
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-                {
-                    lt_pos_ctrl_auto_tune.kpl+=100;
-                }
-                else
-                {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
-                }
-
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
-
-
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
-                {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
-                    lt_pos_ctrl_auto_tune.kpl= (lt_pos_ctrl_auto_tune.kpl*100)/140;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)//step 4
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)//step 2
             {
-                if(lt_pos_ctrl_auto_tune.overshoot_max<((20*lt_pos_ctrl_auto_tune.step_amplitude)/1000) && lt_pos_ctrl_auto_tune.err_energy_ss_int<(lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft))
+                if(pos_ctrl_auto_tune.overshoot_max<((100*pos_ctrl_auto_tune.step_amplitude)/1000) && pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_limit_soft)
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    if(lt_pos_ctrl_auto_tune.tuning_process_ended==0)
-                        lt_pos_ctrl_auto_tune.kpi -= 5;
+                    if(pos_ctrl_auto_tune.tuning_process_ended==0)
+                        pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*100)/120;
 
-                    if(lt_pos_ctrl_auto_tune.kpi<5 && lt_pos_ctrl_auto_tune.tuning_process_ended==0)
+                    if(pos_ctrl_auto_tune.kpi<10 && pos_ctrl_auto_tune.tuning_process_ended==0)
+                        pos_ctrl_auto_tune.kpi = 10;
+
+                    pos_ctrl_auto_tune.active_step_counter=0;
+                }
+
+                if(pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_3;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+
+                }
+
+            }
+
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)// step 3
+            {
+                if(pos_ctrl_auto_tune.err_energy_ss_int < 10*pos_ctrl_auto_tune.err_energy_ss_int_min)
+                {
+                    pos_ctrl_auto_tune.kpl+=100;
+                }
+                else
+                {
+                    pos_ctrl_auto_tune.active_step_counter++;
+                }
+
+                if(pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(3.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
+
+
+                if(pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
+                    pos_ctrl_auto_tune.kpl= (pos_ctrl_auto_tune.kpl*100)/140;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)//step 4
+            {
+                if(pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000) && pos_ctrl_auto_tune.err_energy_ss_int<(pos_ctrl_auto_tune.err_energy_ss_limit_soft))
+                {
+                    pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    if(pos_ctrl_auto_tune.tuning_process_ended==0)
+                        pos_ctrl_auto_tune.kpi -= 5;
+
+                    if(pos_ctrl_auto_tune.kpi<5 && pos_ctrl_auto_tune.tuning_process_ended==0)
                     {
-                        lt_pos_ctrl_auto_tune.kpi = 5;
-                        lt_pos_ctrl_auto_tune.active_step_counter++;
+                        pos_ctrl_auto_tune.kpi = 5;
+                        pos_ctrl_auto_tune.active_step_counter++;
                     }
                     else
-                        lt_pos_ctrl_auto_tune.active_step_counter=0;
+                        pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
+                    pos_ctrl_auto_tune.active_step_counter=0;
 
-                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min    = lt_pos_ctrl_auto_tune.err_energy_ss_limit_soft;
+                    pos_ctrl_auto_tune.err_energy_ss_int_min    = pos_ctrl_auto_tune.err_energy_ss_limit_soft;
                 }
 
             }
 
-            if(lt_pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)// step 5
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)// step 5
             {
 
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int < 10*lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
+                if(pos_ctrl_auto_tune.err_energy_ss_int < 10*pos_ctrl_auto_tune.err_energy_ss_int_min)
                 {
-                    lt_pos_ctrl_auto_tune.kpl+=50;
+                    pos_ctrl_auto_tune.kpl+=50;
                 }
                 else
                 {
-                    lt_pos_ctrl_auto_tune.active_step_counter++;
+                    pos_ctrl_auto_tune.active_step_counter++;
                 }
 
-                if(lt_pos_ctrl_auto_tune.err_energy_ss_int<lt_pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    lt_pos_ctrl_auto_tune.err_energy_ss_int_min = (lt_pos_ctrl_auto_tune.err_energy_ss_int+(3.00*lt_pos_ctrl_auto_tune.err_energy_ss_int_min))/4.00;
+                if(pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(3.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/4.00;
 
-                if(lt_pos_ctrl_auto_tune.active_step_counter==10)
+                if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    lt_pos_ctrl_auto_tune.active_step=END;
+                    pos_ctrl_auto_tune.active_step=END;
 
-                    lt_pos_ctrl_auto_tune.tuning_process_ended=1;
-                    lt_pos_ctrl_auto_tune.auto_tune = 0;
-                    lt_pos_ctrl_auto_tune.activate=0;
+                    pos_ctrl_auto_tune.tuning_process_ended=1;
+                    pos_ctrl_auto_tune.auto_tune = 0;
+                    pos_ctrl_auto_tune.activate=0;
 
-                    lt_pos_ctrl_auto_tune.kpp *= lt_pos_ctrl_auto_tune.kpl;
-                    lt_pos_ctrl_auto_tune.kpi *= lt_pos_ctrl_auto_tune.kpl;
-                    lt_pos_ctrl_auto_tune.kpd *= lt_pos_ctrl_auto_tune.kpl;
-                    lt_pos_ctrl_auto_tune.j       = 0;
-                    lt_pos_ctrl_auto_tune.kpl = 1000;
+                    pos_ctrl_auto_tune.kpp *= pos_ctrl_auto_tune.kpl;
+                    pos_ctrl_auto_tune.kpi *= pos_ctrl_auto_tune.kpl;
+                    pos_ctrl_auto_tune.kpd *= pos_ctrl_auto_tune.kpl;
+                    pos_ctrl_auto_tune.j       = 0;
+                    pos_ctrl_auto_tune.kpl = 1000;
 
-                    lt_pos_ctrl_auto_tune.kpp /= 1000;
-                    lt_pos_ctrl_auto_tune.kpi /= 1000;
-                    lt_pos_ctrl_auto_tune.kpd /= 1000;
+                    pos_ctrl_auto_tune.kpp /= 1000;
+                    pos_ctrl_auto_tune.kpi /= 1000;
+                    pos_ctrl_auto_tune.kpd /= 1000;
 
-                    lt_pos_ctrl_auto_tune.active_step_counter=0;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
-            if(lt_pos_ctrl_auto_tune.rising_edge==1)
+            if(pos_ctrl_auto_tune.rising_edge==1)
             {
-                lt_pos_ctrl_auto_tune.overshoot=0;
-                lt_pos_ctrl_auto_tune.overshoot_max=0;
+                pos_ctrl_auto_tune.overshoot=0;
+                pos_ctrl_auto_tune.overshoot_max=0;
             }
 
-            lt_pos_ctrl_auto_tune.err=0.00;
-            lt_pos_ctrl_auto_tune.err_energy =0.00;
-            lt_pos_ctrl_auto_tune.err_energy_int=0.00;
+            pos_ctrl_auto_tune.err=0.00;
+            pos_ctrl_auto_tune.err_energy =0.00;
+            pos_ctrl_auto_tune.err_energy_int=0.00;
 
-            lt_pos_ctrl_auto_tune.err_ss=0.00;
-            lt_pos_ctrl_auto_tune.err_energy_ss =0.00;
-            lt_pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
+            pos_ctrl_auto_tune.err_ss=0.00;
+            pos_ctrl_auto_tune.err_energy_ss =0.00;
+            pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
 
-            lt_pos_ctrl_auto_tune.rise_time = 0;
+            pos_ctrl_auto_tune.rise_time = 0;
 
-            lt_pos_ctrl_auto_tune.counter=0;
+            pos_ctrl_auto_tune.counter=0;
         }
     }
     /*
      * measurement of error energy
      */
-    lt_pos_ctrl_auto_tune.err = (lt_pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
-    lt_pos_ctrl_auto_tune.err_energy = lt_pos_ctrl_auto_tune.err * lt_pos_ctrl_auto_tune.err;
-    lt_pos_ctrl_auto_tune.err_energy_int += lt_pos_ctrl_auto_tune.err_energy;
+    pos_ctrl_auto_tune.err = (pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
+    pos_ctrl_auto_tune.err_energy = pos_ctrl_auto_tune.err * pos_ctrl_auto_tune.err;
+    pos_ctrl_auto_tune.err_energy_int += pos_ctrl_auto_tune.err_energy;
 
     /*
      * measurement of overshoot and rise time
      */
-    if(lt_pos_ctrl_auto_tune.rising_edge==1)
+    if(pos_ctrl_auto_tune.rising_edge==1)
     {
-        lt_pos_ctrl_auto_tune.overshoot = position_k - lt_pos_ctrl_auto_tune.position_ref;
+        pos_ctrl_auto_tune.overshoot = position_k - pos_ctrl_auto_tune.position_ref;
 
-        if(lt_pos_ctrl_auto_tune.overshoot > lt_pos_ctrl_auto_tune.overshoot_max)
-            lt_pos_ctrl_auto_tune.overshoot_max=lt_pos_ctrl_auto_tune.overshoot;
+        if(pos_ctrl_auto_tune.overshoot > pos_ctrl_auto_tune.overshoot_max)
+            pos_ctrl_auto_tune.overshoot_max=pos_ctrl_auto_tune.overshoot;
 
-        if(position_k > (lt_pos_ctrl_auto_tune.position_init+(60*lt_pos_ctrl_auto_tune.step_amplitude)/100)  && lt_pos_ctrl_auto_tune.rise_time==0)
-            lt_pos_ctrl_auto_tune.rise_time = lt_pos_ctrl_auto_tune.counter;
+        if(position_k > (pos_ctrl_auto_tune.position_init+(60*pos_ctrl_auto_tune.step_amplitude)/100)  && pos_ctrl_auto_tune.rise_time==0)
+            pos_ctrl_auto_tune.rise_time = pos_ctrl_auto_tune.counter;
 
     }
 
     /*
      * measurement of error energy after steady state
      */
-    if((90*lt_pos_ctrl_auto_tune.counter_max)/100<lt_pos_ctrl_auto_tune.counter && lt_pos_ctrl_auto_tune.counter<(98*lt_pos_ctrl_auto_tune.counter_max)/100 && lt_pos_ctrl_auto_tune.rising_edge==1)
+    if((90*pos_ctrl_auto_tune.counter_max)/100<pos_ctrl_auto_tune.counter && pos_ctrl_auto_tune.counter<(98*pos_ctrl_auto_tune.counter_max)/100 && pos_ctrl_auto_tune.rising_edge==1)
     {
-        lt_pos_ctrl_auto_tune.err_ss = (lt_pos_ctrl_auto_tune.position_ref - position_k);
-        lt_pos_ctrl_auto_tune.err_energy_ss = lt_pos_ctrl_auto_tune.err_ss * lt_pos_ctrl_auto_tune.err_ss;
-        lt_pos_ctrl_auto_tune.err_energy_ss_int += lt_pos_ctrl_auto_tune.err_energy_ss;
+        pos_ctrl_auto_tune.err_ss = (pos_ctrl_auto_tune.position_ref - position_k);
+        pos_ctrl_auto_tune.err_energy_ss = pos_ctrl_auto_tune.err_ss * pos_ctrl_auto_tune.err_ss;
+        pos_ctrl_auto_tune.err_energy_ss_int += pos_ctrl_auto_tune.err_energy_ss;
     }
 
     return 0;

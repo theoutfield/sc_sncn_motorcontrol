@@ -145,13 +145,13 @@ typedef struct {
 
     int tuning_process_ended;
 
-} LTPosCtrlAutoTuneParam;
+} PosCtrlAutoTuneParam;
 
 
 /**
  * @brief function to initialize the structure of automatic tuner for limited torque position controller.
  *
- * @param lt_pos_ctrl_auto_tune         structure of type LTPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param pos_ctrl_auto_tune         structure of type PosCtrlAutoTuneParam which will be used during the tuning procedure
  * @param step_amplitude Communication  The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
  * @param counter_max                   The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
  * @param overshot_per_thousand         Overshoot limit while tuning (it is set as per thousand of step amplitude)
@@ -159,18 +159,18 @@ typedef struct {
  *
  * @return void
  *  */
-int init_lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, int controller_type, int counter_max_autotune, int step_amplitude_autotune, int per_thousand_overshoot_autotune, int rise_time_freedom_percent_autotune);
+int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, int controller_type, int counter_max_autotune, int step_amplitude_autotune, int per_thousand_overshoot_autotune, int rise_time_freedom_percent_autotune);
 
 /**
  * @brief function to automatically tune the limited torque position controller.
  *
  * @param motion_ctrl_config            Structure containing all parameters of motion control service
- * @param lt_pos_ctrl_auto_tune         structure of type LTPosCtrlAutoTuneParam which will be used during the tuning procedure
+ * @param pos_ctrl_auto_tune         structure of type PosCtrlAutoTuneParam which will be used during the tuning procedure
  * @param position_k                    The actual position of the system while (double)
  *
  * @return void
  *  */
-int lt_pos_ctrl_autotune(LTPosCtrlAutoTuneParam &lt_pos_ctrl_auto_tune, double position_k);
+int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, double position_k);
 
 
 
