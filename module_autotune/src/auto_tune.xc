@@ -160,7 +160,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,Motio
  *
  * @return void
  *  */
-int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, int controller_type)
+int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, int controller_type)
 {
     pos_ctrl_auto_tune.controller = controller_type;
 
@@ -221,7 +221,7 @@ int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionCo
  *
  * @return void
  *  */
-int lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k)
+int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k)
 {
 
     pos_ctrl_auto_tune.auto_tune =  motion_ctrl_config.position_control_autotune;

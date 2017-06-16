@@ -153,7 +153,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
 
-    init_lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
+    init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
     //***********************************************************************************************
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
@@ -362,11 +362,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         if(motion_ctrl_config.position_control_autotune == 1)
                         {
                             if(pos_ctrl_auto_tune.activate==0)
-                            {
-                                init_lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
-                            }
+                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
 
-                            lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
@@ -406,11 +404,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         if(motion_ctrl_config.position_control_autotune == 1)
                         {
                             if(pos_ctrl_auto_tune.activate==0)
-                            {
-                                init_lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, LIMITED_TORQUE);
-                            }
+                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, LIMITED_TORQUE);
 
-                            lt_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
@@ -427,7 +423,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             }
 
                             torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
-
                         }
                         else
                         {
