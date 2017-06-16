@@ -38,7 +38,6 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
 {
 
     double wn_auto_tune   = 0.00;
-
     double steady_state = 0.00;
     double k = 0.00;
     double g_speed = 0.00;
@@ -141,8 +140,6 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
     pos_ctrl_auto_tune.counter_max=motion_ctrl_config.counter_max_autotune;
 
     pos_ctrl_auto_tune.step_amplitude = motion_ctrl_config.step_amplitude_autotune;
-//    if(pos_ctrl_auto_tune.controller==CASCADED)
-//        pos_ctrl_auto_tune.step_amplitude /=4;
 
     pos_ctrl_auto_tune.err=0.00;
     pos_ctrl_auto_tune.err_energy=0.00;
@@ -152,8 +149,7 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
     pos_ctrl_auto_tune.err_ss=0.00;
     pos_ctrl_auto_tune.err_energy_ss=0.00;
     pos_ctrl_auto_tune.err_energy_ss_int=0.00;
-    //steady state error is measured between 90% and 98% of the period, and its min value is when real position is having a margin of 0.01 with reference position
-    pos_ctrl_auto_tune.err_energy_ss_limit_soft = (((pos_ctrl_auto_tune.step_amplitude)/100) * ((pos_ctrl_auto_tune.step_amplitude)/100) * pos_ctrl_auto_tune.counter_max * 8.00) /100.00;
+    pos_ctrl_auto_tune.err_energy_ss_limit_soft = (((pos_ctrl_auto_tune.step_amplitude)/100) * ((pos_ctrl_auto_tune.step_amplitude)/100) * pos_ctrl_auto_tune.counter_max * 8.00) /100.00;    //steady state error is measured between 90% and 98% of the period
     pos_ctrl_auto_tune.err_energy_ss_int_min    = pos_ctrl_auto_tune.err_energy_ss_limit_soft;
 
     pos_ctrl_auto_tune.active_step_counter=0;
@@ -172,7 +168,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 {
 
     pos_ctrl_auto_tune.auto_tune =  motion_ctrl_config.position_control_autotune;
-
     pos_ctrl_auto_tune.counter++;
 
     if(pos_ctrl_auto_tune.controller == CASCADED)
@@ -212,8 +207,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            // force the load to follow the reference value
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)//step 1
+            // step 1: force the load to follow the reference value
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
             {
                 if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
                 {
@@ -242,8 +237,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             }
 
 
-            //increase kvp until it starts to vibrate or overshoot > 2%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)// step 2
+            //step 2: increase kvp until it starts to vibrate or until the overshoot is higher than 2%
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < (5*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
@@ -261,7 +256,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(100<pos_ctrl_auto_tune.err_energy_ss_int && pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
                     pos_ctrl_auto_tune.err_energy_ss_int_min = (2*pos_ctrl_auto_tune.err_energy_ss_int+pos_ctrl_auto_tune.err_energy_ss_int_min)/3;
 
-
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_3;
@@ -272,13 +266,12 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     pos_ctrl_auto_tune.kpi = pos_ctrl_auto_tune.kpp/10000;
 
                     pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max*3;
-
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
-            //increase kvi until overshoot is less than 1%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)//step 3
+            //step 3: increase kvi until overshoot becomes more than 1%
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)
             {
                 if(pos_ctrl_auto_tune.overshoot_max>((10*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
@@ -287,6 +280,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 else
                 {
                     pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*110)/100;
+                    if(pos_ctrl_auto_tune.kvi<10) pos_ctrl_auto_tune.kvi=10;
                 }
 
                 if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_int_min)
@@ -306,8 +300,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            //reduce kvl until overshoot is less than 2%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)//step 3.5
+            //step 4: reduce kvl until overshoot is less than 3%
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)
             {
                 if(pos_ctrl_auto_tune.overshoot_max<((30*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
@@ -326,8 +320,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            //increase kpp until it starts to vibrate
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)// step 4
+            //step 5: increase kpp until vibration appears
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < (2*pos_ctrl_auto_tune.err_energy_ss_int_min))
                 {
@@ -354,8 +348,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            //increase kpi until overshoot is more than 10%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_6)//step 5
+            //step 6: increase kpi until overshoot is more than 10%
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_6)
             {
                 if(pos_ctrl_auto_tune.overshoot_max>((100*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
@@ -367,7 +361,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     if(pos_ctrl_auto_tune.kpi<10) pos_ctrl_auto_tune.kpi=10;
                 }
 
-
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_7;
@@ -378,8 +371,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            //reduce kpl until overshoot is less than 5%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_7)//step 6
+            //step 7: reduce kpl until overshoot is less than 5%
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_7)
             {
                 if(pos_ctrl_auto_tune.overshoot_max<((50*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
@@ -398,8 +391,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            //increase kpi until err_ss is low enough
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_8)//step 5
+            //step 8: increase kpi until err_ss is low
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_8)
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < (100*100*8*pos_ctrl_auto_tune.counter_max)/100)
                 {
@@ -417,7 +410,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            //end the application
+            //step 9: End autotuning
             if(pos_ctrl_auto_tune.active_step==END)//step 7
             {
                 pos_ctrl_auto_tune.auto_tune = 0;
@@ -454,7 +447,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             pos_ctrl_auto_tune.kpi = 1000  ;
             pos_ctrl_auto_tune.kpd = 40000 ;
             pos_ctrl_auto_tune.kpl = 1;
-            pos_ctrl_auto_tune.j  = 0;
+            pos_ctrl_auto_tune.j   = 0;
 
             pos_ctrl_auto_tune.activate = 1;
             pos_ctrl_auto_tune.counter=0;
@@ -474,7 +467,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)//step 1
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
             {
                 if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
                 {
@@ -493,7 +486,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)//step 2
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)
             {
                 if(pos_ctrl_auto_tune.overshoot_max<((100*pos_ctrl_auto_tune.step_amplitude)/1000) && pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_limit_soft)
                 {
@@ -501,11 +494,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*100)/120;
-
-                    if(pos_ctrl_auto_tune.kpi<10)
-                        pos_ctrl_auto_tune.kpi = 10;
-
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*100)/110;
+                    if(pos_ctrl_auto_tune.kpi<10) pos_ctrl_auto_tune.kpi = 10;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
@@ -518,7 +508,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
             }
 
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)// step 3
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < 10*pos_ctrl_auto_tune.err_energy_ss_int_min)
                 {
@@ -541,7 +531,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)//step 4
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)
             {
                 if(pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000) && pos_ctrl_auto_tune.err_energy_ss_int<(pos_ctrl_auto_tune.err_energy_ss_limit_soft))
                 {
@@ -564,15 +554,12 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
                     pos_ctrl_auto_tune.active_step_counter=0;
-
                     pos_ctrl_auto_tune.err_energy_ss_int_min    = pos_ctrl_auto_tune.err_energy_ss_limit_soft;
                 }
-
             }
 
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)// step 5
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5)
             {
-
                 if(pos_ctrl_auto_tune.err_energy_ss_int < 10*pos_ctrl_auto_tune.err_energy_ss_int_min)
                 {
                     pos_ctrl_auto_tune.kpl+=50;
@@ -651,22 +638,18 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
         pos_ctrl_auto_tune.err_energy_ss_int += pos_ctrl_auto_tune.err_energy_ss;
     }
 
-
-
-
-
     if(pos_ctrl_auto_tune.counter==0)
     {
         motion_ctrl_config.velocity_kp = pos_ctrl_auto_tune.kvp;
         motion_ctrl_config.velocity_ki = pos_ctrl_auto_tune.kvi;
         motion_ctrl_config.velocity_kd = pos_ctrl_auto_tune.kvd;
         motion_ctrl_config.velocity_integral_limit = pos_ctrl_auto_tune.kvl;
-        motion_ctrl_config.moment_of_inertia       = pos_ctrl_auto_tune.j;
 
         motion_ctrl_config.position_kp = pos_ctrl_auto_tune.kpp;
         motion_ctrl_config.position_ki = pos_ctrl_auto_tune.kpi;
         motion_ctrl_config.position_kd = pos_ctrl_auto_tune.kpd;
         motion_ctrl_config.position_integral_limit = pos_ctrl_auto_tune.kpl;
+
         motion_ctrl_config.moment_of_inertia       = pos_ctrl_auto_tune.j;
 
         motion_ctrl_config.position_control_autotune = pos_ctrl_auto_tune.auto_tune;
@@ -674,7 +657,3 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
     return 0;
 }
-
-
-
-
