@@ -67,33 +67,28 @@ int velocity_controller_auto_tune(AutoTuneParam &velocity_auto_tune, double &vel
 #define RISE_TIME_FREEDOM_PERCENT   300   // This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.
 
 /**
- * @brief Type for position sensors.
+ * @brief different steps of autotuning function
  */
 typedef enum {
     SIMPLE_PID=1,
     CASCADED=2,
     LIMITED_TORQUE=3,
 
-    CASCADED_POS_CTRL_STEP1=10,
-    CASCADED_POS_CTRL_STEP2=11,
-    CASCADED_POS_CTRL_STEP3=12,
-    CASCADED_POS_CTRL_STEP3_5=13,
-    CASCADED_POS_CTRL_STEP4=14,
-    CASCADED_POS_CTRL_STEP5=15,
-    CASCADED_POS_CTRL_STEP6=16,
-    CASCADED_POS_CTRL_STEP7=17,
-
-    LT_POS_CTRL_STEP1=20,
-    LT_POS_CTRL_STEP2=21,
-    LT_POS_CTRL_STEP3=22,
-    LT_POS_CTRL_STEP4=23,
-    LT_POS_CTRL_STEP5=24,
+    AUTO_TUNE_STEP_1=11,
+    AUTO_TUNE_STEP_2=12,
+    AUTO_TUNE_STEP_3=13,
+    AUTO_TUNE_STEP_4=14,
+    AUTO_TUNE_STEP_5=15,
+    AUTO_TUNE_STEP_6=16,
+    AUTO_TUNE_STEP_7=17,
+    AUTO_TUNE_STEP_8=18,
+    AUTO_TUNE_STEP_9=19,
 
     END=50
 } AutotuneSteps;
 
 /**
- * @brief Structure type containing auto_tuning parameters of limited torque position controller
+ * @brief Structure type containing auto_tuning parameters
  */
 typedef struct {
 
