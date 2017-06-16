@@ -6,16 +6,6 @@
 
 #include <auto_tune.h>
 
-/**
- * @brief Initializes the structure of type VelCtrlAutoTuneParam to start the auto tuning procedure.
- *
- * @param velocity_auto_tune    structure of type VelCtrlAutoTuneParam which contains velocity_auto_tuning parameters
- * @param velocity_ref          The reference velocity which will be used in auto_tuning procedure.
- *                              Note: velocity_ref should be between 50% to 100% of the rated velocity. Moreover, the supply voltage should be at its nominal value while auto_tuning is in progress.
- * @param settling_time         settling time for automatic tuning of velocity pid controller
- *
- * @return int                  the function returns 0 by default
- *  */
 int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionControlConfig &motion_ctrl_config, int velocity_ref, double settling_time)
 {
     velocity_auto_tune.enable=0;
@@ -44,16 +34,6 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionCon
     return 0;
 }
 
-/**
- * @brief Executes the auto tuning procedure for a PID velocity controller. The results of this procedure will be the PID constants for velocity controller.
- *
- * @param velocity_auto_tune    structure of type VelCtrlAutoTuneParam which contains velocity_auto_tuning parameters
- * @param velocity_ref_in_k     The reference velocity which will be used in auto_tuning procedure.
- * @param velocity_k            Actual velocity of motor (in rpm) which is measured by position feedback service
- * @param period                Velocity control execution period (in micro-seconds).
-
- * @return int                  the function returns 0 by default
- *  */
 int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, MotionControlConfig &motion_ctrl_config, double &velocity_ref_in_k, double velocity_k, int period)
 {
 
@@ -148,19 +128,6 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
     return 0;
 }
 
-
-
-/**
- * @brief function to initialize the structure of automatic tuner for limited torque position controller.
- *
- * @param pos_ctrl_auto_tune         structure of type PosCtrlAutoTuneParam which will be used during the tuning procedure
- * @param step_amplitude Communication  The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
- * @param counter_max                   The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
- * @param overshot_per_thousand         Overshoot limit while tuning (it is set as per thousand of step amplitude)
- * @param rise_time_freedom_percent     This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.
- *
- * @return void
- *  */
 int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, int controller_type)
 {
     pos_ctrl_auto_tune.controller = controller_type;
@@ -201,15 +168,6 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
 }
 
 
-/**
- * @brief function to automatically tune the limited torque position controller.
- *
- * @param pos_ctrl_auto_tune            Structure containing all parameters of motion control service
- * @param pos_ctrl_auto_tune         structure of type PosCtrlAutoTuneParam which will be used during the tuning procedure
- * @param position_k                    The actual position of the system while (double)
- *
- * @return void
- *  */
 int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k)
 {
 
