@@ -160,7 +160,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,Motio
  *
  * @return void
  *  */
-int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, int controller_type, int counter_max_autotune, int step_amplitude_autotune, int per_thousand_overshoot_autotune, int rise_time_freedom_percent_autotune)
+int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, int controller_type)
 {
     pos_ctrl_auto_tune.controller = controller_type;
 
@@ -170,9 +170,9 @@ int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, int cont
 
     pos_ctrl_auto_tune.activate=0;
     pos_ctrl_auto_tune.counter=0;
-    pos_ctrl_auto_tune.counter_max=counter_max_autotune;
+    pos_ctrl_auto_tune.counter_max=motion_ctrl_config.counter_max_autotune;
 
-    pos_ctrl_auto_tune.step_amplitude = step_amplitude_autotune;
+    pos_ctrl_auto_tune.step_amplitude = motion_ctrl_config.step_amplitude_autotune;
 //    if(pos_ctrl_auto_tune.controller==CASCADED)
 //        pos_ctrl_auto_tune.step_amplitude /=4;
 
@@ -198,13 +198,13 @@ int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, int cont
     pos_ctrl_auto_tune.overshoot=0.00;
     pos_ctrl_auto_tune.overshoot_max=0.00;
     pos_ctrl_auto_tune.overshoot_min=pos_ctrl_auto_tune.step_amplitude;
-    pos_ctrl_auto_tune.overshot_per_thousand = ((double)(per_thousand_overshoot_autotune));
+    pos_ctrl_auto_tune.overshot_per_thousand = ((double)(motion_ctrl_config.per_thousand_overshoot_autotune));
     pos_ctrl_auto_tune.overshoot_counter=0;
     pos_ctrl_auto_tune.overshoot_1st_round_damped=0;
 
     pos_ctrl_auto_tune.rise_time=0;
     pos_ctrl_auto_tune.rise_time_opt=0;
-    pos_ctrl_auto_tune.rise_time_freedom_percent=rise_time_freedom_percent_autotune;
+    pos_ctrl_auto_tune.rise_time_freedom_percent=motion_ctrl_config.rise_time_freedom_percent_autotune;
 
     pos_ctrl_auto_tune.tuning_process_ended=0;
 

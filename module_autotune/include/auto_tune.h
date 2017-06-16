@@ -159,7 +159,7 @@ typedef struct {
  *
  * @return void
  *  */
-int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, int controller_type, int counter_max_autotune, int step_amplitude_autotune, int per_thousand_overshoot_autotune, int rise_time_freedom_percent_autotune);
+int init_lt_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, int controller_type);
 
 /**
  * @brief function to automatically tune the limited torque position controller.
