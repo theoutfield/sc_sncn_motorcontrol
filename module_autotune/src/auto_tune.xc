@@ -29,6 +29,10 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionCon
     velocity_auto_tune.z = 0.70;
     velocity_auto_tune.st= settling_time;
 
+    motion_ctrl_config.velocity_kp = KP_VELOCITY_TUNING;
+    motion_ctrl_config.velocity_ki = 0;
+    motion_ctrl_config.velocity_kd = 0;
+
     velocity_auto_tune.kp   = 0.00;
     velocity_auto_tune.ki   = 0.00;
     velocity_auto_tune.kd   = 0.00;
@@ -70,8 +74,6 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
 
     if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
     {
-        velocity_auto_tune.enable = 1;
-
         velocity_ref_in_k = velocity_auto_tune.velocity_ref;
         velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = ((int)(velocity_k));
 
@@ -128,10 +130,9 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
     }
     else if (velocity_auto_tune.counter<=((velocity_auto_tune.array_length*5)/4))//try to reach 0 rpm in 20% of testint time
     {
-        velocity_auto_tune.enable = 1;
         velocity_ref_in_k = 0;
     }
-    else
+    else if (velocity_auto_tune.counter>((velocity_auto_tune.array_length*5)/4))
     {
         velocity_auto_tune.enable = 0;
         velocity_auto_tune.counter=0;

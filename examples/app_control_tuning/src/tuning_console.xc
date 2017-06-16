@@ -111,7 +111,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         // set kp, ki and kd equal to 0 for velocity controller:
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
 
-                        motion_ctrl_config.velocity_kp = 1000000;
+                        motion_ctrl_config.velocity_kp = 0;
                         motion_ctrl_config.velocity_ki = 0;
                         motion_ctrl_config.velocity_kd = 0;
 

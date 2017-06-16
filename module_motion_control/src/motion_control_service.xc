@@ -290,6 +290,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 {
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
+                        if(velocity_auto_tune.enable == 0)
+                        {
+                            init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
+                            pid_init(velocity_control_pid_param);
+                            pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
+                            velocity_auto_tune.enable = 1;
+                        }
+
                         velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                         if(velocity_auto_tune.enable == 0)

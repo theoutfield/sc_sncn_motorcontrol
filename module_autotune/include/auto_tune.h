@@ -10,8 +10,9 @@
  * @brief The velocity in which the tuning will happen. (suggested value: 60% of rated velocity).
  *        Note: The dc-bus voltage should be high enough for the selected velocity.
  */
-#define TUNING_VELOCITY 1000 //[rpm]
-#define SETTLING_TIME   0.3  //preffered settling time for velocity controller [seconds]
+#define TUNING_VELOCITY 1000        //[rpm]
+#define KP_VELOCITY_TUNING  500000  //kp initial value while running the automatic tuning of velocity controller
+#define SETTLING_TIME   0.3         //preffered settling time for velocity controller [seconds]
 
 // parameters of position controller autotuner
 #define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
