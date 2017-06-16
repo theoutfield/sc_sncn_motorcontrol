@@ -16,7 +16,7 @@
  *
  * @return int                  the function returns 0 by default
  *  */
-int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, int velocity_ref, double settling_time)
+int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionControlConfig &motion_ctrl_config, int velocity_ref, double settling_time)
 {
     velocity_auto_tune.enable=0;
     velocity_auto_tune.counter=0;
@@ -50,7 +50,7 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, int veloc
 
  * @return int                  the function returns 0 by default
  *  */
-int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,MotionControlConfig &motion_ctrl_config, double &velocity_ref_in_k, double velocity_k, int period)
+int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, MotionControlConfig &motion_ctrl_config, double &velocity_ref_in_k, double velocity_k, int period)
 {
 
     double wn_auto_tune   = 0.00;
@@ -92,14 +92,14 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,Motio
             speed_integral *= ((saving_reduction_factor*period)/1000000.00);
             speed_integral /= g_speed;
 
-            velocity_auto_tune.j = (speed_integral*0.001);                  //k_m = 0.001
+            velocity_auto_tune.j = ((speed_integral*motion_ctrl_config.velocity_kp)/1000000000);                  //k_m = 0.001 * kp
             velocity_auto_tune.j/= (steady_state/g_speed);
             velocity_auto_tune.j/= (steady_state/g_speed);
             velocity_auto_tune.j*= (velocity_auto_tune.velocity_ref);
 
-            velocity_auto_tune.f = (velocity_auto_tune.velocity_ref*0.001);
+            velocity_auto_tune.f = ((velocity_auto_tune.velocity_ref*motion_ctrl_config.velocity_kp)/1000000000);//k_m = 0.001 * kp
             velocity_auto_tune.f/= (steady_state/g_speed);
-            velocity_auto_tune.f-= (0.001*g_speed);
+            velocity_auto_tune.f-= ((g_speed*motion_ctrl_config.velocity_kp)/1000000000);
 
             if(velocity_auto_tune.f>0 && velocity_auto_tune.j>0)
             {
