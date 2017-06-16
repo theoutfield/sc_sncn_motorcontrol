@@ -50,7 +50,7 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, int veloc
 
  * @return int                  the function returns 0 by default
  *  */
-int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, double &velocity_ref_in_k, double velocity_k, int period)
+int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,MotionControlConfig &motion_ctrl_config, double &velocity_ref_in_k, double velocity_k, int period)
 {
 
     double wn_auto_tune   = 0.00;
@@ -135,6 +135,12 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, doub
     {
         velocity_auto_tune.enable = 0;
         velocity_auto_tune.counter=0;
+
+        motion_ctrl_config.enable_velocity_auto_tuner = 0;
+        motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
+        motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
+        motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
+
         for(int i=0; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i] = 0;
     }
 

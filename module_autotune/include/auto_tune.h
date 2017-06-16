@@ -57,7 +57,7 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, int veloc
 
  * @return int                  the function returns 0 by default
  *  */
-int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, double &velocity_ref_in_k, double velocity_k, int period);
+int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,MotionControlConfig &motion_ctrl_config, double &velocity_ref_in_k, double velocity_k, int period);
 
 
 // position controller autotuner

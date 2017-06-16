@@ -292,7 +292,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
 
-                        velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
+                        velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
 
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
@@ -304,13 +304,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             position_enable_flag =0;
                             i_torque_control.set_torque_control_disabled();
 
-                            motion_ctrl_config.enable_velocity_auto_tuner = 0;
-
                             printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
-
-                            motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
-                            motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
-                            motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
                         }
                     }
                     else if(motion_ctrl_config.enable_profiler==1)
