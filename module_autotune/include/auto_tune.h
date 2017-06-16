@@ -64,7 +64,6 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune,Motio
 #define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
 #define AUTO_TUNE_COUNTER_MAX       1500  // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
 #define PER_THOUSAND_OVERSHOOT      10    // Overshoot limit while tuning (it is set as per thousand of step amplitude)
-#define RISE_TIME_FREEDOM_PERCENT   300   // This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.
 
 /**
  * @brief different steps of autotuning function
@@ -123,25 +122,15 @@ typedef struct {
     double err_energy;
     double err_energy_int;
     double err_energy_int_max;
-    double dynamic_err_energy_int_max;
 
     double err_ss;
     double err_energy_ss;
     double err_energy_ss_int;
     double err_energy_ss_int_min;
-    int    err_energy_ss_int_min_counter;
     double err_energy_ss_limit_soft;
 
     double overshoot;
     double overshoot_max;
-    double overshoot_min;
-    double overshot_per_thousand;
-    int overshoot_counter;
-    int overshoot_1st_round_damped;
-
-    int rise_time;
-    int rise_time_opt;
-    int rise_time_freedom_percent;
 
     int tuning_process_ended;
 

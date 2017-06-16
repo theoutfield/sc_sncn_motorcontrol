@@ -148,7 +148,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     motion_ctrl_config.step_amplitude_autotune  = AUTO_TUNE_STEP_AMPLITUDE;
     motion_ctrl_config.counter_max_autotune     = AUTO_TUNE_COUNTER_MAX   ;
     motion_ctrl_config.per_thousand_overshoot_autotune   = PER_THOUSAND_OVERSHOOT;
-    motion_ctrl_config.rise_time_freedom_percent_autotune= RISE_TIME_FREEDOM_PERCENT;
 
     // initialization of position control automatic tuning:
     motion_ctrl_config.position_control_autotune =0;
