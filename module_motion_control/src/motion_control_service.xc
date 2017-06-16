@@ -129,7 +129,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0;
     double velocity_k = 0.00;
 
-    AutoTuneParam velocity_auto_tune;
+    VelCtrlAutoTuneParam velocity_auto_tune;
 
     //autotune initialization
     init_velocity_auto_tuner(velocity_auto_tune, TUNING_VELOCITY, SETTLING_TIME);
