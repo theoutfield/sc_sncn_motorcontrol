@@ -376,7 +376,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
-                                printf("END OF POSITION CONTROL TUNING \n");
+                                printf("TUNING ENDED: \n");
                                 printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                             }
 
@@ -387,10 +387,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                                 pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-
-                                printf("step: %d  \n", pos_ctrl_auto_tune.active_step);
-                                printf("kpp:%i kpi:%i kpd:%i kpl:%d \n",    motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
-                                printf("kvp:%i kvi:%i kvd:%i kvl:%d \n\n",  motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
                             }
 
                             velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
@@ -418,7 +414,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
-                                printf("END OF POSITION CONTROL TUNING \n");
+                                printf("TUNING ENDED \n");
                                 printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                             }
 
@@ -523,39 +519,34 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-                xscope_int(POSITION_AT, ((int)(position_k-pos_ctrl_auto_tune.position_init)));
-                xscope_int(POSITION_CMD_AT, ((int)(pos_ctrl_auto_tune.position_ref-pos_ctrl_auto_tune.position_init)));
-                xscope_int(ERR_ENG_SS_INT, (int)(pos_ctrl_auto_tune.err_energy_ss_int));
-                xscope_int(ERR_ENG_SS_INT_MIN, (int)(pos_ctrl_auto_tune.err_energy_ss_int_min));
 
-
-//#ifdef XSCOPE_POSITION_CTRL
-//                xscope_int(VELOCITY, upstream_control_data.velocity);
+#ifdef XSCOPE_POSITION_CTRL
+                xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
-//                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
-//                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
-//                xscope_int(TORQUE,   upstream_control_data.computed_torque);
+                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
+                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
+                xscope_int(TORQUE,   upstream_control_data.computed_torque);
                 xscope_int(POSITION_CMD, (int)position_ref_in_k);
-//                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
-//                xscope_int(TORQUE_CMD, torque_ref_k);
-//                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
-//                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-//#endif
-//
-//#ifdef XSCOPE_ANALOGUE_MEASUREMENT
-//                xscope_int(V_DC, upstream_control_data.V_dc);
-//                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-//                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
-//                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
-//                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
-//                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
-//                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
-//#endif
+                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
+                xscope_int(TORQUE_CMD, torque_ref_k);
+                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
+                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
+#endif
+
+#ifdef XSCOPE_ANALOGUE_MEASUREMENT
+                xscope_int(V_DC, upstream_control_data.V_dc);
+                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
+                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
+                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
+                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
+                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
+                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+#endif
 
 
-                if((time_used/app_tile_usec)>330)
+                if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
                 {
-                    printf("TIMING ERROR \n");
+                    printf("TIMING ERR \n");
                 }
 
                 t :> time_end;
@@ -649,7 +640,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 //start control loop just after
                 t :> ts;
                 ts = ts - USEC_STD * POSITION_CONTROL_LOOP_PERIOD;
-
                 break;
 
         case i_motion_control[int i].enable_torque_ctrl():
