@@ -85,16 +85,9 @@ int open_phase_detection_function(client interface TorqueControlInterface client
         ++counter;
     }
 
-    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
     voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
-    printf("%.2f\n", voltage);
     if (error_phase == 0)
-    {
         *ret = voltage / I[B];
-        printf("%.2f\n", *ret);
-    }
-    else
-        printf("%d\n", error_phase);
 
     i_torque_control.set_evaluation_references(0, 0, 0);
 
@@ -307,7 +300,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     }
 
     // open phase detection
-    float resist;
+    float resist = 0;
     int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
 
     //QEI index calibration
