@@ -235,7 +235,7 @@ interface MotionControlInterface
     int get_velocity();
 
     /**
-     * @brief return the value of phase resistances
+     * @brief return the error for the open phase (0 = NO ERROR, 1 = PHASE A, 2 = PHASE B, 3 = PHASE C) and the value of phase resistance, if there was no error detected
      */
     {int, float} open_phase_detection();
 
