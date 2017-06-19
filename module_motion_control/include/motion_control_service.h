@@ -235,9 +235,9 @@ interface MotionControlInterface
     int get_velocity();
 
     /**
-     * @brief return the value of phase resistances
+     * @brief return the error for the open phase (0 = no error, 1 = phase A, 2 = phase B, 3 = phase C) and the value of phase resistance, if there was no error detected
      */
-    {float, float, float} open_phase_detection();
+    {int, float} open_phase_detection();
 
     /**
      * @brief responsible for data communication between torque controller and higher level controllers
@@ -305,6 +305,8 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  * @brief Service to perform torque, velocity or position control.
  *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
+ *        During the initialization of the service it is checked if open circuit exists in phases of the motor.
+ *        If the error exists, fault code for phase failure is generated.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *

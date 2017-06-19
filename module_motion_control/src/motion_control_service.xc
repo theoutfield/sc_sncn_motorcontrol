@@ -22,140 +22,89 @@
 #include <stdio.h>
 #include <cogging_torque_compensation.h>
 
-#define MAX_PERCENTAGE 100
-#define MIN_PERCENTAGE 0
-#define FILTER 100
 #define HALL_MASK_A 0x4
 #define HALL_MASK_B 0x2
 #define HALL_MASK_C 0x1
+
 enum
 {
+    NO_ERROR,
     A,
     B,
     C,
     NR_PHASES
 };
 
-int open_phase_detection (client interface TorqueControlInterface client i_torque_control,
-                           int current_ratio, float * ret)
+typedef enum
 {
-    int error = 0;
+    POS_ERR = 1,
+    SPEED_ERR  = 2,
+    ANGLE_ERR = 3,
+    PORTS_ERR = 4
+
+} sensor_fault;
+
+int open_phase_detection_function(client interface TorqueControlInterface client i_torque_control,
+        MotorcontrolConfig motorcontrol_config, int app_tile_usec, int current_ratio, float * ret)
+{
     UpstreamControlData upstream_control_data;
-    int phase_voltage_percentage[NR_PHASES] = {0, 0, 0};
-    int filter_out = 0, v_dc[FILTER];
-    double I[NR_PHASES] = { 0 };
-    int z = 0, V[NR_PHASES] = { 0 };
-    int start = 0;
-    int nr_measur = 0;
-    double rc_rb = 0, ic_ib = 0, ib = 0, vb_va = 0;
-    unsigned counter;
+    float I[NR_PHASES] = { 0 };
+    int refer[NR_PHASES] = {0, 20, 30, 30};
+    unsigned counter = 1;
+    float voltage = 0;
+    int error_phase = NO_ERROR;
+    float rated_curr = (float)motorcontrol_config.rated_current/1000;
+
+    timer tmr;
+    unsigned ts;
 
     i_torque_control.set_torque_control_disabled();
     i_torque_control.start_system_eval();
+    i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
 
-    while (nr_measur < 3)
+    while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
     {
-        ++nr_measur;
-        counter = 7000;
+        upstream_control_data = i_torque_control.update_upstream_control_data();
 
-        switch (nr_measur)
+        I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
+        I[C] = (float)upstream_control_data.I_c/(float)(current_ratio);
+        I[A] = -(I[B]+I[C]);
+
+        for(int i = 0; i < NR_PHASES; i++)
+            if (I[i] < 0)
+                I[i] = -I[i];
+
+        if (counter % 100 == 0)
         {
-        case 1:
-            phase_voltage_percentage[A] = 40;
-            phase_voltage_percentage[B] = 50;
-            phase_voltage_percentage[C] = 50;
-            break;
-
-        case 2:
-            phase_voltage_percentage[A] = 50;
-            phase_voltage_percentage[B] = 40;
-            phase_voltage_percentage[C] = 50;
-            rc_rb = I[B]/I[C];   // Rc/Rb
-            ic_ib = -I[C] - I[B];
-            ib = I[B];
-            vb_va = V[B] - V[A];
-            break;
-
-        case 3:
-            ret[A] = (V[B] - V[A] - ((-I[C] - I[A]) * vb_va / ib )) / (((-I[C]-I[A]) * ic_ib / ib ) - I[A]);
-            ret[B] = (vb_va + ic_ib * ret[A]) / ib;
-            ret[C] = rc_rb * ret[B];
-
-            if (ret[A] < 0)
-                ret[A] = -ret[A];
-            if (ret[B] < 0)
-                ret[B] = -ret[B];
-            if (ret[C] < 0)
-                ret[C] = -ret[C];
-
-            if(ret[A] > 3 || ret[B] > 3 || ret[C] > 3)
-                error = 1;
-
-//            printf("%.2f %.2f %.2f\n", ret[A], ret[B], ret[C]);
-
-            phase_voltage_percentage[A] = 0;
-            phase_voltage_percentage[B] = 0;
-            phase_voltage_percentage[C] = 0;
-
-            break;
-
+            refer[B] += 1;
+            refer[C] += 1;
+            i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
         }
 
-        for (int i= 0; i < NR_PHASES; i++)
+        if (refer[B] > 50 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
         {
-            if (phase_voltage_percentage[i] > MAX_PERCENTAGE)
-                phase_voltage_percentage[i] = MAX_PERCENTAGE;
-
-            if (phase_voltage_percentage[i] < MIN_PERCENTAGE)
-                phase_voltage_percentage[i] = MIN_PERCENTAGE;
+            if (I[A] < rated_curr/4)
+                error_phase = A;
+            else if (I[B] < rated_curr/4)
+                error_phase = B;
+            else if (I[C] < rated_curr/4)
+                error_phase = C;
+            break;
         }
 
-        i_torque_control.set_evaluation_references(phase_voltage_percentage[A], phase_voltage_percentage[B], phase_voltage_percentage[C]);
+        tmr :> ts;
+        tmr when timerafter (ts + 1000*app_tile_usec) :> ts;
 
-        while (counter > 0)
-        {
-            upstream_control_data = i_torque_control.update_upstream_control_data();
-
-            /*
-             * moving average filter for DC bus voltage
-             * average of last FILTER values
-             */
-            if(z < FILTER)
-                v_dc[z++] = upstream_control_data.V_dc;
-            else
-            {
-                start = 1;
-                z = 0;
-            }
-
-            for (int i = 0; i< FILTER; i++)
-                filter_out += v_dc[i];
-
-            filter_out = filter_out / FILTER;
-
-            if (start)
-            {
-                /*
-                 * voltage calculation
-                 */
-
-                for (int i = 0; i <  NR_PHASES; i++)
-                    V[i] = phase_voltage_percentage[i] * filter_out / 100;
-
-                /*
-                 * current calculation
-                 */
-
-                I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
-                I[C] = (float)(upstream_control_data.I_c)/(float)(current_ratio);
-                I[A] = -(float)(upstream_control_data.I_b+upstream_control_data.I_c)/(float)(current_ratio);
-            }
-
-            --counter;
-        }
+        ++counter;
     }
 
-    return error;
+    voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
+    if (error_phase == 0)
+        *ret = voltage / I[B];
+
+    i_torque_control.set_evaluation_references(0, 0, 0);
+
+    return error_phase;
 }
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque, MotionControlError &motion_control_error)
@@ -363,9 +312,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         app_tile_usec = USEC_FAST;
     }
 
-    // checking for open circuitin phases
-    float resist[NR_PHASES] = { 0 };
-    int error_phase = open_phase_detection(i_torque_control,current_ratio, resist);
+    // open phase detection
+    float resist = 0;
+    int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
 
     int angle = 0;
     int velocity = 0;
@@ -377,12 +326,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int max_pos = (1<<16), mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
     int max_angle = (1<<12), mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
     int old_position, old_angle;
-    int index_v = 0, start = 0, velocity_arr[FILTER];
-    int index_d = 0, start_d = 0, difference = 0, difference_arr[FILTER];
+    int index_v = 0, start = 0, velocity_arr[100];
+    int index_d = 0, start_d = 0, difference = 0, difference_arr[100];
     int filter_diff = 0, filter_vel = 0;
     int hall_state_ch[NR_PHASES] = { 0 };
     int hall_state_old, hall_order = 0;
-    int error_flag = 0;
+    sensor_fault error_sens = NO_ERROR;
 
     // testing the angle, position, velocity from the sensor
     // testing Hall ports
@@ -496,7 +445,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             else if (position > fq_pos - 20 && position < fq_pos + 20)
                 real_fq_pos = position;
 
-            if (index_v < FILTER)
+            if (index_v < 100)
                 velocity_arr[index_v++] = velocity;
             else
             {
@@ -506,13 +455,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             if (start)
             {
                 filter_vel = 0;
-                for (int i = 0; i < FILTER; i++)
+                for (int i = 0; i < 100; i++)
                     filter_vel += velocity_arr[i];
-                filter_vel /= FILTER;
+                filter_vel /= 100;
                 if (filter_vel < 0)
                     filter_vel = -filter_vel;
             }
-            if (index_d < FILTER)
+            if (index_d < 100)
                 difference_arr[index_d++] = difference;
             else
             {
@@ -522,9 +471,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             if (start_d)
             {
                 filter_diff = 0;
-                for (int i = 0; i < FILTER; i++)
+                for (int i = 0; i < 100; i++)
                     filter_diff += difference_arr[i];
-                filter_diff /= FILTER;
+                filter_diff /= 100;
                 if (filter_diff < 0)
                     filter_diff = -filter_diff;
             }
@@ -534,30 +483,38 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             if (counter == 7000)
             {
                 if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
-                    error_flag = 1;
+                    error_sens = SPEED_ERR;
 
-                printf("%d %d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, fq_pos, real_fq_pos);
                 if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
                         || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
                         || (fq_pos - real_fq_pos < -20 || fq_pos - real_fq_pos > 20)
                         || position_ctr < 2000  || max_pos < 60000)
-                    error_flag = 1;
+                    error_sens = POS_ERR;
 
                 if ((mean_angle-real_mean_angle < -20 || mean_angle-real_mean_angle > 20)
                         || (tq_angle - real_tq_angle < -20 || tq_angle - real_tq_angle > 20)
                         || (fq_angle - real_fq_angle < -20 || fq_angle - real_fq_angle > 20)
                         || max_angle < 4000 || angle_ctr < 2000)
-                    error_flag = 1;
+                    error_sens = ANGLE_ERR;
+
+                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                {
+                    if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+                        error_sens = PORTS_ERR;
+
+                    if (hall_order)
+                        error_sens = PORTS_ERR;
+                }
             }
 
-            delay_milliseconds(1);
+            t when timerafter (ts + 1000*app_tile_usec) :> ts;
         }
 
         i_torque_control.disable_index_detection();
     }
 
     //QEI index calibration
-    if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_flag)
+    if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_phase && !error_sens)
     {
         printf("Find encoder index \n");
         int index_found = 0;
@@ -872,45 +829,38 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
 
-                if (resist[A] >= 3)
-                    upstream_control_data.error_status = PHASE_FAILURE_L1;
-                else if (resist[B] >= 3)
-                    upstream_control_data.error_status = PHASE_FAILURE_L2;
-                else if (resist[C] >= 3)
-                    upstream_control_data.error_status = PHASE_FAILURE_L3;
-
-                // check for speed error from sensor
-                if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
-                    upstream_control_data.error_status = SPEED_FAULT;
-
-                // check for position error from the sensor
-                if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
-                     || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
-                     || (fq_pos - real_fq_pos < -20 || fq_pos - real_fq_pos > 20)
-                     || position_ctr < 2000  || max_pos < 60000)
-                    upstream_control_data.error_status = POSITION_FAULT;
-
-                // check for angle error from the sensor
-                if ((mean_angle-real_mean_angle < -20 || mean_angle-real_mean_angle > 20)
-                        || (tq_angle - real_tq_angle < -20 || tq_angle - real_tq_angle > 20)
-                        || (fq_angle - real_fq_angle < -20 || fq_angle - real_fq_angle > 20)
-                        || max_angle < 4000 || angle_ctr < 2000)
+                switch (error_phase)
                 {
-                    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
-                    else
-                        upstream_control_data.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                    case A:
+                        upstream_control_data.error_status = PHASE_FAILURE_L1;
+                        break;
+                    case B:
+                        upstream_control_data.error_status = PHASE_FAILURE_L2;
+                        break;
+                    case C:
+                        upstream_control_data.error_status = PHASE_FAILURE_L3;
+                        break;
                 }
 
-                // check for the errors on Hall ports
-                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                switch (error_sens)
                 {
-                    if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+                    case SPEED_ERR:
+                        upstream_control_data.error_status = SPEED_FAULT;
+                        break;
+                    case POS_ERR:
+                        upstream_control_data.error_status = POSITION_FAULT;
+                        break;
+                    case ANGLE_ERR:
+                        if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                            upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                        else
+                            upstream_control_data.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                        break;
+                    case PORTS_ERR:
                         upstream_control_data.error_status = HALL_SENSOR_FAULT;
-
-                    if (hall_order)
-                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                        break;
                 }
+
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -1124,39 +1074,36 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 upstream_control_data_out = i_torque_control.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
 
-                if (resist[A] >= 3)
-                    upstream_control_data_out.error_status = PHASE_FAILURE_L1;
-                else if (resist[B] >= 3)
-                    upstream_control_data_out.error_status = PHASE_FAILURE_L2;
-                else if (resist[C] >= 3)
-                    upstream_control_data_out.error_status = PHASE_FAILURE_L3;
-
-                if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
-                    upstream_control_data_out.error_status = SPEED_FAULT;
-                if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
-                        || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
-                        || (fq_pos - real_fq_pos < -20 || fq_pos - real_fq_pos > 20)
-                        || position_ctr < 2000  || max_pos < 60000)
-                    upstream_control_data_out.error_status = POSITION_FAULT;
-
-                if ((mean_angle-real_mean_angle < -20 || mean_angle-real_mean_angle > 20)
-                        || (tq_angle - real_tq_angle < -20 || tq_angle - real_tq_angle > 20)
-                        || (fq_angle - real_fq_angle < -20 || fq_angle - real_fq_angle > 20)
-                        || max_angle < 4000 || angle_ctr < 2000)
+                switch (error_phase)
                 {
-                    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                        upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
-                    else
-                        upstream_control_data_out.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                    case A:
+                        upstream_control_data_out.error_status = PHASE_FAILURE_L1;
+                        break;
+                    case B:
+                        upstream_control_data_out.error_status = PHASE_FAILURE_L2;
+                        break;
+                    case C:
+                        upstream_control_data_out.error_status = PHASE_FAILURE_L3;
+                        break;
                 }
 
-                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                switch (error_sens)
                 {
-                    if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
-                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
-
-                    if (hall_order)
-                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                    case SPEED_ERR:
+                        upstream_control_data_out.error_status = SPEED_FAULT;
+                        break;
+                    case POS_ERR:
+                        upstream_control_data_out.error_status = POSITION_FAULT;
+                        break;
+                    case ANGLE_ERR:
+                        if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                            upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
+                        else
+                            upstream_control_data_out.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                        break;
+                    case PORTS_ERR:
+                        upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
+                        break;
                 }
 
                 //reverse position/velocity feedback/commands when polarity is inverted
@@ -1279,32 +1226,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
-                filter_vel = 0;
-                filter_diff = 0;
-                mean_pos = 0;
-                real_mean_pos = 0;
-                tq_pos = 0;
-                real_tq_pos = 0;
-                fq_pos = 0;
-                real_fq_pos = 0;
-                position_ctr = 65535;
-                max_pos = 65535;
-                mean_angle = 0;
-                real_mean_angle = 0;
-                tq_angle  = 0;
-                real_tq_angle = 0;
-                fq_angle = 0;
-                real_fq_angle = 0;
-                max_angle =  4095;
-                angle_ctr = 4095;
-                hall_state_ch[A] = 1;
-                hall_state_ch[B] = 1;
-                hall_state_ch[C] = 1;
-                hall_order = 0;
-                resist[A] = 0;
-                resist[B] = 0;
-                resist[C] = 0;
-
+                error_sens = NO_ERROR;
+                error_phase = NO_ERROR;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
@@ -1328,11 +1251,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
 
 
-        case i_motion_control[int i].open_phase_detection() -> {float res_a, float res_b, float res_c}:
-                open_phase_detection (i_torque_control,current_ratio, resist);
-                res_a = resist[A];
-                res_b = resist[B];
-                res_c = resist[C];
+        case i_motion_control[int i].open_phase_detection() -> {int error_phase_out, float resistance_out}:
+                error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
+                error_phase_out = error_phase;
+                resistance_out = resist;
                 break;
         }
     }
