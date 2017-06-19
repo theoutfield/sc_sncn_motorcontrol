@@ -41,7 +41,7 @@ How to use
 
 5. Outside your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
 
-6. Now you can perform calls to the Motion Control Service through the interfaces connected to it. You can do this at whichever other core. 
+6. Now you can perform calls to the Motion Control Service through the interfaces connected to it. You can do this at whichever other core. Once  **control_tuning_console()** is running, it is possible to run automatic tuners by using the commands **av** (representing Automatic Velocity controller), **ap2** (representing Automatic Position controller strategy 2), and **ap3** (representing Automatic Position controller strategy 3).
 
     .. code-block:: c
 
@@ -86,7 +86,7 @@ How to use
             {
                 on tile[APP_TILE]:
                 {
-                     demo_motion_control(i_motion_control[0]); // step 6
+                     control_tuning_console(i_motion_control[0]); // step 6
                 }
                 on tile[APP_TILE]:
                 {
@@ -267,16 +267,13 @@ Definitions
 -------------
 
 .. doxygendefine:: TUNING_VELOCITY
-.. doxygendefine:: KP_VELOCITY_TUNING
 .. doxygendefine:: SETTLING_TIME
 .. doxygendefine:: AUTO_TUNE_STEP_AMPLITUDE
-.. doxygendefine:: AUTO_TUNE_COUNTER_MAX
 .. doxygendefine:: PER_THOUSAND_OVERSHOOT
 
 Global Types/Structures
 -------------
 
-.. doxygenstruct:: AutotuneSteps
 .. doxygenstruct:: VelCtrlAutoTuneParam
 .. doxygenstruct:: PosCtrlAutoTuneParam
 
