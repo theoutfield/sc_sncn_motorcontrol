@@ -22,105 +22,81 @@
 #include <stdio.h>
 #include <cogging_torque_compensation.h>
 
-#define MAX_PERCENTAGE 100
-#define MIN_PERCENTAGE 0
-#define FILTER 100
-
 enum
 {
-    NO_ERROR = 0,
-    A = 1,
-    B = 2,
-    C = 3,
-    NR_PHASES = 4
+    NO_ERROR,
+    A,
+    B,
+    C,
+    NR_PHASES
 };
 
-int open_phase_detection (client interface TorqueControlInterface client i_torque_control,
-                           int current_ratio, float * ret)
+int open_phase_detection_function(client interface TorqueControlInterface client i_torque_control,
+        MotorcontrolConfig motorcontrol_config, int app_tile_usec, int current_ratio, float * ret)
 {
     UpstreamControlData upstream_control_data;
-    float filter_out = 0, v_dc[FILTER];
-    float i_a[FILTER], filter_curr = 0;
-    double I[NR_PHASES] = { 0 };
-    int z = 0;
-    int start = 0;
-    unsigned counter = 5000;
+    float I[NR_PHASES] = { 0 };
+    int refer[NR_PHASES] = {0, 20, 30, 30};
+    unsigned counter = 1;
     float voltage = 0;
     int error_phase = 0;
+    float rated_curr = (float)motorcontrol_config.rated_current/1000;
+
+    timer tmr;
+    unsigned ts;
 
     i_torque_control.set_torque_control_disabled();
     i_torque_control.start_system_eval();
-    i_torque_control.set_evaluation_references(40, 50, 50);
+    i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
 
-    while (counter > 0)
+    while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
     {
         upstream_control_data = i_torque_control.update_upstream_control_data();
 
-        /*
-         * moving average filter for DC bus voltage
-         * average of last FILTER values
-         */
-        if(z < FILTER)
-        {
-            v_dc[z++] = (float)upstream_control_data.V_dc;
-            i_a[z++] = (-((float)upstream_control_data.I_b + (float)upstream_control_data.I_c))/current_ratio/2;
-        }
-        else
-        {
-            start = 1;
-            z = 0;
-        }
+        I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
+        I[C] = (float)upstream_control_data.I_c/(float)(current_ratio);
+        I[A] = -(I[B]+I[C]);
 
-        for (int i = 0; i< FILTER; i++)
+        for(int i = 0; i < NR_PHASES; i++)
+            if (I[i] < 0)
+                I[i] = -I[i];
+
+        if (counter % 100 == 0)
         {
-            filter_out += v_dc[i];
-            filter_curr += i_a[i];
+            refer[B] += 1;
+            refer[C] += 1;
+            i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
         }
 
-        filter_out = filter_out / FILTER;
-        filter_curr = filter_curr / FILTER;
-
-        if (counter == 1)
+        if (refer[B] > 50 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
         {
-            /*
-             * valid for delta configuration of 3 phase motor
-             */
-            *ret = voltage / filter_curr / 2;
-            if (I[A] < 1 && I[B] < 1 && I[C] < 1)
+            if (I[A] < rated_curr/4)
                 error_phase = A;
-            else if (I[B] < 0.5)
+            else if (I[B] < rated_curr/4)
                 error_phase = B;
-            else if (I[C] < 0.5)
+            else if (I[C] < rated_curr/4)
                 error_phase = C;
-            else
-            {
-                error_phase = NO_ERROR;
-//                *ret = voltage / I[B];
-            }
+            break;
         }
 
-        --counter;
+        tmr :> ts;
+        tmr when timerafter (ts + 1000*app_tile_usec) :> ts;
 
-        if (start)
-        {
-            /*
-             * voltage calculation
-             */
-
-            voltage =  0.1 * filter_out / 2;
-
-            /*
-             * current calculation
-             */
-
-            I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
-            I[C] = (float)upstream_control_data.I_c/(float)(current_ratio);
-            I[A] = -(I[B]+I[C]);
-            printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
-        }
+        ++counter;
     }
 
-//    i_torque_control.set_evaluation_references(0, 0, 0);
+    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
+    voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
+    printf("%.2f\n", voltage);
+    if (error_phase == 0)
+    {
+        *ret = voltage / I[B];
+        printf("%.2f\n", *ret);
+    }
+    else
+        printf("%d\n", error_phase);
+
+    i_torque_control.set_evaluation_references(0, 0, 0);
 
     return error_phase;
 }
@@ -332,7 +308,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     // open phase detection
     float resist;
-    int error_phase = open_phase_detection(i_torque_control, current_ratio, &resist);
+    int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_phase)
@@ -1033,7 +1009,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
         case i_motion_control[int i].open_phase_detection() -> {int error_phase_out, float resistance_out}:
-                error_phase = open_phase_detection(i_torque_control,current_ratio, &resist);
+                error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
                 error_phase_out = error_phase;
                 resistance_out = resist;
                 break;
