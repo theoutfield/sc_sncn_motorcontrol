@@ -1,20 +1,22 @@
-.. _module_controllers:
+.. _module_limited_torque_position_control:
 
 =============================
-Module Controllers
+Limited Torque Position Control Library
 =============================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-This module is mainly containing the required functions to control velocity or position of the motor. The first (and more general) part of this module is a standard PID controller (and its related functions to initialize PID controller, update PID constants, reset PID controller). 
-This PID controller is used in control of velocity in our SOMANET software. Three strategies are provided in our standard software to control the position of an electric motor. Two of these three strategies are also using the standard PID controller of this module. These two strategies are namely POS_PID_CONTROLLER strategy and POS_PID_VELOCITY_CASCADED_CONTROLLER strategy. In addition to standard PID controller, the module_controllers provides a third type of position controller named nonlinear position controller. In this type of controller, the mechanical speed gets reduced when the real position gets close to the target position. This reduction of speed helps to avoid high values of overshoot while controlling the position in step commands. As the structure of PID controllers are pretty straight forward and understandable, for general applications of position control, it is recommended to start with our standard PID-based control strategies (namely VELOCITY_PID_CONTROLLER to control the velocity, and POS_PID_CONTROLLER or POS_PID_VELOCITY_CASCADED_CONTROLLER to control the position).
-
+This library provides a position control strategy which is based on limited torque of electric motor. Depending on the maximum torque of electrical actuator, the proposed position controller calculates the proper reference value of electrical torque in a way that the overshoot of the load in step responses becomes minimum in step responses.
+It is recommended to use the provided automatic tuner to tune the PID parameters of this controller.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/module_controllers>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/lib_limited_torque_position_control>`_
+
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/module_autotune>`_
+
 
 How to use
 ==========
@@ -30,7 +32,7 @@ How to use
 
     ::
 
-        USED_MODULES = module_controllers lib_bldc_torque_control module_pwm module_adc module_hall_sensor module_utils module_profiles module_incremental_encoder module_gpio module_watchdog module_board-support
+        USED_MODULES = module_controllers lib_bldc_torque_control module_pwm module_adc module_hall_sensor module_utils module_profiles module_incremental_encoder module_gpio module_watchdog module_board-support lib_limited_torque_position_control module_autotune
 
     .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
               This will help solving internal dependency issues.
@@ -105,21 +107,21 @@ How to use
                     motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
                     motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
         
-                    motion_ctrl_config.position_control_strategy =            NL_POSITION_CONTROLLER;
+                    motion_ctrl_config.position_control_strategy =            LT_POSITION_CONTROLLER;
         
-                    motion_ctrl_config.position_kp =                                POSITION_Kp;
-                    motion_ctrl_config.position_ki =                                POSITION_Ki;
-                    motion_ctrl_config.position_kd =                                POSITION_Kd;
-                    motion_ctrl_config.position_integral_limit =                   POSITION_INTEGRAL_LIMIT;
+                    motion_ctrl_config.position_kp =                          POSITION_Kp;
+                    motion_ctrl_config.position_ki =                          POSITION_Ki;
+                    motion_ctrl_config.position_kd =                          POSITION_Kd;
+                    motion_ctrl_config.position_integral_limit =              POSITION_INTEGRAL_LIMIT;
                     motion_ctrl_config.moment_of_inertia =                    MOMENT_OF_INERTIA;
         
-                    motion_ctrl_config.velocity_kp =                           VELOCITY_Kp;
-                    motion_ctrl_config.velocity_ki =                           VELOCITY_Ki;
-                    motion_ctrl_config.velocity_kd =                           VELOCITY_Kd;
+                    motion_ctrl_config.velocity_kp =                          VELOCITY_Kp;
+                    motion_ctrl_config.velocity_ki =                          VELOCITY_Ki;
+                    motion_ctrl_config.velocity_kd =                          VELOCITY_Kd;
                     motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
         
-                    motion_ctrl_config.brake_release_strategy =                BRAKE_RELEASE_STRATEGY;
-                    motion_ctrl_config.brake_release_delay =                 BRAKE_RELEASE_DELAY;
+                    motion_ctrl_config.brake_release_strategy =               BRAKE_RELEASE_STRATEGY;
+                    motion_ctrl_config.brake_release_delay =                  BRAKE_RELEASE_DELAY;
         
                     //select resolution of sensor used for motion control
                     if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
@@ -262,39 +264,6 @@ How to use
     return 0;
 }
 
-The functions provided by module_controllers are used inside motion_control_service. As an example, here we explain the algorithm of velocity control inside motion_control_service step by step.
-
-1. The required structure which contains the controller parameters are defined at the beginning of motion_control_service.
-
-2. The PID controller is initialized by calling pid_init function
-
-3. The PID controller parameters are set. This includes PID constants, the integral limit of PID controller, and the controlling loop period.
-
-4. Reference and real values of Velocity are updated inside the main loop
-
-5. The proper torque reference is calculated by calling the pid_update function. After this step the calculated value of reference torque can be sent to torque control service.
-
-This procedure can be similarly used to control the position of electric motor.
-
- 
-    .. code-block:: c
-
-	    PIDparam velocity_control_pid_param; // step 1
-	
-	    pid_init(velocity_control_pid_param);// step 2
-	
-	    pid_set_parameters(
-	            (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
-	            (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
-	            POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 3
-	
-	
-	    velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
-	    velocity_k        = ((double) upstream_control_data.velocity); // step 4
-	
-	    torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 5
-
-
 API
 ===
 
@@ -302,17 +271,12 @@ API
 Global Types
 ------------
 
-.. doxygenstruct:: PIDparam
-.. doxygenstruct:: NonlinearPositionControl
+.. doxygenstruct:: LimitedTorquePosCtrl
 
 Module Controllers
 ``````````````````
 
-.. doxygenfunction:: pid_init
-.. doxygenfunction:: pid_set_parameters
-.. doxygenfunction:: pid_update
-.. doxygenfunction:: pid_reset
-.. doxygenfunction:: nl_position_control_reset
-.. doxygenfunction:: nl_position_control_set_parameters
-.. doxygenfunction:: update_nl_position_control
+.. doxygenfunction:: lt_position_control_reset
+.. doxygenfunction:: lt_position_control_set_parameters
+.. doxygenfunction:: update_lt_position_control
 
