@@ -116,9 +116,13 @@ typedef enum {
     OVER_VOLTAGE_NO_1                           = 0X3211,
     UNDER_VOLTAGE_NO_1                          = 0X3221,
     EXCESS_TEMPERATURE_DRIVE                    = 0X4310,
+    INCREMENTAL_SENSOR_1_FAULT                  = 0X7305,
+    SPEED_FAULT                                 = 0X7310,
+    POSITION_FAULT                              = 0X7320,
 
     //user specific faults
-    WRONG_REF_CLK_FRQ=0XFF01
+    WRONG_REF_CLK_FRQ                           = 0XFF01,
+    HALL_SENSOR_FAULT                           = 0XFF02
 } FaultCode;
 
 /**
