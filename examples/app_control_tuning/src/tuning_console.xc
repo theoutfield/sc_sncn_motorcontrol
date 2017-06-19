@@ -327,18 +327,17 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 printf("detection of open circuit in phases started ...\n");
                 {phase_error, resistance} = i_motion_control.open_phase_detection();
 
-                printf(">>  PHASE RESISTANCE = %.2f Om\n", resistance);
-//
-//                if (phase_error == 1)
-//                    printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
-//                else if (phase_error == 2)
-//                    printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
-//                else if(phase_error == 3)
-//                    printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
-//                else
-//                {
-//                    printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
-//                }
+                if (phase_error == 1)
+                    printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+                else if (phase_error == 2)
+                    printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+                else if(phase_error == 3)
+                    printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+                else
+                {
+                    printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
+                    printf(">>  PHASE RESISTANCE = %.2f Om\n", resistance);
+                }
                 break;
 
         //reverse torque or velocity command
