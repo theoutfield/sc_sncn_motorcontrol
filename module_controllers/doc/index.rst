@@ -9,7 +9,7 @@ Module Controllers
     :depth: 3
 
 This module is mainly containing the required functions to control velocity or position of the motor. The first (and more general) part of this module is a standard PID controller (and its related functions to initialize PID controller, update PID constants, reset PID controller). 
-This PID controller is used in control of velocity in our SOMANET software. Three strategies are provided in our standard software to control the position of an electric motor. Two of these three strategies are also using the standard PID controller of this module. These two strategies are namely POS_PID_CONTROLLER strategy and POS_PID_VELOCITY_CASCADED_CONTROLLER strategy. In addition to standard PID controller, the module_controllers provides a third type of position controller named nonlinear position controller. In this type of controller, the mechanical speed gets reduced when the real position gets close to the target position. This reduction of speed helps to avoid high values of overshoot while controlling the position in step commands. As the structure of PID controllers are pretty straight forward and understandable, for general applications of position control, it is recommended to start with our standard PID-based control strategies (namely VELOCITY_PID_CONTROLLER to control the velocity, and POS_PID_CONTROLLER or POS_PID_VELOCITY_CASCADED_CONTROLLER to control the position).
+This PID controller is used in control of velocity in our SOMANET software. Three strategies are provided in our standard software to control the position of an electric motor. Two of these three strategies are also using the standard PID controller of this module. These two strategies are namely POS_PID_CONTROLLER strategy and POS_PID_VELOCITY_CASCADED_CONTROLLER strategy. In addition to standard PID controller, the module_controllers provides a third type of position controller named limited torque position controller. In this type of controller, the mechanical speed gets reduced when the real position gets close to the target position. This reduction of speed helps to avoid high values of overshoot while controlling the position in step commands. As the structure of PID controllers are pretty straight forward and understandable, for general applications of position control, it is recommended to start with our standard PID-based control strategies (namely VELOCITY_PID_CONTROLLER to control the velocity, and POS_PID_CONTROLLER or POS_PID_VELOCITY_CASCADED_CONTROLLER to control the position).
 
 
 .. cssclass:: github
@@ -303,7 +303,6 @@ Global Types
 ------------
 
 .. doxygenstruct:: PIDparam
-.. doxygenstruct:: NonlinearPositionControl
 
 Module Controllers
 ``````````````````
@@ -312,7 +311,4 @@ Module Controllers
 .. doxygenfunction:: pid_set_parameters
 .. doxygenfunction:: pid_update
 .. doxygenfunction:: pid_reset
-.. doxygenfunction:: nl_position_control_reset
-.. doxygenfunction:: nl_position_control_set_parameters
-.. doxygenfunction:: update_nl_position_control
 

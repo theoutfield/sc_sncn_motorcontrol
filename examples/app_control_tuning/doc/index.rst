@@ -47,10 +47,10 @@ The app uses commands up to 3 characters with an optional value. The command are
 - ``Lpu [number]``: set the maximum position limit.
 - ``Lpl [number]``: set the minimum position limit.
 - ``Lt [number]``: set the torque limit. The unit in in 1/1000 of rated torque. This command stops the motorcontrol.
-- ``Lv [number]``: set the velocity limit. Used in velocity control and in cascaded and non linear position control modes.
+- ``Lv [number]``: set the velocity limit. Used in velocity control and in cascaded and limited-torque position control modes.
 - ``ep1``: enable position control with simple PID controller
 - ``ep2``: enable position control with velocity cascaded controller
-- ``ep3``: enable position control with Non linear controller
+- ``ep3``: enable position control with limited-torque controller
 - ``ev1``: enable velocity control 
 - ``et1``: enable torque control 
 - ``p``: set a position command (the position controller need to be started first)
