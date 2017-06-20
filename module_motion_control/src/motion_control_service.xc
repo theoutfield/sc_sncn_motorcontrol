@@ -318,8 +318,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int current_a = 0, phase_counter[NR_PHASES];
     printf("%d\n", error_phase);
     int  ftr = 0, filter_ctr = 0;
-    float filter_b[NR_PHASES] = { 0 };
-    int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 };
+    float filter_b[NR_PHASES] = { 0 }, rms_b_old = 0, rms_c_old = 0;
+    int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect = 0;
 
     int angle = 0;
     int velocity = 0;
@@ -337,6 +337,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int hall_state_ch[NR_PHASES] = { 0 };
     int hall_state_old;
     sensor_fault error_sens = NO_ERROR;
+
+    error_phase = 1;
 
     // testing the angle, position, velocity from the sensor
     // testing Hall ports
@@ -838,30 +840,22 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
-                //trigger for open phase detection is continous velocity and phase current drop in the range of noise
-
                 ftr++;
-//                filter_b += upstream_control_data.I_b;
                 if (upstream_control_data.I_c < 0)
                     upstream_control_data.I_c = -upstream_control_data.I_c;
                 if (upstream_control_data.I_b < 0)
                     upstream_control_data.I_b = -upstream_control_data.I_b;
 
-                current_a = upstream_control_data.I_b - upstream_control_data.I_c;
-                if (current_a < 0)
-                    current_a = -current_a;
 
                 sum[B] += upstream_control_data.I_b;
                 sum[C] += upstream_control_data.I_c;
-                sum[A] += current_a;
                 sum_sq[B] += upstream_control_data.I_b * upstream_control_data.I_b;
                 sum_sq[C] += upstream_control_data.I_c * upstream_control_data.I_c;
-                sum_sq[A] += current_a*current_a;
 
                 if (ftr > 1 && ftr % 1000 == 0)
                 {
                     float mean[NR_PHASES], sd[NR_PHASES];
-                    for (int i = A; i < NR_PHASES; i++)
+                    for (int i = B; i < NR_PHASES; i++)
                     {
                         mean[i] = (float)sum[i] / ftr;
                         sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
@@ -869,7 +863,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
 
                     ftr = 0;
-                    for (int i = A; i < NR_PHASES; i++)
+                    for (int i = B; i < NR_PHASES; i++)
                     {
                         sum[i] = 0;
                         sum_sq[i] = 0;
@@ -878,10 +872,45 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     ++filter_ctr;
                 }
 
-                if (filter_ctr == 5)
+                if (filter_ctr == 2)
                 {
-                    printf("%.2f %.2f %.2f\n", filter_b[A] / 5, filter_b[B] / 5, filter_b[C] / 5);
-                    filter_b[A] = 0;
+                    if (rms_b_old == 0 && rms_c_old == 0)
+                    {
+                        rms_b_old = filter_b[B]/2;
+                        rms_c_old = filter_b[C]/2;
+                    }
+                    else
+                    {
+                        float rms_b = filter_b[B] / 2;
+                        float rms_c = filter_b[C] / 2;
+                        printf("%.2f %.2f %.2f %.2f\n", rms_b, rms_b_old, rms_c, rms_c_old);
+
+                        if (rms_b - rms_b_old < -0.1*rms_b_old)
+                        {
+                            if (rms_c - rms_c_old > 0.1*rms_c_old)
+                            {
+                                if (detect)
+                                {
+                                    detect += 2;
+                                    if (detect == 7)
+                                        printf("open phase B\n");
+                                }
+                                else
+                                {
+                                    printf("detect 1\n");
+                                    detect = 1;
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            rms_b_old = rms_b;
+                            rms_c_old = rms_c;
+                            detect = 0;
+                        }
+                    }
+
                     filter_b[B] = 0;
                     filter_b[C] = 0;
                     filter_ctr = 0;
