@@ -253,6 +253,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/configuration_parameters/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.701415590" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -634,6 +637,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/configuration_parameters/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.350368816" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1020,6 +1026,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/configuration_parameters/motor_configs}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_shared_memory/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_board-support/targets}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/doc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/predriver}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/include}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.1829573054" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>

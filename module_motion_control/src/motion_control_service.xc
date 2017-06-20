@@ -897,7 +897,25 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                         printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", rms[A], rms_old[A], rms[B], rms_old[B], rms[C], rms_old[C]);
 
-                        if (rms[B] - rms_old[B] < -0.1*rms_old[B])
+                        if (rms[A] - rms_old[A] < -0.1*rms_old[A])
+                        {
+                            if (rms[B] - rms_old[B] > 0.1*rms_old[B] && rms[C] - rms_old[C] > 0.1*rms_old[C])
+                            {
+                                if (detect[A])
+                                {
+                                    detect[A] += 2;
+                                    if (detect[A] == 7)
+                                        printf("open phase A\n");
+                                }
+                                else
+                                {
+                                    printf("detect 1\n");
+                                    detect[A] = 1;
+                                }
+
+                            }
+                        }
+                        else if (rms[B] - rms_old[B] < -0.1*rms_old[B])
                         {
                             if (rms[C] - rms_old[C] > 0.1*rms_old[C] && rms[A] - rms_old[A] > 0.1*rms_old[A])
                             {
@@ -909,8 +927,26 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 }
                                 else
                                 {
-                                    printf("detect 1\n");
+                                    printf("detect 2\n");
                                     detect[B] = 1;
+                                }
+
+                            }
+                        }
+                        else if (rms[C] - rms_old[C] < -0.1*rms_old[C])
+                        {
+                            if (rms[A] - rms_old[A] > 0.1*rms_old[A] && rms[B] - rms_old[B] > 0.1*rms_old[B])
+                            {
+                                if (detect[C])
+                                {
+                                    detect[C] += 2;
+                                    if (detect[C] == 7)
+                                        printf("open phase C\n");
+                                }
+                                else
+                                {
+                                    printf("detect 3\n");
+                                    detect[C] = 1;
                                 }
 
                             }
@@ -918,8 +954,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         else
                         {
                             for (int i = A; i < NR_PHASES; i++)
+                            {
                                 rms_old[i] = rms[i];
-                            detect[B] = 0;
+                                detect[i] = 0;
+                            }
                         }
                     }
 
