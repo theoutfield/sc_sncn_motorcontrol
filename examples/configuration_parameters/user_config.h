@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        40000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        40000    //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
@@ -86,9 +86,9 @@
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
-#define DC_BUS_VOLTAGE             48 //Warning! This parameter is used as well as a base for brake voltage configuration
+#define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 20
+#define APPLIED_TUNING_TORQUE_PERCENT 80
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
 #define COMMUTATION_ANGLE_OFFSET    0
@@ -119,24 +119,25 @@
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
-#define VELOCITY_Kp                             700000
-#define VELOCITY_Ki                             20000
+#define VELOCITY_Kp                             0
+#define VELOCITY_Ki                             0
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             20000
-#define POSITION_Ki                             500
-#define POSITION_Kd                             41000
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
-//     "1000"                 in case of using position controller in "NL_POSITION_CONTROLLER"               mode
-#define POSITION_INTEGRAL_LIMIT                 1000
+//     "1000"                 in case of using position controller in "LT_POSITION_CONTROLLER"               mode
+#define POSITION_INTEGRAL_LIMIT                 PEAK_SPEED
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY           MOTION_POLARITY_NORMAL
 
+#define FILTER_CUT_OFF_FREQ     1000000;//cut-off frequency of filter in motion control service (default value 100 kHz)
 
 /////////////////////////////////////////////////
 //////  PROFILES AND LIMITS CONFIGURATION
@@ -157,7 +158,7 @@
 #define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
 
-#define POSITION_CONTROL_STRATEGY               NL_POSITION_CONTROLLER
+#define POSITION_CONTROL_STRATEGY               LT_POSITION_CONTROLLER
 
 
 //////////////////////////////////////////////
@@ -167,11 +168,11 @@
 #define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 // Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define PULL_BRAKE_VOLTAGE     13000    // [milli-Volts]
+#define PULL_BRAKE_VOLTAGE     18000    // [milli-Volts]
 // Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
 #define HOLD_BRAKE_VOLTAGE     7000     // [milli-Volts]
-#define PULL_BRAKE_TIME        10000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define PULL_BRAKE_TIME        3000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
 /////////////////////////////////////////////////

@@ -11,13 +11,17 @@
 #include <math.h>
 
 #include <controllers.h>
+#include <limited_torque_position_control.h>
+
 #include <profile.h>
+#include <auto_tune.h>
 #include <filters.h>
 
 #include <motion_control_service.h>
 #include <refclk.h>
 #include <mc_internal_constants.h>
 #include <stdio.h>
+
 
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque, MotionControlError &motion_control_error)
@@ -80,10 +84,11 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
+ * @param motion_ctrl_config            Structure containing all parameters of motion control service
  * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
- * @param i_torque_control Communication  interface to the Motor Control Service.
- * @param i_motion_control[3]         array of MotionControlInterfaces to communicate with upto 3 clients
- * @param i_update_brake                Interface to update brake configuration in PWM service
+ * @param i_torque_control Communication    interface to the Motor Control Service.
+ * @param i_motion_control[3]               array of MotionControlInterfaces to communicate with upto 3 clients
+ * @param i_update_brake                    Interface to update brake configuration in PWM service
  *
  * @return void
  *  */
@@ -93,6 +98,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 {
     timer t;
     unsigned int ts;
+    unsigned time_start=0, time_start_old=0, time_loop=0, time_end=0, time_free=0, time_used=0;
+
+    SecondOrderLPfilterParam torque_filter_param;
+    second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
+    double filter_input=0.00, filter_output=0.00;
 
     // structure definition
     UpstreamControlData upstream_control_data;
@@ -102,7 +112,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     PIDparam position_control_pid_param;
 
-    NonlinearPositionControl nl_pos_ctrl;
+    LimitedTorquePosCtrl lt_pos_ctrl;
 
 
     // variable definition
@@ -119,11 +129,31 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0;
     double velocity_k = 0.00;
 
+    VelCtrlAutoTuneParam velocity_auto_tune;
+
+    //autotune initialization
+    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
+
+    downstream_control_data.velocity_cmd = 0;
+    motion_ctrl_config.enable_velocity_auto_tuner = 0;
+
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
     double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
+
+    PosCtrlAutoTuneParam pos_ctrl_auto_tune;
+
+    motion_ctrl_config.step_amplitude_autotune  = AUTO_TUNE_STEP_AMPLITUDE;
+    motion_ctrl_config.counter_max_autotune     = AUTO_TUNE_COUNTER_MAX   ;
+    motion_ctrl_config.per_thousand_overshoot_autotune   = PER_THOUSAND_OVERSHOOT;
+
+    // initialization of position control automatic tuning:
+    motion_ctrl_config.position_control_autotune =0;
+
+    init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
+    //***********************************************************************************************
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
@@ -159,8 +189,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
     int temperature_ratio = motorcontrol_config.temperature_ratio;
 
-    nl_position_control_reset(nl_pos_ctrl);
-    nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+    lt_position_control_reset(lt_pos_ctrl);
+    lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+            motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+            motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
+
 
     pid_init(velocity_control_pid_param);
     if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
@@ -229,6 +262,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         {
         case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
 
+                time_start_old = time_start;
+                t :> time_start;
+                time_loop = time_start - time_start_old;
+                time_free = time_start - time_end;
+
                 upstream_control_data = i_torque_control.update_upstream_control_data();
 
                 velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
@@ -247,11 +285,34 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         torque_ref_k = downstream_control_data.torque_cmd;
                     }
-
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    if(motion_ctrl_config.enable_profiler==1)
+                    if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
+                    {
+                        if(velocity_auto_tune.enable == 0)
+                        {
+                            init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
+                            pid_init(velocity_control_pid_param);
+                            pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
+                            velocity_auto_tune.enable = 1;
+                        }
+
+                        velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        if(velocity_auto_tune.enable == 0)
+                        {
+                            torque_ref_k=0;
+                            torque_enable_flag   =0;
+                            velocity_enable_flag =0;
+                            position_enable_flag =0;
+                            i_torque_control.set_torque_control_disabled();
+
+                            printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
+                        }
+                    }
+                    else if(motion_ctrl_config.enable_profiler==1)
                     {
                         velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         velocity_ref_in_k_1n = velocity_ref_in_k;
@@ -306,16 +367,74 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
-                        velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                        if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
-                        if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
-                        torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        if(motion_ctrl_config.position_control_autotune == 1)
+                        {
+                            if(pos_ctrl_auto_tune.activate==0)
+                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
+
+                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+
+                            if(motion_ctrl_config.position_control_autotune == 0)
+                            {
+                                printf("TUNING ENDED: \n");
+                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                            }
+
+                            if(pos_ctrl_auto_tune.counter==0)
+                            {
+                                pid_init(velocity_control_pid_param);
+                                pid_init(position_control_pid_param);
+
+                                pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            }
+
+                            velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
+                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        }
+                        else
+                        {
+                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
+                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        }
                     }
-                    else if (pos_control_mode == NL_POSITION_CONTROLLER)
+                    else if (pos_control_mode == LT_POSITION_CONTROLLER)
                     {
-                        torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+
+                        if(motion_ctrl_config.position_control_autotune == 1)
+                        {
+                            if(pos_ctrl_auto_tune.activate==0)
+                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, LIMITED_TORQUE);
+
+                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+
+                            if(motion_ctrl_config.position_control_autotune == 0)
+                            {
+                                printf("TUNING ENDED \n");
+                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                            }
+
+                            if(pos_ctrl_auto_tune.counter==0)
+                            {
+                                lt_position_control_reset(lt_pos_ctrl);
+                                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
+                            }
+
+                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
+                        }
+                        else
+                        {
+                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+                        }
                     }
                 }
+
 
                 //brake release, override target torque if we are in brake release
                 if (special_brake_release_counter <= BRAKE_RELEASE_DURATION)
@@ -383,7 +502,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 else if (torque_ref_k < (-motion_ctrl_config.max_torque))
                     torque_ref_k = (-motion_ctrl_config.max_torque);
 
-                i_torque_control.set_torque(((int)(torque_ref_k)));
+                filter_input  =  ((double)(torque_ref_k));
+                filter_output = second_order_LP_filter_update(&filter_input, torque_filter_param);
+
+                if(motion_ctrl_config.filter>=0)
+                    i_torque_control.set_torque(((int)(filter_output))); // use the filter only if the filter cut-off frequency is bigger/equal to zero, otherwise, do not use filter
+                else
+                    i_torque_control.set_torque(((int)(torque_ref_k)));
 
                 //update brake config when ready
                 if (update_brake_configuration_flag && timeafter(ts, update_brake_configuration_time)) {
@@ -393,6 +518,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
                     }
                 }
+
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -418,7 +544,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 #endif
 
 
-break;
+                if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
+                {
+                    printf("TIMING ERR \n");
+                }
+
+                t :> time_end;
+                time_used = time_end - time_start;
+
+                break;
 
         case i_motion_control[int i].disable():
 
@@ -434,6 +568,9 @@ break;
                     position_enable_flag =0;
                     i_torque_control.set_torque_control_disabled();
                 }
+
+                motion_ctrl_config.position_control_autotune =0;
+                pos_ctrl_auto_tune.activate=0;
 
                 break;
 
@@ -453,8 +590,10 @@ break;
                 downstream_control_data.offset_torque = 0;
 
                 //reset pid
-                nl_position_control_reset(nl_pos_ctrl);
-                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                lt_position_control_reset(lt_pos_ctrl);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 pid_reset(position_control_pid_param);
 
 
@@ -480,6 +619,19 @@ break;
 
                 pid_reset(velocity_control_pid_param);
 
+                pid_init(velocity_control_pid_param);
+                if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
+                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
+                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+                if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
+                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
+                pid_set_parameters(
+                        (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
+                        (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
+                        POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+
+
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
                     enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
@@ -488,7 +640,6 @@ break;
                 //start control loop just after
                 t :> ts;
                 ts = ts - USEC_STD * POSITION_CONTROL_LOOP_PERIOD;
-
                 break;
 
         case i_motion_control[int i].enable_torque_ctrl():
@@ -576,11 +727,15 @@ break;
                 profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
                 profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
 
-                nl_position_control_reset(nl_pos_ctrl);
-                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-
+                lt_position_control_reset(lt_pos_ctrl);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 //reset error
                 motion_control_error = MOTION_CONTROL_NO_ERROR;
+
+                second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
+
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
@@ -623,7 +778,9 @@ break;
 
         case i_motion_control[int i].set_j(int j):
                 motion_ctrl_config.moment_of_inertia = j;
-                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
         case i_motion_control[int i].set_torque(int in_target_torque):
