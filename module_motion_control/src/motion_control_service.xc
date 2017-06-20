@@ -49,7 +49,7 @@ int open_phase_detection_function(client interface TorqueControlInterface client
 {
     UpstreamControlData upstream_control_data;
     float I[NR_PHASES] = { 0 };
-    int refer[NR_PHASES] = {0, 20, 30, 30};
+    int refer[NR_PHASES] = {0, 20, 30, 30};// make b and c terminal volateg as cloase as voltage on terminal a at the startup
     unsigned counter = 1;
     float voltage = 0;
     int error_phase = NO_ERROR;
@@ -315,6 +315,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // open phase detection
     float resist = 0;
     int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
+    int current_a = 0, phase_counter[NR_PHASES];
+    printf("%d\n", error_phase);
+    int  ftr = 0, filter_ctr = 0;
+    float filter_b[NR_PHASES] = { 0 };
+    int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 };
 
     int angle = 0;
     int velocity = 0;
@@ -330,7 +335,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int index_d = 0, start_d = 0, difference = 0, difference_arr[100];
     int filter_diff = 0, filter_vel = 0;
     int hall_state_ch[NR_PHASES] = { 0 };
-    int hall_state_old, hall_order = 0;
+    int hall_state_old;
     sensor_fault error_sens = NO_ERROR;
 
     // testing the angle, position, velocity from the sensor
@@ -381,37 +386,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         ++hall_state_ch[B];
                     if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
                         ++hall_state_ch[C];
-
-                    if (hall_state != hall_state_old)
-                    {
-                        switch (hall_state_old)
-                        {
-                        case 1:
-                            if (hall_state != 5 && hall_state != 3)
-                                ++hall_order;
-                            break;
-                        case 2:
-                            if (hall_state != 3 && hall_state != 6)
-                                ++hall_order;
-                            break;
-                        case 3:
-                            if (hall_state != 1 && hall_state != 2)
-                                ++hall_order;
-                            break;
-                        case 4:
-                            if (hall_state != 6 && hall_state != 5)
-                                ++hall_order;
-                            break;
-                        case 5:
-                            if (hall_state != 4 && hall_state != 1)
-                                ++hall_order;
-                            break;
-                        case 6:
-                            if (hall_state != 2 && hall_state != 4)
-                                ++hall_order;
-                            break;
-                        }
-                    }
 
                     hall_state_old = hall_state;
                 }
@@ -482,8 +456,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
             if (counter == 7000)
             {
+                printf("%d %d\n", filter_vel, filter_diff);
                 if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
                     error_sens = SPEED_ERR;
+
+                printf("%d %d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, fq_pos, real_fq_pos);
 
                 if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
                         || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
@@ -499,10 +476,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
                 {
+                    printf("%d %d %d\n", hall_state_ch[A], hall_state_ch[B], hall_state_ch[C]);
                     if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
-                        error_sens = PORTS_ERR;
-
-                    if (hall_order)
                         error_sens = PORTS_ERR;
                 }
             }
@@ -512,6 +487,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         i_torque_control.disable_index_detection();
     }
+
+    printf("%d\n", error_sens);
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_phase && !error_sens)
@@ -861,6 +838,79 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
+                //trigger for open phase detection is continous velocity and phase current drop in the range of noise
+
+                ftr++;
+//                filter_b += upstream_control_data.I_b;
+                if (upstream_control_data.I_c < 0)
+                    upstream_control_data.I_c = -upstream_control_data.I_c;
+                if (upstream_control_data.I_b < 0)
+                    upstream_control_data.I_b = -upstream_control_data.I_b;
+
+                current_a = upstream_control_data.I_b - upstream_control_data.I_c;
+                if (current_a < 0)
+                    current_a = -current_a;
+
+                sum[B] += upstream_control_data.I_b;
+                sum[C] += upstream_control_data.I_c;
+                sum[A] += current_a;
+                sum_sq[B] += upstream_control_data.I_b * upstream_control_data.I_b;
+                sum_sq[C] += upstream_control_data.I_c * upstream_control_data.I_c;
+                sum_sq[A] += current_a*current_a;
+
+                if (ftr > 1 && ftr % 1000 == 0)
+                {
+                    float mean[NR_PHASES], sd[NR_PHASES];
+                    for (int i = A; i < NR_PHASES; i++)
+                    {
+                        mean[i] = (float)sum[i] / ftr;
+                        sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                        filter_b[i] += mean[i] + sqrt(sd[i]);
+                    }
+
+                    ftr = 0;
+                    for (int i = A; i < NR_PHASES; i++)
+                    {
+                        sum[i] = 0;
+                        sum_sq[i] = 0;
+                    }
+
+                    ++filter_ctr;
+                }
+
+                if (filter_ctr == 5)
+                {
+                    printf("%.2f %.2f %.2f\n", filter_b[A] / 5, filter_b[B] / 5, filter_b[C] / 5);
+                    filter_b[A] = 0;
+                    filter_b[B] = 0;
+                    filter_b[C] = 0;
+                    filter_ctr = 0;
+                }
+
+                if (velocity > 10)
+                {
+                    if (current_a < 10 && current_a > -10)
+                        ++phase_counter[A];
+                    else
+                        phase_counter[A] = 0;
+
+                    if (upstream_control_data.I_b < 10 && upstream_control_data.I_b > -10)
+                        ++phase_counter[B];
+                    else
+                        phase_counter[B] = 0;
+
+                    if (upstream_control_data.I_c < 10 && upstream_control_data.I_c > -10)
+                        ++phase_counter[C];
+                    else
+                        phase_counter[C] = 0;
+                }
+
+                if (phase_counter[A] > 10000)
+                    upstream_control_data.error_status = PHASE_FAILURE_L1;
+                if (phase_counter[B] > 10000)
+                    upstream_control_data.error_status = PHASE_FAILURE_L2;
+                if (phase_counter[C] > 10000)
+                    upstream_control_data.error_status = PHASE_FAILURE_L3;
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -873,6 +923,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
                 xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
+                xscope_int(HALL, upstream_control_data.hall_state);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
@@ -886,7 +937,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
-
 
                 break;
 
@@ -1106,6 +1156,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
+                if (phase_counter[A] > 10000)
+                    upstream_control_data_out.error_status = PHASE_FAILURE_L1;
+                if (phase_counter[B] > 10000)
+                    upstream_control_data_out.error_status = PHASE_FAILURE_L2;
+                if (phase_counter[C] > 10000)
+                    upstream_control_data_out.error_status = PHASE_FAILURE_L3;
+
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                 {
@@ -1228,6 +1285,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 i_torque_control.reset_faults();
                 error_sens = NO_ERROR;
                 error_phase = NO_ERROR;
+                for (int i = 0; i < NR_PHASES; i++)
+                    phase_counter[i] = 0;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
