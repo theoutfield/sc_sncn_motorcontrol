@@ -164,7 +164,7 @@
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
-#define BRAKE_RELEASE_STRATEGY     80    // 0 disabled, 1 normal, 2-100 shaking
+#define BRAKE_RELEASE_STRATEGY     0    // 0 disabled, 1 normal, 2-100 shaking
 #define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 // Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
