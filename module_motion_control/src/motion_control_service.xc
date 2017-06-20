@@ -505,7 +505,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 filter_input  =  ((double)(torque_ref_k));
                 filter_output = second_order_LP_filter_update(&filter_input, torque_filter_param);
 
-                if(motion_ctrl_config.filter>=0)
+                if(motion_ctrl_config.filter>0)
                     i_torque_control.set_torque(((int)(filter_output))); // use the filter only if the filter cut-off frequency is bigger/equal to zero, otherwise, do not use filter
                 else
                     i_torque_control.set_torque(((int)(torque_ref_k)));
