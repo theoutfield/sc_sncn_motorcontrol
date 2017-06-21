@@ -193,6 +193,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             pos_ctrl_auto_tune.counter=0;
 
             pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max/3;
+            pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max/3;
+            pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft/3;
         }
 
         if(pos_ctrl_auto_tune.counter==pos_ctrl_auto_tune.counter_max)
@@ -268,6 +270,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     pos_ctrl_auto_tune.kpi = pos_ctrl_auto_tune.kpp/10000;
 
                     pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max*3;
+                    pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max*3;
+                    pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft*3;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
@@ -294,6 +298,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*90)/100;
 
                     pos_ctrl_auto_tune.counter_max/=3;
+                    pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max/3;
+                    pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft/3;
                     pos_ctrl_auto_tune.err_energy_ss_int_min/=3;
 
                     pos_ctrl_auto_tune.kvl = 100000;
