@@ -233,6 +233,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
+                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
