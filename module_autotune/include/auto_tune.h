@@ -103,6 +103,7 @@ typedef struct {
     double overshoot;
     double overshoot_max;
 
+    int max_motor_speed;
 } PosCtrlAutoTuneParam;
 
 
