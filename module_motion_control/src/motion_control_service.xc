@@ -315,11 +315,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // open phase detection
     float resist = 0;
     int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
-    int current_a = 0, phase_counter[NR_PHASES];
+    int current_a = 0;
     printf("%d\n", error_phase);
-    int  ftr = 0, filter_ctr = 0;
-    float filter_b[NR_PHASES] = { 0 }, rms_old[NR_PHASES] =  { 0 }, rms[NR_PHASES] = { 0 };
+    int ftr = 0, filter_ctr = 0;
+    float filter_c[NR_PHASES] = { 0 }, filter_c_old[NR_PHASES] =  { 0 }, rms[NR_PHASES] = { 0 };
     int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect[NR_PHASES] = { 0 }, phase_cur[NR_PHASES] = { 0 };
+    timer t_set;
+    unsigned t_start, end;
 
     int angle = 0;
     int velocity = 0;
@@ -808,19 +810,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
 
-                switch (error_phase)
-                {
-                    case A:
-                        upstream_control_data.error_status = PHASE_FAILURE_L1;
-                        break;
-                    case B:
-                        upstream_control_data.error_status = PHASE_FAILURE_L2;
-                        break;
-                    case C:
-                        upstream_control_data.error_status = PHASE_FAILURE_L3;
-                        break;
-                }
-
                 switch (error_sens)
                 {
                     case SPEED_ERR:
@@ -840,6 +829,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
+                t_set :> start;
+                t_set :> end;
+                unsigned t_cycle = end -start;
+                t_set :> t_start;
+
+                /*
+                 * feature of detecting the open phase
+                 */
                 ftr++;
                 for (int i = A; i < NR_PHASES; i++)
                 {
@@ -863,6 +860,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     sum_sq[i] += phase_cur[i]*phase_cur[i];
                 }
 
+                /*
+                 * every second rms value is calculated
+                 */
                 if (ftr > 1 && ftr % 1000 == 0)
                 {
                     float mean[NR_PHASES], sd[NR_PHASES];
@@ -870,7 +870,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         mean[i] = (float)sum[i] / ftr;
                         sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
-                        filter_b[i] += mean[i] + sqrt(sd[i]);
+                        rms[i] += mean[i] + sqrt(sd[i]);
                     }
 
                     ftr = 0;
@@ -883,69 +883,113 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     ++filter_ctr;
                 }
 
+                /*
+                 * every two seconds rms value is filtered
+                 * old filtered value of the current is remembered
+                 * change between actual and old values in phases are used as a trigger
+                 */
                 if (filter_ctr == 2)
                 {
-                    if (rms_old[A] == 0 && rms_old[B] == 0 && rms_old[C] == 0)
+                    if (filter_c_old[A] == 0 && filter_c_old[B] == 0 && filter_c_old[C] == 0)
                     {
                         for (int i = A; i < NR_PHASES; i++)
-                            rms_old[i] = filter_b[i] / 2;
+                            filter_c_old[i] = rms[i] / 2;
                     }
                     else
                     {
                         for (int i = A; i < NR_PHASES; i++)
-                            rms[i] = filter_b[i] / 2;
+                            filter_c[i] = rms[i] / 2;
 
-                        printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", rms[A], rms_old[A], rms[B], rms_old[B], rms[C], rms_old[C]);
+//                        printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", rms[A], rms_old[A], rms[B], rms_old[B], rms[C], rms_old[C]);
 
-                        if (rms[A] - rms_old[A] < -0.1*rms_old[A])
+                        if (filter_c[A] - filter_c_old[A] < -0.1*filter_c_old[A])
                         {
-                            if (rms[B] - rms_old[B] > 0.1*rms_old[B] && rms[C] - rms_old[C] > 0.1*rms_old[C])
+                            if (filter_c[B] - filter_c_old[B] > 0.1*filter_c_old[B] && filter_c[C] - filter_c_old[C] > 0.1*filter_c_old[C])
                             {
                                 if (detect[A])
                                 {
                                     detect[A] += 2;
                                     if (detect[A] == 7)
-                                        printf("open phase A\n");
+                                    {
+                                        error_phase = A;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    printf("detect 1\n");
                                     detect[A] = 1;
                                 }
 
                             }
                         }
-                        else if (rms[B] - rms_old[B] < -0.1*rms_old[B])
+                        else if (filter_c[B] - filter_c_old[B] < -0.1*filter_c_old[B])
                         {
-                            if (rms[C] - rms_old[C] > 0.1*rms_old[C] && rms[A] - rms_old[A] > 0.1*rms_old[A])
+                            if (filter_c[C] - filter_c_old[C] > 0.1*filter_c_old[C] && filter_c[A] - filter_c_old[A] > 0.1*filter_c_old[A])
                             {
                                 if (detect[B])
                                 {
                                     detect[B] += 2;
                                     if (detect[B] == 7)
-                                        printf("open phase B\n");
+                                    {
+                                        error_phase = B;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    printf("detect 2\n");
                                     detect[B] = 1;
                                 }
 
                             }
                         }
-                        else if (rms[C] - rms_old[C] < -0.1*rms_old[C])
+                        else if (filter_c[C] - filter_c_old[C] < -0.1*filter_c_old[C])
                         {
-                            if (rms[A] - rms_old[A] > 0.1*rms_old[A] && rms[B] - rms_old[B] > 0.1*rms_old[B])
+                            if (filter_c[A] - filter_c_old[A] > 0.1*filter_c_old[A] && filter_c[B] - filter_c_old[B] > 0.1*filter_c_old[B])
                             {
                                 if (detect[C])
                                 {
                                     detect[C] += 2;
                                     if (detect[C] == 7)
-                                        printf("open phase C\n");
+                                    {
+                                        error_phase = C;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    printf("detect 3\n");
                                     detect[C] = 1;
                                 }
 
@@ -955,15 +999,31 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         {
                             for (int i = A; i < NR_PHASES; i++)
                             {
-                                rms_old[i] = rms[i];
+                                filter_c_old[i] = filter_c[i];
                                 detect[i] = 0;
                             }
                         }
                     }
 
                     for (int i = A; i < NR_PHASES; i++)
-                        filter_b[i] = 0;
+                        rms[i] = 0;
                     filter_ctr = 0;
+                }
+
+                t_set :> end;
+//                printf("time = %d\n", end-t_start-t_cycle);
+
+                switch (error_phase)
+                {
+                    case A:
+                        upstream_control_data.error_status = PHASE_FAILURE_L1;
+                        break;
+                    case B:
+                        upstream_control_data.error_status = PHASE_FAILURE_L2;
+                        break;
+                    case C:
+                        upstream_control_data.error_status = PHASE_FAILURE_L3;
+                        break;
                 }
 
 #ifdef XSCOPE_POSITION_CTRL
@@ -1211,13 +1271,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
-                if (phase_counter[A] > 10000)
-                    upstream_control_data_out.error_status = PHASE_FAILURE_L1;
-                if (phase_counter[B] > 10000)
-                    upstream_control_data_out.error_status = PHASE_FAILURE_L2;
-                if (phase_counter[C] > 10000)
-                    upstream_control_data_out.error_status = PHASE_FAILURE_L3;
-
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                 {
@@ -1340,8 +1393,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 i_torque_control.reset_faults();
                 error_sens = NO_ERROR;
                 error_phase = NO_ERROR;
+                filter_ctr = 0;
+                ftr = 0;
                 for (int i = 0; i < NR_PHASES; i++)
-                    phase_counter[i] = 0;
+                    detect[i] = 0;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
