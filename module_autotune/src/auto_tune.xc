@@ -160,6 +160,8 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
     pos_ctrl_auto_tune.overshoot=0.00;
     pos_ctrl_auto_tune.overshoot_max=0.00;
 
+    pos_ctrl_auto_tune.max_motor_speed=motion_ctrl_config.max_motor_speed;                /**< Parameter for setting the maximum motor speed */
+    motion_ctrl_config.max_motor_speed = 1000;
     return 0;
 }
 
@@ -191,6 +193,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             pos_ctrl_auto_tune.counter=0;
 
             pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max/3;
+            pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max/3;
+            pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft/3;
         }
 
         if(pos_ctrl_auto_tune.counter==pos_ctrl_auto_tune.counter_max)
@@ -229,6 +233,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
+                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
@@ -266,6 +271,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     pos_ctrl_auto_tune.kpi = pos_ctrl_auto_tune.kpp/10000;
 
                     pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max*3;
+                    pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max*3;
+                    pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft*3;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
@@ -292,6 +299,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*90)/100;
 
                     pos_ctrl_auto_tune.counter_max/=3;
+                    pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max/3;
+                    pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft/3;
                     pos_ctrl_auto_tune.err_energy_ss_int_min/=3;
 
                     pos_ctrl_auto_tune.kvl = 100000;
@@ -344,6 +353,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*90)/100;
 
                     pos_ctrl_auto_tune.counter_max*=3;
+                    pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max*3;
+                    pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft*3;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
@@ -475,13 +486,14 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpl += 50;
+                    pos_ctrl_auto_tune.kpl += 5;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
+                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
@@ -512,7 +524,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < 10*pos_ctrl_auto_tune.err_energy_ss_int_min)
                 {
-                    pos_ctrl_auto_tune.kpl+=100;
+                    pos_ctrl_auto_tune.kpl+=50;
                 }
                 else
                 {
