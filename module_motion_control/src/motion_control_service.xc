@@ -316,12 +316,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     float resist = 0;
     int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
     int current_a = 0;
-    printf("%d\n", error_phase);
     int ftr = 0, filter_ctr = 0;
     float filter_c[NR_PHASES] = { 0 }, filter_c_old[NR_PHASES] =  { 0 }, rms[NR_PHASES] = { 0 };
     int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect[NR_PHASES] = { 0 }, phase_cur[NR_PHASES] = { 0 };
-    timer t_set;
-    unsigned t_start, end;
 
     int angle = 0;
     int velocity = 0;
@@ -333,14 +330,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int max_pos = (1<<16), mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
     int max_angle = (1<<12), mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
     int old_position, old_angle;
-    int index_v = 0, start = 0, velocity_arr[100];
-    int index_d = 0, start_d = 0, difference = 0, difference_arr[100];
+    int index_v = 0, start = 0, velocity_arr[500];
+    int index_d = 0, start_d = 0, difference = 0, difference_arr[500];
     int filter_diff = 0, filter_vel = 0;
     int hall_state_ch[NR_PHASES] = { 0 };
     int hall_state_old;
+    int max_pos_found = 0, max_angle_found = 0;
     sensor_fault error_sens = NO_ERROR;
-
-    error_phase = 1;
 
     // testing the angle, position, velocity from the sensor
     // testing Hall ports
@@ -352,7 +348,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         max_angle = 0;
         i_torque_control.enable_index_detection();
 
-        while(counter < 7000)
+        while(counter < 20000)
         {
             upstream_control_data = i_torque_control.update_upstream_control_data();
             count = upstream_control_data.position;
@@ -395,35 +391,45 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
             }
 
-            if (angle > max_angle && angle > 4000)
+            if (angle > 4000 && !max_angle_found)
             {
+                max_angle_found = 1;
                 max_angle = angle;
                 mean_angle = max_angle / 2;
                 tq_angle = (max_angle + mean_angle) / 2;
                 fq_angle = mean_angle / 2;
             }
-            else if (angle > mean_angle - 20 && angle < mean_angle + 20)
-                real_mean_angle = angle;
-            else if (angle > tq_angle - 20 && angle < tq_angle + 20)
-                real_tq_angle = angle;
-            else if (angle > fq_angle - 20 && angle < fq_angle + 20)
-                real_fq_angle = angle;
 
-            if (position > max_pos && position > 60000)
+            if (max_angle_found)
             {
+                if (angle > mean_angle - 50 && angle < mean_angle + 50)
+                    real_mean_angle = angle;
+                if (angle > tq_angle - 50 && angle < tq_angle + 50)
+                    real_tq_angle = angle;
+                if (angle > fq_angle - 50 && angle < fq_angle + 50)
+                    real_fq_angle = angle;
+            }
+
+            if (!max_pos_found && position > 60000)
+            {
+                max_pos_found = 1;
                 max_pos = position;
                 mean_pos = max_pos / 2;
                 tq_pos = (max_pos + mean_pos) / 2;
                 fq_pos = mean_pos / 2;
             }
-            else if (position > mean_pos -20 && position < mean_pos + 20)
-                real_mean_pos = position;
-            else if (position > tq_pos - 20 && position < tq_pos + 20)
-                real_tq_pos = position;
-            else if (position > fq_pos - 20 && position < fq_pos + 20)
-                real_fq_pos = position;
 
-            if (index_v < 100)
+            if (max_pos_found)
+            {
+                if (position > mean_pos -100 && position < mean_pos + 100)
+                    real_mean_pos = position;
+                if (position > tq_pos - 100 && position < tq_pos + 100)
+                    real_tq_pos = position;
+                if (position > fq_pos - 100 && position < fq_pos + 100)
+                    real_fq_pos = position;
+            }
+
+            if (index_v < 500)
                 velocity_arr[index_v++] = velocity;
             else
             {
@@ -433,13 +439,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             if (start)
             {
                 filter_vel = 0;
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 500; i++)
                     filter_vel += velocity_arr[i];
-                filter_vel /= 100;
+                filter_vel /= 500;
                 if (filter_vel < 0)
                     filter_vel = -filter_vel;
             }
-            if (index_d < 100)
+            if (index_d < 500)
                 difference_arr[index_d++] = difference;
             else
             {
@@ -449,50 +455,44 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             if (start_d)
             {
                 filter_diff = 0;
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 500; i++)
                     filter_diff += difference_arr[i];
-                filter_diff /= 100;
+                filter_diff /= 500;
                 if (filter_diff < 0)
                     filter_diff = -filter_diff;
             }
 
             ++counter;
 
-            if (counter == 7000)
+            if (counter == 20000)
             {
-                printf("%d %d\n", filter_vel, filter_diff);
                 if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
                     error_sens = SPEED_ERR;
 
-                printf("%d %d %d %d %d %d\n", mean_pos, real_mean_pos, tq_pos, real_tq_pos, fq_pos, real_fq_pos);
-
-                if ((mean_pos-real_mean_pos < -20 || mean_pos-real_mean_pos > 20)
-                        || (tq_pos - real_tq_pos < -20 || tq_pos - real_tq_pos > 20)
-                        || (fq_pos - real_fq_pos < -20 || fq_pos - real_fq_pos > 20)
+                if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
+                        || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
+                        || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
                         || position_ctr < 2000  || max_pos < 60000)
                     error_sens = POS_ERR;
 
-                if ((mean_angle-real_mean_angle < -20 || mean_angle-real_mean_angle > 20)
-                        || (tq_angle - real_tq_angle < -20 || tq_angle - real_tq_angle > 20)
-                        || (fq_angle - real_fq_angle < -20 || fq_angle - real_fq_angle > 20)
+                if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
+                        || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
+                        || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
                         || max_angle < 4000 || angle_ctr < 2000)
                     error_sens = ANGLE_ERR;
 
                 if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
                 {
-                    printf("%d %d %d\n", hall_state_ch[A], hall_state_ch[B], hall_state_ch[C]);
                     if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
                         error_sens = PORTS_ERR;
                 }
             }
 
-            t when timerafter (ts + 1000*app_tile_usec) :> ts;
+            t when timerafter (ts + 500*app_tile_usec) :> ts;
         }
 
         i_torque_control.disable_index_detection();
     }
-
-    printf("%d\n", error_sens);
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_phase && !error_sens)
@@ -829,11 +829,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
-                t_set :> start;
-                t_set :> end;
-                unsigned t_cycle = end -start;
-                t_set :> t_start;
-
                 /*
                  * feature of detecting the open phase
                  */
@@ -899,8 +894,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         for (int i = A; i < NR_PHASES; i++)
                             filter_c[i] = rms[i] / 2;
-
-//                        printf("%.2f %.2f %.2f %.2f %.2f %.2f\n", rms[A], rms_old[A], rms[B], rms_old[B], rms[C], rms_old[C]);
 
                         if (filter_c[A] - filter_c_old[A] < -0.1*filter_c_old[A])
                         {
@@ -1009,9 +1002,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         rms[i] = 0;
                     filter_ctr = 0;
                 }
-
-                t_set :> end;
-//                printf("time = %d\n", end-t_start-t_cycle);
 
                 switch (error_phase)
                 {
