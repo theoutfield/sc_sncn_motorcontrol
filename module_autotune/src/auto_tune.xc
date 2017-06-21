@@ -160,6 +160,8 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
     pos_ctrl_auto_tune.overshoot=0.00;
     pos_ctrl_auto_tune.overshoot_max=0.00;
 
+    pos_ctrl_auto_tune.max_motor_speed=motion_ctrl_config.max_motor_speed;                /**< Parameter for setting the maximum motor speed */
+    motion_ctrl_config.max_motor_speed = 1000;
     return 0;
 }
 
