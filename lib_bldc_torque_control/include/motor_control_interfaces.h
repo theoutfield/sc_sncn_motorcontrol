@@ -48,6 +48,13 @@ interface TorqueControlInterface
     void set_offset_detection_enabled();
 
     /**
+     * @brief Sends the status of the sensor to the motorcontrol
+     *
+     * @return void
+     */
+    void set_sensor_status(int error_sensor);
+
+    /**
      * @brief Enables the safe-torque-off mode
      *
      * @return void
@@ -322,11 +329,27 @@ interface shared_memory_interface
     unsigned int gpio_write_input_read_output(unsigned int in_gpio);
 
     /**
-     * @brief Write write gpio output data to shared memory.
+     * @brief Write gpio output data to shared memory.
      *
      * @param  gpio output data.
      */
     void write_gpio_output(unsigned int out_gpio);
+
+    /**
+     * @brief Write hall state angle to shared memory.
+     *
+     * @param in_hall_state_angle Hall state angle array
+     */
+    void write_hall_state_angle(int in_hall_state_angle[6]);
+
+    /**
+     * @brief Read hall state angle from shared memory.
+     *
+     * @param out_hall_state_angle Hall state angle array
+     *
+     * @return 1 if the data is valid
+     */
+    int read_hall_state_angle(int out_hall_state_angle[6]);
 };
 
 /**

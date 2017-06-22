@@ -244,6 +244,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port, HallEncSelectPort * hal
                 position_feedback_config.ifm_usec = ifm_usec;
                 read_period = init_sensor(qei_hall_port, hall_enc_select_port, spi_ports, gpio_ports, hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
                 crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
+                write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {

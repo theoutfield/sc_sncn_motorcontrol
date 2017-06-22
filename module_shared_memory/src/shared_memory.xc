@@ -12,6 +12,8 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
 
     UpstreamControlData data = {0};
     unsigned int gpio_write_buffer = 0;
+    int hall_state_angle[6] = {0};
+    int hall_state_angle_valid = 0;
 
     while (1) {
         select {
@@ -86,6 +88,20 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 data.secondary_sensor_error = sensor_error;
                 data.secondary_last_sensor_error = last_sensor_error;
                 data.secondary_sensor_timestamp = timestamp;
+                break;
+
+        case i_shared_memory[int j].write_hall_state_angle(int in_hall_state_angle[6]):
+                for (int i=0 ; i<6 ; i++) {
+                    hall_state_angle[i] = in_hall_state_angle[i];
+                }
+                hall_state_angle_valid = 1;
+                break;
+
+        case i_shared_memory[int j].read_hall_state_angle(int out_hall_state_angle[6]) -> int out_hall_state_angle_valid:
+                for (int i=0 ; i<6 ; i++) {
+                    out_hall_state_angle[i] = hall_state_angle[i];
+                }
+                out_hall_state_angle_valid = hall_state_angle_valid;
                 break;
         }
     }

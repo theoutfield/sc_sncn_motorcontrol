@@ -108,6 +108,11 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
     unsigned int hall_transition_period_at_low_speeds;
     unsigned int speed_reduction_factor;
 
+    //send hall state angle to motorcontrol through shared memory
+    if (!isnull(i_shared_memory)) {
+        i_shared_memory.write_hall_state_angle(position_feedback_config.hall_config.hall_state_angle);
+    }
+
     int hall_direction;
     hall_direction = 0;
 
@@ -233,7 +238,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 hv.hall_pole_pairs = position_feedback_config.pole_pairs;
                 hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
                 hv.sensor_polarity=position_feedback_config.polarity;
-
+                write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {

@@ -74,6 +74,12 @@ int main(void)
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+                position_feedback_config.hall_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
+                position_feedback_config.hall_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
+                position_feedback_config.hall_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
+                position_feedback_config.hall_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
+                position_feedback_config.hall_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
+                position_feedback_config.hall_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, null, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
