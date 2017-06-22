@@ -325,11 +325,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     unsigned position_ctr = (1<<16), angle_ctr = (1<<12), counter = 0;
     int max_pos = (1<<16), mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
     int max_angle = (1<<12), mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
-    int old_position, old_angle;
+    int old_position, old_angle, hall_state_old = 0, qei_pos = 0, qei_pos_old = 0;
     int index_v = 0, velocity_arr[500], index_d = 0, difference = 0, difference_arr[500];
     int filter_diff = 0, filter_vel = 0;
-    int hall_state_ch[NR_PHASES] = { 0 };
-    int hall_state_old = 0, hall_order_err = 0;
+    int hall_state_ch[NR_PHASES] = { 0 }, hall_order_err = 0, qei_err_counter = 0;
     int max_pos_found = 0, max_angle_found = 0;
     sensor_fault error_sens = NO_ERROR;
     timer tm_hall;
@@ -923,6 +922,27 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         error_sens = PORTS_ERR;
                     }
+                }
+
+                if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                {
+                    qei_pos = upstream_control_data.singleturn;
+
+                    if(qei_pos != qei_pos_old)
+                    {
+                       if (qei_pos == 0)
+                           qei_err_counter = 1;
+                       else
+                           qei_err_counter = 0;
+                    }
+
+                    if (qei_err_counter && qei_pos == 0)
+                        ++qei_err_counter;
+
+                    if (qei_err_counter == 1000)
+                        error_sens = POS_ERR;
+
+                    qei_pos_old = qei_pos;
                 }
 
                 break;
