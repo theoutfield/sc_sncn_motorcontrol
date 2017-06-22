@@ -312,7 +312,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/cogging_compensation}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.xc.compiler.input.1724638801" name="XC" superClass="com.xmos.cdt.xc.compiler.input"/>
 							</tool>
@@ -753,7 +752,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/cogging_compensation}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.c.compiler.input.c.1113716939" name="C" superClass="com.xmos.cdt.c.compiler.input.c"/>
 							</tool>
@@ -1199,7 +1197,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_auto_tune/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/lib_dsp/doc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/module_bldc_torque_control/libsrc/cogging_compensation}&quot;"/>
 								</option>
 								<inputType id="com.xmos.cdt.cxx.compiler.input.cpp.339654512" name="C++" superClass="com.xmos.cdt.cxx.compiler.input.cpp"/>
 							</tool>
@@ -2017,5 +2014,4 @@
 		<project id="app_control_tuning.null.845073451" name="app_control_tuning"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
 </cproject>

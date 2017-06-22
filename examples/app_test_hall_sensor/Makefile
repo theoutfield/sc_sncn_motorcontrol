@@ -5,7 +5,7 @@
 # Possible SOMANET targets:
 # SOMANET-C22
 # SOMANET-C21-DX
-TARGET = SOMANET-C21-DX_G2
+TARGET = 
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to
@@ -13,7 +13,7 @@ TARGET = SOMANET-C21-DX_G2
 APP_NAME = app_test_hall_sensor
 
 # The USED_MODULES variable lists other module used by the application.
-USED_MODULES = configuration_parameters module_biss_encoder module_bldc_torque_control module_board-support module_encoder_rem_14 module_encoder_rem_16mt module_filters module_hall_sensor module_incremental_encoder module_position_feedback module_serial_encoder module_shared_memory module_spi_master module_utils
+USED_MODULES = configuration_parameters lib_bldc_torque_control module_biss_encoder module_board-support module_encoder_rem_14 module_encoder_rem_16mt module_filters module_hall_sensor module_incremental_encoder module_position_feedback module_serial_encoder module_shared_memory module_spi_master module_utils
 
 # The flags passed to xcc when building the application
 # You can also set the following to override flags for a particular language:
