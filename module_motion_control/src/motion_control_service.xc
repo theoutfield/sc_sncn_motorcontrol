@@ -49,7 +49,7 @@ int open_phase_detection_function(client interface TorqueControlInterface client
 {
     UpstreamControlData upstream_control_data;
     float I[NR_PHASES] = { 0 };
-    int refer[NR_PHASES] = {0, 20, 30, 30};// make b and c terminal volateg as cloase as voltage on terminal a at the startup
+    int refer[NR_PHASES] = {0, 20, 30, 30};// make b and c terminal voltage as close as voltage on terminal a at the startup
     unsigned counter = 1;
     float voltage = 0;
     int error_phase = NO_ERROR;
@@ -1027,14 +1027,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
                 xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-                xscope_int(HALL, upstream_control_data.hall_state);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
                 xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
-                xscope_int(I_A, current_a);
                 xscope_int(I_B, upstream_control_data.I_b);
                 xscope_int(I_C, upstream_control_data.I_c);
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
