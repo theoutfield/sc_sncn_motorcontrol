@@ -1264,6 +1264,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
                 error_sens = NO_ERROR;
+                hall_order_err = 0;
                 error_phase = NO_ERROR;
                 break;
 
