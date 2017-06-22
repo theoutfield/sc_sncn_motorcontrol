@@ -48,6 +48,13 @@ interface TorqueControlInterface
     void set_offset_detection_enabled();
 
     /**
+     * @brief Sends the status of the sensor to the motorcontrol
+     *
+     * @return void
+     */
+    void set_sensor_status(int error_sensor);
+
+    /**
      * @brief Enables the safe-torque-off mode
      *
      * @return void
