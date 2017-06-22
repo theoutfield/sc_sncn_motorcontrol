@@ -328,7 +328,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int old_position, old_angle, hall_state_old = 0, qei_pos = 0, qei_pos_old = 0;
     int index_v = 0, velocity_arr[500], index_d = 0, difference = 0, difference_arr[500];
     int filter_diff = 0, filter_vel = 0;
-    int hall_state_ch[NR_PHASES] = { 0 }, hall_order_err = 0, qei_err_counter = 0;
+    int hall_state_ch[NR_PHASES] = { 0 }, hall_order_err = 0, qei_err_counter = 0, flag_lost_ticks = 0;
     int max_pos_found = 0, max_angle_found = 0;
     sensor_fault error_sens = NO_ERROR;
     timer tm_hall;
@@ -842,6 +842,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
+                if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                    if (upstream_control_data.ticks_notification)
+                        flag_lost_ticks = 1;
+
+                if (flag_lost_ticks)
+                    upstream_control_data.error_status = QEI_INDEX_LOSING_TICKS;
+
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -1163,6 +1170,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
+                if (flag_lost_ticks)
+                    upstream_control_data_out.error_status = QEI_INDEX_LOSING_TICKS;
+
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                 {
@@ -1286,6 +1296,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 error_sens = NO_ERROR;
                 hall_order_err = 0;
                 qei_err_counter = 0;
+                flag_lost_ticks = 0;
                 error_phase = NO_ERROR;
                 break;
 

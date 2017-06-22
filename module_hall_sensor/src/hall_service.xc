@@ -440,7 +440,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 singleturn = (singleturn * 16) / position_feedback_config.pole_pairs; // singleturn = (singleturn * 2**16) / (2**12 * pole_pairs)
 
                 tx :> time1;
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn, speed_out, angle_out, hall_state_new, 0, SENSOR_NO_ERROR, SENSOR_NO_ERROR, time1/position_feedback_config.ifm_usec);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn, speed_out, angle_out, hall_state_new, 0, SENSOR_NO_ERROR, SENSOR_NO_ERROR, time1/position_feedback_config.ifm_usec, 0);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);

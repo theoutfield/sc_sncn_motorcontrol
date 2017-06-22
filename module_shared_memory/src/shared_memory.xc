@@ -33,7 +33,7 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 out_data = data;
                 break;
 
-        case i_shared_memory[int j].write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp):
+        case i_shared_memory[int j].write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp, int ticks_notification):
                 data.angle = angle;
                 data.hall_state = hall_state;
                 data.qei_index_found = qei_index_found;
@@ -46,6 +46,7 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 data.sensor_error = sensor_error;
                 data.last_sensor_error = last_sensor_error;
                 data.sensor_timestamp = timestamp;
+                data.ticks_notification = ticks_notification;
                 break;
 
         case i_shared_memory[int j].write_angle(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int velocity, SensorError sensor_error, SensorError last_sensor_error):
@@ -57,7 +58,7 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 data.angle_last_sensor_error = last_sensor_error;
                 break;
 
-        case i_shared_memory[int j].write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp):
+        case i_shared_memory[int j].write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp, int ticks_notification):
                 data.angle = angle;
                 data.hall_state = hall_state;
                 data.qei_index_found = qei_index_found;
@@ -70,6 +71,7 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 data.secondary_sensor_error = sensor_error;
                 data.secondary_last_sensor_error = last_sensor_error;
                 data.secondary_sensor_timestamp = timestamp;
+                data.ticks_notification = ticks_notification;
                 break;
 
         case i_shared_memory[int j].write_primary_feedback(int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp):

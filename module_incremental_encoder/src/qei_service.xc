@@ -74,6 +74,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
     int notification = MOTCTRL_NTF_EMPTY;
 
+    int ticks_notification = 0;
 
     // used to compute the singleturn
     int shift = position_feedback_config.resolution;
@@ -128,6 +129,10 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
                             //realign the count with the position in case we missed ticks
                             int align = (count % position_feedback_config.resolution);
+                            if (align != 0)
+                                ticks_notification = 1;
+                            else
+                                ticks_notification = 0;
                             if ((align < (position_feedback_config.resolution/2)) && (align > (-position_feedback_config.resolution/2))) {
                                 count -= align;
                             } else if (align > 0) {
@@ -223,7 +228,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 // set the singleturn position to a 16 bits format
                 int singleturn = position * (1 << (16 - shift_counter)) / shift;
 
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/ifm_usec);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, SENSOR_NO_ERROR, SENSOR_NO_ERROR, ts_velocity/ifm_usec, ticks_notification);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
