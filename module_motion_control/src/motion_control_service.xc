@@ -81,7 +81,7 @@ int open_phase_detection_function(client interface TorqueControlInterface client
             i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
         }
 
-        if (refer[B] > 50 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
+        if (refer[B] > 60 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
         {
             if (I[A] < rated_curr/4)
                 error_phase = A;
@@ -327,172 +327,172 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int hall_state = 0;
 
     unsigned position_ctr = (1<<16), angle_ctr = (1<<12), counter = 0;
-    int max_pos = (1<<16), mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
-    int max_angle = (1<<12), mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
-    int old_position, old_angle;
-    int index_v = 0, start = 0, velocity_arr[500];
-    int index_d = 0, start_d = 0, difference = 0, difference_arr[500];
-    int filter_diff = 0, filter_vel = 0;
-    int hall_state_ch[NR_PHASES] = { 0 };
-    int hall_state_old;
-    int max_pos_found = 0, max_angle_found = 0;
-    sensor_fault error_sens = NO_ERROR;
+       int max_pos = (1<<16), mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
+       int max_angle = (1<<12), mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
+       int old_position, old_angle;
+       int index_v = 0, velocity_arr[500], index_d = 0, difference = 0, difference_arr[500];
+       int filter_diff = 0, filter_vel = 0;
+       int hall_state_ch[NR_PHASES] = { 0 };
+       int hall_state_old;
+       int max_pos_found = 0, max_angle_found = 0;
+       sensor_fault error_sens = NO_ERROR;
 
-    // testing the angle, position, velocity from the sensor
-    // testing Hall ports
-    if (!error_phase)
-    {
-        position_ctr = 0;
-        angle_ctr = 0;
-        max_pos = 0;
-        max_angle = 0;
-        i_torque_control.enable_index_detection();
+       // testing the angle, position, velocity from the sensor
+       // testing Hall ports
+       if (!error_phase)
+       {
+           position_ctr = 0;
+           angle_ctr = 0;
+           max_pos = 0;
+           max_angle = 0;
+           i_torque_control.enable_index_detection();
 
-        while(counter < 20000)
-        {
-            upstream_control_data = i_torque_control.update_upstream_control_data();
-            count = upstream_control_data.position;
-            position = upstream_control_data.singleturn;
-            velocity = upstream_control_data.velocity;
-            angle = upstream_control_data.angle;
-            hall_state = upstream_control_data.hall_state;
+           while(counter < 20000)
+           {
+               upstream_control_data = i_torque_control.update_upstream_control_data();
+               count = upstream_control_data.position;
+               position = upstream_control_data.singleturn;
+               velocity = upstream_control_data.velocity;
+               angle = upstream_control_data.angle;
+               hall_state = upstream_control_data.hall_state;
 
-            if (counter == 0)
-            {
-                old_position = position;
-                old_angle = angle;
-                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                    hall_state_old = hall_state;
-            }
-            else
-            {
-                if (old_position != position)
-                {
-                    difference = position - old_position;
-                    old_position = position;
-                    ++position_ctr;
-                }
-                if (old_angle != angle)
-                {
-                    old_angle = angle;
-                    ++angle_ctr;
-                }
+               if (counter == 0)
+               {
+                   old_position = position;
+                   old_angle = angle;
+                   if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                       hall_state_old = hall_state;
+               }
+               else
+               {
+                   if (old_position != position)
+                   {
+                       difference = position - old_position;
+                       old_position = position;
+                       ++position_ctr;
+                   }
+                   if (old_angle != angle)
+                   {
+                       old_angle = angle;
+                       ++angle_ctr;
+                   }
 
-                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                {
-                    if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
-                        ++hall_state_ch[A];
-                    if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
-                        ++hall_state_ch[B];
-                    if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
-                        ++hall_state_ch[C];
+                   if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                   {
+                       if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
+                           ++hall_state_ch[A];
+                       if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
+                           ++hall_state_ch[B];
+                       if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
+                           ++hall_state_ch[C];
 
-                    hall_state_old = hall_state;
-                }
-            }
+                       hall_state_old = hall_state;
+                   }
+               }
 
-            if (angle > 4000 && !max_angle_found)
-            {
-                max_angle_found = 1;
-                max_angle = angle;
-                mean_angle = max_angle / 2;
-                tq_angle = (max_angle + mean_angle) / 2;
-                fq_angle = mean_angle / 2;
-            }
+               if (angle > 4000 && !max_angle_found)
+               {
+                   max_angle_found = 1;
+                   max_angle = angle;
+                   mean_angle = max_angle / 2;
+                   tq_angle = (max_angle + mean_angle) / 2;
+                   fq_angle = mean_angle / 2;
+               }
 
-            if (max_angle_found)
-            {
-                if (angle > mean_angle - 50 && angle < mean_angle + 50)
-                    real_mean_angle = angle;
-                if (angle > tq_angle - 50 && angle < tq_angle + 50)
-                    real_tq_angle = angle;
-                if (angle > fq_angle - 50 && angle < fq_angle + 50)
-                    real_fq_angle = angle;
-            }
+               if (max_angle_found)
+               {
+                   if (angle > mean_angle - 50 && angle < mean_angle + 50)
+                       real_mean_angle = angle;
+                   if (angle > tq_angle - 50 && angle < tq_angle + 50)
+                       real_tq_angle = angle;
+                   if (angle > fq_angle - 50 && angle < fq_angle + 50)
+                       real_fq_angle = angle;
+               }
 
-            if (!max_pos_found && position > 60000)
-            {
-                max_pos_found = 1;
-                max_pos = position;
-                mean_pos = max_pos / 2;
-                tq_pos = (max_pos + mean_pos) / 2;
-                fq_pos = mean_pos / 2;
-            }
+               if (!max_pos_found && position > 60000)
+               {
+                   max_pos_found = 1;
+                   max_pos = position;
+                   mean_pos = max_pos / 2;
+                   tq_pos = (max_pos + mean_pos) / 2;
+                   fq_pos = mean_pos / 2;
+               }
 
-            if (max_pos_found)
-            {
-                if (position > mean_pos -100 && position < mean_pos + 100)
-                    real_mean_pos = position;
-                if (position > tq_pos - 100 && position < tq_pos + 100)
-                    real_tq_pos = position;
-                if (position > fq_pos - 100 && position < fq_pos + 100)
-                    real_fq_pos = position;
-            }
+               if (max_pos_found)
+               {
+                   if (position > mean_pos -100 && position < mean_pos + 100)
+                       real_mean_pos = position;
+                   if (position > tq_pos - 100 && position < tq_pos + 100)
+                       real_tq_pos = position;
+                   if (position > fq_pos - 100 && position < fq_pos + 100)
+                       real_fq_pos = position;
+               }
 
-            if (index_v < 500)
-                velocity_arr[index_v++] = velocity;
-            else
-            {
-                start = 1;
-                index_v = 0;
-            }
-            if (start)
-            {
-                filter_vel = 0;
-                for (int i = 0; i < 500; i++)
-                    filter_vel += velocity_arr[i];
-                filter_vel /= 500;
-                if (filter_vel < 0)
-                    filter_vel = -filter_vel;
-            }
-            if (index_d < 500)
-                difference_arr[index_d++] = difference;
-            else
-            {
-                start_d = 1;
-                index_d = 0;
-            }
-            if (start_d)
-            {
-                filter_diff = 0;
-                for (int i = 0; i < 500; i++)
-                    filter_diff += difference_arr[i];
-                filter_diff /= 500;
-                if (filter_diff < 0)
-                    filter_diff = -filter_diff;
-            }
+               velocity_arr[index_v] = velocity;
+               index_v++;
+               if (index_v == 500)
+               {
+                   index_v = 0;
+                   filter_vel = 0;
+                   for (int i = 0; i < 500; i++)
+                       filter_vel += velocity_arr[i];
+                   filter_vel /= 500;
+                   if (filter_vel < 0)
+                       filter_vel = -filter_vel;
+               }
 
-            ++counter;
+               difference_arr[index_d] = difference;
+               index_d++;
+               if (index_d == 500)
+               {
+                   index_d = 0;
+                   filter_diff = 0;
+                   for (int i = 0; i < 500; i++)
+                       filter_diff += difference_arr[i];
+                   filter_diff /= 500;
+                   if (filter_diff < 0)
+                       filter_diff = -filter_diff;
+               }
 
-            if (counter == 20000)
-            {
-                if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
-                    error_sens = SPEED_ERR;
+               ++counter;
 
-                if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
-                        || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
-                        || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
-                        || position_ctr < 2000  || max_pos < 60000)
-                    error_sens = POS_ERR;
+               if (counter == 20000)
+               {
+                   if (filter_vel < 50)
+                   {
+                       if (filter_vel - filter_diff < -30 || filter_vel - filter_diff > 30)
+                           error_sens = SPEED_ERR;
+                   }
+                   else
+                   {
+                       if (filter_vel - filter_diff < -60 || filter_vel - filter_diff > 60)
+                           error_sens = SPEED_ERR;
+                   }
 
-                if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
-                        || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
-                        || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
-                        || max_angle < 4000 || angle_ctr < 2000)
-                    error_sens = ANGLE_ERR;
+                   if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
+                           || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
+                           || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
+                           || position_ctr < 2000  || max_pos < 60000)
+                       error_sens = POS_ERR;
 
-                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                {
-                    if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
-                        error_sens = PORTS_ERR;
-                }
-            }
+                   if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
+                           || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
+                           || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
+                           || max_angle < 4000 || angle_ctr < 2000)
+                       error_sens = ANGLE_ERR;
 
-            t when timerafter (ts + 500*app_tile_usec) :> ts;
-        }
+                   if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                   {
+                       if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+                           error_sens = PORTS_ERR;
+                   }
+               }
 
-        i_torque_control.disable_index_detection();
-    }
+               t when timerafter (ts + 500*app_tile_usec) :> ts;
+           }
+
+           i_torque_control.disable_index_detection();
+   }
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_phase && !error_sens)
