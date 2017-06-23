@@ -282,6 +282,7 @@ void multiturn(int &count, int last_position, int position, int ticks_per_turn);
  * @param hall_state The Hall pin state if Hall sensor is used
  * @param sensor_error the sensor error status
  * @param timestamp timestamp in microseconds of when the position data was read
+ * @param information about losing ticks in a case of using a QEI with INDEX.
  */
 void write_shared_memory(client interface shared_memory_interface ?i_shared_memory, SensorFunction sensor_function, int count, int position, int velocity, int angle, int hall_state, unsigned int qei_index_found, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp, int ticks_notification);
 
