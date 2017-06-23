@@ -310,7 +310,7 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  *        After that, the angle, position and velocity feedback from the position sensor is checked.
  *        If one of those is not working properly, fault code for sensor malfunctioning is generated.
  *        In a case of using a Hall sensor, readings from Hall ports are checked (if the Hall ports are toggling and if the readings appear in the right order for cw and ccw motion).
- *        For incremental encoder it is checked if the sensor is proprely plugged and if the application loses ticks from the sensor.
+ *        For incremental encoder it is checked if the sensor is properly plugged and if the service loses ticks from the sensor.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
