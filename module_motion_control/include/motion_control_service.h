@@ -305,11 +305,12 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  * @brief Service to perform torque, velocity or position control.
  *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
- *        During the initialization of the service it is checked if open circuit exists in phases of the motor.
+ *        Service monitors of the open circuit exists in phases of the motor by observing the behaviour of phase currents.
  *        If the error exists, fault code for phase failure is generated.
- *        After that the angle, position and velocity feedback from the position sensor is checked.
+ *        After that, the angle, position and velocity feedback from the position sensor is checked.
  *        If one of those is not working properly, fault code for sensor malfunctioning is generated.
  *        In a case of using a Hall sensor, readings from Hall ports are checked (if the Hall ports are toggling and if the readings appear in the right order for cw and ccw motion).
+ *        For incremental encoder it is checked if the sensor is proprely plugged and if the application loses ticks from the sensor.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
