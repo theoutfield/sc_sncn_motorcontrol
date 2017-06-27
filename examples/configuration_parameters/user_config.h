@@ -132,7 +132,7 @@
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
 //     "1000"                 in case of using position controller in "LT_POSITION_CONTROLLER"               mode
-#define POSITION_INTEGRAL_LIMIT                 1000
+#define POSITION_INTEGRAL_LIMIT                 PEAK_SPEED
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY           MOTION_POLARITY_NORMAL
