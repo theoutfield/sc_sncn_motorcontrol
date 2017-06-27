@@ -16,8 +16,8 @@
 
 // parameters of position controller autotuner
 #define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
-#define AUTO_TUNE_COUNTER_MAX       1500  // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
-#define PER_THOUSAND_OVERSHOOT      10    // Overshoot limit while tuning (it is set as per thousand of step amplitude)
+#define AUTO_TUNE_COUNTER_MAX        4000 // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
+#define PER_THOUSAND_OVERSHOOT         10 // Overshoot limit while tuning (it is set as per thousand of step amplitude)
 
 /**
  * @brief steps of position controller autotuning procedure
