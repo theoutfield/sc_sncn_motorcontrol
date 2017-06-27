@@ -916,19 +916,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 switch (error_sens)
                 {
                     case SPEED_ERR:
-                        upstream_control_data.error_status = SPEED_FAULT;
+                        upstream_control_data.sensor_error = SPEED_FAULT;
                         break;
                     case POS_ERR:
-                        upstream_control_data.error_status = POSITION_FAULT;
+                        upstream_control_data.sensor_error = POSITION_FAULT;
                         break;
                     case ANGLE_ERR:
                         if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                            upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                            upstream_control_data.sensor_error = HALL_SENSOR_FAULT;
                         else
-                            upstream_control_data.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                            upstream_control_data.sensor_error = INCREMENTAL_SENSOR_1_FAULT;
                         break;
                     case PORTS_ERR:
-                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                        upstream_control_data.sensor_error = HALL_SENSOR_FAULT;
                         break;
                 }
 
@@ -1252,19 +1252,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 switch (error_sens)
                 {
                     case SPEED_ERR:
-                        upstream_control_data_out.error_status = SPEED_FAULT;
+                        upstream_control_data_out.sensor_error = SPEED_FAULT;
                         break;
                     case POS_ERR:
-                        upstream_control_data_out.error_status = POSITION_FAULT;
+                        upstream_control_data_out.sensor_error = POSITION_FAULT;
                         break;
                     case ANGLE_ERR:
                         if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                            upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
+                            upstream_control_data_out.sensor_error = HALL_SENSOR_FAULT;
                         else
-                            upstream_control_data_out.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                            upstream_control_data_out.sensor_error = INCREMENTAL_SENSOR_1_FAULT;
                         break;
                     case PORTS_ERR:
-                        upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
+                        upstream_control_data_out.sensor_error = HALL_SENSOR_FAULT;
                         break;
                 }
 
