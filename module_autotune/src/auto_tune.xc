@@ -243,7 +243,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < (5*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
-                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*1010)/1000;
+                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*1100)/1000;
                     pos_ctrl_auto_tune.kvi = pos_ctrl_auto_tune.kvp/10000;
 
                     pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
@@ -356,8 +356,29 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    pos_ctrl_auto_tune.active_step=END;
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_7;
                     pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*90)/100;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+
+                }
+            }
+
+            //step 7: reduce kpp until overshoot is less than 2%
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_7 && pos_ctrl_auto_tune.rising_edge==0)
+            {
+                if(pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000))
+                {
+                    pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*95)/100;
+                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*98)/100;
+                }
+
+                if(pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    pos_ctrl_auto_tune.active_step=END;
                     pos_ctrl_auto_tune.active_step_counter=0;
 
                 }
