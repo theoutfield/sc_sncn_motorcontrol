@@ -9,7 +9,7 @@ Commutation angle offset and PID gains tuning helper
     :depth: 3
 
 The purpose of this application is finding the commutation angle offset to be able to turn the motor, the PID setting for position and velocity controllers and the open circuit fault in phases.
-The application is given the functionnality to compensate the cogging torque of the motor, allowing a better control at slow speed.
+The application is given the functionnality to compensate :ref:`the cogging torque <Cogging-Torque-Feature>` of the motor, allowing a better control at low speed.
 
 This is a console app which use simple command of 1, 2 or 3 characters and an optional value.
 
