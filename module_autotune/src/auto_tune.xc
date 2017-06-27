@@ -192,9 +192,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             pos_ctrl_auto_tune.activate = 1;
             pos_ctrl_auto_tune.counter=0;
 
-            pos_ctrl_auto_tune.counter_max=pos_ctrl_auto_tune.counter_max/3;
-            pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max/3;
-            pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft/3;
         }
 
         if(pos_ctrl_auto_tune.counter==pos_ctrl_auto_tune.counter_max)
