@@ -529,6 +529,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 xscope_int(ERR_EN_SS_INT_MIN, ((int)(pos_ctrl_auto_tune.err_energy_ss_int_min                         )));
                 xscope_int(ERR_EN_SS_INT    , ((int)(pos_ctrl_auto_tune.err_energy_ss_int                             )));
+                xscope_int(STEP_COUNTER     ,(pos_ctrl_auto_tune.active_step_counter*500 )                              );
 
 //#ifdef XSCOPE_POSITION_CTRL
 //                xscope_int(VELOCITY, upstream_control_data.velocity);

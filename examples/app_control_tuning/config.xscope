@@ -41,6 +41,7 @@
     <Probe name="POS_ACT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="ERR_EN_SS_INT_MIN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="ERR_EN_SS_INT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     
     
 </xSCOPEconfig>
