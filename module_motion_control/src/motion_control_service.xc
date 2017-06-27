@@ -512,6 +512,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         }
 
         i_torque_control.disable_index_detection();
+        i_torque_control.set_sensor_status(error_sens);
     }
 
     //QEI index calibration
@@ -1390,6 +1391,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
                 error_sens = NO_ERROR;
+                i_torque_control.set_sensor_status(error_sens);
                 hall_order_err = 0;
                 qei_err_counter = 0;
                 error_phase = NO_ERROR;
