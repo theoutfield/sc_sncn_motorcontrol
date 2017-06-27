@@ -28,8 +28,11 @@ Console commands
 
 The app uses commands up to 3 characters with an optional value. The command are executed by pressing enter. If no value is entered the default is `0`:
 
-- ``ao``: start the auto offset tuning. It automatically updates the offset field display. If the offset detection fails the offset will be -1. If it displays "WRONG POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. After the offset is found you need to make sure that a positive torque command result in a positive velocity/position increment. Otherwise the position and velocity controller will not work.
+- ``a``: start the auto offset tuning. It automatically updates the offset field display. If the offset detection fails the offset will be -1. If it displays "WRONG POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. After the offset is found you need to make sure that a positive torque command result in a positive velocity/position increment. Otherwise the position and velocity controller will not work.
 - ``ac``: start the cogging torque detection. It automatically records the cogging torque present in the motor in one mechanical rotation. After the torque is recorded, press "ec1" to enable the compensation of the cogging torque
+- ``av``: starts the automatic tuning of velocity controller. By default, the motor will start to rotate at a speed close to 1000 rpm for 1.5 second, and after that the PID parameters of velocity controller will be updated. These parameters will also be printed on the screen.
+- ``ap2``: starts the automatic tuning of position controller with cascaded structure. Once this command is sent, the motor starts to move forward and backward, and the PID parameters of position controller with cascaded structure will be optimized. This procedure could last up to 4 minutes, and by the end of this procedure the optimized parameters of PID controllers for inner loop (velocity controller) and outer loop (position controller) will be updated in the software (and printed on the console). Depending on load type further fine tuning might be required by the user. 
+- ``ap3``: starts the automatic tuning of position controller with limited-torque structure. Once this command is sent, the motor starts to move forward and backward, and the PID parameters of position controller with limited torque structure will be optimized. This procedure could last up to 4 minutes, and by the end of this procedure the optimized parameters of PID controller will be updated in the software (and printed on the console). Depending on load type further fine tuning might be required by the user. In this case increase all PID constants with the same ratio to sharpen the control, or reduce them all with the same ratio to make the controller smoother.
 - ``kp``: print the position PID parameters
 - ``kpp [number]``: set the P coefficient of the Position controller.
 - ``kpi [number]``: set the I coefficient of the Position controller.
@@ -46,10 +49,10 @@ The app uses commands up to 3 characters with an optional value. The command are
 - ``Lpu [number]``: set the maximum position limit.
 - ``Lpl [number]``: set the minimum position limit.
 - ``Lt [number]``: set the torque limit. The unit in in 1/1000 of rated torque. This command stops the motorcontrol.
-- ``Lv [number]``: set the velocity limit. Used in velocity control and in cascaded and non linear position control modes.
+- ``Lv [number]``: set the velocity limit. Used in velocity control and in cascaded and limited-torque position control modes.
 - ``ep1``: enable position control with simple PID controller
 - ``ep2``: enable position control with velocity cascaded controller
-- ``ep3``: enable position control with Non linear controller
+- ``ep3``: enable position control with limited-torque controller
 - ``ev1``: enable velocity control 
 - ``et1``: enable torque control 
 - ``ec[number]``: 1 -> enable cogging torque compensation ; 0 -> disable cogging torque compensation

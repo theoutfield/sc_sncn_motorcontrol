@@ -429,7 +429,7 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                 printf("please select position controller type\n");
                 printf("press 1 to use a position pid controller \n");
                 printf("press 2 to use a cascaded positon/velocity pid controller \n");
-                printf("press 3 to use a nonlinear position controller \n");
+                printf("press 3 to use a limited-torque position controller \n");
 
                 console_inputs = get_user_command();
                 while(console_inputs.value!=1 && console_inputs.value!=2 && console_inputs.value!=3)
@@ -437,7 +437,7 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                     printf("wrong input\n");
                     printf("press 1 to use a position pid controller \n");
                     printf("press 2 to use a cascaded positon/velocity pid controller \n");
-                    printf("press 3 to use a nonlinear position controller \n");
+                    printf("press 3 to use a limited-torque position controller \n");
 
                     console_inputs = get_user_command();
                 }
@@ -457,8 +457,8 @@ void demo_motion_control(client interface MotionControlInterface i_motion_contro
                         break;
 
                 case 3:
-                        i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
-                        printf("nonlinear position controller with linear profiler selected\n");
+                        i_motion_control.enable_position_ctrl(LT_POSITION_CONTROLLER);
+                        printf("limited-torque position controller with linear profiler selected\n");
                         break;
 
                 default:
