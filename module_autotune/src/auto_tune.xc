@@ -270,38 +270,31 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-//            //step 3: increase kvi until overshoot becomes more than 1%
-//            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3)
-//            {
-//                if(pos_ctrl_auto_tune.overshoot_max>((10*pos_ctrl_auto_tune.step_amplitude)/1000))
-//                {
-//                    pos_ctrl_auto_tune.active_step_counter++;
-//                }
-//                else
-//                {
-//                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*110)/100;
-//                    if(pos_ctrl_auto_tune.kvi<10) pos_ctrl_auto_tune.kvi=10;
-//                }
-//
-//                if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_int_min)
-//                         pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int_min+pos_ctrl_auto_tune.err_energy_ss_int)/2;
-//
-//                if(pos_ctrl_auto_tune.active_step_counter==10)
-//                {
-//                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
-//                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*90)/100;
-//
-//                    pos_ctrl_auto_tune.counter_max/=3;
-//                    pos_ctrl_auto_tune.err_energy_int_max    = pos_ctrl_auto_tune.err_energy_int_max/3;
-//                    pos_ctrl_auto_tune.err_energy_ss_limit_soft = pos_ctrl_auto_tune.err_energy_ss_limit_soft/3;
-//                    pos_ctrl_auto_tune.err_energy_ss_int_min/=3;
-//
-//                    pos_ctrl_auto_tune.kvl = 100000;
-//
-//                    pos_ctrl_auto_tune.active_step_counter=0;
-//                }
-//            }
-//
+            //step 3: increase kvi until overshoot becomes more than 1%
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3 && pos_ctrl_auto_tune.rising_edge==0)
+            {
+                if(pos_ctrl_auto_tune.overshoot_max>((10*pos_ctrl_auto_tune.step_amplitude)/1000))
+                {
+                    pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*110)/100;
+                    if(pos_ctrl_auto_tune.kvi<10) pos_ctrl_auto_tune.kvi=10;
+                }
+
+                if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_int_min)
+                         pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int_min+pos_ctrl_auto_tune.err_energy_ss_int)/2;
+
+                if(pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
+                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*90)/100;
+                    pos_ctrl_auto_tune.kvl = 10000;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
 //            //step 4: reduce kvl until overshoot is less than 3%
 //            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4)
 //            {
