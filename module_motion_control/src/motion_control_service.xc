@@ -42,7 +42,6 @@ typedef enum
     SPEED_ERR  = 2,
     ANGLE_ERR = 3,
     PORTS_ERR = 4
-
 } sensor_fault;
 
 sensor_fault sensor_functionality_evaluation(client interface TorqueControlInterface i_torque_control, MotorcontrolConfig motorcontrol_config, int app_tile_usec)
@@ -505,11 +504,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
 
     // testing the angle, position, velocity from the sensor
-    int hall_order_err = 0;
-    int hall_state, hall_state_old;
     sensor_fault error_sens;
-    timer tm_hall;
-    unsigned ts_hall;
     if (!error_phase)
         error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, app_tile_usec);
 
@@ -543,7 +538,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
-    tm_hall :> ts_hall;
 
     while(1)
     {
@@ -966,61 +960,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 break;
 
-        case tm_hall when timerafter (ts_hall + 100*app_tile_usec) :> ts_hall :
-
-                /*
-                 * check hall states if the Hall sensor is used
-                 */
-                if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                {
-                    hall_state = upstream_control_data.hall_state;
-
-                    if (hall_state_old == 0)
-                    {
-                        hall_state_old = hall_state;
-                    }
-
-                    if (hall_state != hall_state_old)
-                    {
-                        switch (hall_state_old)
-                        {
-                        case 1:
-                            if (hall_state != 5 && hall_state != 3)
-                                ++hall_order_err;
-                            break;
-                        case 2:
-                            if (hall_state != 3 && hall_state != 6)
-                                ++hall_order_err;
-                            break;
-                        case 3:
-                            if (hall_state != 1 && hall_state != 2)
-                                ++hall_order_err;
-                            break;
-                        case 4:
-                            if (hall_state != 6 && hall_state != 5)
-                                ++hall_order_err;
-                            break;
-                        case 5:
-                            if (hall_state != 4 && hall_state != 1)
-                                ++hall_order_err;
-                            break;
-                        case 6:
-                            if (hall_state != 2 && hall_state != 4)
-                                ++hall_order_err;
-                            break;
-                        }
-                    }
-
-                    hall_state_old = hall_state;
-
-                    if (hall_order_err == 1)
-                    {
-                        error_sens = PORTS_ERR;
-                    }
-                }
-
-                break;
-
         case i_motion_control[int i].disable():
 
                 i_torque_control.set_brake_status(0);
@@ -1369,7 +1308,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 i_torque_control.reset_faults();
                 error_sens = NO_ERROR;
                 i_torque_control.set_sensor_status(error_sens);
-                hall_order_err = 0;
                 error_phase = NO_ERROR;
                 break;
 
