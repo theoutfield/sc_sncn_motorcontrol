@@ -486,7 +486,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpl += 5;
+                    pos_ctrl_auto_tune.kpl += 50;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
