@@ -16,6 +16,15 @@ sc_sncn_motorcontrol Change Log
 -----
 
   * Rename MOTOR_PHASES_CONFIGURATION in user_config.h and main.xc files.
+  * Fix position control strategy values: POS_PID_CONTROLLER = 1, POS_PID_VELOCITY_CASCADED_CONTROLLER = 2, NL_POSITION_CONTROLLER = 3, VELOCITY_PID_CONTROLLER = 4
+  * Fix bug in gpio service:
+   * only use gpio on the first position_feedback_service
+   * fix gpio ports config inside position_feedback_service
+   * disable gpio port when used by BiSS
+   * disable gpio service in motorcontrol demo apps
+  * Fix BiSS multiturn with inverted sensor polarity
+  * Fix sensor polarity in sensor test apps
+
 
 3.0.1
 -----
