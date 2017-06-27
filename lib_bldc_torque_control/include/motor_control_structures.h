@@ -49,7 +49,8 @@ typedef enum {
     SENSOR_BISS_NO_ACK_BIT_ERROR               = 18,
     SENSOR_BISS_NO_START_BIT_ERROR             = 19,
     SENSOR_CHECKSUM_ERROR                      = 20,
-    SENSOR_BISS_DATA_LINE_ERROR                = 21
+    SENSOR_BISS_DATA_LINE_ERROR                = 21,
+    QEI_INDEX_LOSING_TICKS                     = 22
 } SensorError;
 
 /**
@@ -230,7 +231,6 @@ typedef struct
     int analogue_input_b_2;
 
     unsigned int gpio[4];
-
 }UpstreamControlData;
 
 /**
