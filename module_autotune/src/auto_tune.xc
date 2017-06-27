@@ -209,7 +209,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             }
 
             // step 1: force the load to follow the reference value
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1 && pos_ctrl_auto_tune.rising_edge==0)// this condition happens only when the rising step is completed (and we have entered into falling step)
             {
                 if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
                 {
@@ -240,11 +240,11 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
 
             //step 2: increase kvp until it starts to vibrate or until the overshoot is higher than 2%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2 && pos_ctrl_auto_tune.rising_edge==0)
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < (5*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000))
                 {
-                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*1005)/1000;
+                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*1010)/1000;
                     pos_ctrl_auto_tune.kvi = pos_ctrl_auto_tune.kvp/10000;
 
                     pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
