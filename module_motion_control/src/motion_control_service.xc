@@ -505,7 +505,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
 
     // testing the angle, position, velocity from the sensor
-    int hall_order_err = 0, qei_err_counter = 0, qei_pos = 0, qei_pos_old = 0;
+    int hall_order_err = 0;
     int hall_state, hall_state_old;
     sensor_fault error_sens;
     timer tm_hall;
@@ -1019,27 +1019,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-                if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
-                {
-                    qei_pos = upstream_control_data.singleturn;
-
-                    if(qei_pos != qei_pos_old)
-                    {
-                       if (qei_pos == 0)
-                           qei_err_counter = 1;
-                       else
-                           qei_err_counter = 0;
-                    }
-
-                    if (qei_err_counter && qei_pos == 0)
-                        ++qei_err_counter;
-
-                    if (qei_err_counter == 1000)
-                        error_sens = POS_ERR;
-
-                    qei_pos_old = qei_pos;
-                }
-
                 break;
 
         case i_motion_control[int i].disable():
@@ -1391,7 +1370,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 error_sens = NO_ERROR;
                 i_torque_control.set_sensor_status(error_sens);
                 hall_order_err = 0;
-                qei_err_counter = 0;
                 error_phase = NO_ERROR;
                 break;
 
@@ -1402,7 +1380,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 position_enable_flag = 0;
                 i_torque_control.set_safe_torque_off_enabled();
                 break;
-
 
         case i_motion_control[int i].enable_cogging_compensation(int flag):
                 if (flag)

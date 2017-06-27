@@ -75,6 +75,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     int notification = MOTCTRL_NTF_EMPTY;
 
     SensorError sensor_error = SENSOR_NO_ERROR;
+    int qei_err_counter = 0, singleturn_old = 0;
 
     // used to compute the singleturn
     int shift = position_feedback_config.resolution;
@@ -227,6 +228,28 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
                 // set the singleturn position to a 16 bits format
                 int singleturn = position * (1 << (16 - shift_counter)) / shift;
+
+                // checks if the cable gets disconnected
+                if(singleturn != singleturn_old)
+                {
+                    if (singleturn == 0)
+                        qei_err_counter = 1;
+                    else
+                        qei_err_counter = 0;
+                }
+
+                if (qei_err_counter && singleturn == 0)
+                    ++qei_err_counter;
+                else
+                {
+                    qei_err_counter = 0;
+                    sensor_error = SENSOR_NO_ERROR;
+                }
+
+                if (qei_err_counter == 1000)
+                    sensor_error = INCREMENTAL_SENSOR_1_FAULT;
+
+                singleturn_old = singleturn;
 
                 write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, sensor_error, SENSOR_NO_ERROR, ts_velocity/ifm_usec);
 
