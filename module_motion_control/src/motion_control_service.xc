@@ -199,7 +199,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
         }
 
         t :> ts;
-        t when timerafter (ts + 100*app_tile_usec) :> ts;
+        t when timerafter (ts + 500*app_tile_usec) :> ts;
     }
 
     i_torque_control.disable_index_detection();
