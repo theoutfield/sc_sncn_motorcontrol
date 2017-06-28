@@ -356,35 +356,20 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_7;
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*90)/100;
-                    pos_ctrl_auto_tune.active_step_counter=0;
-
-                }
-            }
-
-            //step 7: reduce kpp until overshoot is less than 2%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_7 && pos_ctrl_auto_tune.rising_edge==0)
-            {
-                if(pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000))
-                {
-                    pos_ctrl_auto_tune.active_step_counter++;
-                }
-                else
-                {
-                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*95)/100;
-                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*98)/100;
-                }
-
-                if(pos_ctrl_auto_tune.active_step_counter==10)
-                {
                     pos_ctrl_auto_tune.active_step=END;
+
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*90)/100;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*90)/100;
+
+                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*90)/100;
+                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*80)/100;
+
                     pos_ctrl_auto_tune.active_step_counter=0;
 
                 }
             }
 
-            //step 9: End autotuning
+            //step 7: End autotuning
             if(pos_ctrl_auto_tune.active_step==END)
             {
                 pos_ctrl_auto_tune.auto_tune = 0;
@@ -413,54 +398,54 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
     }
     else if(pos_ctrl_auto_tune.controller == LIMITED_TORQUE)
     {
-//        if(pos_ctrl_auto_tune.activate==0)
-//        {
-//            pos_ctrl_auto_tune.position_init = position_k;
-//
-//            pos_ctrl_auto_tune.kpp = 10000 ;
-//            pos_ctrl_auto_tune.kpi = 1000  ;
-//            pos_ctrl_auto_tune.kpd = 40000 ;
-//            pos_ctrl_auto_tune.kpl = 1;
-//            pos_ctrl_auto_tune.j   = 0;
-//
-//            pos_ctrl_auto_tune.activate = 1;
-//            pos_ctrl_auto_tune.counter=0;
-//        }
-//
-//        if(pos_ctrl_auto_tune.counter==pos_ctrl_auto_tune.counter_max)
-//        {
-//            //change of reference value in each cycle
-//            if(pos_ctrl_auto_tune.position_ref == (pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude))
-//            {
-//                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init - pos_ctrl_auto_tune.step_amplitude;
-//                pos_ctrl_auto_tune.rising_edge=0;
-//            }
-//            else
-//            {
-//                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude;
-//                pos_ctrl_auto_tune.rising_edge=1;
-//            }
-//
-//            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
-//            {
-//                if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
-//                {
-//                    pos_ctrl_auto_tune.active_step_counter++;
-//                }
-//                else
-//                {
-//                    pos_ctrl_auto_tune.kpl += 50;
-//                    pos_ctrl_auto_tune.active_step_counter=0;
-//                }
-//
-//                if(pos_ctrl_auto_tune.active_step_counter==10)
-//                {
-//                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
-//                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
-//                    pos_ctrl_auto_tune.active_step_counter=0;
-//                }
-//            }
-//
+        if(pos_ctrl_auto_tune.activate==0)
+        {
+            pos_ctrl_auto_tune.position_init = position_k;
+
+            pos_ctrl_auto_tune.kpp = 10000 ;
+            pos_ctrl_auto_tune.kpi = 1000  ;
+            pos_ctrl_auto_tune.kpd = 40000 ;
+            pos_ctrl_auto_tune.kpl = 1;
+            pos_ctrl_auto_tune.j   = 0;
+
+            pos_ctrl_auto_tune.activate = 1;
+            pos_ctrl_auto_tune.counter=0;
+        }
+
+        if(pos_ctrl_auto_tune.counter==pos_ctrl_auto_tune.counter_max)
+        {
+            //change of reference value in each cycle
+            if(pos_ctrl_auto_tune.position_ref == (pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude))
+            {
+                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init - pos_ctrl_auto_tune.step_amplitude;
+                pos_ctrl_auto_tune.rising_edge=0;
+            }
+            else
+            {
+                pos_ctrl_auto_tune.position_ref = pos_ctrl_auto_tune.position_init + pos_ctrl_auto_tune.step_amplitude;
+                pos_ctrl_auto_tune.rising_edge=1;
+            }
+
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
+            {
+                if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
+                {
+                    pos_ctrl_auto_tune.active_step_counter++;
+                }
+                else
+                {
+                    pos_ctrl_auto_tune.kpl += 50;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+                }
+
+                if(pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
+                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
 //            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2)
 //            {
 //                if(pos_ctrl_auto_tune.overshoot_max<((100*pos_ctrl_auto_tune.step_amplitude)/1000) && pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_limit_soft)
@@ -567,23 +552,23 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 //                    pos_ctrl_auto_tune.active_step_counter=0;
 //                }
 //            }
-//
-//            if(pos_ctrl_auto_tune.rising_edge==1)
-//            {
-//                pos_ctrl_auto_tune.overshoot=0;
-//                pos_ctrl_auto_tune.overshoot_max=0;
-//            }
-//
-//            pos_ctrl_auto_tune.err=0.00;
-//            pos_ctrl_auto_tune.err_energy =0.00;
-//            pos_ctrl_auto_tune.err_energy_int=0.00;
-//
-//            pos_ctrl_auto_tune.err_ss=0.00;
-//            pos_ctrl_auto_tune.err_energy_ss =0.00;
-//            pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
-//
-//            pos_ctrl_auto_tune.counter=0;
-//        }
+
+            if(pos_ctrl_auto_tune.rising_edge==1)
+            {
+                pos_ctrl_auto_tune.overshoot=0;
+                pos_ctrl_auto_tune.overshoot_max=0;
+
+
+                pos_ctrl_auto_tune.err=0.00;
+                pos_ctrl_auto_tune.err_energy =0.00;
+                pos_ctrl_auto_tune.err_energy_int=0.00;
+
+                pos_ctrl_auto_tune.err_ss=0.00;
+                pos_ctrl_auto_tune.err_energy_ss =0.00;
+                pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
+            }
+            pos_ctrl_auto_tune.counter=0;
+        }
     }
 
 
