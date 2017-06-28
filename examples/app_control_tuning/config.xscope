@@ -18,8 +18,8 @@
 
 	<!-- Velocity Position Control -->
 
-	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Position Secondary" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>

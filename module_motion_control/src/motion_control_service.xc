@@ -546,7 +546,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 //                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
 //                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
 //                xscope_int(TORQUE,   upstream_control_data.computed_torque);
-//                xscope_int(POSITION_CMD, (int)position_ref_in_k);
+                xscope_int(POSITION_CMD, (int)position_ref_in_k);
 //                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
 //                xscope_int(TORQUE_CMD, torque_ref_k);
 //                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
