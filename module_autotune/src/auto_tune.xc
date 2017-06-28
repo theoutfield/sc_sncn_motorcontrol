@@ -133,6 +133,16 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
 
     pos_ctrl_auto_tune.position_init = 0.00;
     pos_ctrl_auto_tune.position_ref  = 0.00;
+
+    pos_ctrl_auto_tune.position_act_k= 0.00;
+    pos_ctrl_auto_tune.position_act_k_1= 0.00;
+    pos_ctrl_auto_tune.position_act_k_2= 0.00;
+
+    pos_ctrl_auto_tune.velocity_k  = 0.00;
+    pos_ctrl_auto_tune.velocity_k_1= 0.00;
+
+    pos_ctrl_auto_tune.acceleration_k= 0.00;
+
     pos_ctrl_auto_tune.auto_tune  = 0;
 
     pos_ctrl_auto_tune.activate=0;
@@ -171,6 +181,17 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
     pos_ctrl_auto_tune.auto_tune =  motion_ctrl_config.position_control_autotune;
     pos_ctrl_auto_tune.counter++;
+
+    pos_ctrl_auto_tune.position_act_k_2 = pos_ctrl_auto_tune.position_act_k_1;
+    pos_ctrl_auto_tune.position_act_k_1 = pos_ctrl_auto_tune.position_act_k;
+    pos_ctrl_auto_tune.position_act_k   = position_k;
+
+    pos_ctrl_auto_tune.velocity_k_1= pos_ctrl_auto_tune.velocity_k;
+    pos_ctrl_auto_tune.velocity_k  = pos_ctrl_auto_tune.position_act_k - pos_ctrl_auto_tune.position_act_k_1;
+
+    pos_ctrl_auto_tune.velocity_k_filtered = (4*pos_ctrl_auto_tune.velocity_k_filtered + pos_ctrl_auto_tune.velocity_k)/5;
+
+    pos_ctrl_auto_tune.acceleration_k= pos_ctrl_auto_tune.velocity_k-pos_ctrl_auto_tune.velocity_k_1;
 
     if(pos_ctrl_auto_tune.controller == CASCADED)
     {
@@ -647,6 +668,15 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
         pos_ctrl_auto_tune.err_energy_ss = pos_ctrl_auto_tune.err_ss * pos_ctrl_auto_tune.err_ss;
         pos_ctrl_auto_tune.err_energy_ss_int += pos_ctrl_auto_tune.err_energy_ss;
     }
+
+    /*
+     * change of direction over rise_time
+     */
+    if(pos_ctrl_auto_tune.rising_edge==1 && (10*pos_ctrl_auto_tune.position_ref)/100<position_k && position_k<(98*pos_ctrl_auto_tune.position_ref)/100)
+    {
+
+    }
+
 
     if(pos_ctrl_auto_tune.counter==0)
     {

@@ -67,6 +67,17 @@ typedef struct {
     int    controller;
     double position_init;
     double position_ref;
+
+    double position_act_k;
+    double position_act_k_1;
+    double position_act_k_2;
+
+    double velocity_k;
+    double velocity_k_filtered;
+    double velocity_k_1;
+
+    double acceleration_k;
+
     int    rising_edge;
 
     int activate;
