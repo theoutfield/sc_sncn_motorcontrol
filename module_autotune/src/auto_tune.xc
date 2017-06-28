@@ -208,7 +208,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             }
 
             // step 1: force the load to follow the reference value
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1 && pos_ctrl_auto_tune.rising_edge==0)// this condition happens only when the rising step is completed (and we have entered into falling step)
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)// this condition happens only when the rising step is completed (and we have entered into falling step)
             {
                 if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
                 {
@@ -378,20 +378,16 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.active_step_counter=0;
             }
 
+            pos_ctrl_auto_tune.overshoot=0;
+            pos_ctrl_auto_tune.overshoot_max=0;
 
-            if(pos_ctrl_auto_tune.rising_edge==1)
-            {
-                pos_ctrl_auto_tune.overshoot=0;
-                pos_ctrl_auto_tune.overshoot_max=0;
+            pos_ctrl_auto_tune.err=0.00;
+            pos_ctrl_auto_tune.err_energy =0.00;
+            pos_ctrl_auto_tune.err_energy_int=0.00;
 
-                pos_ctrl_auto_tune.err=0.00;
-                pos_ctrl_auto_tune.err_energy =0.00;
-                pos_ctrl_auto_tune.err_energy_int=0.00;
-
-                pos_ctrl_auto_tune.err_ss=0.00;
-                pos_ctrl_auto_tune.err_energy_ss =0.00;
-                pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
-            }
+            pos_ctrl_auto_tune.err_ss=0.00;
+            pos_ctrl_auto_tune.err_energy_ss =0.00;
+            pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
 
             pos_ctrl_auto_tune.counter=0;
         }
@@ -553,53 +549,44 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 //                }
 //            }
 
-            if(pos_ctrl_auto_tune.rising_edge==1)
-            {
-                pos_ctrl_auto_tune.overshoot=0;
-                pos_ctrl_auto_tune.overshoot_max=0;
+            pos_ctrl_auto_tune.overshoot=0;
+            pos_ctrl_auto_tune.overshoot_max=0;
 
+            pos_ctrl_auto_tune.err=0.00;
+            pos_ctrl_auto_tune.err_energy =0.00;
+            pos_ctrl_auto_tune.err_energy_int=0.00;
 
-                pos_ctrl_auto_tune.err=0.00;
-                pos_ctrl_auto_tune.err_energy =0.00;
-                pos_ctrl_auto_tune.err_energy_int=0.00;
+            pos_ctrl_auto_tune.err_ss=0.00;
+            pos_ctrl_auto_tune.err_energy_ss =0.00;
+            pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
 
-                pos_ctrl_auto_tune.err_ss=0.00;
-                pos_ctrl_auto_tune.err_energy_ss =0.00;
-                pos_ctrl_auto_tune.err_energy_ss_int = 0.00;
-            }
             pos_ctrl_auto_tune.counter=0;
         }
     }
 
+    /*
+     * measurement of error energy
+     */
+    pos_ctrl_auto_tune.err = (pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
+    pos_ctrl_auto_tune.err_energy = pos_ctrl_auto_tune.err * pos_ctrl_auto_tune.err;
+    pos_ctrl_auto_tune.err_energy_int += pos_ctrl_auto_tune.err_energy;
 
+    /*
+     * measurement of overshoot and rise time
+     */
+    pos_ctrl_auto_tune.overshoot = position_k - pos_ctrl_auto_tune.position_ref;
 
-    if(pos_ctrl_auto_tune.rising_edge==1)
+    if(pos_ctrl_auto_tune.overshoot > pos_ctrl_auto_tune.overshoot_max)
+        pos_ctrl_auto_tune.overshoot_max=pos_ctrl_auto_tune.overshoot;
+
+    /*
+     * measurement of error energy after steady state
+     */
+    if((90*pos_ctrl_auto_tune.counter_max)/100<pos_ctrl_auto_tune.counter && pos_ctrl_auto_tune.counter<(98*pos_ctrl_auto_tune.counter_max)/100)
     {
-        /*
-         * measurement of error energy
-         */
-        pos_ctrl_auto_tune.err = (pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
-        pos_ctrl_auto_tune.err_energy = pos_ctrl_auto_tune.err * pos_ctrl_auto_tune.err;
-        pos_ctrl_auto_tune.err_energy_int += pos_ctrl_auto_tune.err_energy;
-
-
-        /*
-         * measurement of overshoot and rise time
-         */
-        pos_ctrl_auto_tune.overshoot = position_k - pos_ctrl_auto_tune.position_ref;
-
-        if(pos_ctrl_auto_tune.overshoot > pos_ctrl_auto_tune.overshoot_max)
-            pos_ctrl_auto_tune.overshoot_max=pos_ctrl_auto_tune.overshoot;
-
-        /*
-         * measurement of error energy after steady state
-         */
-        if((90*pos_ctrl_auto_tune.counter_max)/100<pos_ctrl_auto_tune.counter && pos_ctrl_auto_tune.counter<(98*pos_ctrl_auto_tune.counter_max)/100)
-        {
-            pos_ctrl_auto_tune.err_ss = (pos_ctrl_auto_tune.position_ref - position_k);
-            pos_ctrl_auto_tune.err_energy_ss = pos_ctrl_auto_tune.err_ss * pos_ctrl_auto_tune.err_ss;
-            pos_ctrl_auto_tune.err_energy_ss_int += pos_ctrl_auto_tune.err_energy_ss;
-        }
+        pos_ctrl_auto_tune.err_ss = (pos_ctrl_auto_tune.position_ref - position_k);
+        pos_ctrl_auto_tune.err_energy_ss = pos_ctrl_auto_tune.err_ss * pos_ctrl_auto_tune.err_ss;
+        pos_ctrl_auto_tune.err_energy_ss_int += pos_ctrl_auto_tune.err_energy_ss;
     }
 
     if(pos_ctrl_auto_tune.counter==0)

@@ -429,6 +429,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
                                         motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
                                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
+
+                                printf("step:%i \n",  pos_ctrl_auto_tune.active_step);
+                                printf("kpp:%i kpi:%i kpd:%i kpl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+
                             }
 
                             torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
@@ -533,7 +537,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 //#ifdef XSCOPE_POSITION_CTRL
 //                xscope_int(VELOCITY, upstream_control_data.velocity);
-//                xscope_int(POSITION, upstream_control_data.position);
+                xscope_int(POSITION, upstream_control_data.position);
 //                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
 //                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
 //                xscope_int(TORQUE,   upstream_control_data.computed_torque);
