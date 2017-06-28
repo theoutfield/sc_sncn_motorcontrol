@@ -229,7 +229,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
-                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
@@ -430,14 +429,19 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpl += 50;
+                    int increment = (pos_ctrl_auto_tune.kpl*5)/100;
+
+                    if(increment<50)
+                        pos_ctrl_auto_tune.kpl += 50;
+                    else
+                        pos_ctrl_auto_tune.kpl += increment;
+
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
-                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
