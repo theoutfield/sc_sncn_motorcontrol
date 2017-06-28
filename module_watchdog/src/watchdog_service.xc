@@ -24,7 +24,7 @@
 
     int IFM_module_type = -1;
 
-    unsigned int wd_half_period = 40 * usec;
+    unsigned int wd_half_period = 70 * usec;
 
     unsigned char led_motor_on_wdtick_wden_buffer = 0;
     unsigned char   set_wd_en_mask = 0b0001;
@@ -32,6 +32,7 @@
     //CPLD
     unsigned cpld_out_state = 0x8;//set green LED off
     unsigned int cycles_counter = 0;
+    const unsigned int cycles_reset = 40; //20 periods
 
     int WD_En_sent_flag =0;
     unsigned int wd_enabled = 0;
@@ -55,8 +56,8 @@
             IFM_module_type = DC1K_DC5K;
         }
     }
-    else if(!isnull(watchdog_ports.p_cpld_shared)){//DC500
-        IFM_module_type = DC500;
+    else if(!isnull(watchdog_ports.p_cpld_shared)){//DC500_DC1KD1
+        IFM_module_type = DC500_DC1KD1;
     }
 
     /* WD Initialization routine */
@@ -69,11 +70,11 @@
             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
             wd_enabled = 1;
             break;
-        case DC500:
-            cpld_out_state &= 0b0111;//turn green LED on
+        case DC500_DC1KD1:
+            cpld_out_state &= 0b0111;//turn green LED on, on DC1K rev d1 turn orange LED off
             cpld_out_state |= 0b0101;//enable CPLD, reset errors
             watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-            cycles_counter = 40;
+            cycles_counter = cycles_reset;
             wd_enabled = 1;
             break;
         case DC1K_DC5K://FixMe: optimize it further
@@ -114,7 +115,7 @@
                         led_motor_on_wdtick_wden_buffer &= 0b1100;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                         break;
-                    case DC500:
+                    case DC500_DC1KD1:
                         cpld_out_state |= 0b1000;//set green LED off
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
                         break;
@@ -146,7 +147,7 @@
                                 WD_En_sent_flag++;
                             }
                             break;
-                        case DC500:
+                        case DC500_DC1KD1:
                             cpld_out_state ^= (1 << 1); //toggle wd tick
                             watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
 
@@ -197,11 +198,11 @@
                         led_motor_on_wdtick_wden_buffer |= 0b1011;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                         break;
-                    case DC500:
+                    case DC500_DC1KD1:
                         cpld_out_state &= 0b0111;//turn green LED on
                         cpld_out_state |= 0b0101;//enable CPLD, reset errors
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-                        cycles_counter = 40;
+                        cycles_counter = cycles_reset;
                         break;
                     case DC1K_DC5K://FixMe: optimize the code. Why do we write 3 times?
                         //Reset all pins to zero, do not touch WD tick
@@ -228,7 +229,7 @@ void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_mod
                 output ^= (1 << 1);
                 watchdog_ports.p_shared_enable_tick_led <: output;
                 break;
-            case DC500://ToDo: to be tested
+            case DC500_DC1KD1://ToDo: to be tested
                 output ^= (1 << 3);
                 watchdog_ports.p_cpld_shared <: output;
                 break;

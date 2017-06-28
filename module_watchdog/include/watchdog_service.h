@@ -21,7 +21,7 @@ typedef struct {
 /**
  * @brief Enumeration of existing IFM modules.
  */
-enum {DC100_DC300, DC500, DC1K_DC5K};
+enum {DC100_DC300, DC500_DC1KD1, DC1K_DC5K};
 
 /**
  * @brief Service to manage the watchdog chip within your IFM SOMANET device.
