@@ -324,27 +324,27 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                         {
                         case 1:
                             if (hall_state_new != 5 && hall_state_new != 3)
-                                sensor_error = HALL_SENSOR_FAULT;
+                                sensor_error = SENSOR_HALL_FAULT;
                             break;
                         case 2:
                             if (hall_state_new != 3 && hall_state_new != 6)
-                                sensor_error = HALL_SENSOR_FAULT;
+                                sensor_error = SENSOR_HALL_FAULT;
                             break;
                         case 3:
                             if (hall_state_new != 1 && hall_state_new != 2)
-                                sensor_error = HALL_SENSOR_FAULT;
+                                sensor_error = SENSOR_HALL_FAULT;
                             break;
                         case 4:
                             if (hall_state_new != 6 && hall_state_new != 5)
-                                sensor_error = HALL_SENSOR_FAULT;
+                                sensor_error = SENSOR_HALL_FAULT;
                             break;
                         case 5:
                             if (hall_state_new != 4 && hall_state_new != 1)
-                                sensor_error = HALL_SENSOR_FAULT;
+                                sensor_error = SENSOR_HALL_FAULT;
                             break;
                         case 6:
                             if (hall_state_new != 2 && hall_state_new != 4)
-                                sensor_error = HALL_SENSOR_FAULT;
+                                sensor_error = SENSOR_HALL_FAULT;
                             break;
                         }
                     }

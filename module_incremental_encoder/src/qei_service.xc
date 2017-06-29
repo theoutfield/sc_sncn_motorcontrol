@@ -130,7 +130,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                             //realign the count with the position in case we missed ticks
                             int align = (count % position_feedback_config.resolution);
                             if (align != 0)
-                                sensor_error = QEI_INDEX_LOSING_TICKS;
+                                sensor_error = SENSOR_QEI_INDEX_LOSING_TICKS;
                             else
                                 sensor_error = SENSOR_NO_ERROR;
 
