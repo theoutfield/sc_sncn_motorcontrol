@@ -33,7 +33,7 @@
     unsigned cpld_out_state = 0x8;//set green LED off
     WatchdogError cpld_fault_monitor = WATCHDOG_NO_ERROR;
     unsigned int cycles_counter = 0;
-    const unsigned int cycles_reset = 40; //20 periods
+    unsigned int cycles_reset = 40; //20 periods
 
     int WD_En_sent_flag =0;
     unsigned int wd_enabled = 0;
@@ -62,6 +62,7 @@
         if (!isnull(watchdog_ports.p_cpld_fault_monitor)) {
             IFM_module_type = DC1KD1;
             wd_half_period = 80 * usec;
+            cycles_reset = 25; //12.5 periods
         }
     }
 
@@ -225,9 +226,11 @@
                 }
 
                 wd_enabled = 1;
-                t :> ts;
-                t when timerafter (ts + 100*usec  ) :> void;//100 us
-                t :> ts;
+                if (IFM_module_type != DC1KD1) {
+                    t :> ts;
+                    t when timerafter (ts + 100*usec  ) :> void;//100 us
+                    t :> ts;
+                }
                 break;
         }
     }
