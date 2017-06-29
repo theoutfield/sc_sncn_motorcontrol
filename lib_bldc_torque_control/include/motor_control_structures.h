@@ -63,6 +63,22 @@ typedef enum {
 } MotionControlError;
 
 /**
+ * @brief Type for Watchdog Error
+ *
+ */
+typedef enum {
+    WATCHDOG_NO_ERROR                           = 0,
+    WATCHDOG_TICKS_ERROR                        = 0b0001,
+    WATCHDOG_DEAD_TIME_PHASE_A_ERROR            = 0b0010,
+    WATCHDOG_DEAD_TIME_PHASE_B_ERROR            = 0b0011,
+    WATCHDOG_DEAD_TIME_PHASE_C_ERROR            = 0b0100,
+    WATCHDOG_DEAD_TIME_PHASE_D_ERROR            = 0b0101,
+    WATCHDOG_OVER_CURRENT_ERROR                 = 0b0110,
+    WATCHDOG_OVER_UNDER_VOLTAGE_OVER_TEMP_ERROR = 0b0111,
+    WATCHDOG_UNKNOWN_ERROR                      = 0b1111
+} WatchdogError;
+
+/**
  * @brief Type for motors.
  */
 typedef enum {
@@ -222,6 +238,8 @@ typedef struct
     unsigned int secondary_sensor_timestamp;
 
     MotionControlError motion_control_error;
+
+    WatchdogError watchdog_error;
 
     int temperature;
 
