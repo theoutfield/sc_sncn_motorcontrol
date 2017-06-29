@@ -570,6 +570,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 xscope_int(JERK ,((int)(pos_ctrl_auto_tune.jerk_k*100)));
                 xscope_int(JERK_FILTERED ,((int)(pos_ctrl_auto_tune.jerk_k_filtered*100)));
+                xscope_int(JERK_FILTERED_ENERGY ,((int)(pos_ctrl_auto_tune.jerk_filtered_energy*100)));
+                xscope_int(JERK_TRANSITION ,(pos_ctrl_auto_tune.jerk_k_transition*1000 + 100));
 
 //#ifdef XSCOPE_POSITION_CTRL
 //                xscope_int(VELOCITY, upstream_control_data.velocity);
