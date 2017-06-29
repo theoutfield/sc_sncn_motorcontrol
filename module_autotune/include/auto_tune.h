@@ -76,8 +76,15 @@ typedef struct {
     double velocity_k_1;
     double velocity_k_filtered;
     double velocity_k_filtered_k_1;
+
     double acceleration_k;
+    double acceleration_k_1;
     double acceleration_k_filtered;
+    double acceleration_k_filtered_k_1;
+
+    double jerk_k;
+    double jerk_k_1;
+    double jerk_k_filtered;
 
     int    rising_edge;
 

@@ -183,20 +183,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
     pos_ctrl_auto_tune.auto_tune =  motion_ctrl_config.position_control_autotune;
     pos_ctrl_auto_tune.counter++;
 
-    pos_ctrl_auto_tune.position_act_k_2 = pos_ctrl_auto_tune.position_act_k_1;
-    pos_ctrl_auto_tune.position_act_k_1 = pos_ctrl_auto_tune.position_act_k;
-    pos_ctrl_auto_tune.position_act_k   = position_k;
-
-    pos_ctrl_auto_tune.velocity_k_1= pos_ctrl_auto_tune.velocity_k;
-    pos_ctrl_auto_tune.velocity_k  = pos_ctrl_auto_tune.position_act_k - pos_ctrl_auto_tune.position_act_k_1;
-
-    pos_ctrl_auto_tune.velocity_k_filtered_k_1 = pos_ctrl_auto_tune.velocity_k_filtered;
-    pos_ctrl_auto_tune.velocity_k_filtered = (9*pos_ctrl_auto_tune.velocity_k_filtered + pos_ctrl_auto_tune.velocity_k)/10;
-
-    pos_ctrl_auto_tune.acceleration_k= pos_ctrl_auto_tune.velocity_k_filtered-pos_ctrl_auto_tune.velocity_k_filtered_k_1;
-    pos_ctrl_auto_tune.acceleration_k_filtered= (49*pos_ctrl_auto_tune.acceleration_k_filtered+pos_ctrl_auto_tune.acceleration_k)/50;
-
-
     if(pos_ctrl_auto_tune.controller == CASCADED)
     {
         if(pos_ctrl_auto_tune.activate==0)
@@ -654,6 +640,16 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
     pos_ctrl_auto_tune.err = (pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
     pos_ctrl_auto_tune.err_energy = pos_ctrl_auto_tune.err * pos_ctrl_auto_tune.err;
     pos_ctrl_auto_tune.err_energy_int += pos_ctrl_auto_tune.err_energy;
+
+
+    /*
+     * jerk measurement
+     * from the moment jerk becomes negative, measure the energy of it over positive states
+     */
+    pos_ctrl_auto_tune.err = (pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
+    pos_ctrl_auto_tune.err_energy = pos_ctrl_auto_tune.err * pos_ctrl_auto_tune.err;
+    pos_ctrl_auto_tune.err_energy_int += pos_ctrl_auto_tune.err_energy;
+
 
     /*
      * measurement of overshoot and rise time

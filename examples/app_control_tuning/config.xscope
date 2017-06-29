@@ -46,6 +46,8 @@
     <Probe name="VELOCITY_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="ACCELERATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="ACCELERATION_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="JERK" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="JERK_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     
     
 </xSCOPEconfig>
