@@ -38,31 +38,32 @@ enum
 
 typedef enum
 {
-    POS_ERR = 1,
-    ANGLE_ERR = 2,
-    PORTS_ERR = 3
+    POS_ERR =   1,
+    SPEED_ERR = 2,
+    ANGLE_ERR = 3,
+    PORTS_ERR = 4
 } sensor_fault;
 
 sensor_fault sensor_functionality_evaluation(client interface TorqueControlInterface i_torque_control, MotorcontrolConfig motorcontrol_config, int app_tile_usec)
 {
     UpstreamControlData upstream_control_data;
-    int angle = 0, count = 0, position = 0, hall_state = 0;
+    int angle = 0, position = 0, hall_state = 0, velocity = 0;
 
     unsigned counter = 0;
     int max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
     int max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
     int hall_state_old = 0, max_pos_found = 0, max_angle_found = 0;
     int filter_diff = 0, filter_vel = 0, hall_state_ch[NR_PHASES] = { 0 };
+    int index_v = 0, velocity_arr[500], index_d = 0, difference_arr[500],  old_position = 0;
     sensor_fault error_sens = NO_ERROR;
     timer t;
     unsigned ts;
 
     i_torque_control.enable_index_detection();
 
-    while(counter < 10000)
+    while(counter < 15000)
     {
         upstream_control_data = i_torque_control.update_upstream_control_data();
-        count = upstream_control_data.position;
         position = upstream_control_data.singleturn;
         angle = upstream_control_data.angle;
         hall_state = upstream_control_data.hall_state;
@@ -85,55 +86,106 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
 
                 hall_state_old = hall_state;
             }
-        }
 
-        if (angle > 4000 && !max_angle_found)
-        {
-            max_angle_found = 1;
-            max_angle = angle;
-            mean_angle = max_angle / 2;
-            tq_angle = (max_angle + mean_angle) / 2;
-            fq_angle = mean_angle / 2;
-        }
+            if (angle > 4000 && !max_angle_found)
+            {
+                max_angle_found = 1;
+                max_angle = angle;
+                mean_angle = max_angle / 2;
+                tq_angle = (max_angle + mean_angle) / 2;
+                fq_angle = mean_angle / 2;
+            }
 
-        if (max_angle_found)
-        {
-            if (angle > mean_angle - 50 && angle < mean_angle + 50)
-                real_mean_angle = angle;
-            if (angle > tq_angle - 50 && angle < tq_angle + 50)
-                real_tq_angle = angle;
-            if (angle > fq_angle - 50 && angle < fq_angle + 50)
-                real_fq_angle = angle;
-        }
+            if (max_angle_found)
+            {
+                if (angle > mean_angle - 50 && angle < mean_angle + 50)
+                    real_mean_angle = angle;
+                if (angle > tq_angle - 50 && angle < tq_angle + 50)
+                    real_tq_angle = angle;
+                if (angle > fq_angle - 50 && angle < fq_angle + 50)
+                    real_fq_angle = angle;
+            }
 
-        if (!max_pos_found && position > 60000)
-        {
-            max_pos_found = 1;
-            max_pos = position;
-            mean_pos = max_pos / 2;
-            tq_pos = (max_pos + mean_pos) / 2;
-            fq_pos = mean_pos / 2;
-        }
+            if (!max_pos_found && position > 60000)
+            {
+                max_pos_found = 1;
+                max_pos = position;
+                mean_pos = max_pos / 2;
+                tq_pos = (max_pos + mean_pos) / 2;
+                fq_pos = mean_pos / 2;
+            }
 
-        if (max_pos_found)
-        {
-            if (position > mean_pos -100 && position < mean_pos + 100)
-                real_mean_pos = position;
-            if (position > tq_pos - 100 && position < tq_pos + 100)
-                real_tq_pos = position;
-            if (position > fq_pos - 100 && position < fq_pos + 100)
-                real_fq_pos = position;
+            if (max_pos_found)
+            {
+                if (position > mean_pos -100 && position < mean_pos + 100)
+                    real_mean_pos = position;
+                if (position > tq_pos - 100 && position < tq_pos + 100)
+                    real_tq_pos = position;
+                if (position > fq_pos - 100 && position < fq_pos + 100)
+                    real_fq_pos = position;
+            }
         }
 
         ++counter;
+        t :> ts;
+        t when timerafter (ts + 500*app_tile_usec) :> ts;
+    }
 
-        if (counter == 10000)
+    while (counter > 0)
+    {
+        upstream_control_data = i_torque_control.update_upstream_control_data();
+        position = upstream_control_data.singleturn;
+        velocity = upstream_control_data.velocity;
+
+        if (old_position == 0)
+            old_position = position;
+
+        if (position != old_position)
+        {
+            if(position - old_position > -60000 && position - old_position < 60000)
+            {
+                difference_arr[index_d] = ((position - old_position) * (60000000/500)) / 65535;
+                index_d++;
+                old_position = position;
+            }
+        }
+
+        velocity_arr[index_v] = velocity;
+        index_v++;
+        if (index_v == 500)
+        {
+            index_v = 0;
+            filter_vel = 0;
+            for (int i = 0; i < 500; i++)
+                filter_vel += velocity_arr[i];
+            filter_vel /= 500;
+            filter_vel = abs(filter_vel);
+        }
+
+        if (index_d == 500)
+        {
+            index_d = 0;
+            filter_diff = 0;
+            for (int i = 0; i < 500; i++)
+                filter_diff += difference_arr[i];
+            filter_diff /= 500;
+            filter_diff = abs(filter_diff);
+        }
+
+        --counter;
+        t :> ts;
+        t when timerafter (ts + 500*app_tile_usec) :> ts;
+
+        if (counter == 0)
         {
             if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
                     || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
                     || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
                     || max_pos < 60000)
                 error_sens = POS_ERR;
+
+            if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
+                error_sens = SPEED_ERR;
 
             if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
                     || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
@@ -147,15 +199,10 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
                     error_sens = PORTS_ERR;
             }
         }
-
-        t :> ts;
-        t when timerafter (ts + 500*app_tile_usec) :> ts;
     }
 
     i_torque_control.disable_index_detection();
     i_torque_control.set_sensor_status(error_sens);
-    printf("%d\n", error_sens);
-    printf("%d %d %d %d %d\n", max_pos, mean_pos, real_mean_pos, tq_pos, real_tq_pos);
     return error_sens;
 }
 
@@ -861,16 +908,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 switch (error_sens)
                 {
                     case POS_ERR:
-                        upstream_control_data.sensor_error = POSITION_FAULT;
+                        upstream_control_data.sensor_error = SENSOR_POSITION_FAULT;
+                        break;
+                    case SPEED_ERR:
+                        upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
                         break;
                     case ANGLE_ERR:
                         if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                            upstream_control_data.sensor_error = HALL_SENSOR_FAULT;
+                            upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
                         else
-                            upstream_control_data.sensor_error = INCREMENTAL_SENSOR_1_FAULT;
+                            upstream_control_data.sensor_error = SENSOR_INCREMENTAL_FAULT;
                         break;
                     case PORTS_ERR:
-                        upstream_control_data.sensor_error = HALL_SENSOR_FAULT;
+                        upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
                         break;
                 }
 
@@ -1144,16 +1194,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 switch (error_sens)
                 {
                     case POS_ERR:
-                        upstream_control_data_out.sensor_error = POSITION_FAULT;
+                        upstream_control_data_out.sensor_error = SENSOR_POSITION_FAULT;
+                        break;
+                    case SPEED_ERR:
+                        upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
                         break;
                     case ANGLE_ERR:
                         if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                            upstream_control_data_out.sensor_error = HALL_SENSOR_FAULT;
+                            upstream_control_data_out.sensor_error = SENSOR_HALL_FAULT;
                         else
-                            upstream_control_data_out.sensor_error = INCREMENTAL_SENSOR_1_FAULT;
+                            upstream_control_data_out.sensor_error = SENSOR_INCREMENTAL_FAULT;
                         break;
                     case PORTS_ERR:
-                        upstream_control_data_out.sensor_error = HALL_SENSOR_FAULT;
+                        upstream_control_data_out.sensor_error = SENSOR_HALL_FAULT;
                         break;
                 }
 
