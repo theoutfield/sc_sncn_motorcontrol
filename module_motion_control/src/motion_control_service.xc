@@ -543,7 +543,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(VELOCITY     ,((int)(pos_ctrl_auto_tune.velocity_k)));
                 xscope_int(VELOCITY_FILTERED     ,((int)(pos_ctrl_auto_tune.velocity_k_filtered)));
 
-                xscope_int(ACCELERATION ,((int)(pos_ctrl_auto_tune.acceleration_k)));
+                xscope_int(ACCELERATION ,((int)(pos_ctrl_auto_tune.acceleration_k*100)));
+                xscope_int(ACCELERATION_FILTERED ,((int)(pos_ctrl_auto_tune.acceleration_k_filtered*100)));
 
 //#ifdef XSCOPE_POSITION_CTRL
 //                xscope_int(VELOCITY, upstream_control_data.velocity);

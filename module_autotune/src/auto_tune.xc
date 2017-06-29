@@ -142,6 +142,7 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
     pos_ctrl_auto_tune.velocity_k_1= 0.00;
 
     pos_ctrl_auto_tune.acceleration_k= 0.00;
+    pos_ctrl_auto_tune.acceleration_k_filtered= 0.00;
 
     pos_ctrl_auto_tune.auto_tune  = 0;
 
@@ -189,9 +190,12 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
     pos_ctrl_auto_tune.velocity_k_1= pos_ctrl_auto_tune.velocity_k;
     pos_ctrl_auto_tune.velocity_k  = pos_ctrl_auto_tune.position_act_k - pos_ctrl_auto_tune.position_act_k_1;
 
-    pos_ctrl_auto_tune.velocity_k_filtered = (4*pos_ctrl_auto_tune.velocity_k_filtered + pos_ctrl_auto_tune.velocity_k)/5;
+    pos_ctrl_auto_tune.velocity_k_filtered_k_1 = pos_ctrl_auto_tune.velocity_k_filtered;
+    pos_ctrl_auto_tune.velocity_k_filtered = (9*pos_ctrl_auto_tune.velocity_k_filtered + pos_ctrl_auto_tune.velocity_k)/10;
 
-    pos_ctrl_auto_tune.acceleration_k= pos_ctrl_auto_tune.velocity_k-pos_ctrl_auto_tune.velocity_k_1;
+    pos_ctrl_auto_tune.acceleration_k= pos_ctrl_auto_tune.velocity_k_filtered-pos_ctrl_auto_tune.velocity_k_filtered_k_1;
+    pos_ctrl_auto_tune.acceleration_k_filtered= (49*pos_ctrl_auto_tune.acceleration_k_filtered+pos_ctrl_auto_tune.acceleration_k)/50;
+
 
     if(pos_ctrl_auto_tune.controller == CASCADED)
     {
