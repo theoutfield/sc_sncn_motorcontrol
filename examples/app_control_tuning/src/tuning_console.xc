@@ -78,6 +78,36 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         {
 
         //automatic tuning
+        case 'g':
+                switch (mode_2)
+                {
+                   case 's':
+
+                       printf("Evaluation of phases is starting ...\n");
+                       printf("Voltages are applied to phase terminals ...\n");
+                       {phase_error, resistance} = i_motion_control.open_phase_detection();
+
+                       if (phase_error == 1)
+                           printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+                       else if (phase_error == 2)
+                           printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+                       else if(phase_error == 3)
+                           printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+                       else
+                       {
+                           printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n\n");
+
+                           printf("Evaluation of sensors is starting ...\n");
+                           printf("Motor will rotate couple of turns in both directions ...\n");
+                           delay_seconds(1);
+                           i_motion_control.sensors_evaluation();
+                           printf("End\n");
+                       }
+
+                       break;
+                }
+            break;
+
         case 'a':
                 motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
@@ -261,6 +291,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
 
                 default://find motor commutation offset automatically
+
                          printf("Sending offset_detection command ...\n");
 
                          motorcontrol_config = i_motion_control.set_offset_detection_enabled();
@@ -439,24 +470,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         i_motion_control.update_control_data(downstream_control_data);
                         printf("set torque %d\n", downstream_control_data.torque_cmd);
                         break;
-                }
-                break;
-
-       case 'g':
-
-                printf("detection of open circuit in phases started ...\n");
-                {phase_error, resistance} = i_motion_control.open_phase_detection();
-
-                if (phase_error == 1)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
-                else if (phase_error == 2)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
-                else if(phase_error == 3)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
-                else
-                {
-                    printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
-                    printf(">>  PHASE RESISTANCE = %.2f Om\n", resistance);
                 }
                 break;
 
