@@ -248,6 +248,13 @@ interface MotionControlInterface
     {int, float} open_phase_detection();
 
     /**
+     * @brief Enables the sensors evaluation
+     *
+     * @return void
+     */
+    void sensors_evaluation();
+
+    /**
      * @brief responsible for data communication between torque controller and higher level controllers
      *
      * @param downstreamcontroldata -> structure including the commands for torque/velocity/position controller

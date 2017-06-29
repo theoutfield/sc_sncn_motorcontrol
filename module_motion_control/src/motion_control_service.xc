@@ -73,78 +73,78 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
                 hall_state_old = hall_state;
         }
-        else
+
+        if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
         {
-            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-            {
-                if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
-                    ++hall_state_ch[A];
-                if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
-                    ++hall_state_ch[B];
-                if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
-                    ++hall_state_ch[C];
+            if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
+                ++hall_state_ch[A];
+            if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
+                ++hall_state_ch[B];
+            if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
+                ++hall_state_ch[C];
 
-                hall_state_old = hall_state;
-            }
+            hall_state_old = hall_state;
+        }
 
-            if (angle > 4000 && !max_angle_found)
-            {
-                max_angle_found = 1;
-                max_angle = angle;
-                mean_angle = max_angle / 2;
-                tq_angle = (max_angle + mean_angle) / 2;
-                fq_angle = mean_angle / 2;
-            }
+        if (angle > 4000 && !max_angle_found)
+        {
+            max_angle_found = 1;
+            max_angle = angle;
+            mean_angle = max_angle / 2;
+            tq_angle = (max_angle + mean_angle) / 2;
+            fq_angle = mean_angle / 2;
+        }
 
-            if (max_angle_found)
-            {
-                if (angle > mean_angle - 50 && angle < mean_angle + 50)
-                    real_mean_angle = angle;
-                if (angle > tq_angle - 50 && angle < tq_angle + 50)
-                    real_tq_angle = angle;
-                if (angle > fq_angle - 50 && angle < fq_angle + 50)
-                    real_fq_angle = angle;
-            }
+        if (max_angle_found)
+        {
+            if (angle > mean_angle - 50 && angle < mean_angle + 50)
+                real_mean_angle = angle;
+            if (angle > tq_angle - 50 && angle < tq_angle + 50)
+                real_tq_angle = angle;
+            if (angle > fq_angle - 50 && angle < fq_angle + 50)
+                real_fq_angle = angle;
+        }
 
-            if (!max_pos_found && position > 60000)
-            {
-                max_pos_found = 1;
-                max_pos = position;
-                mean_pos = max_pos / 2;
-                tq_pos = (max_pos + mean_pos) / 2;
-                fq_pos = mean_pos / 2;
-            }
+        if (!max_pos_found && position > 60000)
+        {
+            max_pos_found = 1;
+            max_pos = position;
+            mean_pos = max_pos / 2;
+            tq_pos = (max_pos + mean_pos) / 2;
+            fq_pos = mean_pos / 2;
+        }
 
-            if (max_pos_found)
-            {
-                if (position > mean_pos -100 && position < mean_pos + 100)
-                    real_mean_pos = position;
-                if (position > tq_pos - 100 && position < tq_pos + 100)
-                    real_tq_pos = position;
-                if (position > fq_pos - 100 && position < fq_pos + 100)
-                    real_fq_pos = position;
-            }
+        if (max_pos_found)
+        {
+            if (position > mean_pos -100 && position < mean_pos + 100)
+                real_mean_pos = position;
+            if (position > tq_pos - 100 && position < tq_pos + 100)
+                real_tq_pos = position;
+            if (position > fq_pos - 100 && position < fq_pos + 100)
+                real_fq_pos = position;
         }
 
         ++counter;
+
+
         t :> ts;
-        t when timerafter (ts + 500*app_tile_usec) :> ts;
+        t when timerafter (ts + 500*app_tile_usec) :> void;
     }
 
-    while (counter > 0)
+    while (counter > 5000)
     {
         upstream_control_data = i_torque_control.update_upstream_control_data();
         position = upstream_control_data.singleturn;
         velocity = upstream_control_data.velocity;
 
-        if (old_position == 0)
+        if (counter == 15000)
             old_position = position;
 
         if (position != old_position)
         {
             if(position - old_position > -60000 && position - old_position < 60000)
             {
-                difference_arr[index_d] = ((position - old_position) * (60000000/500)) / 65535;
+                difference_arr[index_d] = ((position - old_position) * (60000000/1000)) / 65535;
                 index_d++;
                 old_position = position;
             }
@@ -174,33 +174,32 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
 
         --counter;
         t :> ts;
-        t when timerafter (ts + 500*app_tile_usec) :> ts;
-
-        if (counter == 0)
-        {
-            if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
-                    || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
-                    || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
-                    || max_pos < 60000)
-                error_sens = POS_ERR;
-
-            if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
-                error_sens = SPEED_ERR;
-
-            if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
-                    || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
-                    || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
-                    || max_angle < 4000)
-                error_sens = ANGLE_ERR;
-
-            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-            {
-                if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
-                    error_sens = PORTS_ERR;
-            }
-        }
+        t when timerafter (ts + 1000*app_tile_usec) :> void;
     }
 
+    if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
+            || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
+            || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
+            || max_pos < 60000)
+        error_sens = POS_ERR;
+
+    if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
+        error_sens = SPEED_ERR;
+
+    if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
+            || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
+            || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
+            || max_angle < 4000)
+        error_sens = ANGLE_ERR;
+
+    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+    {
+        if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+            error_sens = PORTS_ERR;
+    }
+
+    printf("%d\n", error_sens);
+    printf("%d %d\n", filter_vel, filter_diff);
     i_torque_control.disable_index_detection();
     i_torque_control.set_sensor_status(error_sens);
     return error_sens;
@@ -214,8 +213,8 @@ int open_phase_detection_function(client interface TorqueControlInterface i_torq
     int refer[NR_PHASES] = {0, 20, 30, 30};
     unsigned counter = 1;
     float voltage = 0;
-    int error_phase = NO_ERROR;
     float rated_curr = (float)motorcontrol_config.rated_current/1000;
+    int error_phase = NO_ERROR;
 
     timer tmr;
     unsigned ts;
@@ -496,19 +495,17 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     }
 
     // open phase detection
+    int error_phase;
     float resist = 0;
-    int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
 
     // testing the angle, position, velocity from the sensor
     sensor_fault error_sens;
     int qei_pos_old = 0, qei_pos = 0, qei_err_counter = 0;
     timer tm_qei;
     unsigned ts_qei;
-    if (!error_phase)
-        error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, app_tile_usec);
 
     //QEI index calibration
-    if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_phase && !error_sens)
+    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
     {
         printf("Find encoder index \n");
         int index_found = 0;
@@ -935,7 +932,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
                 xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-                xscope_int(ANGLE, upstream_control_data.singleturn);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
@@ -1362,6 +1358,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
                 error_phase_out = error_phase;
                 resistance_out = resist;
+                break;
+
+        case i_motion_control[int i].sensors_evaluation():
+                error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, app_tile_usec);
                 break;
         }
     }
