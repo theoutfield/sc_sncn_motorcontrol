@@ -40,7 +40,8 @@ int general_system_evaluation(client interface MotionControlInterface i_motion_c
         printf("Motor will rotate couple of turns in both directions ...\n");
         delay_seconds(1);
         sensor_error = i_motion_control.sensors_evaluation();
-        printf("End\n");
+        if (sensor_error == 0)
+            printf("SENSOR IS WORKING PROPERLY ...\n\n");
         return sensor_error;
     }
 }
