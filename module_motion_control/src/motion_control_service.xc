@@ -535,39 +535,39 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
 
-                xscope_int(POS_REF, ((int)(pos_ctrl_auto_tune.position_ref-pos_ctrl_auto_tune.position_init )));
-                xscope_int(POS_ACT, ((int)(position_k                     -pos_ctrl_auto_tune.position_init )));
-
-                xscope_int(ERR_EN_SS_INT_MIN, ((int)(pos_ctrl_auto_tune.err_energy_ss_int_min                         )));
-                xscope_int(ERR_EN_SS_INT    , ((int)(pos_ctrl_auto_tune.err_energy_ss_int                             )));
-                xscope_int(STEP_COUNTER     ,(pos_ctrl_auto_tune.active_step_counter*500 )                              );
-
-                xscope_int(VELOCITY     ,((int)(pos_ctrl_auto_tune.velocity_k)));
-                xscope_int(VELOCITY_FILTERED     ,((int)(pos_ctrl_auto_tune.velocity_k_filtered)));
-
-                xscope_int(ACCELERATION ,((int)(pos_ctrl_auto_tune.acceleration_k*100)));
-                xscope_int(ACCELERATION_FILTERED ,((int)(pos_ctrl_auto_tune.acceleration_k_filtered*100)));
-
-                xscope_int(JERK ,((int)(pos_ctrl_auto_tune.jerk_k*100)));
-                xscope_int(JERK_FILTERED ,((int)(pos_ctrl_auto_tune.jerk_k_filtered*100)));
-                xscope_int(JERK_FILTERED_ENERGY ,((int)(pos_ctrl_auto_tune.jerk_filtered_energy*100)));
-                xscope_int(JERK_ENERGY_LIMIT ,((int)(pos_ctrl_auto_tune.jerk_energy_limit*100)));
-                xscope_int(JERK_TRANSITION ,(pos_ctrl_auto_tune.jerk_k_transition*1000 + 100));
-                xscope_int(JERK_COUNTER_LIMIT ,(pos_ctrl_auto_tune.jerk_counter_limit));
-
-                xscope_int(ERR_EN_SS_INT_MIN ,((int)(pos_ctrl_auto_tune.err_energy_ss_int_min)));
-                xscope_int(ERR_EN_SS_INT ,((int)(pos_ctrl_auto_tune.err_energy_ss_int)));
-
+//                xscope_int(POS_REF, ((int)(pos_ctrl_auto_tune.position_ref-pos_ctrl_auto_tune.position_init )));
+//                xscope_int(POS_ACT, ((int)(position_k                     -pos_ctrl_auto_tune.position_init )));
+//
+//                xscope_int(ERR_EN_SS_INT_MIN, ((int)(pos_ctrl_auto_tune.err_energy_ss_int_min                         )));
+//                xscope_int(ERR_EN_SS_INT    , ((int)(pos_ctrl_auto_tune.err_energy_ss_int                             )));
+//                xscope_int(STEP_COUNTER     ,(pos_ctrl_auto_tune.active_step_counter*500 )                              );
+//
+//                xscope_int(VELOCITY     ,((int)(pos_ctrl_auto_tune.velocity_k)));
+//                xscope_int(VELOCITY_FILTERED     ,((int)(pos_ctrl_auto_tune.velocity_k_filtered)));
+//
+//                xscope_int(ACCELERATION ,((int)(pos_ctrl_auto_tune.acceleration_k*100)));
+//                xscope_int(ACCELERATION_FILTERED ,((int)(pos_ctrl_auto_tune.acceleration_k_filtered*100)));
+//
+//                xscope_int(JERK ,((int)(pos_ctrl_auto_tune.jerk_k*100)));
+//                xscope_int(JERK_FILTERED ,((int)(pos_ctrl_auto_tune.jerk_k_filtered*100)));
+//                xscope_int(JERK_FILTERED_ENERGY ,((int)(pos_ctrl_auto_tune.jerk_filtered_energy*100)));
+//                xscope_int(JERK_ENERGY_LIMIT ,((int)(pos_ctrl_auto_tune.jerk_energy_limit*100)));
+//                xscope_int(JERK_TRANSITION ,(pos_ctrl_auto_tune.jerk_k_transition*1000 + 100));
+//                xscope_int(JERK_COUNTER_LIMIT ,(pos_ctrl_auto_tune.jerk_counter_limit));
+//
+//                xscope_int(ERR_EN_SS_INT_MIN ,((int)(pos_ctrl_auto_tune.err_energy_ss_int_min)));
+//                xscope_int(ERR_EN_SS_INT ,((int)(pos_ctrl_auto_tune.err_energy_ss_int)));
+//
 
 
 
 //#ifdef XSCOPE_POSITION_CTRL
 //                xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(POSITION, upstream_control_data.position);
+//                xscope_int(POSITION, upstream_control_data.position);
 //                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
 //                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
 //                xscope_int(TORQUE,   upstream_control_data.computed_torque);
-                xscope_int(POSITION_CMD, (int)position_ref_in_k);
+//                xscope_int(POSITION_CMD, (int)position_ref_in_k);
 //                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
 //                xscope_int(TORQUE_CMD, torque_ref_k);
 //                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
