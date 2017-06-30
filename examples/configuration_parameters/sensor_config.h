@@ -4,6 +4,7 @@
 
 //General config
 #define SENSOR_MAX_TICKS                  0x7fffffff   // the count is reset to 0 if greater than this
+#define SENSOR_MAX_TICKS_LOST             10           // how many ticks is allowed to be lost expressed in percentage of encoder resolution
 #define SENSOR_VELOCITY_COMPUTE_PERIOD    1000         // default velocity compute period 1ms
 
 //BiSS config, use default if not set before
