@@ -250,9 +250,9 @@ interface MotionControlInterface
     /**
      * @brief Enables the sensors evaluation
      *
-     * @return void
+     * @return sensor status (0 = no error, != 0 error)
      */
-    void sensors_evaluation();
+    int sensors_evaluation();
 
     /**
      * @brief responsible for data communication between torque controller and higher level controllers
