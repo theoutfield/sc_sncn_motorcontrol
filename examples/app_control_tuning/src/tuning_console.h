@@ -23,3 +23,13 @@
  *
  */
 void control_tuning_console(client interface MotionControlInterface i_motion_control);
+
+/**
+ * @brief App that evaluates and searches for errors in phases and sensors
+ *
+ * @param i_motion_control client interface to the motion control service
+ *
+ * return error if it exists
+ *
+ */
+int general_system_evaluation(client interface MotionControlInterface i_motion_control);

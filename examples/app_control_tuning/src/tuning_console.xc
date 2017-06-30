@@ -8,6 +8,43 @@
 #include <stdio.h>
 #include <ctype.h>
 
+int general_system_evaluation(client interface MotionControlInterface i_motion_control)
+{
+    float resistance;
+    int phase_error = 0, sensor_error = 0;
+
+    printf("Evaluation of phases is starting ...\n");
+    printf("Voltages are applied to phase terminals ...\n");
+    {phase_error, resistance} = i_motion_control.open_phase_detection();
+
+    if (phase_error == 1)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+        return phase_error;
+    }
+    else if (phase_error == 2)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+        return phase_error;
+    }
+    else if(phase_error == 3)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+        return phase_error;
+    }
+    else
+    {
+        printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n\n");
+
+        printf("Evaluation of sensors is starting ...\n");
+        printf("Motor will rotate couple of turns in both directions ...\n");
+        delay_seconds(1);
+        sensor_error = i_motion_control.sensors_evaluation();
+        printf("End\n");
+        return sensor_error;
+    }
+}
+
 void control_tuning_console(client interface MotionControlInterface i_motion_control)
 {
     DownstreamControlData downstream_control_data = {0};
@@ -27,9 +64,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
     if(ctrlReadData == 1) {
         tile_usec = USEC_FAST;
     }
-
-    float resistance;
-    int phase_error = 0;
 
     delay_ticks(100*1000*tile_usec);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
@@ -76,38 +110,21 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
         switch(mode_1)
         {
-
-        //automatic tuning
         case 'g':
                 switch (mode_2)
                 {
                    case 's':
-
-                       printf("Evaluation of phases is starting ...\n");
-                       printf("Voltages are applied to phase terminals ...\n");
-                       {phase_error, resistance} = i_motion_control.open_phase_detection();
-
-                       if (phase_error == 1)
-                           printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
-                       else if (phase_error == 2)
-                           printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
-                       else if(phase_error == 3)
-                           printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
-                       else
+                       switch(mode_3)
                        {
-                           printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n\n");
-
-                           printf("Evaluation of sensors is starting ...\n");
-                           printf("Motor will rotate couple of turns in both directions ...\n");
-                           delay_seconds(1);
-                           i_motion_control.sensors_evaluation();
-                           printf("End\n");
+                           case 'e':
+                               general_system_evaluation(i_motion_control);
+                               break;
                        }
-
-                       break;
+                   break;
                 }
             break;
 
+        //automatic tuning
         case 'a':
                 motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
@@ -292,30 +309,39 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                 default://find motor commutation offset automatically
 
-                         printf("Sending offset_detection command ...\n");
+                    if (general_system_evaluation(i_motion_control) == 0)
+                    {
+                        printf("Sending offset_detection command ...\n");
 
-                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+                        motorcontrol_config = i_motion_control.set_offset_detection_enabled();
 
-                         if(motorcontrol_config.commutation_angle_offset == -1)
-                         {
-                             printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-                         }
-                         else
-                         {
-                             motorcontrol_config = i_motion_control.get_motorcontrol_config();
-                             printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+                        if(motorcontrol_config.commutation_angle_offset == -1)
+                        {
+                            printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                        }
+                        else
+                        {
+                            motorcontrol_config = i_motion_control.get_motorcontrol_config();
+                            printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
 
-                             printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
+                            printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
 
-                             if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
-                             {
-                                 printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
-                                 for (int i=0;i<6;i++) {
-                                     printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
-                                 }
-                             }
-                         }
-                         break;
+                            if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                            {
+                                printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
+                                for (int i=0;i<6;i++) {
+                                    printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        printf("SENSOR NOT WORKING PROPERLY, OFFSET DETECTION NOT POSSIBLE ...\n");
+                    }
+
+                    break;
+
                  } //end switch(mode_2)
 
                 break;
