@@ -207,7 +207,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
     }
 
 //    printf("%d\n", error_sens);
-    printf("%d %d\n", filter_vel, filter_diff);
+//    printf("%d %d\n", filter_vel, filter_diff);
     i_torque_control.disable_index_detection();
     i_torque_control.set_sensor_status(error_sens);
     return error_sens;
@@ -512,12 +512,25 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         printf("Find encoder index \n");
         int index_found = 0;
         i_torque_control.enable_index_detection();
+        t :> ts;
         while (!index_found)
         {
             upstream_control_data = i_torque_control.update_upstream_control_data();
             index_found = upstream_control_data.qei_index_found;
+            select
+            {
+                case t when timerafter(ts+5*1e6*app_tile_usec) :> void:
+                    error_sens = POS_ERR;
+                    index_found = 1;
+                    break;
+            }
         }
-        printf("Incremental encoder index found\n");
+
+        if (error_sens == 0)
+            printf("Incremental encoder index found\n");
+        else
+            printf("Incremental encoder index found \n Check if the sensor is connected\n\n");
+
         i_torque_control.disable_index_detection();
     }
 
