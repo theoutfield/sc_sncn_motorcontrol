@@ -424,7 +424,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 else
                                 {
                                     printf("TUNING ENDED \n");
-                                    printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                    printf("kp:%i ki:%i kd:%i kl:%d J:%d\n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit, motion_ctrl_config.moment_of_inertia);
                                 }
                             }
 
@@ -436,7 +436,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
 
                                 printf("step:%i \n",  pos_ctrl_auto_tune.active_step);
-                                printf("kpp:%i kpi:%i kpd:%i kpl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                printf("kp:%i ki:%i kd:%i kl:%d J:%d\n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit, motion_ctrl_config.moment_of_inertia);
 
                             }
 
@@ -551,8 +551,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(JERK ,((int)(pos_ctrl_auto_tune.jerk_k*100)));
                 xscope_int(JERK_FILTERED ,((int)(pos_ctrl_auto_tune.jerk_k_filtered*100)));
                 xscope_int(JERK_FILTERED_ENERGY ,((int)(pos_ctrl_auto_tune.jerk_filtered_energy*100)));
+                xscope_int(JERK_ENERGY_LIMIT ,((int)(pos_ctrl_auto_tune.jerk_energy_limit*100)));
                 xscope_int(JERK_TRANSITION ,(pos_ctrl_auto_tune.jerk_k_transition*1000 + 100));
                 xscope_int(JERK_COUNTER_LIMIT ,(pos_ctrl_auto_tune.jerk_counter_limit));
+
+                xscope_int(ERR_EN_SS_INT_MIN ,((int)(pos_ctrl_auto_tune.err_energy_ss_int_min)));
+                xscope_int(ERR_EN_SS_INT ,((int)(pos_ctrl_auto_tune.err_energy_ss_int)));
+
 
 
 

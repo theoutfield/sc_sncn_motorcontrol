@@ -86,8 +86,9 @@ typedef struct {
     double jerk_k_1;
     double jerk_k_filtered;
     int    jerk_k_transition;
-    int jerk_counter_limit;
+    int     jerk_counter_limit;
     double jerk_filtered_energy;
+    double jerk_energy_limit;
 
     int    rising_edge;
 

@@ -39,8 +39,8 @@
     
     <Probe name="POS_REF" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
     <Probe name="POS_ACT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
-    <Probe name="ERR_EN_SS_INT_MIN" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
-    <Probe name="ERR_EN_SS_INT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
+    <Probe name="ERR_EN_SS_INT_MIN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="ERR_EN_SS_INT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
     <Probe name="VELOCITY_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
@@ -49,6 +49,7 @@
     <Probe name="JERK" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
     <Probe name="JERK_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="JERK_FILTERED_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="JERK_ENERGY_LIMIT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="JERK_TRANSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="JERK_COUNTER_LIMIT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     
