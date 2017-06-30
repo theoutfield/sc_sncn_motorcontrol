@@ -533,26 +533,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-                pos_ctrl_auto_tune.position_act_k_2 = pos_ctrl_auto_tune.position_act_k_1;
-                pos_ctrl_auto_tune.position_act_k_1 = pos_ctrl_auto_tune.position_act_k;
-                pos_ctrl_auto_tune.position_act_k   = position_k;
-
-                pos_ctrl_auto_tune.velocity_k_1= pos_ctrl_auto_tune.velocity_k;
-                pos_ctrl_auto_tune.velocity_k  = pos_ctrl_auto_tune.position_act_k - pos_ctrl_auto_tune.position_act_k_1;
-
-                pos_ctrl_auto_tune.velocity_k_filtered_k_1 = pos_ctrl_auto_tune.velocity_k_filtered;
-                pos_ctrl_auto_tune.velocity_k_filtered = (9*pos_ctrl_auto_tune.velocity_k_filtered + pos_ctrl_auto_tune.velocity_k)/10;
-
-                pos_ctrl_auto_tune.acceleration_k_1= pos_ctrl_auto_tune.acceleration_k;
-                pos_ctrl_auto_tune.acceleration_k= pos_ctrl_auto_tune.velocity_k_filtered-pos_ctrl_auto_tune.velocity_k_filtered_k_1;
-
-                pos_ctrl_auto_tune.acceleration_k_filtered_k_1 = pos_ctrl_auto_tune.acceleration_k_filtered;
-                pos_ctrl_auto_tune.acceleration_k_filtered= (19*pos_ctrl_auto_tune.acceleration_k_filtered+pos_ctrl_auto_tune.acceleration_k)/20;
-
-                pos_ctrl_auto_tune.jerk_k_1= pos_ctrl_auto_tune.jerk_k;
-                pos_ctrl_auto_tune.jerk_k= pos_ctrl_auto_tune.acceleration_k_filtered-pos_ctrl_auto_tune.acceleration_k_filtered_k_1;
-
-                pos_ctrl_auto_tune.jerk_k_filtered= (49*pos_ctrl_auto_tune.jerk_k_filtered+pos_ctrl_auto_tune.jerk_k)/50;
 
 
                 xscope_int(POS_REF, ((int)(pos_ctrl_auto_tune.position_ref-pos_ctrl_auto_tune.position_init )));
@@ -572,6 +552,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(JERK_FILTERED ,((int)(pos_ctrl_auto_tune.jerk_k_filtered*100)));
                 xscope_int(JERK_FILTERED_ENERGY ,((int)(pos_ctrl_auto_tune.jerk_filtered_energy*100)));
                 xscope_int(JERK_TRANSITION ,(pos_ctrl_auto_tune.jerk_k_transition*1000 + 100));
+                xscope_int(JERK_COUNTER_LIMIT ,(pos_ctrl_auto_tune.jerk_counter_limit));
+
+
 
 //#ifdef XSCOPE_POSITION_CTRL
 //                xscope_int(VELOCITY, upstream_control_data.velocity);

@@ -50,6 +50,7 @@
     <Probe name="JERK_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="JERK_FILTERED_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="JERK_TRANSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="JERK_COUNTER_LIMIT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     
     
 </xSCOPEconfig>

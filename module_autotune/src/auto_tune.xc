@@ -663,28 +663,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
     pos_ctrl_auto_tune.err_energy = pos_ctrl_auto_tune.err * pos_ctrl_auto_tune.err;
     pos_ctrl_auto_tune.err_energy_int += pos_ctrl_auto_tune.err_energy;
 
-
-    /*
-     * jerk measurement
-     * from the moment jerk becomes negative, measure the energy of it over positive states
-     */
-    if(pos_ctrl_auto_tune.rising_edge==1 &&
-                   pos_ctrl_auto_tune.position_init-pos_ctrl_auto_tune.step_amplitude+(10*2*pos_ctrl_auto_tune.step_amplitude)/100<position_k &&
-        position_k<pos_ctrl_auto_tune.position_init+pos_ctrl_auto_tune.step_amplitude-( 2*2*pos_ctrl_auto_tune.step_amplitude)/100                )
-    {
-        if(pos_ctrl_auto_tune.jerk_k_filtered<0) pos_ctrl_auto_tune.jerk_k_transition=1;
-
-        if(pos_ctrl_auto_tune.jerk_k_transition==1 && 0<pos_ctrl_auto_tune.jerk_k_filtered)
-        {
-            pos_ctrl_auto_tune.jerk_filtered_energy += (pos_ctrl_auto_tune.jerk_k_filtered*pos_ctrl_auto_tune.jerk_k_filtered);
-        }
-    }
-
-    pos_ctrl_auto_tune.err = (pos_ctrl_auto_tune.position_ref - position_k)/1000.00;
-    pos_ctrl_auto_tune.err_energy = pos_ctrl_auto_tune.err * pos_ctrl_auto_tune.err;
-    pos_ctrl_auto_tune.err_energy_int += pos_ctrl_auto_tune.err_energy;
-
-
     /*
      * measurement of overshoot and rise time
      */
@@ -701,6 +679,47 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
         pos_ctrl_auto_tune.err_ss = (pos_ctrl_auto_tune.position_ref - position_k);
         pos_ctrl_auto_tune.err_energy_ss = pos_ctrl_auto_tune.err_ss * pos_ctrl_auto_tune.err_ss;
         pos_ctrl_auto_tune.err_energy_ss_int += pos_ctrl_auto_tune.err_energy_ss;
+    }
+
+    pos_ctrl_auto_tune.position_act_k_2 = pos_ctrl_auto_tune.position_act_k_1;
+    pos_ctrl_auto_tune.position_act_k_1 = pos_ctrl_auto_tune.position_act_k;
+    pos_ctrl_auto_tune.position_act_k   = position_k;
+
+    pos_ctrl_auto_tune.velocity_k_1= pos_ctrl_auto_tune.velocity_k;
+    pos_ctrl_auto_tune.velocity_k  = pos_ctrl_auto_tune.position_act_k - pos_ctrl_auto_tune.position_act_k_1;
+
+    pos_ctrl_auto_tune.velocity_k_filtered_k_1 = pos_ctrl_auto_tune.velocity_k_filtered;
+    pos_ctrl_auto_tune.velocity_k_filtered = (9*pos_ctrl_auto_tune.velocity_k_filtered + pos_ctrl_auto_tune.velocity_k)/10;
+
+    pos_ctrl_auto_tune.acceleration_k_1= pos_ctrl_auto_tune.acceleration_k;
+    pos_ctrl_auto_tune.acceleration_k= pos_ctrl_auto_tune.velocity_k_filtered-pos_ctrl_auto_tune.velocity_k_filtered_k_1;
+
+    pos_ctrl_auto_tune.acceleration_k_filtered_k_1 = pos_ctrl_auto_tune.acceleration_k_filtered;
+    pos_ctrl_auto_tune.acceleration_k_filtered= (19*pos_ctrl_auto_tune.acceleration_k_filtered+pos_ctrl_auto_tune.acceleration_k)/20;
+
+    pos_ctrl_auto_tune.jerk_k_1= pos_ctrl_auto_tune.jerk_k;
+    pos_ctrl_auto_tune.jerk_k= pos_ctrl_auto_tune.acceleration_k_filtered-pos_ctrl_auto_tune.acceleration_k_filtered_k_1;
+
+    pos_ctrl_auto_tune.jerk_k_filtered= (49*pos_ctrl_auto_tune.jerk_k_filtered+pos_ctrl_auto_tune.jerk_k)/50;
+
+
+    if(pos_ctrl_auto_tune.rising_edge==1 &&
+                  pos_ctrl_auto_tune.position_init-pos_ctrl_auto_tune.step_amplitude+(80*2*pos_ctrl_auto_tune.step_amplitude)/100<position_k &&
+       position_k<pos_ctrl_auto_tune.position_init-pos_ctrl_auto_tune.step_amplitude+(85*2*pos_ctrl_auto_tune.step_amplitude)/100)
+    {
+        pos_ctrl_auto_tune.jerk_counter_limit = (4*pos_ctrl_auto_tune.jerk_counter_limit+pos_ctrl_auto_tune.counter)/5;
+    }
+
+    /*
+     * jerk measurement
+     * from the moment jerk becomes negative, measure the energy of it over positive states
+     */
+    if(pos_ctrl_auto_tune.rising_edge==1 && pos_ctrl_auto_tune.counter<(pos_ctrl_auto_tune.jerk_counter_limit*3))
+    {
+        if(pos_ctrl_auto_tune.jerk_k_filtered<0) pos_ctrl_auto_tune.jerk_k_transition=1;
+
+        if(pos_ctrl_auto_tune.jerk_k_transition==1 && 0<pos_ctrl_auto_tune.jerk_k_filtered)
+            pos_ctrl_auto_tune.jerk_filtered_energy += (pos_ctrl_auto_tune.jerk_k_filtered*pos_ctrl_auto_tune.jerk_k_filtered);
     }
 
 
