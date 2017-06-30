@@ -198,7 +198,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             error_sens = PORTS_ERR;
     }
 
-    printf("%d\n", error_sens);
+//    printf("%d\n", error_sens);
     printf("%d %d\n", filter_vel, filter_diff);
     i_torque_control.disable_index_detection();
     i_torque_control.set_sensor_status(error_sens);
@@ -494,15 +494,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         app_tile_usec = USEC_FAST;
     }
 
-    // open phase detection
     int error_phase;
     float resist = 0;
-
-    // testing the angle, position, velocity from the sensor
     sensor_fault error_sens;
-    int qei_pos_old = 0, qei_pos = 0, qei_err_counter = 0;
-    timer tm_qei;
-    unsigned ts_qei;
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
@@ -534,7 +528,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
-    tm_qei :> ts_qei;
 
     while(1)
     {
@@ -931,7 +924,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
-                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
+                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error);
+                xscope_int(ALIGN, upstream_control_data.last_sensor_error);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
@@ -954,31 +948,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 t :> time_end;
                 time_used = time_end - time_start;
-
-                break;
-
-        case tm_qei when timerafter (ts_qei + 100*app_tile_usec) :> ts_qei :
-
-                if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
-                {
-                    qei_pos = upstream_control_data.singleturn;
-
-                    if(qei_pos != qei_pos_old)
-                    {
-                        if (qei_pos == 0)
-                            qei_err_counter = 1;
-                        else
-                            qei_err_counter = 0;
-                    }
-
-                    if (qei_err_counter && qei_pos == 0)
-                        ++qei_err_counter;
-
-                    if (qei_err_counter == 1000)
-                        error_sens = POS_ERR;
-
-                    qei_pos_old = qei_pos;
-                }
 
                 break;
 
@@ -1331,7 +1300,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 error_sens = NO_ERROR;
                 i_torque_control.set_sensor_status(error_sens);
                 error_phase = NO_ERROR;
-                qei_err_counter = 0;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
