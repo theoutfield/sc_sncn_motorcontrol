@@ -840,7 +840,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'f':
             UpstreamControlData upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
 
-            if (upstream_control_data.error_status == NO_FAULT)
+            if (upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR)
             {
                 printf("No fault\n");
             }
@@ -852,6 +852,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                 if(upstream_control_data.error_status != NO_FAULT)
                     printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+                else if (upstream_control_data.sensor_error != SENSOR_NO_ERROR)
+                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.sensor_error);
 
                 //reset fault
                 printf("Reset fault...\n");
@@ -860,7 +862,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 //check if reset worked
                 delay_ticks(500*1000*tile_usec);
                 upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
-                if(upstream_control_data.error_status == NO_FAULT)
+                if(upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR)
                 {
                     printf(">>  FAULT REMOVED\n");
                 } else {
