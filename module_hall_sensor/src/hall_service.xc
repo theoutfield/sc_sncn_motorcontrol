@@ -197,6 +197,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
     hall_state_old = hall_state_1;
 
     SensorError sensor_error = SENSOR_NO_ERROR, last_sensor_error = SENSOR_NO_ERROR;
+    int hall_error_counter = 0;
 
     tx :> time1;
 
@@ -235,6 +236,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 sensor_error = SENSOR_NO_ERROR;
                 last_sensor_error = SENSOR_NO_ERROR;
+                hall_error_counter = 0;
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
@@ -324,30 +326,45 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                         {
                         case 1:
                             if (hall_state_new != 5 && hall_state_new != 3)
-                                sensor_error = SENSOR_HALL_FAULT;
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
                             break;
                         case 2:
                             if (hall_state_new != 3 && hall_state_new != 6)
-                                sensor_error = SENSOR_HALL_FAULT;
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
                             break;
                         case 3:
                             if (hall_state_new != 1 && hall_state_new != 2)
-                                sensor_error = SENSOR_HALL_FAULT;
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
                             break;
                         case 4:
                             if (hall_state_new != 6 && hall_state_new != 5)
-                                sensor_error = SENSOR_HALL_FAULT;
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
                             break;
                         case 5:
                             if (hall_state_new != 4 && hall_state_new != 1)
-                                sensor_error = SENSOR_HALL_FAULT;
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
                             break;
                         case 6:
                             if (hall_state_new != 2 && hall_state_new != 4)
-                                sensor_error = SENSOR_HALL_FAULT;
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
                             break;
                         }
                     }
+
+                    if (hall_error_counter == 1000)
+                        sensor_error = SENSOR_HALL_FAULT;
 
                     if (sensor_error != SENSOR_NO_ERROR)
                         last_sensor_error = sensor_error;
