@@ -174,7 +174,6 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
     pos_ctrl_auto_tune.overshoot_max=0.00;
 
     pos_ctrl_auto_tune.max_motor_speed=motion_ctrl_config.max_motor_speed;                /**< Parameter for setting the maximum motor speed */
-    motion_ctrl_config.max_motor_speed=1000;
     return 0;
 }
 
@@ -416,6 +415,11 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             pos_ctrl_auto_tune.kpl = 1;
             pos_ctrl_auto_tune.j   = 0;
 
+            pos_ctrl_auto_tune.kvp = 0 ;
+            pos_ctrl_auto_tune.kvi = 0 ;
+            pos_ctrl_auto_tune.kvd = 0 ;
+            pos_ctrl_auto_tune.kvl = 0 ;
+
             pos_ctrl_auto_tune.activate = 1;
             pos_ctrl_auto_tune.counter=0;
         }
@@ -535,7 +539,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
                     pos_ctrl_auto_tune.active_step_counter=0;
-                    motion_ctrl_config.max_motor_speed=pos_ctrl_auto_tune.max_motor_speed;
                 }
                 //keeping updated for the value of err_en_ss_min
                 pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(4.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/5;
@@ -635,6 +638,9 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
+
+                pos_ctrl_auto_tune.kvl = pos_ctrl_auto_tune.j ;
+
             }
 
 
@@ -650,6 +656,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.kpl =0;
                 pos_ctrl_auto_tune.active_step_counter=0;
             }
+            //show the tuning step with kvp (which is not important in the case of limited torque position controller
+            pos_ctrl_auto_tune.kvp = pos_ctrl_auto_tune.active_step ;
 
             pos_ctrl_auto_tune.overshoot=0;
             pos_ctrl_auto_tune.overshoot_max=0;
