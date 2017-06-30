@@ -183,8 +183,16 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             || max_pos < 60000)
         error_sens = POS_ERR;
 
-    if (filter_vel - filter_diff < -20 || filter_vel - filter_diff > 20)
-        error_sens = SPEED_ERR;
+    if (filter_vel < 60 && filter_vel > -60)
+    {
+        if (filter_vel - filter_diff < -30 || filter_vel - filter_diff > 30)
+            error_sens = SPEED_ERR;
+    }
+    else
+    {
+        if (filter_vel - filter_diff < -50 || filter_vel - filter_diff > 50)
+                    error_sens = SPEED_ERR;
+    }
 
     if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
             || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
@@ -1328,8 +1336,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 resistance_out = resist;
                 break;
 
-        case i_motion_control[int i].sensors_evaluation():
+        case i_motion_control[int i].sensors_evaluation() -> int sensor_status_out :
                 error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, app_tile_usec);
+                sensor_status_out = error_sens;
                 break;
         }
     }
