@@ -18,7 +18,7 @@
 
 	<!-- Velocity Position Control -->
 
-	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
@@ -43,15 +43,15 @@
     <Probe name="ERR_EN_SS_INT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="STEP_COUNTER" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
     <Probe name="VELOCITY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
-    <Probe name="VELOCITY_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="VELOCITY_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
     <Probe name="ACCELERATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
-    <Probe name="ACCELERATION_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="ACCELERATION_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
     <Probe name="JERK" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
-    <Probe name="JERK_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
-    <Probe name="JERK_FILTERED_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
-    <Probe name="JERK_ENERGY_LIMIT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
-    <Probe name="JERK_TRANSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
-    <Probe name="JERK_COUNTER_LIMIT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>    
+    <Probe name="JERK_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
+    <Probe name="JERK_FILTERED_ENERGY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
+    <Probe name="JERK_ENERGY_LIMIT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
+    <Probe name="JERK_TRANSITION" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
+    <Probe name="JERK_COUNTER_LIMIT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>    
     
     
 </xSCOPEconfig>
