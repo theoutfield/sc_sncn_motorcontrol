@@ -502,9 +502,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         app_tile_usec = USEC_FAST;
     }
 
-    int error_phase;
+    int error_phase = NO_ERROR;
     float resist = 0;
-    sensor_fault error_sens;
+    sensor_fault error_sens = NO_ERROR;
+    unsigned qei_ctr = 100000;
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
@@ -512,24 +513,23 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         printf("Find encoder index \n");
         int index_found = 0;
         i_torque_control.enable_index_detection();
-        t :> ts;
         while (!index_found)
         {
             upstream_control_data = i_torque_control.update_upstream_control_data();
             index_found = upstream_control_data.qei_index_found;
-            select
+            if (qei_ctr == 0)
             {
-                case t when timerafter(ts+5*1e6*app_tile_usec) :> void:
-                    error_sens = POS_ERR;
-                    index_found = 1;
-                    break;
+                error_sens = POS_ERR;
+                index_found = 1;
             }
+
+            --qei_ctr;
         }
 
-        if (error_sens == 0)
+        if (error_sens == NO_ERROR)
             printf("Incremental encoder index found\n");
         else
-            printf("Incremental encoder index found \n Check if the sensor is connected\n\n");
+            printf("Incremental encoder index not found \n Check if the sensor is connected\n\n");
 
         i_torque_control.disable_index_detection();
     }
