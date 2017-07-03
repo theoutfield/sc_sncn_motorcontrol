@@ -234,7 +234,8 @@ How to use
                     position_feedback_config.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
                     position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
                     position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
-
+					position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
+                    
                     position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
 
                     //setting second sensor
