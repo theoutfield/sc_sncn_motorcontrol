@@ -237,7 +237,8 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                             motorcontrol_config.protection_limit_over_current =  PROTECTION_MAXIMUM_CURRENT;
                             motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                             motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
-                            for (int i = 0; i < 1024; i++)
+        
+         				 	for (int i = 0; i < 1024; i++)
                             {
                                 motorcontrol_config.torque_offset[i] = 0;
                             }
