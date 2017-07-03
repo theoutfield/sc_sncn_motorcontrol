@@ -71,7 +71,6 @@ typedef struct {
     UsecType ifm_usec;              /**< Number of clock ticks in a microsecond >*/
     int pole_pairs;                 /**< Number of pole pairs */
     int resolution;                 /**< Number of ticks per turn */
-    int max_ticks_lost;             /**< Number of ticks that is allowed to be lost */
     int offset;                     /**< Offset (in ticks) added to the absolute multiturn position (count). Does not affect the electrical angle */
     int max_ticks;                  /**< The multiturn position is reset to 0 when reached */
     int velocity_compute_period;    /**< Velocity compute period in microsecond. Is also the polling period to write to the shared memory */
