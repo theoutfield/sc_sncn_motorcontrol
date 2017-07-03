@@ -75,7 +75,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
     int notification = MOTCTRL_NTF_EMPTY;
 
     SensorError sensor_error = SENSOR_NO_ERROR, last_sensor_error = SENSOR_NO_ERROR;
-    int singleturn_counter = 0, singleturn_old = 0, losing_ticks_counter = 0;
+    int singleturn_counter = 0, singleturn_old = 0, losing_ticks_counter = 0, ticks_lost;
 
     // used to compute the singleturn
     int shift = position_feedback_config.resolution;
@@ -132,22 +132,21 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                             int align = (count % position_feedback_config.resolution);
                             if (align != 0)
                             {
+                                if (align > 0)
+                                    ticks_lost = position_feedback_config.resolution - align;
+                                else
+                                    ticks_lost = position_feedback_config.resolution + align;
+
                                 // generate an error
-                                if ((align > 0 && align > position_feedback_config.resolution/position_feedback_config.max_ticks_lost) || (align < 0 && align < -position_feedback_config.resolution/position_feedback_config.max_ticks_lost))
+                                if(ticks_lost > position_feedback_config.resolution/position_feedback_config.max_ticks_lost)
                                     ++losing_ticks_counter;
                                 else
                                     losing_ticks_counter = 0;
                             }
-//
-//                            if(align != 0)
-//                                last_sensor_error = 16000-align;
-//                            else
-//                                last_sensor_error = align;
-//
+
 //                            if (align != 0)
-//                                sensor_error = SENSOR_QEI_INDEX_LOSING_TICKS;
-//                            else
-//                                sensor_error = SENSOR_NO_ERROR;
+//                                last_sensor_error = 16000 - align;
+
 
                             if ((align < (position_feedback_config.resolution/2)) && (align > (-position_feedback_config.resolution/2))) {
                                 count -= align;
