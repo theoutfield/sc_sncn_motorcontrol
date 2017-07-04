@@ -28,7 +28,7 @@ Console commands
 
 The app uses commands up to 3 characters with an optional value. The command are executed by pressing enter. If no value is entered the default is `0`:
 
-- ``a``: start the auto offset tuning. It automatically updates the offset field display. If the offset detection fails the offset will be -1. If it displays "WRONG POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. After the offset is found you need to make sure that a positive torque command result in a positive velocity/position increment. Otherwise the position and velocity controller will not work.
+- ``a``: start the auto offset tuning. It automatically updates the offset field display. Prior to offset detection, general system evaluation is done, i.e. checking of open phase and sensors evaluation. If general system evaluation returns the error, offset detection is disabled. If the offset detection fails the offset will be -1. If it displays "WRONG POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. After the offset is found you need to make sure that a positive torque command result in a positive velocity/position increment. Otherwise the position and velocity controller will not work.
 - ``ac``: start the cogging torque detection. It automatically records the cogging torque present in the motor in one mechanical rotation. After the torque is recorded, press "ec1" to enable the compensation of the cogging torque
 - ``av``: starts the automatic tuning of velocity controller. By default, the motor will start to rotate at a speed close to 1000 rpm for 1.5 second, and after that the PID parameters of velocity controller will be updated. These parameters will also be printed on the screen.
 - ``ap2``: starts the automatic tuning of position controller with cascaded structure. Once this command is sent, the motor starts to move forward and backward, and the PID parameters of position controller with cascaded structure will be optimized. This procedure could last up to 4 minutes, and by the end of this procedure the optimized parameters of PID controllers for inner loop (velocity controller) and outer loop (position controller) will be updated in the software (and printed on the console). Depending on load type further fine tuning might be required by the user. 
@@ -56,6 +56,7 @@ The app uses commands up to 3 characters with an optional value. The command are
 - ``ev1``: enable velocity control 
 - ``et1``: enable torque control 
 - ``ec[number]``: 1 -> enable cogging torque compensation ; 0 -> disable cogging torque compensation
+- ``gse``: general system evaluation. First evaluation done is the checking of the open circuit in phases. Open circuit is detected based on measurement of resistance in phases. Second evaluation done is checking of sensors functionality. Position, velocity and angle readings are checked. If the error is detected, it can can be visible in fault code or sensor error field on xscope.    
 - ``p``: set a position command (the position controller need to be started first)
 - ``pp``: set a position command with profiler
 - ``ps``: do a position step command
@@ -69,7 +70,6 @@ The app uses commands up to 3 characters with an optional value. The command are
 - ``tsp``: do a torque step command with profiler
 - ``tss``: activate the torque safe mode. in this mode all the phases are disconnected and the motor can turn freely (usefull if you want to turn it by hand).
 - ``r``: reverse the current torque or velocity command
-- ``g``: start the detection of open circuit in phases. Open circuit is detected based on measurement of resistance in phases. If the open circuit is detected, message about the open circuit is printed, open phase failure error can be visible in fault code field on xscope. Phases of the motor should be checked.  
 - ``d``: toggle the motion polarity. It reverse the position/velocity/torque commands and feedback in the motion controller. Which will make you motor turn the other direction.
 - ``j``: print profilers parameters
 - ``ja``: set profiler acceleration

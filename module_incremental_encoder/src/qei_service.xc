@@ -74,7 +74,8 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
     int notification = MOTCTRL_NTF_EMPTY;
 
-    SensorError sensor_error = SENSOR_NO_ERROR;
+    SensorError sensor_error = SENSOR_NO_ERROR, last_sensor_error = SENSOR_NO_ERROR;
+    int singleturn_counter = 0, singleturn_old = 0, losing_ticks_counter = 0, ticks_lost;
 
     // used to compute the singleturn
     int shift = position_feedback_config.resolution;
@@ -130,9 +131,23 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                             //realign the count with the position in case we missed ticks
                             int align = (count % position_feedback_config.resolution);
                             if (align != 0)
-                                sensor_error = QEI_INDEX_LOSING_TICKS;
-                            else
-                                sensor_error = SENSOR_NO_ERROR;
+                            {
+                                if (align > 0)
+                                    ticks_lost = position_feedback_config.resolution - align;
+                                else
+                                    ticks_lost = position_feedback_config.resolution + align;
+
+                                // generate an error
+                                if(ticks_lost > position_feedback_config.resolution/position_feedback_config.qei_config.ticks_lost_threshold)
+                                    ++losing_ticks_counter;
+                                else
+                                    losing_ticks_counter = 0;
+                            }
+
+//                            if (align != 0)
+//                                last_sensor_error = 16000 - align;
+
+
                             if ((align < (position_feedback_config.resolution/2)) && (align > (-position_feedback_config.resolution/2))) {
                                 count -= align;
                             } else if (align > 0) {
@@ -176,6 +191,9 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 break;
 
             case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
+                sensor_error = SENSOR_NO_ERROR;
+                last_sensor_error = SENSOR_NO_ERROR;
+                singleturn_counter = 0;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
                 shift = position_feedback_config.resolution;
@@ -228,7 +246,29 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                 // set the singleturn position to a 16 bits format
                 int singleturn = position * (1 << (16 - shift_counter)) / shift;
 
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, sensor_error, SENSOR_NO_ERROR, ts_velocity/ifm_usec);
+                if(singleturn != singleturn_old)
+                {
+                    if (singleturn == 0)
+                        singleturn_counter = 1;
+                    else
+                        singleturn_counter = 0;
+
+                    singleturn_old = singleturn;
+                }
+
+                if (singleturn_counter && singleturn == 0)
+                    ++singleturn_counter;
+
+                if (singleturn_counter == 1000)
+                    sensor_error = SENSOR_INCREMENTAL_FAULT;
+
+                if (losing_ticks_counter == 1000)
+                    sensor_error = SENSOR_QEI_INDEX_LOSING_TICKS;
+
+                if (sensor_error != SENSOR_NO_ERROR)
+                    last_sensor_error = sensor_error;
+
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, sensor_error, last_sensor_error, ts_velocity/ifm_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);

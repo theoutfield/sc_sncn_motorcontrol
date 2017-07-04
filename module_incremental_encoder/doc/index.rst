@@ -107,7 +107,8 @@ How to use
                         position_feedback_config.qei_config.index_type  = QEI_SENSOR_INDEX_TYPE;
                         position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
                         position_feedback_config.qei_config.port_number = QEI_SENSOR_PORT_NUMBER;
-
+						position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
+						
                         position_feedback_service(qei_hall_port_1, qei_hall_port_2, null, null, null, null, null, null,
                                 position_feedback_config, i_shared_memory[0], i_position_feedback_1,
                                 null, null, null);

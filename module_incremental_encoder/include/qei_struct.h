@@ -46,6 +46,7 @@ typedef enum {
  */
 typedef struct {
     QEI_IndexType   number_of_channels; /**< Encoder index type. */
+    int ticks_lost_threshold;           /**< Number of ticks that is allowed to be lost */
     EncoderPortNumber port_number;      /**< Configure which input port is used */
     EncoderPortSignalType signal_type;  /**< Configure of the input port signal type (RS422 (differential) or TTL) */
 } QEIConfig;

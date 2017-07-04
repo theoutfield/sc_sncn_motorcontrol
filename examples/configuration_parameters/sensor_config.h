@@ -39,6 +39,7 @@
 #define QEI_SENSOR_SIGNAL_TYPE          ENCODER_PORT_RS422_SIGNAL   // [ENCODER_PORT_RS422_SIGNAL, ENCODER_PORT_TTL_SIGNAL]
 #define QEI_SENSOR_VELOCITY_COMPUTE_PERIOD        1000
 #define QEI_SENSOR_RESOLUTION           4000               // ticks per turn = 4 * CPR (Cycles per revolution)
+#define QEI_SENSOR_TICKS_LOST           100         // how many ticks is allowed to be lost = resolution / sensor ticks lost
 
 //Hall config
 #define HALL_SENSOR_PORT_NUMBER      ENCODER_PORT_1     // [ENCODER_PORT_1, ENCODER_PORT_2]
