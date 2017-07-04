@@ -110,7 +110,7 @@ void second_order_LP_filter_init(int f_c, int T_s, SecondOrderLPfilterParam &par
 
     fs= 1000000.00/((double)(T_s));
     w = 6.28318530718 * ((double)f_c);
-    z = 0.60;
+    z = 0.70;
 
     d = (fs*fs) + (2*z*w*fs) + (w*w);
 

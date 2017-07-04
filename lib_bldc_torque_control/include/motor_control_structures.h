@@ -49,7 +49,12 @@ typedef enum {
     SENSOR_BISS_NO_ACK_BIT_ERROR               = 18,
     SENSOR_BISS_NO_START_BIT_ERROR             = 19,
     SENSOR_CHECKSUM_ERROR                      = 20,
-    SENSOR_BISS_DATA_LINE_ERROR                = 21
+    SENSOR_BISS_DATA_LINE_ERROR                = 21,
+    SENSOR_QEI_INDEX_LOSING_TICKS              = 22,
+    SENSOR_HALL_FAULT                          = 23,
+    SENSOR_INCREMENTAL_FAULT                   = 24,    // 0x7305
+    SENSOR_SPEED_FAULT                         = 25,    // 0x7310
+    SENSOR_POSITION_FAULT                      = 26     // 0x7320
 } SensorError;
 
 /**
@@ -116,13 +121,9 @@ typedef enum {
     OVER_VOLTAGE_NO_1                           = 0X3211,
     UNDER_VOLTAGE_NO_1                          = 0X3221,
     EXCESS_TEMPERATURE_DRIVE                    = 0X4310,
-    INCREMENTAL_SENSOR_1_FAULT                  = 0X7305,
-    SPEED_FAULT                                 = 0X7310,
-    POSITION_FAULT                              = 0X7320,
 
     //user specific faults
     WRONG_REF_CLK_FRQ                           = 0XFF01,
-    HALL_SENSOR_FAULT                           = 0XFF02
 } FaultCode;
 
 /**
@@ -230,7 +231,6 @@ typedef struct
     int analogue_input_b_2;
 
     unsigned int gpio[4];
-
 }UpstreamControlData;
 
 /**

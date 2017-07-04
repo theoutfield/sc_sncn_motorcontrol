@@ -8,6 +8,44 @@
 #include <stdio.h>
 #include <ctype.h>
 
+int general_system_evaluation(client interface MotionControlInterface i_motion_control)
+{
+    float resistance;
+    int phase_error = 0, sensor_error = 0;
+
+    printf("Evaluation of phases is starting ...\n");
+    printf("Voltages are applied to phase terminals ...\n");
+    {phase_error, resistance} = i_motion_control.open_phase_detection();
+
+    if (phase_error == 1)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+        return phase_error;
+    }
+    else if (phase_error == 2)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+        return phase_error;
+    }
+    else if(phase_error == 3)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+        return phase_error;
+    }
+    else
+    {
+        printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n\n");
+
+        printf("Evaluation of sensors is starting ...\n");
+        printf("Motor will rotate couple of turns in both directions ...\n");
+        delay_seconds(1);
+        sensor_error = i_motion_control.sensors_evaluation();
+        if (sensor_error == 0)
+            printf("SENSOR IS WORKING PROPERLY ...\n\n");
+        return sensor_error;
+    }
+}
+
 void control_tuning_console(client interface MotionControlInterface i_motion_control)
 {
     DownstreamControlData downstream_control_data = {0};
@@ -27,9 +65,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
     if(ctrlReadData == 1) {
         tile_usec = USEC_FAST;
     }
-
-    float resistance;
-    int phase_error = 0;
 
     delay_ticks(100*1000*tile_usec);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
@@ -76,9 +111,23 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
         switch(mode_1)
         {
+        case 'g':
+                switch (mode_2)
+                {
+                   case 's':
+                       switch(mode_3)
+                       {
+                           case 'e':
+                               general_system_evaluation(i_motion_control);
+                               break;
+                       }
+                   break;
+                }
+            break;
 
         //automatic tuning
         case 'a':
+                motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
                 case 'c' :
@@ -97,38 +146,13 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         i_motion_control.disable();
                         printf("Cogging torque calibrated\n");
                         break;
-                case 'o'://find motor commutation offset automatically
-                         printf("Sending offset_detection command ...\n");
-
-                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
-
-                         if(motorcontrol_config.commutation_angle_offset == -1)
-                         {
-                             printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-                         }
-                         else
-                         {
-                             motorcontrol_config = i_motion_control.get_motorcontrol_config();
-                             printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-
-                             printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
-
-                             if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
-                             {
-                                 printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
-                                 for (int i=0;i<6;i++) {
-                                     printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
-                                 }
-                             }
-                         }
-                         break;
 
                 case 'v'://calculate optimal pid parameters for velocity controller
 
                         // set kp, ki and kd equal to 0 for velocity controller:
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
 
-                        motion_ctrl_config.velocity_kp = 1000000;
+                        motion_ctrl_config.velocity_kp = 0;
                         motion_ctrl_config.velocity_ki = 0;
                         motion_ctrl_config.velocity_kd = 0;
 
@@ -163,9 +187,163 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         // end of automatic velocity controller tuning
                         break;
 
-                 default:
-                         break;
-                 }
+
+                case 'p'://calculate optimal pid parameters for position controllers
+                        switch(mode_3)//settings for auto-tuner of position controller
+                        {
+                        case 'a'://amplitude
+                                motion_ctrl_config.step_amplitude_autotune = value;
+
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        case 'p'://period
+                                motion_ctrl_config.counter_max_autotune   = value;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        case 'o'://overshoot
+                                motion_ctrl_config.per_thousand_overshoot_autotune = value;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        case 'r'://rise time
+                                motion_ctrl_config.rise_time_freedom_percent_autotune = value;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        default:
+                                if (value == 1)
+                                 {
+                                     //i_motion_control.enable_position_ctrl(POS_PID_CONTROLLER);
+                                     //printf("simple PID pos ctrl enabled\n");
+                                 }
+                                 else if (value == 2)
+                                 {
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+
+                                     motion_ctrl_config.velocity_kp = 0;
+                                     motion_ctrl_config.velocity_ki = 0;
+                                     motion_ctrl_config.velocity_kd = 0;
+                                     motion_ctrl_config.velocity_integral_limit = 10000000;
+
+                                     motion_ctrl_config.position_kp = 0;
+                                     motion_ctrl_config.position_ki = 0;
+                                     motion_ctrl_config.position_kd = 0;
+                                     motion_ctrl_config.position_integral_limit = 10000000;
+                                     motion_ctrl_config.moment_of_inertia       = 0;
+
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("Kpp:%d Kpi:%d Kpd:%d kpl:%d\n",  motion_ctrl_config.position_kp,
+                                             motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                             motion_ctrl_config.position_integral_limit);
+                                     printf("Kvp:%d Kvi:%d Kvd:%d kvl:%d\n",  motion_ctrl_config.velocity_kp,
+                                             motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd);
+
+                                     i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
+                                     printf("cascaded-pid ctrl enabled\n");
+
+                                     downstream_control_data.offset_torque = 0;
+
+                                     // set the velocity pid tuning flag to 1
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     motion_ctrl_config.position_control_autotune = 1;
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("controller tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
+
+                                 }
+                                 else if (value == 3)
+                                 {
+                                     // set kp, ki and kd equal to 0 for velocity controller:
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+
+                                     motion_ctrl_config.position_kp = 0;
+                                     motion_ctrl_config.position_ki = 0;
+                                     motion_ctrl_config.position_kd = 0;
+                                     motion_ctrl_config.position_integral_limit = 1000;
+                                     motion_ctrl_config.moment_of_inertia       = 0;
+
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",  motion_ctrl_config.position_kp,
+                                             motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                             motion_ctrl_config.position_integral_limit);
+
+                                     i_motion_control.enable_position_ctrl(LT_POSITION_CONTROLLER);
+                                     printf("Limited torque pos ctrl enabled\n");
+
+                                     downstream_control_data.offset_torque = 0;
+
+                                     // set the velocity pid tuning flag to 1
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     motion_ctrl_config.position_control_autotune = 1;
+                                     i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                     printf("controller tunning flag set to %d\n",  motion_ctrl_config.position_control_autotune);
+
+                                     // end of automatic velocity controller tuning
+                                 }
+                                printf("AutoTuneParams: amplitude %d period(ticks) %d overshoot %d, rise_time %d \n",
+                                        motion_ctrl_config.step_amplitude_autotune, motion_ctrl_config.counter_max_autotune,
+                                        motion_ctrl_config.per_thousand_overshoot_autotune, motion_ctrl_config.rise_time_freedom_percent_autotune);
+                                break;
+                        }
+                        break;
+
+                default://find motor commutation offset automatically
+
+                    if (general_system_evaluation(i_motion_control) == 0)
+                    {
+                        printf("Sending offset_detection command ...\n");
+
+                        motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+
+                        if(motorcontrol_config.commutation_angle_offset == -1)
+                        {
+                            printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                        }
+                        else
+                        {
+                            motorcontrol_config = i_motion_control.get_motorcontrol_config();
+                            printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+
+                            printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
+
+                            if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                            {
+                                printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
+                                for (int i=0;i<6;i++) {
+                                    printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        printf("SENSOR NOT WORKING PROPERLY, OFFSET DETECTION NOT POSSIBLE ...\n");
+                    }
+
+                    break;
+
+                 } //end switch(mode_2)
 
                 break;
 
@@ -322,24 +500,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 }
                 break;
 
-       case 'g':
-
-                printf("detection of open circuit in phases started ...\n");
-                {phase_error, resistance} = i_motion_control.open_phase_detection();
-
-                if (phase_error == 1)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
-                else if (phase_error == 2)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
-                else if(phase_error == 3)
-                    printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
-                else
-                {
-                    printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n");
-                    printf(">>  PHASE RESISTANCE = %.2f Om\n", resistance);
-                }
-                break;
-
         //reverse torque or velocity command
         case 'r':
                 downstream_control_data.torque_cmd = -downstream_control_data.torque_cmd;
@@ -400,8 +560,24 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         }
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n", motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki,
-                                motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
+                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",
+                                motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd,
+                                motion_ctrl_config.velocity_integral_limit);
+                        break;
+
+                case 't': //torque
+                        switch(mode_3)
+                        {
+                        case 'f':
+                            motion_ctrl_config.filter = value;
+                                break;
+                        default:
+                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            printf("filter cut-off freq:%d\n", motion_ctrl_config.filter);
+                                break;
+                        }
+
                         break;
 
                 default:
@@ -503,8 +679,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         }
                         else if (value == 3)
                         {
-                            i_motion_control.enable_position_ctrl(NL_POSITION_CONTROLLER);
-                            printf("Nonlinear pos ctrl enabled\n");
+                            i_motion_control.enable_position_ctrl(LT_POSITION_CONTROLLER);
+                            printf("limited torque pos ctrl enabled\n");
                         }
                         else
                         {
@@ -691,7 +867,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'f':
             UpstreamControlData upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
 
-            if (upstream_control_data.error_status == NO_FAULT)
+            if (upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR)
             {
                 printf("No fault\n");
             }
@@ -703,6 +879,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                 if(upstream_control_data.error_status != NO_FAULT)
                     printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+                else if (upstream_control_data.sensor_error != SENSOR_NO_ERROR)
+                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.sensor_error);
 
                 //reset fault
                 printf("Reset fault...\n");
@@ -711,7 +889,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 //check if reset worked
                 delay_ticks(500*1000*tile_usec);
                 upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
-                if(upstream_control_data.error_status == NO_FAULT)
+                if(upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR)
                 {
                     printf(">>  FAULT REMOVED\n");
                 } else {

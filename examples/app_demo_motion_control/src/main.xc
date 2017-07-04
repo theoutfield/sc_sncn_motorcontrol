@@ -69,20 +69,22 @@ int main(void) {
 
             motion_ctrl_config.position_control_strategy =            POSITION_CONTROL_STRATEGY;
 
-            motion_ctrl_config.position_kp =                                POSITION_Kp;
-            motion_ctrl_config.position_ki =                                POSITION_Ki;
-            motion_ctrl_config.position_kd =                                POSITION_Kd;
-            motion_ctrl_config.position_integral_limit =                   POSITION_INTEGRAL_LIMIT;
+            motion_ctrl_config.filter =                               FILTER_CUT_OFF_FREQ;
+
+            motion_ctrl_config.position_kp =                          POSITION_Kp;
+            motion_ctrl_config.position_ki =                          POSITION_Ki;
+            motion_ctrl_config.position_kd =                          POSITION_Kd;
+            motion_ctrl_config.position_integral_limit =              POSITION_INTEGRAL_LIMIT;
             motion_ctrl_config.moment_of_inertia =                    MOMENT_OF_INERTIA;
 
-            motion_ctrl_config.velocity_kp =                           VELOCITY_Kp;
-            motion_ctrl_config.velocity_ki =                           VELOCITY_Ki;
-            motion_ctrl_config.velocity_kd =                           VELOCITY_Kd;
+            motion_ctrl_config.velocity_kp =                          VELOCITY_Kp;
+            motion_ctrl_config.velocity_ki =                          VELOCITY_Ki;
+            motion_ctrl_config.velocity_kd =                          VELOCITY_Kd;
             motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
             motion_ctrl_config.enable_velocity_auto_tuner =           ENABLE_VELOCITY_AUTO_TUNER;
 
-            motion_ctrl_config.brake_release_strategy =                BRAKE_RELEASE_STRATEGY;
-            motion_ctrl_config.brake_release_delay =                 BRAKE_RELEASE_DELAY;
+            motion_ctrl_config.brake_release_strategy =               BRAKE_RELEASE_STRATEGY;
+            motion_ctrl_config.brake_release_delay =                  BRAKE_RELEASE_DELAY;
 
             //select resolution of sensor used for motion control
             if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
@@ -194,6 +196,7 @@ int main(void) {
                     position_feedback_config.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
                     position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
                     position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
+                    position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
 
                     position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
                     position_feedback_config.hall_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;

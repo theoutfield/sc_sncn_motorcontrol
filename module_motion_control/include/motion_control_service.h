@@ -22,7 +22,7 @@
 /**
  * @brief Period for the control loop [microseconds].
  */
-#define POSITION_CONTROL_LOOP_PERIOD    1000
+#define POSITION_CONTROL_LOOP_PERIOD    333
 
 /**
  * @brief Threshold to detect brake release in ticks.
@@ -48,7 +48,7 @@
 typedef enum {
     POS_PID_CONTROLLER                      = 1,
     POS_PID_VELOCITY_CASCADED_CONTROLLER    = 2,
-    NL_POSITION_CONTROLLER                  = 3,
+    LT_POSITION_CONTROLLER                  = 3,
     VELOCITY_PID_CONTROLLER                 = 4
 } MotionControlStrategies;
 
@@ -102,6 +102,12 @@ typedef struct {
     int position_kd;                    /**< Parameter for position controller D-constant */
     int position_integral_limit;        /**< Parameter for integral limit of position pid controller */
 
+    int position_control_autotune;      /**< Parameter for enabling/disabling automatic tuning of position controller*/
+    int step_amplitude_autotune;        /**< The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.*/
+    int counter_max_autotune;           /**< The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.*/
+    int per_thousand_overshoot_autotune;      /**< Overshoot limit while tuning (it is set as per thousand of step amplitude)*/
+    int rise_time_freedom_percent_autotune;   /**< This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.*/
+
     int velocity_kp;                    /**< Parameter for velocity controller P-constant */
     int velocity_ki;                    /**< Parameter for velocity controller I-constant */
     int velocity_kd;                    /**< Parameter for velocity controller D-constant */
@@ -122,6 +128,8 @@ typedef struct {
     int pull_brake_voltage;             /**< Parameter for setting the voltage for pulling the brake out! */
     int pull_brake_time;                /**< Parameter for setting the time of brake pulling */
     int hold_brake_voltage;             /**< Parameter for setting the brake voltage after it is pulled */
+
+    int filter;
 } MotionControlConfig;
 
 /**
@@ -240,6 +248,13 @@ interface MotionControlInterface
     {int, float} open_phase_detection();
 
     /**
+     * @brief Enables the sensors evaluation
+     *
+     * @return sensor status (0 = no error, != 0 error)
+     */
+    int sensors_evaluation();
+
+    /**
      * @brief responsible for data communication between torque controller and higher level controllers
      *
      * @param downstreamcontroldata -> structure including the commands for torque/velocity/position controller
@@ -305,11 +320,8 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  * @brief Service to perform torque, velocity or position control.
  *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
- *        During the initialization of the service it is checked if open circuit exists in phases of the motor.
+ *        Service monitors if the open circuit exists in phases of the motor by observing the behaviour of phase currents.
  *        If the error exists, fault code for phase failure is generated.
- *        After that the angle, position and velocity feedback from the position sensor is checked.
- *        If one of those is not working properly, fault code for sensor malfunctioning is generated.
- *        In the case of using a Hall sensor, it is checked if the readings from Hall ports are toggling.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *

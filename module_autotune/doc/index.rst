@@ -1,20 +1,18 @@
-.. _module_controllers:
+.. _module_autotune:
 
-=============================
-Module Controllers
-=============================
+=====================
+Module AutoTune
+=====================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-This module is mainly containing the required functions to control velocity or position of the motor. The first (and more general) part of this module is a standard PID controller (and its related functions to initialize PID controller, update PID constants, reset PID controller). 
-This PID controller is used in control of velocity in our SOMANET software. Three strategies are provided in our standard software to control the position of an electric motor. Two of these three strategies are also using the standard PID controller of this module. These two strategies are namely POS_PID_CONTROLLER strategy and POS_PID_VELOCITY_CASCADED_CONTROLLER strategy. In addition to standard PID controller, the module_controllers provides a third type of position controller named limited torque position controller. In this type of controller, the mechanical speed gets reduced when the real position gets close to the target position. This reduction of speed helps to avoid high values of overshoot while controlling the position in step commands. As the structure of PID controllers are pretty straight forward and understandable, for general applications of position control, it is recommended to start with our standard PID-based control strategies (namely VELOCITY_PID_CONTROLLER to control the velocity, and POS_PID_CONTROLLER or POS_PID_VELOCITY_CASCADED_CONTROLLER to control the position).
-
+Somanet motion controllers provide the user with velocity and position control. The module AutoTune provides the user with an initial estimation of proper constants for **velocity controller with pid structure**, **position controller with cascaded-pid structure**, and **position controller with limited-torque structure**. Autotuning is a feature of motion control service. As a result, all steps of motion_control_service should be accomplished for using the functions of this module.
 
 .. cssclass:: github
 
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/module_controllers>`_
+  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_autotune>`_
 
 How to use
 ==========
@@ -22,7 +20,7 @@ How to use
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
 .. seealso:: 
-    You might find useful the **app_demo_motion_control** example apps, which illustrate the use of module_controllers: 
+    You might find useful the **app_demo_motion_control** example apps, which illustrate the use of this module: 
     
     * :ref:`BLDC Motion Control Demo <app_demo_bldc_motion_control>`
 
@@ -37,13 +35,13 @@ How to use
 
 2. Properly instantiate a :ref:`Torque Control Service <lib_bldc_torque_control>`.
 
-3. Include the Motion Control Service header **motion_control_service.h** in your app. This service uses the functions provided by module_controllers. 
+3. Include the Motion Control Service header **motion_control_service.h** in your app. 
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
 5. Outside your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
 
-6. Now you can perform calls to the Motion Control Service (which uses the functions of module_controllers) through the interfaces connected to it. You can do this at whichever other core. 
+6. Now you can perform calls to the Motion Control Service through the interfaces connected to it. You can do this at whichever other core. Once  **control_tuning_console()** is running, it is possible to run automatic tuners by using the commands **av** (representing Automatic Velocity controller), **ap2** (representing Automatic Position controller strategy 2), and **ap3** (representing Automatic Position controller strategy 3).
 
     .. code-block:: c
 
@@ -88,7 +86,7 @@ How to use
             {
                 on tile[APP_TILE]:
                 {
-                     demo_motion_control(i_motion_control[0]); // step 6
+                     control_tuning_console(i_motion_control[0]); // step 6
                 }
                 on tile[APP_TILE]:
                 {
@@ -262,53 +260,27 @@ How to use
     return 0;
 }
 
-The functions provided by module_controllers are used inside motion_control_service. As an example, here we explain the algorithm of velocity control inside motion_control_service step by step.
-
-1. The required structure which contains the controller parameters are defined at the beginning of motion_control_service.
-
-2. The PID controller is initialized by calling pid_init function
-
-3. The PID controller parameters are set. This includes PID constants, the integral limit of PID controller, and the controlling loop period.
-
-4. Reference and real values of Velocity are updated inside the main loop
-
-5. The proper torque reference is calculated by calling the pid_update function. After this step the calculated value of reference torque can be sent to torque control service.
-
-This procedure can be similarly used to control the position of electric motor.
-
- 
-    .. code-block:: c
-
-	    PIDparam velocity_control_pid_param; // step 1
-	
-	    pid_init(velocity_control_pid_param);// step 2
-	
-	    pid_set_parameters(
-	            (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
-	            (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
-	            POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 3
-	
-	
-	    velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
-	    velocity_k        = ((double) upstream_control_data.velocity); // step 4
-	
-	    torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param); // step 5
-
-
 API
 ===
 
+Definitions
+-------------
 
-Global Types
-------------
+.. doxygendefine:: TUNING_VELOCITY
+.. doxygendefine:: SETTLING_TIME
+.. doxygendefine:: AUTO_TUNE_STEP_AMPLITUDE
+.. doxygendefine:: PER_THOUSAND_OVERSHOOT
 
-.. doxygenstruct:: PIDparam
+Global Types/Structures
+-------------
 
-Module Controllers
-``````````````````
+.. doxygenstruct:: VelCtrlAutoTuneParam
+.. doxygenstruct:: PosCtrlAutoTuneParam
 
-.. doxygenfunction:: pid_init
-.. doxygenfunction:: pid_set_parameters
-.. doxygenfunction:: pid_update
-.. doxygenfunction:: pid_reset
+AutoTuning Functions
+````````````````````````
+.. doxygenfunction:: init_velocity_auto_tuner
+.. doxygenfunction:: velocity_controller_auto_tune
+.. doxygenfunction:: init_pos_ctrl_autotune
+.. doxygenfunction:: pos_ctrl_autotune
 

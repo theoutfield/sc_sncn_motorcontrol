@@ -11,6 +11,7 @@
 #include <math.h>
 
 #include <controllers.h>
+#include <limited_torque_position_control.h>
 
 #include <profile.h>
 #include <auto_tune.h>
@@ -37,14 +38,182 @@ enum
 
 typedef enum
 {
-    POS_ERR = 1,
-    SPEED_ERR  = 2,
+    POS_ERR =   1,
+    SPEED_ERR = 2,
     ANGLE_ERR = 3,
     PORTS_ERR = 4
-
 } sensor_fault;
 
-int open_phase_detection_function(client interface TorqueControlInterface client i_torque_control,
+sensor_fault sensor_functionality_evaluation(client interface TorqueControlInterface i_torque_control, MotorcontrolConfig motorcontrol_config, int app_tile_usec)
+{
+    UpstreamControlData upstream_control_data;
+    int angle = 0, position = 0, hall_state = 0, velocity = 0;
+
+    unsigned counter = 0;
+    int max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
+    int max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
+    int hall_state_old = 0, max_pos_found = 0, max_angle_found = 0;
+    int filter_diff = 0, filter_vel = 0, hall_state_ch[NR_PHASES] = { 0 };
+    int index_v = 0, velocity_arr[500], index_d = 0, difference_arr[500],  old_position = 0;
+    sensor_fault error_sens = NO_ERROR;
+    timer t;
+    unsigned ts;
+
+    i_torque_control.enable_index_detection();
+
+    while(counter < 15000)
+    {
+        upstream_control_data = i_torque_control.update_upstream_control_data();
+        position = upstream_control_data.singleturn;
+        angle = upstream_control_data.angle;
+        hall_state = upstream_control_data.hall_state;
+
+        if (counter == 0)
+        {
+            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                hall_state_old = hall_state;
+        }
+
+        if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+        {
+            if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
+                ++hall_state_ch[A];
+            if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
+                ++hall_state_ch[B];
+            if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
+                ++hall_state_ch[C];
+
+            hall_state_old = hall_state;
+        }
+
+        if (angle > 4000 && !max_angle_found)
+        {
+            max_angle_found = 1;
+            max_angle = angle;
+            mean_angle = max_angle / 2;
+            tq_angle = (max_angle + mean_angle) / 2;
+            fq_angle = mean_angle / 2;
+        }
+
+        if (max_angle_found)
+        {
+            if (angle > mean_angle - 50 && angle < mean_angle + 50)
+                real_mean_angle = angle;
+            if (angle > tq_angle - 50 && angle < tq_angle + 50)
+                real_tq_angle = angle;
+            if (angle > fq_angle - 50 && angle < fq_angle + 50)
+                real_fq_angle = angle;
+        }
+
+        if (!max_pos_found && position > 60000)
+        {
+            max_pos_found = 1;
+            max_pos = position;
+            mean_pos = max_pos / 2;
+            tq_pos = (max_pos + mean_pos) / 2;
+            fq_pos = mean_pos / 2;
+        }
+
+        if (max_pos_found)
+        {
+            if (position > mean_pos -100 && position < mean_pos + 100)
+                real_mean_pos = position;
+            if (position > tq_pos - 100 && position < tq_pos + 100)
+                real_tq_pos = position;
+            if (position > fq_pos - 100 && position < fq_pos + 100)
+                real_fq_pos = position;
+        }
+
+        ++counter;
+
+
+        t :> ts;
+        t when timerafter (ts + 500*app_tile_usec) :> void;
+    }
+
+    while (counter > 5000)
+    {
+        upstream_control_data = i_torque_control.update_upstream_control_data();
+        position = upstream_control_data.singleturn;
+        velocity = upstream_control_data.velocity;
+
+        if (counter == 15000)
+            old_position = position;
+
+        if (position != old_position)
+        {
+            if(position - old_position > -60000 && position - old_position < 60000)
+            {
+                difference_arr[index_d] = ((position - old_position) * (60000000/1000)) / 65535;
+                index_d++;
+                old_position = position;
+            }
+        }
+
+        velocity_arr[index_v] = velocity;
+        index_v++;
+        if (index_v == 500)
+        {
+            index_v = 0;
+            filter_vel = 0;
+            for (int i = 0; i < 500; i++)
+                filter_vel += velocity_arr[i];
+            filter_vel /= 500;
+            filter_vel = abs(filter_vel);
+        }
+
+        if (index_d == 500)
+        {
+            index_d = 0;
+            filter_diff = 0;
+            for (int i = 0; i < 500; i++)
+                filter_diff += difference_arr[i];
+            filter_diff /= 500;
+            filter_diff = abs(filter_diff);
+        }
+
+        --counter;
+        t :> ts;
+        t when timerafter (ts + 1000*app_tile_usec) :> void;
+    }
+
+    if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
+            || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
+            || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
+            || max_pos < 60000)
+        error_sens = POS_ERR;
+
+    if (filter_vel < 60 && filter_vel > -60)
+    {
+        if (filter_vel - filter_diff < -30 || filter_vel - filter_diff > 30)
+            error_sens = SPEED_ERR;
+    }
+    else
+    {
+        if (filter_vel - filter_diff < -50 || filter_vel - filter_diff > 50)
+                    error_sens = SPEED_ERR;
+    }
+
+    if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
+            || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
+            || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
+            || max_angle < 4000)
+        error_sens = ANGLE_ERR;
+
+    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+    {
+        if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+            error_sens = PORTS_ERR;
+    }
+
+//    printf("%d\n", error_sens);
+//    printf("%d %d\n", filter_vel, filter_diff);
+    i_torque_control.disable_index_detection();
+    i_torque_control.set_sensor_status(error_sens);
+    return error_sens;
+}
+
+int open_phase_detection_function(client interface TorqueControlInterface i_torque_control,
         MotorcontrolConfig motorcontrol_config, int app_tile_usec, int current_ratio, float * ret)
 {
     UpstreamControlData upstream_control_data;
@@ -52,8 +221,8 @@ int open_phase_detection_function(client interface TorqueControlInterface client
     int refer[NR_PHASES] = {0, 20, 30, 30};// make b and c terminal voltage as close as voltage on terminal a at the startup
     unsigned counter = 1;
     float voltage = 0;
-    int error_phase = NO_ERROR;
     float rated_curr = (float)motorcontrol_config.rated_current/1000;
+    int error_phase = NO_ERROR;
 
     timer tmr;
     unsigned ts;
@@ -167,10 +336,11 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *
+ * @param motion_ctrl_config            Structure containing all parameters of motion control service
  * @param pos_velocity_control_config   Configuration for ttorque/velocity/position controllers.
- * @param i_torque_control Communication  interface to the Motor Control Service.
- * @param i_motion_control[3]         array of MotionControlInterfaces to communicate with upto 3 clients
- * @param i_update_brake                Interface to update brake configuration in PWM service
+ * @param i_torque_control Communication    interface to the Motor Control Service.
+ * @param i_motion_control[3]               array of MotionControlInterfaces to communicate with upto 3 clients
+ * @param i_update_brake                    Interface to update brake configuration in PWM service
  *
  * @return void
  *  */
@@ -180,6 +350,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 {
     timer t;
     unsigned int ts;
+    unsigned time_start=0, time_start_old=0, time_loop=0, time_end=0, time_free=0, time_used=0;
+
+    SecondOrderLPfilterParam torque_filter_param;
+    second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
+    double filter_input=0.00, filter_output=0.00;
 
     int torque_measurement;
     int torque_buffer [8] = {0};
@@ -193,7 +368,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     PIDparam position_control_pid_param;
 
-    NonlinearPositionControl nl_pos_ctrl;
+    LimitedTorquePosCtrl lt_pos_ctrl;
 
 
     // variable definition
@@ -215,19 +390,31 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     init_cogging_torque_parameters(ct_parameters, 10);
 
-    AutoTuneParam velocity_auto_tune;
+    VelCtrlAutoTuneParam velocity_auto_tune;
 
     //autotune initialization
-    init_velocity_auto_tuner(velocity_auto_tune, TUNING_VELOCITY, SETTLING_TIME);
+    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
 
     downstream_control_data.velocity_cmd = 0;
-    motion_ctrl_config.enable_velocity_auto_tuner == 0;
+    motion_ctrl_config.enable_velocity_auto_tuner = 0;
 
     double position_ref_in_k = 0.00;
     double position_ref_in_k_1n = 0.00;
     double position_ref_in_k_2n = 0.00;
     double position_ref_in_k_3n = 0.00;
     double position_k   = 0.00, position_k_1=0.00;
+
+    PosCtrlAutoTuneParam pos_ctrl_auto_tune;
+
+    motion_ctrl_config.step_amplitude_autotune  = AUTO_TUNE_STEP_AMPLITUDE;
+    motion_ctrl_config.counter_max_autotune     = AUTO_TUNE_COUNTER_MAX   ;
+    motion_ctrl_config.per_thousand_overshoot_autotune   = PER_THOUSAND_OVERSHOOT;
+
+    // initialization of position control automatic tuning:
+    motion_ctrl_config.position_control_autotune =0;
+
+    init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
+    //***********************************************************************************************
 
     MotionControlError motion_control_error = MOTION_CONTROL_NO_ERROR;
 
@@ -264,8 +451,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int temperature_ratio = motorcontrol_config.temperature_ratio;
     int current_ratio = motorcontrol_config.current_ratio;
 
-    nl_position_control_reset(nl_pos_ctrl);
-    nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+    lt_position_control_reset(lt_pos_ctrl);
+    lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+            motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+            motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
+
 
     pid_init(velocity_control_pid_param);
     if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
@@ -312,190 +502,18 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         app_tile_usec = USEC_FAST;
     }
 
-    // open phase detection
+    int error_phase = NO_ERROR;
     float resist = 0;
-    int error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
+    sensor_fault error_sens = NO_ERROR;
+    unsigned qei_ctr = 100000;
+
     int current_a = 0;
     int ftr = 0, filter_ctr = 0;
     float filter_c[NR_PHASES] = { 0 }, filter_c_old[NR_PHASES] =  { 0 }, rms[NR_PHASES] = { 0 };
     int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect[NR_PHASES] = { 0 }, phase_cur[NR_PHASES] = { 0 };
 
-    int angle = 0;
-    int velocity = 0;
-    int count = 0;
-    int position = 0;
-    int hall_state = 0;
-
-    unsigned position_ctr = (1<<16), angle_ctr = (1<<12), counter = 0;
-       int max_pos = (1<<16), mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
-       int max_angle = (1<<12), mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
-       int old_position, old_angle;
-       int index_v = 0, velocity_arr[500], index_d = 0, difference = 0, difference_arr[500];
-       int filter_diff = 0, filter_vel = 0;
-       int hall_state_ch[NR_PHASES] = { 0 };
-       int hall_state_old;
-       int max_pos_found = 0, max_angle_found = 0;
-       sensor_fault error_sens = NO_ERROR;
-
-       // testing the angle, position, velocity from the sensor
-       // testing Hall ports
-       if (!error_phase)
-       {
-           position_ctr = 0;
-           angle_ctr = 0;
-           max_pos = 0;
-           max_angle = 0;
-           i_torque_control.enable_index_detection();
-
-           while(counter < 20000)
-           {
-               upstream_control_data = i_torque_control.update_upstream_control_data();
-               count = upstream_control_data.position;
-               position = upstream_control_data.singleturn;
-               velocity = upstream_control_data.velocity;
-               angle = upstream_control_data.angle;
-               hall_state = upstream_control_data.hall_state;
-
-               if (counter == 0)
-               {
-                   old_position = position;
-                   old_angle = angle;
-                   if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                       hall_state_old = hall_state;
-               }
-               else
-               {
-                   if (old_position != position)
-                   {
-                       difference = position - old_position;
-                       old_position = position;
-                       ++position_ctr;
-                   }
-                   if (old_angle != angle)
-                   {
-                       old_angle = angle;
-                       ++angle_ctr;
-                   }
-
-                   if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                   {
-                       if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
-                           ++hall_state_ch[A];
-                       if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
-                           ++hall_state_ch[B];
-                       if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
-                           ++hall_state_ch[C];
-
-                       hall_state_old = hall_state;
-                   }
-               }
-
-               if (angle > 4000 && !max_angle_found)
-               {
-                   max_angle_found = 1;
-                   max_angle = angle;
-                   mean_angle = max_angle / 2;
-                   tq_angle = (max_angle + mean_angle) / 2;
-                   fq_angle = mean_angle / 2;
-               }
-
-               if (max_angle_found)
-               {
-                   if (angle > mean_angle - 50 && angle < mean_angle + 50)
-                       real_mean_angle = angle;
-                   if (angle > tq_angle - 50 && angle < tq_angle + 50)
-                       real_tq_angle = angle;
-                   if (angle > fq_angle - 50 && angle < fq_angle + 50)
-                       real_fq_angle = angle;
-               }
-
-               if (!max_pos_found && position > 60000)
-               {
-                   max_pos_found = 1;
-                   max_pos = position;
-                   mean_pos = max_pos / 2;
-                   tq_pos = (max_pos + mean_pos) / 2;
-                   fq_pos = mean_pos / 2;
-               }
-
-               if (max_pos_found)
-               {
-                   if (position > mean_pos -100 && position < mean_pos + 100)
-                       real_mean_pos = position;
-                   if (position > tq_pos - 100 && position < tq_pos + 100)
-                       real_tq_pos = position;
-                   if (position > fq_pos - 100 && position < fq_pos + 100)
-                       real_fq_pos = position;
-               }
-
-               velocity_arr[index_v] = velocity;
-               index_v++;
-               if (index_v == 500)
-               {
-                   index_v = 0;
-                   filter_vel = 0;
-                   for (int i = 0; i < 500; i++)
-                       filter_vel += velocity_arr[i];
-                   filter_vel /= 500;
-                   if (filter_vel < 0)
-                       filter_vel = -filter_vel;
-               }
-
-               difference_arr[index_d] = difference;
-               index_d++;
-               if (index_d == 500)
-               {
-                   index_d = 0;
-                   filter_diff = 0;
-                   for (int i = 0; i < 500; i++)
-                       filter_diff += difference_arr[i];
-                   filter_diff /= 500;
-                   if (filter_diff < 0)
-                       filter_diff = -filter_diff;
-               }
-
-               ++counter;
-
-               if (counter == 20000)
-               {
-                   if (filter_vel < 50)
-                   {
-                       if (filter_vel - filter_diff < -30 || filter_vel - filter_diff > 30)
-                           error_sens = SPEED_ERR;
-                   }
-                   else
-                   {
-                       if (filter_vel - filter_diff < -60 || filter_vel - filter_diff > 60)
-                           error_sens = SPEED_ERR;
-                   }
-
-                   if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
-                           || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
-                           || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
-                           || position_ctr < 2000  || max_pos < 60000)
-                       error_sens = POS_ERR;
-
-                   if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
-                           || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
-                           || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
-                           || max_angle < 4000 || angle_ctr < 2000)
-                       error_sens = ANGLE_ERR;
-
-                   if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                   {
-                       if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
-                           error_sens = PORTS_ERR;
-                   }
-               }
-
-               t when timerafter (ts + 500*app_tile_usec) :> ts;
-           }
-
-           i_torque_control.disable_index_detection();
-   }
-
     //QEI index calibration
-    if (motorcontrol_config.commutation_sensor == QEI_SENSOR && !error_phase && !error_sens)
+    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
     {
         printf("Find encoder index \n");
         int index_found = 0;
@@ -504,8 +522,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         {
             upstream_control_data = i_torque_control.update_upstream_control_data();
             index_found = upstream_control_data.qei_index_found;
+            if (qei_ctr == 0)
+            {
+                error_sens = POS_ERR;
+                index_found = 1;
+            }
+
+            --qei_ctr;
         }
-        printf("Incremental encoder index found\n");
+
+        if (error_sens == NO_ERROR)
+            printf("Incremental encoder index found\n");
+        else
+            printf("Incremental encoder index not found \n Check if the sensor is connected\n\n");
+
         i_torque_control.disable_index_detection();
     }
 
@@ -524,12 +554,18 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
+
     while(1)
     {
 #pragma ordered
         select
         {
         case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
+
+                time_start_old = time_start;
+                t :> time_start;
+                time_loop = time_start - time_start_old;
+                time_free = time_start - time_end;
 
                 upstream_control_data = i_torque_control.update_upstream_control_data();
 
@@ -549,17 +585,22 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         torque_ref_k = downstream_control_data.torque_cmd;
                     }
-
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
+                        if(velocity_auto_tune.enable == 0)
+                        {
+                            init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
+                            pid_init(velocity_control_pid_param);
+                            pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
-                        velocity_controller_auto_tune(velocity_auto_tune, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
+                            velocity_auto_tune.enable = 1;
+                        }
 
+                        velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-
                         if(velocity_auto_tune.enable == 0)
                         {
                             torque_ref_k=0;
@@ -568,15 +609,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             position_enable_flag =0;
                             i_torque_control.set_torque_control_disabled();
 
-                            motion_ctrl_config.enable_velocity_auto_tuner = 0;
-
                             printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
-
-                            motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
-                            motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
-                            motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
                         }
-
                     }
                     else if(motion_ctrl_config.enable_profiler==1)
                     {
@@ -721,16 +755,74 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
-                        velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                        if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
-                        if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
-                        torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        if(motion_ctrl_config.position_control_autotune == 1)
+                        {
+                            if(pos_ctrl_auto_tune.activate==0)
+                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
+
+                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+
+                            if(motion_ctrl_config.position_control_autotune == 0)
+                            {
+                                printf("TUNING ENDED: \n");
+                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                            }
+
+                            if(pos_ctrl_auto_tune.counter==0)
+                            {
+                                pid_init(velocity_control_pid_param);
+                                pid_init(position_control_pid_param);
+
+                                pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            }
+
+                            velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
+                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        }
+                        else
+                        {
+                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
+                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        }
                     }
-                    else if (pos_control_mode == NL_POSITION_CONTROLLER)
+                    else if (pos_control_mode == LT_POSITION_CONTROLLER)
                     {
-                        torque_ref_k = update_nl_position_control(nl_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+
+                        if(motion_ctrl_config.position_control_autotune == 1)
+                        {
+                            if(pos_ctrl_auto_tune.activate==0)
+                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, LIMITED_TORQUE);
+
+                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+
+                            if(motion_ctrl_config.position_control_autotune == 0)
+                            {
+                                printf("TUNING ENDED \n");
+                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                            }
+
+                            if(pos_ctrl_auto_tune.counter==0)
+                            {
+                                lt_position_control_reset(lt_pos_ctrl);
+                                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
+                            }
+
+                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
+                        }
+                        else
+                        {
+                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+                        }
                     }
                 }
+
 
                 //brake release, override target torque if we are in brake release
                 if (special_brake_release_counter <= BRAKE_RELEASE_DURATION)
@@ -797,7 +889,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 else if (torque_ref_k < (-motion_ctrl_config.max_torque))
                     torque_ref_k = (-motion_ctrl_config.max_torque);
 
-                i_torque_control.set_torque(((int)(torque_ref_k)));
+                filter_input  =  ((double)(torque_ref_k));
+                filter_output = second_order_LP_filter_update(&filter_input, torque_filter_param);
+
+                if(motion_ctrl_config.filter>0)
+                    i_torque_control.set_torque(((int)(filter_output))); // use the filter only if the filter cut-off frequency is bigger/equal to zero, otherwise, do not use filter
+                else
+                    i_torque_control.set_torque(((int)(torque_ref_k)));
 
                 //update brake config when ready
                 if (update_brake_configuration_flag && timeafter(ts, update_brake_configuration_time)) {
@@ -812,20 +910,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 switch (error_sens)
                 {
-                    case SPEED_ERR:
-                        upstream_control_data.error_status = SPEED_FAULT;
-                        break;
                     case POS_ERR:
-                        upstream_control_data.error_status = POSITION_FAULT;
+                        upstream_control_data.sensor_error = SENSOR_POSITION_FAULT;
+                        break;
+                    case SPEED_ERR:
+                        upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
                         break;
                     case ANGLE_ERR:
                         if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                            upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                            upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
                         else
-                            upstream_control_data.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                            upstream_control_data.sensor_error = SENSOR_INCREMENTAL_FAULT;
                         break;
                     case PORTS_ERR:
-                        upstream_control_data.error_status = HALL_SENSOR_FAULT;
+                        upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
                         break;
                 }
 
@@ -1041,6 +1139,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
 
+                if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
+                {
+                    printf("TIMING ERR \n");
+                }
+
+                t :> time_end;
+                time_used = time_end - time_start;
+
                 break;
 
         case i_motion_control[int i].disable():
@@ -1057,6 +1163,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     position_enable_flag =0;
                     i_torque_control.set_torque_control_disabled();
                 }
+
+                motion_ctrl_config.position_control_autotune =0;
+                pos_ctrl_auto_tune.activate=0;
 
                 break;
 
@@ -1076,8 +1185,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 downstream_control_data.offset_torque = 0;
 
                 //reset pid
-                nl_position_control_reset(nl_pos_ctrl);
-                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                lt_position_control_reset(lt_pos_ctrl);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 pid_reset(position_control_pid_param);
 
 
@@ -1124,7 +1235,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 //start control loop just after
                 t :> ts;
                 ts = ts - USEC_STD * POSITION_CONTROL_LOOP_PERIOD;
-
                 break;
 
         case i_motion_control[int i].enable_torque_ctrl():
@@ -1212,11 +1322,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 profiler_param.v_max = (double)(motion_ctrl_config.max_speed_profiler);
                 profiler_param.torque_rate_max = (double)(motion_ctrl_config.max_torque_rate_profiler);
 
-                nl_position_control_reset(nl_pos_ctrl);
-                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
-
+                lt_position_control_reset(lt_pos_ctrl);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 //reset error
                 motion_control_error = MOTION_CONTROL_NO_ERROR;
+
+                second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
+
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
@@ -1242,20 +1356,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 switch (error_sens)
                 {
-                    case SPEED_ERR:
-                        upstream_control_data_out.error_status = SPEED_FAULT;
-                        break;
                     case POS_ERR:
-                        upstream_control_data_out.error_status = POSITION_FAULT;
+                        upstream_control_data_out.sensor_error = SENSOR_POSITION_FAULT;
+                        break;
+                    case SPEED_ERR:
+                        upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
                         break;
                     case ANGLE_ERR:
                         if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
-                            upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
+                            upstream_control_data_out.sensor_error = SENSOR_HALL_FAULT;
                         else
-                            upstream_control_data_out.error_status = INCREMENTAL_SENSOR_1_FAULT;
+                            upstream_control_data_out.sensor_error = SENSOR_INCREMENTAL_FAULT;
                         break;
                     case PORTS_ERR:
-                        upstream_control_data_out.error_status = HALL_SENSOR_FAULT;
+                        upstream_control_data_out.sensor_error = SENSOR_HALL_FAULT;
                         break;
                 }
 
@@ -1291,7 +1405,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].set_j(int j):
                 motion_ctrl_config.moment_of_inertia = j;
-                nl_position_control_set_parameters(nl_pos_ctrl, motion_ctrl_config, POSITION_CONTROL_LOOP_PERIOD);
+                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 break;
 
         case i_motion_control[int i].set_torque(int in_target_torque):
@@ -1380,6 +1496,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
                 error_sens = NO_ERROR;
+                i_torque_control.set_sensor_status(error_sens);
                 error_phase = NO_ERROR;
                 filter_ctr = 0;
                 ftr = 0;
@@ -1394,7 +1511,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 position_enable_flag = 0;
                 i_torque_control.set_safe_torque_off_enabled();
                 break;
-
 
         case i_motion_control[int i].enable_cogging_compensation(int flag):
                 if (flag)
@@ -1412,6 +1528,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
                 error_phase_out = error_phase;
                 resistance_out = resist;
+                break;
+
+        case i_motion_control[int i].sensors_evaluation() -> int sensor_status_out :
+                error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, app_tile_usec);
+                sensor_status_out = error_sens;
                 break;
         }
     }
