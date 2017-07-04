@@ -265,8 +265,8 @@ void adc_ad7265(
             tmp_val = (short)(tmp_val & ADC_MASK);      // Mask out active bits and convert to signed word
             out_b = (int)tmp_val;
 
-            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048 - 40);
-            phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048 - 40);
+            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
+            phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
 
 
             if((5000<protection_counter) && (fault_code==NO_FAULT))
