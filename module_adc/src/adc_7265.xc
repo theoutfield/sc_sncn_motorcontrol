@@ -265,8 +265,9 @@ void adc_ad7265(
             tmp_val = (short)(tmp_val & ADC_MASK);      // Mask out active bits and convert to signed word
             out_b = (int)tmp_val;
 
-            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
-            phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
+            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048 - 40);
+            phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048 - 40);
+
 
             if((5000<protection_counter) && (fault_code==NO_FAULT))
             {
@@ -282,23 +283,23 @@ void adc_ad7265(
                     fault_code=DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1;
                 }
 
-                if (OUT_A[AD_7265_VDC_IDC]<v_dc_min)
-                {
-                    i_watchdog.protect(WD_UNDER_VOLTAGE);
-                    fault_code=UNDER_VOLTAGE_NO_1;
-                }
-
-                if (v_dc_max<OUT_A[AD_7265_VDC_IDC])
-                {
-                    i_watchdog.protect(WD_OVER_VOLTAGE);
-                    fault_code=OVER_VOLTAGE_NO_1;
-                }
-
-                if (t_max<OUT_A[AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B])
-                {
-                    i_watchdog.protect(WD_OVER_TEMPERATURE);
-                    fault_code=EXCESS_TEMPERATURE_DRIVE;
-                }
+                //if (OUT_A[AD_7265_VDC_IDC]<v_dc_min)
+                //{
+                //    i_watchdog.protect(WD_UNDER_VOLTAGE);
+                //    fault_code=UNDER_VOLTAGE_NO_1;
+                //}
+                //
+                //if (v_dc_max<OUT_A[AD_7265_VDC_IDC])
+                //{
+                //    i_watchdog.protect(WD_OVER_VOLTAGE);
+                //    fault_code=OVER_VOLTAGE_NO_1;
+                //}
+                //
+                //if (t_max<OUT_A[AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B])
+                //{
+                //    i_watchdog.protect(WD_OVER_TEMPERATURE);
+                //    fault_code=EXCESS_TEMPERATURE_DRIVE;
+                //}
             }
 
             V_dc_out           = OUT_A[AD_7265_VDC_IDC];
