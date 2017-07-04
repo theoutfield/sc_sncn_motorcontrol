@@ -270,7 +270,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         ++counter;
     }
 
-    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
+//    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
 
     voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
     if (error_phase == 0)
@@ -511,10 +511,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     float resist = 0;
     sensor_fault error_sens = NO_ERROR;
     unsigned qei_ctr = 100000;
-
-    int ftr = 0, filter_ctr = 0;
-    float filter_c[NR_PHASES] = { 0 }, filter_c_old[NR_PHASES] =  { 0 }, rms[NR_PHASES] = { 0 };
-    int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect[NR_PHASES] = { 0 }, phase_cur[NR_PHASES] = { 0 };
 
     //QEI index calibration
     if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
@@ -931,192 +927,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
-                /*
-                 * feature of detecting the open phase
-                 */
-                ftr++;
-                for (int i = A; i < NR_PHASES; i++)
-                {
-                    switch (i)
-                    {
-                        case A:
-                            phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
-                            break;
-                        case B:
-                            phase_cur[B] = upstream_control_data.I_b;
-                            break;
-                        case C:
-                            phase_cur[C] = upstream_control_data.I_c;
-                            break;
-                    }
-
-                    if (phase_cur[i] < 0)
-                        phase_cur[i] = -phase_cur[i];
-
-                    sum[i] += phase_cur[i];
-                    sum_sq[i] += phase_cur[i]*phase_cur[i];
-                }
-
-                /*
-                 * every 0,16 microseconds rms value is calculated
-                 */
-                if (ftr > 1 && ftr % 500 == 0)
-                {
-                    float mean[NR_PHASES], sd[NR_PHASES];
-                    for (int i = A; i < NR_PHASES; i++)
-                    {
-                        mean[i] = (float)sum[i] / ftr;
-                        sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
-                        rms[i] += mean[i] + sqrt(sd[i]);
-                    }
-
-                    ftr = 0;
-                    for (int i = A; i < NR_PHASES; i++)
-                    {
-                        sum[i] = 0;
-                        sum_sq[i] = 0;
-                    }
-
-                    if (filter_c_old[A] == 0 && filter_c_old[B] == 0 && filter_c_old[C] == 0)
-                    {
-                        for (int i = A; i < NR_PHASES; i++)
-                            filter_c_old[i] = rms[i];
-                    }
-                    else
-                    {
-                        for (int i = A; i < NR_PHASES; i++)
-                            filter_c_old[i] = rms[i];
-
-                        if (filter_c[A] - filter_c_old[A] < -0.1*filter_c_old[A])
-                        {
-                            if (filter_c[B] - filter_c_old[B] > 0.1*filter_c_old[B] && filter_c[C] - filter_c_old[C] > 0.1*filter_c_old[C])
-                            {
-                                if (detect[A])
-                                {
-                                    detect[A] += 2;
-                                    if (detect[A] == 7)
-                                    {
-                                        error_phase = A;
-                                        i_torque_control.set_brake_status(0);
-                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                        {
-                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                        }
-                                        else
-                                        {
-                                            torque_enable_flag   =0;
-                                            velocity_enable_flag =0;
-                                            position_enable_flag =0;
-                                            i_torque_control.set_torque_control_disabled();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    detect[A] = 1;
-                                }
-
-                            }
-                        }
-                        else if (filter_c[B] - filter_c_old[B] < -0.1*filter_c_old[B])
-                        {
-                            if (filter_c[C] - filter_c_old[C] > 0.1*filter_c_old[C] && filter_c[A] - filter_c_old[A] > 0.1*filter_c_old[A])
-                            {
-                                if (detect[B])
-                                {
-                                    detect[B] += 2;
-                                    if (detect[B] == 7)
-                                    {
-                                        error_phase = B;
-                                        i_torque_control.set_brake_status(0);
-                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                        {
-                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                        }
-                                        else
-                                        {
-                                            torque_enable_flag   =0;
-                                            velocity_enable_flag =0;
-                                            position_enable_flag =0;
-                                            i_torque_control.set_torque_control_disabled();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    detect[B] = 1;
-                                }
-
-                            }
-                        }
-                        else if (filter_c[C] - filter_c_old[C] < -0.1*filter_c_old[C])
-                        {
-                            if (filter_c[A] - filter_c_old[A] > 0.1*filter_c_old[A] && filter_c[B] - filter_c_old[B] > 0.1*filter_c_old[B])
-                            {
-                                if (detect[C])
-                                {
-                                    detect[C] += 2;
-                                    if (detect[C] == 7)
-                                    {
-                                        error_phase = C;
-                                        i_torque_control.set_brake_status(0);
-                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                        {
-                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                        }
-                                        else
-                                        {
-                                            torque_enable_flag   =0;
-                                            velocity_enable_flag =0;
-                                            position_enable_flag =0;
-                                            i_torque_control.set_torque_control_disabled();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    detect[C] = 1;
-                                }
-
-                            }
-                        }
-                        else
-                        {
-                            for (int i = A; i < NR_PHASES; i++)
-                            {
-                                filter_c_old[i] = filter_c[i];
-                                detect[i] = 0;
-                            }
-                        }
-                    }
-
-                }
-
-//                /*
-//                 * every 0,66 seconds rms value is filtered
-//                 * old filtered value of the current is remembered
-//                 * change between actual and old values in phases are used as a trigger
-//                 */
-//                if (filter_ctr == 2)
-//                {
-//                    if (filter_c_old[A] == 0 && filter_c_old[B] == 0 && filter_c_old[C] == 0)
-//                    {
-//                        for (int i = A; i < NR_PHASES; i++)
-//                            filter_c_old[i] = rms[i] / 2;
-//                    }
-//                    else
-//                    {
-//                        for (int i = A; i < NR_PHASES; i++)
-//                            filter_c[i] = rms[i] / 2;
-//
-//
-//                    }
-//
-//                    for (int i = A; i < NR_PHASES; i++)
-//                        rms[i] = 0;
-//                    filter_ctr = 0;
-//                }
-
                 switch (error_phase)
                 {
                     case A:
@@ -1147,7 +957,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
                 xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
-                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
                 xscope_int(I_B, upstream_control_data.I_b);
                 xscope_int(I_C, upstream_control_data.I_c);
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
@@ -1515,10 +1324,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 error_sens = NO_ERROR;
                 i_torque_control.set_sensor_status(error_sens);
                 error_phase = NO_ERROR;
-                filter_ctr = 0;
-                ftr = 0;
-                for (int i = 0; i < NR_PHASES; i++)
-                    detect[i] = 0;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
