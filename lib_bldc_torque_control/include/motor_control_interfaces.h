@@ -428,29 +428,19 @@ interface UpdatePWMGeneral
 interface WatchdogInterface
 {
     /**
-     * @brief send the status of WD service to the client (ACTIVE/INACTIVE)
-     */
-    int status(void);
-
-    /**
-     * @brief Initialize and starts ticking the watchdog.
-     */
-    void start(void);
-
-    /**
-     * @brief Stops ticking the watchdog. Therefore, any output through the phases is disabled.
-     */
-    void stop(void);
-
-    /**
-     * @reacts on any detected fault. Any output through the phases will be disabled.
+     * @brief reacts on any detected fault. Any output through the phases will be disabled.
      */
     void protect(int fault_id);
 
     /**
-     * @resets the state of fault in watchdog service, and starts the watchdog from the beginning
+     * @brief resets the state of fault in watchdog service, and starts the watchdog from the beginning
      */
     void reset_faults();
+
+    /**
+     * @brief read the fault monitor led
+     */
+    WatchdogError read_fault_monitor();
 };
 
 #endif /* MOTOR_CONTROL_INTERFACES_H_ */
