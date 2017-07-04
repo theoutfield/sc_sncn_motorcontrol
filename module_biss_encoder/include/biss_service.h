@@ -23,9 +23,9 @@
  *
  * @return error status (No Error, CRC Error, No Ack, No Start Bit)
  */
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
-        HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config,
-        port * (&?gpio_ports)[4], timer t,
+SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
+        int biss_clock_low, int biss_clock_high,
+        timer t,
         PositionFeedbackConfig &position_feedback_config, unsigned int data[]);
 
 

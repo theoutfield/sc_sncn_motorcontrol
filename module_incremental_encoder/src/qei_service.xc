@@ -41,7 +41,7 @@ int check_qei_config(PositionFeedbackConfig &position_feedback_config)
     return QEI_SUCCESS;
 }
 
-void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
+void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
                  client interface shared_memory_interface ?i_shared_memory,
                  server interface PositionFeedbackInterface i_position_feedback[3],
                  int gpio_on)
@@ -92,16 +92,16 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
 
     t_velocity :> ts_velocity;
 
-    qei_hall_port.p_qei_hall :> new_pins;
+    qei_hall_port :> new_pins;
 
     int loop_flag = 1;
     while (loop_flag) {
         select {
-            case qei_hall_port.p_qei_hall when pinsneq(new_pins) :> new_pins :
-                qei_hall_port.p_qei_hall :> new_pins_1;
-                qei_hall_port.p_qei_hall :> new_pins_1;
+            case qei_hall_port when pinsneq(new_pins) :> new_pins :
+                qei_hall_port :> new_pins_1;
+                qei_hall_port :> new_pins_1;
                 if (new_pins_1 == new_pins) {
-                    qei_hall_port.p_qei_hall :> new_pins;
+                    qei_hall_port :> new_pins;
                     if (new_pins_1 == new_pins) {
                         int inc;
                         if (position_feedback_config.polarity == SENSOR_POLARITY_NORMAL) {

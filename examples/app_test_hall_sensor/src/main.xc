@@ -40,8 +40,8 @@ void hall_test(client interface PositionFeedbackInterface i_position_feedback, c
     }
 }
 
-QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
+port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
 
 int main(void)
 {
@@ -81,7 +81,7 @@ int main(void)
                 position_feedback_config.hall_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
                 position_feedback_config.hall_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, null, null, null, null, null, null,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, null, null, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

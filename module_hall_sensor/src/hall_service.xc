@@ -82,7 +82,7 @@ static const unsigned int hall_half_angle[6] = {
         (HALL_ANGLE_1+HALL_ANGLE_2)/2
 };
 
-void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
+void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
         client interface shared_memory_interface ?i_shared_memory,
                 server interface PositionFeedbackInterface i_position_feedback[3],
                 int gpio_on)
@@ -189,8 +189,8 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
     do
     {
-        qei_hall_port.p_qei_hall :> hall_state_1;
-        qei_hall_port.p_qei_hall :> hall_state_2;
+        qei_hall_port :> hall_state_1;
+        qei_hall_port :> hall_state_2;
     } while(hall_state_1 != hall_state_2);
 
     hall_state_new = hall_state_1;
@@ -276,9 +276,9 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 switch(hall_stable_states)
                 {
                 case 0:
-                    qei_hall_port.p_qei_hall :> hall_state_1;
+                    qei_hall_port :> hall_state_1;
                     hall_state_1 &= 0x07;
-                    qei_hall_port.p_qei_hall :> hall_state_2;
+                    qei_hall_port :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_1 == hall_state_2)
                         hall_stable_states++;
@@ -286,7 +286,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
 
                 case 1:
-                    qei_hall_port.p_qei_hall :> hall_state_2;
+                    qei_hall_port :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_2 == hall_state_1)
                         hall_stable_states++;
@@ -296,7 +296,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
 
                 case 2:
-                    qei_hall_port.p_qei_hall :> hall_state_2;
+                    qei_hall_port :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_2 == hall_state_1)
                         hall_state_new = hall_state_2;

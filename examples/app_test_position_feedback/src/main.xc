@@ -194,10 +194,11 @@ void position_feedback_commands(client interface PositionFeedbackInterface i_pos
     }
 }
 
-QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
+port ? hall_enc_select_port = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION;
+port ? hall_enc_select_port_inv = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION_INV;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
@@ -282,7 +283,7 @@ int main(void)
                 position_feedback_config_2.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_port_inv, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config_1, i_shared_memory[0], i_position_feedback_1,
                         position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
             }

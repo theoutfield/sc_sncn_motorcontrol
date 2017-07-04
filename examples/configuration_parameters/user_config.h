@@ -11,11 +11,15 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+//#include <motor_config.h>
+#include <motor_config_RobotDrive_ILM_50x08.h>
+//#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
 /////////////////////////////////////////////
+//#include <sensor_config_biss_AC36_1213.h>
+//#include <sensor_config_ssi_12.h>
 #include <sensor_config.h>
 
 
@@ -24,7 +28,7 @@
 ///////////////////////
 
 // SENSOR 1 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR
+#define SENSOR_1_TYPE                     BISS_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -34,10 +38,10 @@
 #define SENSOR_1_FUNCTION                 SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL
 
 // RESOLUTION (TICKS PER TURN) OF SENSOR_1
-#define SENSOR_1_RESOLUTION               REM_16MT_SENSOR_RESOLUTION
+#define SENSOR_1_RESOLUTION               BISS_SENSOR_RESOLUTION
 
 // VELOCITY COMPUTE PERIOD (ALSO POLLING RATE) OF SENSOR_1 (in microseconds)
-#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
+#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  BISS_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [0 - normal, 1 - inverted]
 #define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
