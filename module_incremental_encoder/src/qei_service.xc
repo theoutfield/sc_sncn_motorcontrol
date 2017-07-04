@@ -138,7 +138,7 @@ void qei_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionF
                                     ticks_lost = position_feedback_config.resolution + align;
 
                                 // generate an error
-                                if(ticks_lost > position_feedback_config.resolution/position_feedback_config.max_ticks_lost)
+                                if(ticks_lost > position_feedback_config.resolution/position_feedback_config.qei_config.ticks_lost_threshold)
                                     ++losing_ticks_counter;
                                 else
                                     losing_ticks_counter = 0;

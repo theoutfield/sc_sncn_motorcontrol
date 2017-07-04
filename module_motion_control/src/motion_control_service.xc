@@ -946,7 +946,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
                 xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error);
-                xscope_int(ALIGN, upstream_control_data.last_sensor_error);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
