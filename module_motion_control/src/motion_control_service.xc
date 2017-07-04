@@ -116,11 +116,11 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
 
         if (max_pos_found)
         {
-            if (position > mean_pos -100 && position < mean_pos + 100)
+            if (position > mean_pos -5000 && position < mean_pos + 5000)
                 real_mean_pos = position;
-            if (position > tq_pos - 100 && position < tq_pos + 100)
+            if (position > tq_pos - 5000 && position < tq_pos + 5000)
                 real_tq_pos = position;
-            if (position > fq_pos - 100 && position < fq_pos + 100)
+            if (position > fq_pos - 5000 && position < fq_pos + 5000)
                 real_fq_pos = position;
         }
 
@@ -128,7 +128,10 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
 
 
         t :> ts;
-        t when timerafter (ts + 500*app_tile_usec) :> void;
+        if (motorcontrol_config.commutation_sensor == BISS_SENSOR)
+            t when timerafter (ts + 1500*app_tile_usec) :> void;
+        else
+            t when timerafter (ts + 500*app_tile_usec) :> void;
     }
 
     while (counter > 5000)
@@ -177,9 +180,9 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
         t when timerafter (ts + 1000*app_tile_usec) :> void;
     }
 
-    if ((mean_pos-real_mean_pos < -100 || mean_pos-real_mean_pos > 100)
-            || (tq_pos - real_tq_pos < -100 || tq_pos - real_tq_pos > 100)
-            || (fq_pos - real_fq_pos < -100 || fq_pos - real_fq_pos > 100)
+    if ((mean_pos-real_mean_pos < -5000 || mean_pos-real_mean_pos > 5000)
+            || (tq_pos - real_tq_pos < -5000 || tq_pos - real_tq_pos > 5000)
+            || (fq_pos - real_fq_pos < -5000 || fq_pos - real_fq_pos > 5000)
             || max_pos < 60000)
         error_sens = POS_ERR;
 
@@ -207,18 +210,18 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
     }
 
 //    printf("%d\n", error_sens);
-//    printf("%d %d\n", filter_vel, filter_diff);
+//    printf("%d %d %d %d\n", max_pos, real_mean_pos, real_tq_pos, real_fq_pos);
     i_torque_control.disable_index_detection();
     i_torque_control.set_sensor_status(error_sens);
     return error_sens;
 }
 
-int open_phase_detection_function(client interface TorqueControlInterface i_torque_control,
+int open_phase_detection_offline(client interface TorqueControlInterface i_torque_control,
         MotorcontrolConfig motorcontrol_config, int app_tile_usec, int current_ratio, float * ret)
 {
     UpstreamControlData upstream_control_data;
     float I[NR_PHASES] = { 0 };
-    int refer[NR_PHASES] = {0, 20, 30, 30};
+    int refer[NR_PHASES] = {0, 20, 20, 20};// make b and c terminal voltage as close as voltage on terminal a at the startup
     unsigned counter = 1;
     float voltage = 0;
     float rated_curr = (float)motorcontrol_config.rated_current/1000;
@@ -250,13 +253,13 @@ int open_phase_detection_function(client interface TorqueControlInterface i_torq
             i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
         }
 
-        if (refer[B] > 60 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
+        if (refer[B] > 90 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
         {
-            if (I[A] < rated_curr/4)
+            if (I[A] < rated_curr/4 && I[A] < 0.2)
                 error_phase = A;
-            else if (I[B] < rated_curr/4)
+            else if (I[B] < rated_curr/4 && I[B] < 0.2)
                 error_phase = B;
-            else if (I[C] < rated_curr/4)
+            else if (I[C] < rated_curr/4 && I[C] < 0.2)
                 error_phase = C;
             break;
         }
@@ -266,6 +269,8 @@ int open_phase_detection_function(client interface TorqueControlInterface i_torq
 
         ++counter;
     }
+
+//    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
 
     voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
     if (error_phase == 0)
@@ -903,19 +908,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
 
-                switch (error_phase)
-                {
-                    case A:
-                        upstream_control_data.error_status = PHASE_FAILURE_L1;
-                        break;
-                    case B:
-                        upstream_control_data.error_status = PHASE_FAILURE_L2;
-                        break;
-                    case C:
-                        upstream_control_data.error_status = PHASE_FAILURE_L3;
-                        break;
-                }
-
                 switch (error_sens)
                 {
                     case POS_ERR:
@@ -935,6 +927,19 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
+                switch (error_phase)
+                {
+                    case A:
+                        upstream_control_data.error_status = PHASE_FAILURE_L1;
+                        break;
+                    case B:
+                        upstream_control_data.error_status = PHASE_FAILURE_L2;
+                        break;
+                    case C:
+                        upstream_control_data.error_status = PHASE_FAILURE_L3;
+                        break;
+                }
+
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
@@ -945,7 +950,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
-                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error);
+                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
@@ -959,7 +964,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
-
 
                 if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
                 {
@@ -1343,7 +1347,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
         case i_motion_control[int i].open_phase_detection() -> {int error_phase_out, float resistance_out}:
-                error_phase = open_phase_detection_function(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
+                error_phase = open_phase_detection_offline(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
                 error_phase_out = error_phase;
                 resistance_out = resist;
                 break;
