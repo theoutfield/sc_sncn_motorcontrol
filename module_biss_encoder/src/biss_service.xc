@@ -9,25 +9,9 @@
 #include <xs1.h>
 #include <xscope.h>
 
-extern char start_message[];
-
-
-static inline unsigned int read_biss_bit(QEIHallPort * qei_hall_port, port *data_port, int data_port_config)
-{
-    unsigned int bit = 0;
-    if (data_port_config) {
-        *data_port :> bit;
-    } else {
-        qei_hall_port->p_qei_hall :> bit;
-        bit = (bit >> BISS_DATA_PORT_BIT)&1;
-    }
-    return bit;
-}
-
-
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
-        HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config,
-        port * (&?gpio_ports)[4], timer t,
+SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
+        int biss_clock_low, int biss_clock_high,
+        timer t,
         PositionFeedbackConfig &position_feedback_config, unsigned int data[])
 {
     unsigned int crc  =  0;
@@ -39,30 +23,18 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
     unsigned int readbuf = 0;
     unsigned int bitindex = 0;
     unsigned int byteindex = 0;
-    unsigned int data_length = BISS_CDS_BIT + position_feedback_config.biss_config.multiturn_resolution +  position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits + BISS_STATUS_BITS;
+    unsigned int data_length = position_feedback_config.biss_config.multiturn_resolution +  position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits + BISS_STATUS_BITS;
     unsigned int read_limit = position_feedback_config.biss_config.busy; //maximum number of bits to read before the start bit
     unsigned int crc_length = 32 - clz(position_feedback_config.biss_config.crc_poly); //clz: number of leading 0
-    unsigned int frame_length = data_length+crc_length+1;
-
-    //set clock and data port config
-    unsigned int clock_config = 0;
-    port *clock_port;
-    if (position_feedback_config.biss_config.clock_port_config <= BISS_CLOCK_PORT_EXT_D3) { //clock is output on a gpio port
-        clock_config = 1;
-        clock_port = gpio_ports[position_feedback_config.biss_config.clock_port_config];
-    }
-    unsigned int data_port_config = 0;
-    port *data_port;
-    if (position_feedback_config.biss_config.data_port_number > ENCODER_PORT_2) { //data is input on a gpio port
-        data_port_config = 1;
-        data_port = gpio_ports[position_feedback_config.biss_config.data_port_number-ENCODER_PORT_EXT_D0];
-    }
+    unsigned int frame_length = data_length+crc_length;
 
     //wait for the data line to go high
     t :> time;
     timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
     while(bit != 1 && timeafter(timeout, time)) {
-        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
+        *biss_clock_port <: biss_clock_high;
+        *biss_data_port :> bit;
+        bit &= 1;
         t :> time;
     }
 
@@ -73,53 +45,47 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
 
     //SSI sensor, no ack, start, status bits
     if (position_feedback_config.sensor_type == SSI_SENSOR) {
-        read_status = 2; //force status to 2 to skip the ack and start bit detection
-        read_limit = 1 + position_feedback_config.biss_config.multiturn_resolution +  position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits + crc_length;
-        data_length = read_limit - crc_length;
+        read_status = 2; //force status to 2 because there is no ack and start bit
+        data_length -= BISS_STATUS_BITS; //SSI does not have status bits
+        read_limit = data_length + crc_length;
         //put clock low and wait for the encoder to be ready
         if (position_feedback_config.biss_config.busy) {
-            if (clock_config) { //clock is output on a gpio port
-                *clock_port <:0;
-            } else { //clock is output on the hall_enc_select port leftmost 2 bits
-                hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
-            }
+            *biss_clock_port <: biss_clock_low;
             delay_ticks(position_feedback_config.biss_config.busy*position_feedback_config.ifm_usec);
         }
-    }
+    } else {
+        //BiSS sensor: wait for ack and start bits
+        while (read_limit && read_status != 2) {
+            *biss_clock_port <: biss_clock_low;
+            *biss_clock_port <: biss_clock_high;
+            *biss_data_port :> bit;
+            bit &= 1;
 
-    //wait for ack and start bits
-    while (read_limit && read_status != 2) {
-        if (clock_config) { //clock is output on a gpio port
-            *clock_port <:0;
-            *clock_port <:1;
-        } else { //clock is output on the hall_enc_select port leftmost 2 bits
-            hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
-            hall_enc_select_port->p_hall_enc_select <: position_feedback_config.biss_config.clock_port_config | hall_enc_select_config;
-        }
-        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
-
-        //check ack and start bits
-        if (read_status) { //ack received, start not received
-            if (bit) {//start bit received, set status to 2
+            //check ack and start bits
+            if (read_status) { //ack received, start not received
+                if (bit) {//start bit received, set status to 2
+                    read_status++;
+                    read_limit = frame_length; //now we read exactly data_length+crc_length bits
+                    break;
+                }
+            } else if (bit == 0)  {//ack bit received, set status to 1
                 read_status++;
-                read_limit = frame_length; //now we read exactly data_length+crc_length bits
             }
-        } else if (bit == 0)  {//ack bit received, set status to 1
-            read_status++;
+            read_limit--;
         }
-        read_limit--;
     }
+
+    //discard first bit
+    *biss_clock_port <: biss_clock_low;
+    *biss_clock_port <: biss_clock_high;
+    *biss_data_port :> void;
 
     //read the raw data
     while (read_limit) {
-        if (clock_config) { //clock is output on a gpio port
-            *clock_port <:0;
-            *clock_port <:1;
-        } else { //clock is output on the hall_enc_select port leftmost 2 bits
-            hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
-            hall_enc_select_port->p_hall_enc_select <: position_feedback_config.biss_config.clock_port_config | hall_enc_select_config;
-        }
-        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
+        *biss_clock_port <: biss_clock_low;
+        *biss_clock_port <: biss_clock_high;
+        *biss_data_port :> bit;
+        bit &= 1;
 
         //save the data
         if (bitindex == 32) { //byte full
@@ -137,7 +103,8 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
     t :> time;
     timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
     while(bit != 0 && timeafter(timeout, time)) {
-        bit = read_biss_bit(qei_hall_port, data_port, data_port_config);
+        *biss_data_port :> bit;
+        bit &= 1;
         t :> time;
     }
 
@@ -175,8 +142,8 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port,
     unsigned int position = 0;
     SensorError status = SENSOR_NO_ERROR;
     unsigned int status_bits = 0;
-    unsigned int readbuf = data[0] << BISS_CDS_BIT; //discard CDS bit
-    unsigned int bitindex = BISS_CDS_BIT; //discard CDS bit
+    unsigned int readbuf = data[0];
+    unsigned int bitindex = 0;
     unsigned int byteindex = 0;
     int count = 0;
 

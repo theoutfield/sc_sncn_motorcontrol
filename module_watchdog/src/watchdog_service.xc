@@ -120,7 +120,6 @@
                     case DC1KD1:
                         cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-                        //wd_enabled = 0;
                         break;
                     case DC1K_DC5K://[ LED | Motor_En | WD_Tick | WD_En ]
                         led_motor_on_wdtick_wden_buffer &= 0b1000;

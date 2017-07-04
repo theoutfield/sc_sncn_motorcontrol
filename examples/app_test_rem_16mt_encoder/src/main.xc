@@ -267,7 +267,7 @@ int main(void)
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
-                position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(null, null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

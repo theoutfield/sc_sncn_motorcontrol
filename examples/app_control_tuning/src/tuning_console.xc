@@ -912,6 +912,36 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                     break;
                 }
 
+                switch(upstream_control_data.watchdog_error) {
+                case WATCHDOG_NO_ERROR:
+                    printf("WATCHDOG_NO_ERROR\n");
+                    break;
+                case WATCHDOG_TICKS_ERROR:
+                    printf("WATCHDOG_TICKS_ERROR\n");
+                    break;
+                case WATCHDOG_OVER_UNDER_VOLTAGE_OVER_TEMP_ERROR:
+                    printf("WATCHDOG_OVER_UNDER_VOLTAGE_OVER_TEMP_ERROR\n");
+                    break;
+                case WATCHDOG_OVER_CURRENT_ERROR:
+                    printf("WATCHDOG_OVER_CURRENT_ERROR\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_A_ERROR:
+                    printf("WATCHDOG_DEAD_TIME_PHASE_A_ERROR\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_B_ERROR:
+                    printf("WATCHDOG_DEAD_TIME_PHASE_B_ERROR\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_C_ERROR:
+                    printf("WATCHDOG_DEAD_TIME_PHASE_C_ERROR\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_D_ERROR:
+                    printf("WATCHDOG_DEAD_TIME_PHASE_D_ERROR\n");
+                    break;
+                default:
+                    printf("watchdog error: %d\n", upstream_control_data.watchdog_error);
+                    break;
+                }
+
                 //reset fault
                 printf("Reset fault...\n");
                 i_motion_control.reset_motorcontrol_faults();

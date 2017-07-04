@@ -211,11 +211,11 @@ Types
 .. doxygenenum:: SensorFunction
 .. doxygenenum:: SensorError
 .. doxygenenum:: EncoderPortNumber
+.. doxygenenum:: PositionFeedbackPortsLocation
+.. doxygenstruct:: PositionFeedbackPortsCheck
 .. doxygenstruct:: PositionFeedbackConfig
 
 
-.. doxygenstruct:: QEIHallPort
-.. doxygenstruct:: HallEncSelectPort
 .. doxygenstruct:: SPIPorts
 
 Service

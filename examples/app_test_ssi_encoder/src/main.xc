@@ -55,24 +55,19 @@ void ssi_test(client interface PositionFeedbackInterface i_position_feedback, cl
     }
 }
 
-PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
-WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
-FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
+port ? hall_enc_select_port = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION;
+port ? hall_enc_select_port_inv = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION_INV;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
 port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 int main() {
-    interface WatchdogInterface i_watchdog[2];
     interface shared_memory_interface i_shared_memory[2];
     interface PositionFeedbackInterface i_position_feedback[3];
-    interface UpdatePWM i_update_pwm;
-    interface UpdateBrake i_update_brake;
 
     par {
         /************************************************************
@@ -81,24 +76,6 @@ int main() {
         on tile[IFM_TILE]: par {
             /* Test BiSS Encoder Client */
             ssi_test(i_position_feedback[0], null);
-
-            /* PWM Service */
-            {
-                pwm_config(pwm_ports);
-
-                if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
-                    predriver(fet_driver_ports);
-
-                //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                        i_update_brake, IFM_TILE_USEC);
-
-            }
-
-            /* Watchdog Service */
-            {
-                watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
-            }
 
             /* Shared memory Service */
             [[distribute]] shared_memory_service(i_shared_memory, 2);
@@ -131,7 +108,7 @@ int main() {
                 position_feedback_config.gpio_config[2] = GPIO_OFF;
                 position_feedback_config.gpio_config[3] = GPIO_OFF;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_port_inv, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }
