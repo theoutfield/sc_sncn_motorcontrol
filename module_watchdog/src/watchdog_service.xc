@@ -110,20 +110,26 @@
                         //Disable WD and set red LED on
                         led_motor_on_wdtick_wden_buffer &= 0b1100;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        wd_enabled = 0;
                         break;
                     case DC500:
+                        cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
+                        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+                        wd_enabled = 0;
+                        break;
                     case DC1KD1:
                         cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+                        //wd_enabled = 0;
                         break;
                     case DC1K_DC5K://[ LED | Motor_En | WD_Tick | WD_En ]
                         led_motor_on_wdtick_wden_buffer &= 0b1000;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        wd_enabled = 0;
                         break;
                 }
 
                 fault=fault_id;
-                wd_enabled = 0;
                 break;
 
         case t when timerafter(ts + wd_half_period) :> void://clocking
