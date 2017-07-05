@@ -279,23 +279,23 @@ void adc_ad7265(
                     fault_code=DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1;
                 }
 
-                //if (OUT_A[AD_7265_VDC_IDC]<v_dc_min)
-                //{
-                //    i_watchdog.protect(WD_UNDER_VOLTAGE);
-                //    fault_code=UNDER_VOLTAGE_NO_1;
-                //}
-                //
-                //if (v_dc_max<OUT_A[AD_7265_VDC_IDC])
-                //{
-                //    i_watchdog.protect(WD_OVER_VOLTAGE);
-                //    fault_code=OVER_VOLTAGE_NO_1;
-                //}
-                //
-                //if (t_max<OUT_A[AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B])
-                //{
-                //    i_watchdog.protect(WD_OVER_TEMPERATURE);
-                //    fault_code=EXCESS_TEMPERATURE_DRIVE;
-                //}
+                if (OUT_A[adc_ports.ad7265_channel_index.voltage_dc]<v_dc_min)
+                {
+                    i_watchdog.protect(WD_UNDER_VOLTAGE);
+                    fault_code=UNDER_VOLTAGE_NO_1;
+                }
+
+                if (v_dc_max<OUT_A[adc_ports.ad7265_channel_index.voltage_dc])
+                {
+                    i_watchdog.protect(WD_OVER_VOLTAGE);
+                    fault_code=OVER_VOLTAGE_NO_1;
+                }
+
+                if (t_max<OUT_A[adc_ports.ad7265_channel_index.temperature])
+                {
+                    i_watchdog.protect(WD_OVER_TEMPERATURE);
+                    fault_code=EXCESS_TEMPERATURE_DRIVE;
+                }
             }
 
             V_dc_out           = OUT_A[adc_ports.ad7265_channel_index.voltage_dc];
