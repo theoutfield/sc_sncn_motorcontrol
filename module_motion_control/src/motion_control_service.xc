@@ -1038,21 +1038,21 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-//                if(detect[A] > 80)
-//                {
-//                    detect[B] = 0;
-//                    detect[C] = 0;
-//                }
-//                else if(detect[B] > 80)
-//                {
-//                    detect[A] = 0;
-//                    detect[C] = 0;
-//                }
-//                else if(detect[C] > 80)
-//                {
-//                    detect[A] = 0;
-//                    detect[B] = 0;
-//                }
+                if(detect[A] > 80)
+                {
+                    detect[B] = 0;
+                    detect[C] = 0;
+                }
+                else if(detect[B] > 80)
+                {
+                    detect[A] = 0;
+                    detect[C] = 0;
+                }
+                else if(detect[C] > 80)
+                {
+                    detect[A] = 0;
+                    detect[B] = 0;
+                }
 
                 switch (error_phase)
                 {
