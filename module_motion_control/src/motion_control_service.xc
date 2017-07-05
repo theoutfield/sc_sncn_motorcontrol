@@ -950,7 +950,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         phase_cur[i] = -phase_cur[i];
                 }
 
-                if(upstream_control_data.velocity > 5)
+                if(upstream_control_data.velocity > 5 || upstream_control_data.velocity < -5)
                 {
                     if(phase_cur[B] > upstream_control_data.computed_torque/50*phase_cur[A] && phase_cur[C] > upstream_control_data.computed_torque/50*phase_cur[A])
                     {
