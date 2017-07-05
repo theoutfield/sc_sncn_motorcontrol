@@ -30,7 +30,7 @@
  */
 #define AD7265_DIFF_A1A2_B1B2  0b0000
 #define AD7265_DIFF_A3A4_B3B4  0b0010
-#define AD7265_DIFF_A5A6_B5B6  0b0101
+#define AD7265_DIFF_A5A6_B5B6  0b0100
 
 /**
  * @brief Define proper configuration register values of AD7949 chip in UNIPOLAR (SINGLE_ENDED) sampling mode
@@ -67,18 +67,23 @@ typedef enum
 } Ad7949ChannelInputs;
 
 /**
- * @brief Possible selection of analogue input pairs (to be sampled) in case of using AD7265 chip
- * used internally in AD7265 service.
+ * Structure type for channel mapping
  */
-typedef enum
+typedef struct
 {
-    AD_7265_CURRENT_B_C     =0,                     //corresponding to VA1 & VB1 in AD7265 (dc1k board)
-    AD_7265_VDC_IDC         =1,                     //corresponding to VA2 & VB2 in AD7265 (dc1k board)
-    AD_7265_AI_SIGNAL_1_3   =2,                     //corresponding to VA3 & VB3 in AD7265 (dc1k board)
-    AD_7265_AI_SIGNAL_2_4   =3,                     //corresponding to VA4 & VB4 in AD7265 (dc1k board)
-    AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B  =4,         //corresponding to VA5 & VB5 in AD7265 (dc1k board)
-    AD_7265_PHASE_VOLTAGE_C_PHASE_VOLTAGE_B  =5     //corresponding to VA6 & VB6 in AD7265 (dc1k board)
-} Ad7265ChannelInputs;
+    int current_a;
+    int current_b;
+    int voltage_dc;
+    int current_dc;
+    int temperature;
+    int voltage_a;
+    int voltage_b;
+    int voltage_c;
+    int analogue_input_1;
+    int analogue_input_2;
+    int analogue_input_3;
+    int analogue_input_4;
+} Ad7265ChannelIndex;
 
 /**
  * @brief Fault Codes for sending to watchdog service
@@ -113,6 +118,7 @@ typedef struct
     out port ?p1_serial_clk;            /**< [[Nullable]] Port connecting to external ADC serial clock. */
     port ?p1_ready;                     /**< [[Nullable]] Port used to as ready signal for p32_adc_data ports and ADC chip. */
     out port ?p4_mux;                   /**< [[Nullable]] 4-bit Port used to control multiplexor on ADC chip. */
+    Ad7265ChannelIndex ad7265_channel_index;
 } AD7265Ports;
 
 /**
