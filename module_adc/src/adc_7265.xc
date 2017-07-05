@@ -197,8 +197,9 @@ void adc_ad7265(
     int data_updated=0;
 
     int j=0;
-    unsigned short channel_config[6] = {AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3, AD7265_SGL_A4_B4, AD7265_SGL_A5_B5, AD7265_SGL_A6_B6};
-    int OUT_A[12];
+    unsigned short channel_config[8] = {AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3, AD7265_SGL_A4_B4, AD7265_SGL_A5_B5, AD7265_SGL_A6_B6,
+                                        AD7265_DIFF_A3A4_B3B4, AD7265_DIFF_A5A6_B5B6};
+    int OUT_A[20];
 
     //proper task startup
     t :> time;
@@ -206,20 +207,6 @@ void adc_ad7265(
 
     configure_adc_ports_7265(adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
-    if(operational_mode)
-    {
-        //d1
-        channel_config[/*voltage difference between VB3 and VB4. The number will be equal to the number of VB3, and the result will be stored in analogue input 1
-        which in differential mode will be equal to VB3 - VB4*/2] = AD7265_DIFF_A3A4_B3B4;//only B3B4 is used for version d1
-        channel_config[/*voltage difference between VB3 and VB4. The number will be equal to the number of VB3, and the result will be stored in analogue input 2
-        which in differential mode will be equal to VB3 - VB4*/4] = AD7265_DIFF_A5A6_B5B6;// only B5B6 is used for version d1
-
-        ////c4
-        //channel_config[/*voltage difference between VA3 and VA4. The number will be equal to the number of VA3, and the result will be stored in analogue input 1
-        //which in differential mode will be equal to VA3 - VA4*/2] = AD7265_DIFF_A3A4_B3B4;//only A3A4 and B3B4 are used for version c1
-        //channel_config[/*voltage difference between VB3 and VB4. The number will be equal to the number of VB3, and the result will be stored in analogue input 2
-        //which in differential mode will be equal to VB3 - VB4*/2] = AD7265_DIFF_A3A4_B3B4;//only A3A4 and B3B4 are used for version c1
-    }
 
     while(1)
     {
@@ -313,10 +300,19 @@ void adc_ad7265(
 
             V_dc_out           = OUT_A[adc_ports.ad7265_channel_index.voltage_dc];
             Temperature_out    = OUT_A[adc_ports.ad7265_channel_index.temperature];
-            analogue_input_a_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_1];
-            analogue_input_a_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_2];
-            analogue_input_b_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_3];
-            analogue_input_b_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_4];
+            if(operational_mode==0)
+            {
+                analogue_input_a_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_1];
+                analogue_input_a_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_2];
+                analogue_input_b_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_3];
+                analogue_input_b_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_4];
+            }
+            else
+            {
+                analogue_input_a_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_differential_mode_1];
+                analogue_input_a_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_differential_mode_2];
+            }
+
             fault_code_out     = fault_code;
             data_updated=1;
             break;
@@ -336,7 +332,7 @@ void adc_ad7265(
         {
             if(protection_counter<10000) protection_counter++;
 
-            for(j=5;0<=j;j--)
+            for(j=7;0<=j;j--)
             {
                 adc_ports.p4_mux <: channel_config[j];
                 t :> time;
@@ -364,7 +360,7 @@ void adc_ad7265(
                 tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
                 tmp_val = tmp_val >> (SHIFTING_BITS+1);
                 tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-                OUT_A[(j+6)] = (int)tmp_val;
+                OUT_A[(j+10)] = (int)tmp_val;
             }
 
             data_updated=0;

@@ -30,7 +30,7 @@
  */
 #define AD7265_DIFF_A1A2_B1B2  0b0000
 #define AD7265_DIFF_A3A4_B3B4  0b0010
-#define AD7265_DIFF_A5A6_B5B6  0b0100
+#define AD7265_DIFF_A5A6_B5B6  0b0101
 
 /**
  * @brief Define proper configuration register values of AD7949 chip in UNIPOLAR (SINGLE_ENDED) sampling mode
@@ -66,6 +66,7 @@ typedef enum
     AD_7949_EXT_A0_P_EXT_A1_P=3
 } Ad7949ChannelInputs;
 
+
 /**
  * Structure type for channel mapping
  */
@@ -83,6 +84,8 @@ typedef struct
     int analogue_input_2;
     int analogue_input_3;
     int analogue_input_4;
+    int analogue_input_differential_mode_1;
+    int analogue_input_differential_mode_2;
 } Ad7265ChannelIndex;
 
 /**
@@ -130,6 +133,7 @@ typedef struct
     int sign_phase_c;                   /**< Direction in which current on C Phase is measured [-1,1]. */
     unsigned current_sensor_amplitude;  /**< Max amplitude of current the sensors that your DC board can handle. */
 }CurrentSensorsConfig;
+
 
 /**
  * Structure type for ports and configuration used by the ADC Service .
