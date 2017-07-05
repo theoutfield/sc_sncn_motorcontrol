@@ -255,11 +255,11 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
 
         if (refer[B] > 90 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
         {
-            if (I[A] < rated_curr/4 && I[A] < 0.2)
+            if (I[A] < rated_curr/10)
                 error_phase = A;
-            else if (I[B] < rated_curr/4 && I[B] < 0.2)
+            else if (I[B] < rated_curr/10)
                 error_phase = B;
-            else if (I[C] < rated_curr/4 && I[C] < 0.2)
+            else if (I[C] < rated_curr/10)
                 error_phase = C;
             break;
         }
@@ -1147,7 +1147,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
                 xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
-                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
+//                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
                 xscope_int(I_B, upstream_control_data.I_b);
                 xscope_int(I_C, upstream_control_data.I_c);
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
