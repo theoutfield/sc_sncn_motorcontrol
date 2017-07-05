@@ -262,8 +262,8 @@ void adc_ad7265(
             out_b = (int)tmp_val;
 
 
-            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048 -41);
-            phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048 -41);
+            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
+            phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
 
             if((5000<protection_counter) && (fault_code==NO_FAULT))
             {

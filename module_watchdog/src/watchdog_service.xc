@@ -194,7 +194,7 @@
                 }
 
                 //showing the fault type by LED flashing (once, twice, ..., five times)
-                if(fault!=NO_FAULT) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
+                if(fault!=NO_FAULT) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, cpld_out_state, times, LED_counter);
 
                 LED_counter++;
 
@@ -241,7 +241,7 @@
     }
 }
 
-void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned int &times, unsigned int &delay_counter){
+void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned &output_cpld, unsigned int &times, unsigned int &delay_counter){
     if ((delay_counter % period == 0) && times != (fault*2)){//blinking
         switch(IFM_module_type){
             case DC100_DC300://ToDo: to be tested
@@ -251,8 +251,8 @@ void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_mod
                 break;
             case DC500://ToDo: to be tested
             case DC1KD1:
-                output ^= (1 << 3);
-                watchdog_ports.p_cpld_shared <: output;
+                output_cpld ^= (1 << 3);
+                watchdog_ports.p_cpld_shared <: output_cpld;
                 break;
             case DC1K_DC5K:
                 output ^= (1 << 3);
