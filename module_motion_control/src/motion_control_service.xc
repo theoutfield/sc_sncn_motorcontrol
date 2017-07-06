@@ -270,7 +270,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         ++counter;
     }
 
-    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
+//    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
 
     voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
     if (error_phase == 0)
@@ -513,8 +513,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     unsigned qei_ctr = 100000;
     float curr_threshold = (float)motorcontrol_config.rated_current /1000 / 10;
     unsigned measurement = 0;
-
-    int ftr = 0, filter_ctr = 0;
+    int ftr = 0;
     float rms[NR_PHASES] = { 0 };
     int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect[NR_PHASES] = { 0 };
     int detect_low[NR_PHASES] = { 0 }, phase_cur[NR_PHASES] = { 0 };
@@ -1533,10 +1532,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 error_sens = NO_ERROR;
                 i_torque_control.set_sensor_status(error_sens);
                 error_phase = NO_ERROR;
-                filter_ctr = 0;
-                ftr = 0;
-                for (int i = 0; i < NR_PHASES; i++)
-                    detect[i] = 0;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
