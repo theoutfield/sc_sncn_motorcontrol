@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -40,7 +40,7 @@
 #define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [0 - normal, 1 - inverted]
-#define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
+#define SENSOR_1_POLARITY                 SENSOR_POLARITY_INVERTED
 
 
 ///////////////////////
@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    0
+#define COMMUTATION_ANGLE_OFFSET    3200
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -127,14 +127,14 @@
 
 #define ENABLE_COMPENSATION_RECORDING           0 //set the cogging torque recording to 0 on startup
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             0
-#define POSITION_Ki                             0
-#define POSITION_Kd                             0
+#define POSITION_Kp                             50000
+#define POSITION_Ki                             350
+#define POSITION_Kd                             200000
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
 //     "1000"                 in case of using position controller in "LT_POSITION_CONTROLLER"               mode
-#define POSITION_INTEGRAL_LIMIT                 PEAK_SPEED
+#define POSITION_INTEGRAL_LIMIT                 1000
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY           MOTION_POLARITY_NORMAL
@@ -181,5 +181,5 @@
 //////  AUXILARY CONFIGURATION PARAMETERS
 /////////////////////////////////////////////////
 
-#define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
+#define MOMENT_OF_INERTIA                       50000//set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
