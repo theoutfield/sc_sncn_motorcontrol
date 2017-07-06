@@ -934,67 +934,70 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
-                for (int i = A; i < NR_PHASES; i++)
+                if(error_phase == NO_ERROR)
                 {
-                    switch (i)
-                    {
-                    case A:
-                        phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
-                        break;
-                    case B:
-                        phase_cur[B] = upstream_control_data.I_b;
-                        break;
-                    case C:
-                        phase_cur[C] = upstream_control_data.I_c;
-                        break;
-                    }
-
-                    if (phase_cur[i] < 0)
-                        phase_cur[i] = -phase_cur[i];
-
-                    sum[i] += phase_cur[i];
-                    sum_sq[i] += phase_cur[i]*phase_cur[i];
-                }
-
-                ftr++;
-
-                // every 33 ms rms value is calcuated
-                if (ftr > 1 && ftr % 100 == 0)
-                {
-                    float mean[NR_PHASES], sd[NR_PHASES];
                     for (int i = A; i < NR_PHASES; i++)
                     {
-                        mean[i] = (float)sum[i] / ftr;
-                        sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
-                        rms[i] += mean[i] + sqrt(sd[i]);
-                    }
-
-                    for (int i = A; i < NR_PHASES; i++)
-                        rms[i] = rms[i] / current_ratio;
-
-
-                    if (rms[B] < curr_threshold && rms[A] > 10 * rms[B] && rms[C] > 10*rms[B])
-                    {
-                        detect[B]++;
-
-                        if(detect[B] == 5)
+                        switch (i)
                         {
-                            printstrln("start detecting B");
+                        case A:
+                            phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
+                            break;
+                        case B:
+                            phase_cur[B] = upstream_control_data.I_b;
+                            break;
+                        case C:
+                            phase_cur[C] = upstream_control_data.I_c;
+                            break;
                         }
 
-                        if (detect[B] == 20)
-                            printstrln("open phase B");
-                    }
-                    else
-                        detect[B] = 0;
+                        if (phase_cur[i] < 0)
+                            phase_cur[i] = -phase_cur[i];
 
-//                    printf("%.2f %.2f %.2f\n", rms[A]/current_ratio, rms[B]/current_ratio, rms[C]/current_ratio);
-                    ftr = 0;
-                    for (int i = A; i < NR_PHASES; i++)
+                        sum[i] += phase_cur[i];
+                        sum_sq[i] += phase_cur[i]*phase_cur[i];
+                    }
+
+                    ftr++;
+
+                    // every 33 ms rms value is calcuated
+                    if (ftr > 1 && ftr % 100 == 0)
                     {
-                        sum[i] = 0;
-                        sum_sq[i] = 0;
-                        rms[i] = 0;
+                        float mean[NR_PHASES], sd[NR_PHASES];
+                        for (int i = A; i < NR_PHASES; i++)
+                        {
+                            mean[i] = (float)sum[i] / ftr;
+                            sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                            rms[i] += mean[i] + sqrt(sd[i]);
+                        }
+
+                        for (int i = A; i < NR_PHASES; i++)
+                            rms[i] = rms[i] / current_ratio;
+
+
+                        if (rms[B] < curr_threshold && rms[A] > 10 * rms[B] && rms[C] > 10*rms[B])
+                        {
+                            detect[B]++;
+
+                            if(detect[B] == 5)
+                            {
+                                printstrln("start detecting B");
+                            }
+
+                            if (detect[B] == 20)
+                                printstrln("open phase B");
+                        }
+                        else
+                            detect[B] = 0;
+
+                        //                    printf("%.2f %.2f %.2f\n", rms[A]/current_ratio, rms[B]/current_ratio, rms[C]/current_ratio);
+                        ftr = 0;
+                        for (int i = A; i < NR_PHASES; i++)
+                        {
+                            sum[i] = 0;
+                            sum_sq[i] = 0;
+                            rms[i] = 0;
+                        }
                     }
                 }
 
