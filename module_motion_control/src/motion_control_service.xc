@@ -511,6 +511,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     float resist = 0;
     sensor_fault error_sens = NO_ERROR;
     unsigned qei_ctr = 100000;
+    unsigned phase_ctr = 0;
+    int scale = 0;
+    float curr_threshold = (float)motorcontrol_config.rated_current /1000 / 10;
 
     int ftr = 0, filter_ctr = 0;
     float filter_c[NR_PHASES] = { 0 }, filter_c_old[NR_PHASES] =  { 0 }, rms[NR_PHASES] = { 0 };
@@ -948,111 +951,170 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                     if (phase_cur[i] < 0)
                         phase_cur[i] = -phase_cur[i];
+
+                    sum[i] += phase_cur[i];
+                    sum_sq[i] += phase_cur[i]*phase_cur[i];
                 }
 
-                if(upstream_control_data.velocity > 5 || upstream_control_data.velocity < -5)
+                ftr++;
+
+                // every 33 ms rms value is calcuated
+                if (ftr > 1 && ftr % 100 == 0)
                 {
-                    if(phase_cur[B] > upstream_control_data.computed_torque/50*phase_cur[A] && phase_cur[C] > upstream_control_data.computed_torque/50*phase_cur[A])
+                    float mean[NR_PHASES], sd[NR_PHASES];
+                    for (int i = A; i < NR_PHASES; i++)
                     {
-                        if(detect[A] == 80)
-                            printstrln("start detecting A");
+                        mean[i] = (float)sum[i] / ftr;
+                        sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                        rms[i] += mean[i] + sqrt(sd[i]);
+                    }
 
-                        ++detect[A];
+                    for (int i = A; i < NR_PHASES; i++)
+                        rms[i] = rms[i] / current_ratio;
 
-                        if(detect[A] == 100)
+
+                    if (rms[B] < curr_threshold && rms[A] > 10 * rms[B] && rms[C] > 10*rms[B])
+                    {
+                        detect[B]++;
+
+                        if(detect[B] == 5)
                         {
-                            error_phase = A;
-                            i_torque_control.set_brake_status(0);
-                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                            {
-                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                            }
-                            else
-                            {
-                                torque_enable_flag   =0;
-                                velocity_enable_flag =0;
-                                position_enable_flag =0;
-                                i_torque_control.set_torque_control_disabled();
-                            }
+                            printstrln("start detecting B");
                         }
+
+                        if (detect[B] == 20)
+                            printstrln("open phase B");
                     }
                     else
+                        detect[B] = 0;
+
+//                    printf("%.2f %.2f %.2f\n", rms[A]/current_ratio, rms[B]/current_ratio, rms[C]/current_ratio);
+                    ftr = 0;
+                    for (int i = A; i < NR_PHASES; i++)
                     {
-                        detect[A] = 0;
-
-                        if(phase_cur[A] > upstream_control_data.computed_torque/50*phase_cur[B] && phase_cur[C] > upstream_control_data.computed_torque/50*phase_cur[B])
-                        {
-                            if(detect[B] == 80)
-                                printstrln("start detecting B");
-
-                            ++detect[B];
-
-                            if(detect[B] == 100)
-                            {
-                                error_phase = B;
-                                i_torque_control.set_brake_status(0);
-                                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                {
-                                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                }
-                                else
-                                {
-                                    torque_enable_flag   =0;
-                                    velocity_enable_flag =0;
-                                    position_enable_flag =0;
-                                    i_torque_control.set_torque_control_disabled();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            detect[B] = 0;
-
-                            if(phase_cur[A] > upstream_control_data.computed_torque/50*phase_cur[C] && phase_cur[B] > upstream_control_data.computed_torque/50*phase_cur[C])
-                            {
-                                if(detect[C] == 80)
-                                    printstrln("start detecting C");
-
-                                ++detect[C];
-
-                                if(detect[C] == 100)
-                                {
-                                    error_phase = C;
-                                    i_torque_control.set_brake_status(0);
-                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                    {
-                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                    }
-                                    else
-                                    {
-                                        torque_enable_flag   =0;
-                                        velocity_enable_flag =0;
-                                        position_enable_flag =0;
-                                        i_torque_control.set_torque_control_disabled();
-                                    }
-                                }
-                            }
-                            else
-                                detect[C] = 0;
-                        }
+                        sum[i] = 0;
+                        sum_sq[i] = 0;
+                        rms[i] = 0;
                     }
                 }
 
-                if(detect[A] > 80)
-                {
-                    detect[B] = 0;
-                    detect[C] = 0;
-                }
-                else if(detect[B] > 80)
-                {
-                    detect[A] = 0;
-                    detect[C] = 0;
-                }
-                else if(detect[C] > 80)
-                {
-                    detect[A] = 0;
-                    detect[B] = 0;
-                }
+//                phase_ctr++;
+//                if(abs(upstream_control_data.computed_torque) > 10 && phase_ctr % 100 == 0)
+//                {
+//                    if (upstream_control_data.computed_torque/50 != 0)
+//                        scale = abs(upstream_control_data.computed_torque/50);
+//
+//                    phase_ctr = 0;
+//                }
+//
+//                if(upstream_control_data.velocity > 5 || upstream_control_data.velocity < -5)
+//                {
+//                    if(phase_cur[B] > scale*phase_cur[A] && phase_cur[C] > scale*phase_cur[A])
+//                    {
+//                        if(detect[A] == 100)
+//                        {
+//                            printf("%d\n", scale);
+//                            printstrln("start detecting A");
+//                        }
+//
+//                        ++detect[A];
+//
+//                        if(detect[A] == 120)
+//                        {
+//                            error_phase = A;
+//                            i_torque_control.set_brake_status(0);
+//                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+//                            {
+//                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+//                            }
+//                            else
+//                            {
+//                                torque_enable_flag   =0;
+//                                velocity_enable_flag =0;
+//                                position_enable_flag =0;
+//                                i_torque_control.set_torque_control_disabled();
+//                            }
+//                        }
+//                    }
+//                    else
+//                        detect[A] = 0;
+//
+//                    if(phase_cur[A] > scale*phase_cur[B] && phase_cur[C] > scale*phase_cur[B])
+//                    {
+//                        if(detect[B] == 100)
+//                        {
+//                            printf("%d\n", scale);
+//                            printstrln("start detecting B");
+//                        }
+//
+//                        ++detect[B];
+//
+//                        if(detect[B] == 120)
+//                        {
+//                            error_phase = B;
+//                            i_torque_control.set_brake_status(0);
+//                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+//                            {
+//                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+//                            }
+//                            else
+//                            {
+//                                torque_enable_flag   =0;
+//                                velocity_enable_flag =0;
+//                                position_enable_flag =0;
+//                                i_torque_control.set_torque_control_disabled();
+//                            }
+//                        }
+//                    }
+//                    else
+//                        detect[B] = 0;
+//
+//                    if(phase_cur[A] > scale*phase_cur[C] && phase_cur[B] > scale*phase_cur[C])
+//                    {
+//                        if(detect[C] == 100)
+//                        {
+//                            printf("%d\n", scale);
+//                            printstrln("start detecting C");
+//                        }
+//
+//                        ++detect[C];
+//
+//                        if(detect[C] == 120)
+//                        {
+//                            error_phase = C;
+//                            i_torque_control.set_brake_status(0);
+//                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+//                            {
+//                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+//                            }
+//                            else
+//                            {
+//                                torque_enable_flag   =0;
+//                                velocity_enable_flag =0;
+//                                position_enable_flag =0;
+//                                i_torque_control.set_torque_control_disabled();
+//                            }
+//                        }
+//                    }
+//                    else
+//                        detect[C] = 0;
+//                }
+//
+//                if(detect[A] > 80)
+//                {
+//                    detect[B] = 0;
+//                    detect[C] = 0;
+//                }
+//                else if(detect[B] > 80)
+//                {
+//                    detect[A] = 0;
+//                    detect[C] = 0;
+//                }
+//                else if(detect[C] > 80)
+//                {
+//                    detect[A] = 0;
+//                    detect[B] = 0;
+//                }
 
                 switch (error_phase)
                 {
