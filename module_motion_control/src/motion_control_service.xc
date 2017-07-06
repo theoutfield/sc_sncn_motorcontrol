@@ -514,6 +514,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     unsigned phase_ctr = 0;
     int scale = 0;
     float curr_threshold = (float)motorcontrol_config.rated_current /1000 / 10;
+    unsigned measurement = 0;
 
     int ftr = 0, filter_ctr = 0;
     float filter_c[NR_PHASES] = { 0 }, filter_c_old[NR_PHASES] =  { 0 }, rms[NR_PHASES] = { 0 };
@@ -958,45 +959,51 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         sum_sq[i] += phase_cur[i]*phase_cur[i];
                     }
 
-                    ftr++;
-
-                    // every 33 ms rms value is calcuated
-                    if (ftr > 1 && ftr % 100 == 0)
+                    if (upstream_control_data.velocity > 50)
                     {
-                        float mean[NR_PHASES], sd[NR_PHASES];
-                        for (int i = A; i < NR_PHASES; i++)
+                        ftr++;
+                        // every 33 ms rms value is calcuated
+                        if (ftr > 1 && ftr % 100 == 0)
                         {
-                            mean[i] = (float)sum[i] / ftr;
-                            sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
-                            rms[i] += mean[i] + sqrt(sd[i]);
-                        }
-
-                        for (int i = A; i < NR_PHASES; i++)
-                            rms[i] = rms[i] / current_ratio;
-
-
-                        if (rms[B] < curr_threshold && rms[A] > 10 * rms[B] && rms[C] > 10*rms[B])
-                        {
-                            detect[B]++;
-
-                            if(detect[B] == 5)
+                            ++measurement;
+                            float mean[NR_PHASES], sd[NR_PHASES];
+                            for (int i = A; i < NR_PHASES; i++)
                             {
-                                printstrln("start detecting B");
+                                mean[i] = (float)sum[i] / ftr;
+                                sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                                rms[i] += mean[i] + sqrt(sd[i]);
                             }
 
-                            if (detect[B] == 20)
-                                printstrln("open phase B");
-                        }
-                        else
-                            detect[B] = 0;
+                            for (int i = A; i < NR_PHASES; i++)
+                                rms[i] = rms[i] / current_ratio;
 
-                        //                    printf("%.2f %.2f %.2f\n", rms[A]/current_ratio, rms[B]/current_ratio, rms[C]/current_ratio);
-                        ftr = 0;
-                        for (int i = A; i < NR_PHASES; i++)
-                        {
-                            sum[i] = 0;
-                            sum_sq[i] = 0;
-                            rms[i] = 0;
+                            if (rms[B] < curr_threshold && rms[A] > 8 * rms[B] && rms[C] > 8 * rms[B])
+                            {
+                                detect[B]++;
+
+                                if(detect[B] == 2)
+                                {
+                                    printstrln("start detecting B");
+                                }
+
+                                if (detect[B] == 3)
+                                    printstrln("open phase B");
+                            }
+
+                            if(measurement == 20)
+                            {
+                                measurement = 0;
+                                detect[B] = 0;
+                            }
+
+//                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
+                            ftr = 0;
+                            for (int i = A; i < NR_PHASES; i++)
+                            {
+                                sum[i] = 0;
+                                sum_sq[i] = 0;
+                                rms[i] = 0;
+                            }
                         }
                     }
                 }
