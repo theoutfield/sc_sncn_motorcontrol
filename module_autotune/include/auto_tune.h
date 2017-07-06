@@ -16,8 +16,8 @@
 
 // parameters of position controller autotuner
 #define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
-#define AUTO_TUNE_COUNTER_MAX       1500  // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
-#define PER_THOUSAND_OVERSHOOT      10    // Overshoot limit while tuning (it is set as per thousand of step amplitude)
+#define AUTO_TUNE_COUNTER_MAX        2000 // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
+#define PER_THOUSAND_OVERSHOOT         10 // Overshoot limit while tuning (it is set as per thousand of step amplitude)
 
 /**
  * @brief steps of position controller autotuning procedure
@@ -37,6 +37,7 @@ typedef enum {
     AUTO_TUNE_STEP_8=18,
     AUTO_TUNE_STEP_9=19,
 
+    UNSUCCESSFUL=49,
     END=50
 } AutotuneSteps;
 
@@ -66,6 +67,29 @@ typedef struct {
     int    controller;
     double position_init;
     double position_ref;
+
+    double position_act_k;
+    double position_act_k_1;
+    double position_act_k_2;
+
+    double velocity_k;
+    double velocity_k_1;
+    double velocity_k_filtered;
+    double velocity_k_filtered_k_1;
+
+    double acceleration_k;
+    double acceleration_k_1;
+    double acceleration_k_filtered;
+    double acceleration_k_filtered_k_1;
+
+    double jerk_k;
+    double jerk_k_1;
+    double jerk_k_filtered;
+    int    jerk_k_transition;
+    int     jerk_counter_limit;
+    double jerk_filtered_energy;
+    double jerk_energy_limit;
+
     int    rising_edge;
 
     int activate;
