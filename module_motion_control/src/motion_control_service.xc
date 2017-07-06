@@ -957,24 +957,24 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         sum_sq[i] += phase_cur[i]*phase_cur[i];
                     }
 
-                    if (abs(upstream_control_data.velocity) > 50)
+                    ftr++;
+                    // every 33 ms rms value is calcuated
+                    if (ftr > 1 && ftr % 100 == 0)
                     {
-                        ftr++;
-                        // every 33 ms rms value is calcuated
-                        if (ftr > 1 && ftr % 100 == 0)
+                        ++measurement;
+                        float mean[NR_PHASES], sd[NR_PHASES];
+                        for (int i = A; i < NR_PHASES; i++)
                         {
-                            ++measurement;
-                            float mean[NR_PHASES], sd[NR_PHASES];
-                            for (int i = A; i < NR_PHASES; i++)
-                            {
-                                mean[i] = (float)sum[i] / ftr;
-                                sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
-                                rms[i] += mean[i] + sqrt(sd[i]);
-                            }
+                            mean[i] = (float)sum[i] / ftr;
+                            sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                            rms[i] += mean[i] + sqrt(sd[i]);
+                        }
 
-                            for (int i = A; i < NR_PHASES; i++)
-                                rms[i] = rms[i] / current_ratio;
+                        for (int i = A; i < NR_PHASES; i++)
+                            rms[i] = rms[i] / current_ratio;
 
+                        if (abs(upstream_control_data.velocity) > 50)
+                        {
                             if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
                             {
                                 detect[A]++;
@@ -1040,25 +1040,23 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     }
                                 }
                             }
-
-                            if(measurement == 20)
-                            {
-                                measurement = 0;
-                                for (int i = A; i < NR_PHASES; i++)
-                                    detect[i] = 0;
-                            }
-
-                            ftr = 0;
-                            for (int i = A; i < NR_PHASES; i++)
-                            {
-                                sum[i] = 0;
-                                sum_sq[i] = 0;
-                                rms[i] = 0;
-                            }
-
-
-                            //                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
                         }
+
+                        if(measurement == 20)
+                        {
+                            measurement = 0;
+                            for (int i = A; i < NR_PHASES; i++)
+                                detect[i] = 0;
+                        }
+
+                        ftr = 0;
+                        for (int i = A; i < NR_PHASES; i++)
+                        {
+                            sum[i] = 0;
+                            sum_sq[i] = 0;
+                            rms[i] = 0;
+                        }
+                        //                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
                     }
                 }
 
