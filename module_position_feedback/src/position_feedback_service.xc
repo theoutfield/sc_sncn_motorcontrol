@@ -358,7 +358,7 @@ int write_hall_state_angle_shared_memory(PositionFeedbackConfig &position_feedba
     return 0;
 }
 
-void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, port ?hall_enc_select_port_no_inv, port ?hall_enc_select_port_inv, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
+void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, HallEncSelectPort &?hall_enc_select_port_struct, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
                                PositionFeedbackConfig &position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
                                server interface PositionFeedbackInterface i_position_feedback_1[3],
@@ -375,11 +375,13 @@ void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, por
     //check all ports
     //hall_enc_select_port
     unsigned int hall_enc_select_port_inv_mask = 0;
-    if (!isnull(hall_enc_select_port_no_inv)) {
-        ports_check.hall_enc_select_port = POSITION_FEEDBACK_PORTS_1;
-    } else if (!isnull(hall_enc_select_port_inv)) {
-        ports_check.hall_enc_select_port = POSITION_FEEDBACK_PORTS_1;
-        hall_enc_select_port_inv_mask = 0b0011; //DC1K d1 has inverted logic
+    if (!isnull(hall_enc_select_port_struct)) {
+        if (!isnull(hall_enc_select_port_struct.p_hall_enc_select)) {
+            ports_check.hall_enc_select_port = POSITION_FEEDBACK_PORTS_1;
+            if (hall_enc_select_port_struct.hall_enc_select_inverted == 1) {
+                hall_enc_select_port_inv_mask = 0b0011; //DC1K d1 has inverted logic
+            }
+        }
     }
     //gpio ports
     ports_check.gpio_ports[0] = POSITION_FEEDBACK_PORTS_NULL;
@@ -413,15 +415,11 @@ void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, por
     }
 
     //move hall_enc_select_port
-    port ? * movable hall_enc_select_port_no_inv_0 = &hall_enc_select_port_no_inv;
-    port ? * movable hall_enc_select_port_inv_0 = &hall_enc_select_port_inv;
     port * movable hall_enc_select_port;
+    HallEncSelectPort * movable hall_enc_select_port_struct_p = &hall_enc_select_port_struct;
+    port ? * movable hall_enc_select_port_temp =  &(hall_enc_select_port_struct_p->p_hall_enc_select);
     if (ports_check.hall_enc_select_port == POSITION_FEEDBACK_PORTS_1) {
-        if (hall_enc_select_port_inv_mask) {
-            hall_enc_select_port = reconfigure_port(move(hall_enc_select_port_inv_0), port);
-        } else {
-            hall_enc_select_port = reconfigure_port(move(hall_enc_select_port_no_inv_0), port);
-        }
+        hall_enc_select_port = reconfigure_port(move(hall_enc_select_port_temp), port);
     }
 
     //move gpio ports

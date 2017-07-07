@@ -44,8 +44,6 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
     delay_milliseconds(500);
     PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
     printstr(">>   SOMANET REM_16MT SENSOR COMMANDS SERVICE STARTING...\n");
-    i_torque_control.set_torque_control_enabled();
-    i_torque_control.set_brake_status(1);
 
     while(1) {
         char mode = 0;
@@ -133,6 +131,11 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
         case 's':
             i_position_feedback.send_command(REM_16MT_CONF_STPRESET, value, 16);
             printf("singleturn\n");
+            break;
+        //start motorcontrol
+        case 'S':
+            i_torque_control.set_torque_control_enabled();
+            i_torque_control.set_brake_status(1);
             break;
         //calibration table size
         case 't':
@@ -267,7 +270,7 @@ int main(void)
 
                 position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
-                position_feedback_service(null, null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

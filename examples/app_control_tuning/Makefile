@@ -6,7 +6,7 @@
 # SOMANET-C22
 # SOMANET-C21-DX
 # SOMANET-C21-DX_G2
-TARGET = SOMANET-C21-DX_G2
+TARGET = 
 
 
 # The APP_NAME variable determines the name of the final .xe file. It should

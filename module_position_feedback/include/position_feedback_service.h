@@ -222,6 +222,14 @@ typedef struct {
     port * movable slave_select;
 } SPIPorts;
 
+/**
+ * @brief Structure for the hall_enc_select port used to select the mode (differential or not) of Hall/qei ports. Also used for the BiSS clock output
+ */
+typedef struct {
+    port ?p_hall_enc_select;       /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). Also used for the BiSS clock output */
+    int hall_enc_select_inverted;  /**< Select if the logic is inverted (0 normal, 1 inverted) */
+} HallEncSelectPort;
+
 #include <shared_memory.h>
 #include <biss_service.h>
 #include <rem_16mt_service.h>
@@ -253,7 +261,7 @@ typedef struct {
  * @param i_position_feedback_2 Server interface for second service
  *
  */
-void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, port ?hall_enc_select_port, port ?hall_enc_select_port_inv, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
+void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, HallEncSelectPort &?hall_enc_select_port_struct, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
                                PositionFeedbackConfig &position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
                                server interface PositionFeedbackInterface i_position_feedback_1[3],

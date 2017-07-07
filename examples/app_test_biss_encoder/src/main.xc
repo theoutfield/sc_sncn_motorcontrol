@@ -85,10 +85,9 @@ void biss_test(client interface PositionFeedbackInterface i_position_feedback, c
 }
 
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
 port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
 port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
-port ? hall_enc_select_port = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION;
-port ? hall_enc_select_port_inv = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION_INV;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
@@ -132,7 +131,7 @@ int main() {
                 position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
                 position_feedback_config.biss_config.data_port_signal_type = BISS_DATA_PORT_SIGNAL_TYPE;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_port_inv, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

@@ -39,8 +39,7 @@ void qei_test(client interface PositionFeedbackInterface i_position_feedback, cl
 
 port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
 port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
-port ? hall_enc_select_port = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION;
-port ? hall_enc_select_port_inv = SOMANET_IFM_ENCODER_PORT_INPUT_MODE_SELECTION_INV;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
 
 int main(void)
 {
@@ -75,7 +74,7 @@ int main(void)
                 position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
                 position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_port_inv, null, null, null, null, null,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }
