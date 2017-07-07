@@ -997,7 +997,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
 
                     ftr++;
-                    // every 33 ms rms value is calcuated
+                    // every 33 ms rms value is calculated
                     if (ftr > 1 && ftr % 100 == 0)
                     {
                         ++measurement;
@@ -1014,7 +1014,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             rms[i] = rms[i] / current_ratio;
 
                         // if velocity is high
-                        // if three times it's detected that there is high difference between phase cuurents, phase is opened
+                        // if three times it's detected that there is high difference between phase currents, phase is opened
                         if (abs(upstream_control_data.velocity) > 50)
                         {
                             if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
