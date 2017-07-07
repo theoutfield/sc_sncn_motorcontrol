@@ -65,18 +65,18 @@ typedef enum {
  *
  */
 typedef enum {
-    POSITION_FEEDBACK_PORTS_NULL  = 0,          /**< port is not available */
-    POSITION_FEEDBACK_PORTS_1  = 1,             /**< port is for service 1 */
-    POSITION_FEEDBACK_PORTS_2  = 2,             /**< port is for service 2 */
-    POSITION_FEEDBACK_PORTS_BISS_CLOCK_1  = 3,  /**< port is on biss clock 1 */
-    POSITION_FEEDBACK_PORTS_BISS_CLOCK_2  = 4,  /**< port is on biss clock 2 */
+    POSITION_FEEDBACK_PORTS_NULL         = 0,   /**< port is not available */
+    POSITION_FEEDBACK_PORTS_1            = 1,   /**< port is for service 1 */
+    POSITION_FEEDBACK_PORTS_2            = 2,   /**< port is for service 2 */
+    POSITION_FEEDBACK_PORTS_BISS_CLOCK_1 = 3,   /**< port is on biss clock 1 */
+    POSITION_FEEDBACK_PORTS_BISS_CLOCK_2 = 4,   /**< port is on biss clock 2 */
     POSITION_FEEDBACK_PORTS_BISS_DATA_1  = 5,   /**< port is on biss data 1 */
     POSITION_FEEDBACK_PORTS_BISS_DATA_2  = 6    /**< port is on biss data 2 */
 } PositionFeedbackPortsLocation;
 
 
 /**
- * @brief Structure to keep track of port pointers location
+ * @brief Structure to keep track of port pointers locations
  */
 typedef struct {
     PositionFeedbackPortsLocation hall_enc_select_port;  /**< hall_enc_select_port */

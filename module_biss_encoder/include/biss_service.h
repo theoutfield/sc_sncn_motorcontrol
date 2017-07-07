@@ -13,10 +13,10 @@
 /**
  * @brief Read generic BiSS sensor data
  *
- * @param qei_hall_port BiSS/SSI input port
- * @param hall_enc_select_port port used to select the mode (differential or not) of Hall/qei ports and optionally output the BiSS clock
- * @param hall_enc_select_config config to select the mode (differential or not) of Hall/qei ports
- * @param gpio_ports to optionally use gpio ports for input/output
+ * @param biss_clock_port BiSS/SSI clock port
+ * @param biss_data_port BiSS/SSI data port
+ * @param biss_clock_low value of the BiSS clock when low
+ * @param biss_clock_high value of the BiSS clock when high
  * @param t used for the timeout
  * @param position_feedback_config Configuration of the BiSS sensor (data lengths, crc polynomial, etc)
  * @param[out] data Array to store the read bits, should be large enough to store all the data bits + crc bits

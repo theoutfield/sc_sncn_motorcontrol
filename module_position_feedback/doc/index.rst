@@ -215,8 +215,8 @@ Types
 .. doxygenstruct:: PositionFeedbackPortsCheck
 .. doxygenstruct:: PositionFeedbackConfig
 
-
 .. doxygenstruct:: SPIPorts
+.. doxygenstruct:: HallEncSelectPort
 
 Service
 --------

@@ -14,11 +14,12 @@
 /**
  * @brief Service to read and process data from an Position Sensor with a serial interface (SPI or BiSS).
  *
- * @param qei_hall_port BiSS/SSI input port
- * @param hall_enc_select_port port used to select the mode (differential or not) of Hall/QEI/BiSS ports
+ * @param biss_clock_port BiSS/SSI clock port
+ * @param biss_data_port BiSS/SSI data port
  * @param spi_ports SPI ports and clock blocks
  * @param gpio_ports GPIO ports array
- * @param hall_enc_select_config config to select the mode (differential or not) of Hall/QEI/BiSS ports
+ * @param biss_clock_low value of the BiSS clock when low
+ * @param biss_clock_high value of the BiSS clock when high
  * @param position_feedback_config Configuration for the service.
  * @param i_shared_memory Client interface to write the position data to the shared memory.
  * @param i_position_feedback Server interface used by clients for configuration and direct position read.
