@@ -21,20 +21,22 @@ typedef struct {
     double constant_gain;
     double k_m;          // actuator torque gain
 
-    double feedback_p_loop;
+    double gained_feedback;
+    double gained_feedback_k_1;
+    double inertia_damping;
     double feedback_d_loop;
 
-    double y_k;
-    double abs_y_k;
-    double y_k_sign;
-    double y_k_1;
-    double delta_y_k;
+    double w_k;
+    double abs_w_k;
+    double w_k_sign;
+    double w_k_1;
+    double delta_w_k;
 
-    double state_1;
-    double state_2;
-    double state_3;
-    double state_min;
-    double state_index;
+    double max_state_1;
+    double max_state_2;
+    double max_state_3;
+    double max_state_min;
+    double max_state_index;
 
     double dynamic_max_speed; //the maximum speed which the system should have (in order to stop at target with no overshoot)
 
