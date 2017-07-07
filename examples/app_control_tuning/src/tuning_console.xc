@@ -336,7 +336,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                     }
                     else
                     {
-                        printf("SENSOR NOT WORKING PROPERLY, OFFSET DETECTION NOT POSSIBLE ...\n");
+                        printf("OFFSET DETECTION NOT POSSIBLE ...\n");
                     }
 
                     break;
