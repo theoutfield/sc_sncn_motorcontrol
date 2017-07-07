@@ -44,6 +44,9 @@ typedef enum
     PORTS_ERR = 4
 } sensor_fault;
 
+/*
+ * checking the position, velocity and angle reading from the sensor, when user triggers 'gse' command in tuning console or prior to commutation offset detection
+ */
 sensor_fault sensor_functionality_evaluation(client interface TorqueControlInterface i_torque_control, MotorcontrolConfig motorcontrol_config, int app_tile_usec)
 {
     UpstreamControlData upstream_control_data;
@@ -59,6 +62,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
     timer t;
     unsigned ts;
 
+    // starts rotating the motor
     i_torque_control.enable_index_detection();
 
     while(counter < 15000)
@@ -68,12 +72,15 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
         angle = upstream_control_data.angle;
         hall_state = upstream_control_data.hall_state;
 
+        // remembering the first element
         if (counter == 0)
         {
             if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
                 hall_state_old = hall_state;
         }
 
+        // checking if hall ports are toggling
+        // if they are not, hall_state variables will be zero and will signal an error
         if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
         {
             if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
@@ -86,6 +93,8 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             hall_state_old = hall_state;
         }
 
+        // finding the max angle which should be 4095 (12 bits resolution)
+        // calculating the expected mean angle, point between mean and max, point between mean and 0
         if (angle > 4000 && !max_angle_found)
         {
             max_angle_found = 1;
@@ -95,6 +104,8 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             fq_angle = mean_angle / 2;
         }
 
+        // calculating the real mean angle, point between mean and max, point between mean and 0
+        // given threshold is 50
         if (max_angle_found)
         {
             if (angle > mean_angle - 50 && angle < mean_angle + 50)
@@ -105,6 +116,9 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
                 real_fq_angle = angle;
         }
 
+
+        // finding the max pos which should be 65535 (16 bits resolution)
+        // calculating the expected mean position, point between mean and max, point between mean and 0
         if (!max_pos_found && position > 60000)
         {
             max_pos_found = 1;
@@ -114,6 +128,8 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             fq_pos = mean_pos / 2;
         }
 
+        // calculating the real mean position, point between mean and max, point between mean and 0
+        // given threshold is 5000
         if (max_pos_found)
         {
             if (position > mean_pos -5000 && position < mean_pos + 5000)
@@ -134,6 +150,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             t when timerafter (ts + 500*app_tile_usec) :> void;
     }
 
+    // evaluating velocity readings by comparing velocity data from the sensor and computed velocity from position data from the sensor
     while (counter > 5000)
     {
         upstream_control_data = i_torque_control.update_upstream_control_data();
@@ -143,6 +160,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
         if (counter == 15000)
             old_position = position;
 
+        // calculating velocity from position readings as simple derivative
         if (position != old_position)
         {
             if(position - old_position > -60000 && position - old_position < 60000)
@@ -153,6 +171,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             }
         }
 
+        // mean average filter of velocity data from the sensor
         velocity_arr[index_v] = velocity;
         index_v++;
         if (index_v == 500)
@@ -165,6 +184,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             filter_vel = abs(filter_vel);
         }
 
+        // mean average filter of computed velocity from the sensor
         if (index_d == 500)
         {
             index_d = 0;
@@ -180,12 +200,14 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
         t when timerafter (ts + 1000*app_tile_usec) :> void;
     }
 
+    // comparison of position data
     if ((mean_pos-real_mean_pos < -5000 || mean_pos-real_mean_pos > 5000)
             || (tq_pos - real_tq_pos < -5000 || tq_pos - real_tq_pos > 5000)
             || (fq_pos - real_fq_pos < -5000 || fq_pos - real_fq_pos > 5000)
             || max_pos < 60000)
         error_sens = POS_ERR;
 
+    // comparison of velocity data for low and high velocities
     if (filter_vel < 60 && filter_vel > -60)
     {
         if (filter_vel - filter_diff < -30 || filter_vel - filter_diff > 30)
@@ -197,6 +219,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
                     error_sens = SPEED_ERR;
     }
 
+    // comparison of angle data
     if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
             || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
             || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
@@ -216,12 +239,16 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
     return error_sens;
 }
 
+/*
+ * detection of open phase prior to starting the motorcontrol
+ * voltage difference between terminal a and terminals b,c (on the same potential) should establish electric circuit consisting of phase a in series with a branch consisting of parallel branches b and c
+ */
 int open_phase_detection_offline(client interface TorqueControlInterface i_torque_control,
         MotorcontrolConfig motorcontrol_config, int app_tile_usec, int current_ratio, float * ret)
 {
     UpstreamControlData upstream_control_data;
     float I[NR_PHASES] = { 0 };
-    int refer[NR_PHASES] = {0, 20, 20, 20};// make b and c terminal voltage as close as voltage on terminal a at the startup
+    int refer[NR_PHASES] = {0, 20, 20, 20};
     unsigned counter = 1;
     float voltage = 0;
     float rated_curr = (float)motorcontrol_config.rated_current/1000;
@@ -234,6 +261,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     i_torque_control.start_system_eval();
     i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
 
+    // algorithm is applied until all currents become high enough, i.e. have enough information to make a conclusion that phases are not open
     while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
     {
         upstream_control_data = i_torque_control.update_upstream_control_data();
@@ -246,6 +274,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
             if (I[i] < 0)
                 I[i] = -I[i];
 
+        // change terminal b and c voltages
         if (counter % 100 == 0)
         {
             refer[B] += 1;
@@ -253,6 +282,10 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
             i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
         }
 
+        // break the algortihm if voltage on terminals goes over the max limit or currents went over 80 % raed current
+        // at this moment we can conclude if the phase is opened
+        // at such a high voltage at the terminals, if the current is below 10 % of rated current it can be said that the phase is opened
+        // if non of the conditions here are met, it can be said that phases are not opened
         if (refer[B] > 90 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
         {
             if (I[A] < rated_curr/10)
@@ -272,6 +305,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
 
 //    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
 
+    // calculation of phase resistance
     voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
     if (error_phase == 0)
         *ret = voltage / I[B];
