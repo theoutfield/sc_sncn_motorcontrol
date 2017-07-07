@@ -967,6 +967,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
+                /*
+                 * open phase online detection
+                 */
                 if(error_phase == NO_ERROR)
                 {
                     for (int i = A; i < NR_PHASES; i++)
@@ -984,9 +987,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             break;
                         }
 
+                        // observing abs value
                         if (phase_cur[i] < 0)
                             phase_cur[i] = -phase_cur[i];
 
+                        // calculating sum and sum of squares for currents
                         sum[i] += phase_cur[i];
                         sum_sq[i] += phase_cur[i]*phase_cur[i];
                     }
@@ -997,6 +1002,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         ++measurement;
                         float mean[NR_PHASES], sd[NR_PHASES];
+                        // calculating mean, standard deviation and rms value
                         for (int i = A; i < NR_PHASES; i++)
                         {
                             mean[i] = (float)sum[i] / ftr;
@@ -1007,6 +1013,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         for (int i = A; i < NR_PHASES; i++)
                             rms[i] = rms[i] / current_ratio;
 
+                        // if velocity is high
+                        // if three times it's detected that there is high difference between phase cuurents, phase is opened
                         if (abs(upstream_control_data.velocity) > 50)
                         {
                             if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
@@ -1150,6 +1158,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             }
                         }
 
+                        // every 20 measurements reset detection flag
                         if(measurement == 20)
                         {
                             measurement = 0;
