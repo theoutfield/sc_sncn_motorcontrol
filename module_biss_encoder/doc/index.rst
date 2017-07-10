@@ -44,9 +44,9 @@ How to use
 
 3. Instantiate the ports for the BiSS.
 
-     BiSS needs a clock output port, a data input port and a clock block. The ports structures are defined in ``position_feedback_service.h``.
-     The clock block is taken for the SPI ports sturcture. Depending on the BiSS configuration the output clock port is taken from ``hall_enc_select_port`` or from a GPIO port and the data input port is taken from ``qei_hall_port`` ``1`` or ``2`` or a GPIO port.
-     The functions take pointers for parameters, so you need to pass the addresses of the port structures. If ``qei_hall_ports`` are used the ``hall_enc_select_config`` parameter also needs to be set to configure the ports in differential mode.
+     BiSS needs a clock output port, a data input port and a clock block. The read function takes pointers for parameters, so you need to pass the addresses of the ports.
+     The ``biss_clock_low`` and ``biss_clock_high`` parameters need to be set. When the clock port is a 1-bit port they should be ``0`` and ``1``. 
+     When the clock port is more than 1 bit and the other bits are used for external config ``biss_clock_low`` and ``biss_clock_high`` should be set accordingly.
 
 4. Fill up the BiSS configuration structure. BiSS and SSI use the same parameters. The protocol type is selected with the ``position_feedback_config.sensor_type`` parameters. Usually SSI encoders don't support CRC or multiturn, they can be disabled by setting them to `0`.
 
@@ -61,11 +61,8 @@ How to use
         #include <biss_service.h>
         
         // 3.Instantiate the ports for the BiSS.
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
-        port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
+        port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
+        port ? gpio_port_3 = SOMANET_IFM_GPIO_D3; // 1-bit port
 
         int main(void)
         {
@@ -91,8 +88,10 @@ How to use
                     // 5. Use the functions to read BiSS data and process it into position data.
                     // read BiSS data
                     int data[BISS_FRAME_BYTES]; // array of 32 bit bytes to store the data. The size needs to be enough to store all the data bits. 
-                    int hall_enc_select_config = 0b0011; //to configure qei_hall_ports in differential mode
-                    int error = read_biss_sensor_data(&qei_hall_port_1, &hall_enc_select_port, hall_enc_select_config, &gpio_ports, t, position_feedback_config, data);
+                    timer t;
+                    int biss_clock_low = 0;
+                    int biss_clock_high = 1;
+                    int error = read_biss_sensor_data(&gpio_port_3, &qei_hall_port_2, biss_clock_low, biss_clock_high, t, position_feedback_config, data);
                     // process data
                     int count, position, status;
                     { count, position, status } = biss_encoder(data, position_feedback_config);

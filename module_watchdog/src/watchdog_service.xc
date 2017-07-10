@@ -31,7 +31,9 @@
     unsigned char p_ifm_wdtick = 0b0000;
     //CPLD
     unsigned cpld_out_state = 0x8;//set green LED off
+    WatchdogError cpld_fault_monitor = WATCHDOG_NO_ERROR;
     unsigned int cycles_counter = 0;
+    unsigned int cycles_reset = 40; //20 periods
 
     int WD_En_sent_flag =0;
     unsigned int wd_enabled = 0;
@@ -57,6 +59,11 @@
     }
     else if(!isnull(watchdog_ports.p_cpld_shared)){//DC500
         IFM_module_type = DC500;
+        if (!isnull(watchdog_ports.p_cpld_fault_monitor)) {
+            IFM_module_type = DC1KD1;
+            wd_half_period = 80 * usec;
+            cycles_reset = 25; //12.5 periods
+        }
     }
 
     /* WD Initialization routine */
@@ -70,10 +77,11 @@
             wd_enabled = 1;
             break;
         case DC500:
-            cpld_out_state &= 0b0111;//turn green LED on
+        case DC1KD1:
+            cpld_out_state &= 0b0111;//turn green LED on, on DC1K rev d1 turn orange LED off
             cpld_out_state |= 0b0101;//enable CPLD, reset errors
             watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-            cycles_counter = 40;
+            cycles_counter = cycles_reset;
             wd_enabled = 1;
             break;
         case DC1K_DC5K://FixMe: optimize it further
@@ -92,19 +100,8 @@
     // Loop forever processing commands
     while (1) {
         select {
-        case i_watchdog[int i].status() -> {int status}:
-                status = ACTIVE;
-                break;
-
-                //FixMe: this call is absolete, should be removed
-        case i_watchdog[int i].start(): // produce a rising edge on the WD_EN
-                wd_enabled = 1;
-                break;
-
-                //FixMe: this call is absolete, should be removed
-        case i_watchdog[int i].stop():
-                // Disable the kicking
-                wd_enabled = 0;
+        case i_watchdog[int i].read_fault_monitor() -> WatchdogError out_cpld_fault_monitor:
+                out_cpld_fault_monitor = cpld_fault_monitor;
                 break;
 
         case i_watchdog[int i].protect(int fault_id):
@@ -113,19 +110,25 @@
                         //Disable WD and set red LED on
                         led_motor_on_wdtick_wden_buffer &= 0b1100;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        wd_enabled = 0;
                         break;
                     case DC500:
-                        cpld_out_state |= 0b1000;//set green LED off
+                        cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
+                        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+                        wd_enabled = 0;
+                        break;
+                    case DC1KD1:
+                        cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
                         break;
                     case DC1K_DC5K://[ LED | Motor_En | WD_Tick | WD_En ]
                         led_motor_on_wdtick_wden_buffer &= 0b1000;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        wd_enabled = 0;
                         break;
                 }
 
                 fault=fault_id;
-                wd_enabled = 0;
                 break;
 
         case t when timerafter(ts + wd_half_period) :> void://clocking
@@ -147,6 +150,7 @@
                             }
                             break;
                         case DC500:
+                        case DC1KD1:
                             cpld_out_state ^= (1 << 1); //toggle wd tick
                             watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
 
@@ -175,8 +179,22 @@
                     }
                 }
 
+                //read cpld fault monitor on DC1KD1
+                if (IFM_module_type == DC1KD1) {
+                    unsigned int tmp = 0;
+                    watchdog_ports.p_cpld_fault_monitor :> tmp;
+                    tmp = tmp >> 4; //the first four bits are used for pwm
+                    if (tmp == 0b1000) { //green led on = no error
+                        cpld_fault_monitor = WATCHDOG_NO_ERROR;
+                    } else if (tmp == 0 || (tmp&0b1000)) { //every led is off or green led is on with red led = unknown error
+                        cpld_fault_monitor = WATCHDOG_UNKNOWN_ERROR;
+                    } else { //the rest of the error maps to the enum
+                        cpld_fault_monitor = tmp;
+                    }
+                }
+
                 //showing the fault type by LED flashing (once, twice, ..., five times)
-                if(fault!=NO_FAULT) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, times, LED_counter);
+                if(fault!=NO_FAULT) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, cpld_out_state, times, LED_counter);
 
                 LED_counter++;
 
@@ -198,10 +216,11 @@
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                         break;
                     case DC500:
-                        cpld_out_state &= 0b0111;//turn green LED on
+                    case DC1KD1:
+                        cpld_out_state &= 0b0111;//turn green LED on, on DC1K rev d1 turn orange LED off
                         cpld_out_state |= 0b0101;//enable CPLD, reset errors
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-                        cycles_counter = 40;
+                        cycles_counter = cycles_reset;
                         break;
                     case DC1K_DC5K://FixMe: optimize the code. Why do we write 3 times?
                         //Reset all pins to zero, do not touch WD tick
@@ -212,15 +231,17 @@
                 }
 
                 wd_enabled = 1;
-                t :> ts;
-                t when timerafter (ts + 100*usec  ) :> void;//100 us
-                t :> ts;
+                if (IFM_module_type != DC1KD1) {
+                    t :> ts;
+                    t when timerafter (ts + 100*usec  ) :> void;//100 us
+                    t :> ts;
+                }
                 break;
         }
     }
 }
 
-void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned int &times, unsigned int &delay_counter){
+void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned &output_cpld, unsigned int &times, unsigned int &delay_counter){
     if ((delay_counter % period == 0) && times != (fault*2)){//blinking
         switch(IFM_module_type){
             case DC100_DC300://ToDo: to be tested
@@ -229,8 +250,9 @@ void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_mod
                 watchdog_ports.p_shared_enable_tick_led <: output;
                 break;
             case DC500://ToDo: to be tested
-                output ^= (1 << 3);
-                watchdog_ports.p_cpld_shared <: output;
+            case DC1KD1:
+                output_cpld ^= (1 << 3);
+                watchdog_ports.p_cpld_shared <: output_cpld;
                 break;
             case DC1K_DC5K:
                 output ^= (1 << 3);

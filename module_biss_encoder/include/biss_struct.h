@@ -11,8 +11,6 @@
 #define SET_PORT1_AS_HALL_PORT2_AS_QEI 0b0010
 #define SET_PORT1_AS_QEI_PORT2_AS_HALL 0b0001
 
-#define BISS_CDS_BIT        1    /**< CDS bit length */
-
 
 /**
  * @brief Type for the BiSS clock port config

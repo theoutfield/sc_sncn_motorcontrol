@@ -197,8 +197,9 @@ void adc_ad7265(
     int data_updated=0;
 
     int j=0;
-    unsigned short channel_config[5] = {AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3, AD7265_SGL_A4_B4, AD7265_SGL_A5_B5};
-    int OUT_A[5], OUT_B[5];
+    unsigned short channel_config[8] = {AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3, AD7265_SGL_A4_B4, AD7265_SGL_A5_B5, AD7265_SGL_A6_B6,
+                                        AD7265_DIFF_A3A4_B3B4, AD7265_DIFF_A5A6_B5B6};
+    int OUT_A[20];
 
     //proper task startup
     t :> time;
@@ -206,11 +207,6 @@ void adc_ad7265(
 
     configure_adc_ports_7265(adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
-    if(operational_mode)
-    {
-        channel_config[AD_7265_AI_SIGNAL_1_3] = AD7265_DIFF_A3A4_B3B4;
-        channel_config[AD_7265_AI_SIGNAL_2_4] = AD7265_DIFF_A3A4_B3B4;
-    }
 
     while(1)
     {
@@ -265,8 +261,11 @@ void adc_ad7265(
             tmp_val = (short)(tmp_val & ADC_MASK);      // Mask out active bits and convert to signed word
             out_b = (int)tmp_val;
 
+
             phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
             phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
+            if(current_sensor_config.sign_phase_a != 0)//if phase a is measured instead of phase C
+                phaseC_out = current_sensor_config.sign_phase_a * (phaseB_out+phaseC_out);
 
             if((5000<protection_counter) && (fault_code==NO_FAULT))
             {
@@ -282,31 +281,40 @@ void adc_ad7265(
                     fault_code=DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1;
                 }
 
-                if (OUT_A[AD_7265_VDC_IDC]<v_dc_min)
+                if (OUT_A[adc_ports.ad7265_channel_index.voltage_dc]<v_dc_min)
                 {
                     i_watchdog.protect(WD_UNDER_VOLTAGE);
                     fault_code=UNDER_VOLTAGE_NO_1;
                 }
 
-                if (v_dc_max<OUT_A[AD_7265_VDC_IDC])
+                if (v_dc_max<OUT_A[adc_ports.ad7265_channel_index.voltage_dc])
                 {
                     i_watchdog.protect(WD_OVER_VOLTAGE);
                     fault_code=OVER_VOLTAGE_NO_1;
                 }
 
-                if (t_max<OUT_A[AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B])
+                if (t_max<OUT_A[adc_ports.ad7265_channel_index.temperature])
                 {
                     i_watchdog.protect(WD_OVER_TEMPERATURE);
                     fault_code=EXCESS_TEMPERATURE_DRIVE;
                 }
             }
 
-            V_dc_out           = OUT_A[AD_7265_VDC_IDC];
-            Temperature_out    = OUT_A[AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B];
-            analogue_input_a_1 = OUT_A[AD_7265_AI_SIGNAL_1_3];
-            analogue_input_b_1 = OUT_B[AD_7265_AI_SIGNAL_1_3];
-            analogue_input_a_2 = OUT_A[AD_7265_AI_SIGNAL_2_4];
-            analogue_input_b_2 = OUT_B[AD_7265_AI_SIGNAL_2_4];
+            V_dc_out           = OUT_A[adc_ports.ad7265_channel_index.voltage_dc];
+            Temperature_out    = OUT_A[adc_ports.ad7265_channel_index.temperature];
+            if(operational_mode==0)
+            {
+                analogue_input_a_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_1];
+                analogue_input_a_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_2];
+                analogue_input_b_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_3];
+                analogue_input_b_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_4];
+            }
+            else
+            {
+                analogue_input_a_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_differential_mode_1];
+                analogue_input_a_2 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_differential_mode_2];
+            }
+
             fault_code_out     = fault_code;
             data_updated=1;
             break;
@@ -326,7 +334,7 @@ void adc_ad7265(
         {
             if(protection_counter<10000) protection_counter++;
 
-            for(j=AD_7265_BOARD_TEMP_PHASE_VOLTAGE_B;AD_7265_CURRENT_B_C<=j;j--)
+            for(j=7;0<=j;j--)
             {
                 adc_ports.p4_mux <: channel_config[j];
                 t :> time;
@@ -354,7 +362,7 @@ void adc_ad7265(
                 tmp_val = bitrev( inp_val );            // Reverse bit order. WARNING. Machine dependent
                 tmp_val = tmp_val >> (SHIFTING_BITS+1);
                 tmp_val = (short)(tmp_val & ADC_MASK);  // Mask out active bits and convert to signed word
-                OUT_B[j] = (int)tmp_val;
+                OUT_A[(j+10)] = (int)tmp_val;
             }
 
             data_updated=0;

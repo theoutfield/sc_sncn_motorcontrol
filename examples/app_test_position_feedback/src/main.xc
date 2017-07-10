@@ -194,10 +194,10 @@ void position_feedback_commands(client interface PositionFeedbackInterface i_pos
     }
 }
 
-QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
+port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
@@ -278,9 +278,9 @@ int main(void)
                 position_feedback_config_1.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 //set sensor 1 parameters
-                position_feedback_config_2.sensor_type = QEI_SENSOR;
-                position_feedback_config_2.resolution  = QEI_SENSOR_RESOLUTION;
-                position_feedback_config_2.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config_2.sensor_type = BISS_SENSOR;
+                position_feedback_config_2.resolution  = BISS_SENSOR_RESOLUTION;
+                position_feedback_config_2.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,

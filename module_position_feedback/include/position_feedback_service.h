@@ -60,6 +60,31 @@ typedef enum {
 } SensorPolarity;
 
 
+/**
+ * @brief Type for port pointer location
+ *
+ */
+typedef enum {
+    POSITION_FEEDBACK_PORTS_NULL         = 0,   /**< port is not available */
+    POSITION_FEEDBACK_PORTS_1            = 1,   /**< port is for service 1 */
+    POSITION_FEEDBACK_PORTS_2            = 2,   /**< port is for service 2 */
+    POSITION_FEEDBACK_PORTS_BISS_CLOCK_1 = 3,   /**< port is on biss clock 1 */
+    POSITION_FEEDBACK_PORTS_BISS_CLOCK_2 = 4,   /**< port is on biss clock 2 */
+    POSITION_FEEDBACK_PORTS_BISS_DATA_1  = 5,   /**< port is on biss data 1 */
+    POSITION_FEEDBACK_PORTS_BISS_DATA_2  = 6    /**< port is on biss data 2 */
+} PositionFeedbackPortsLocation;
+
+
+/**
+ * @brief Structure to keep track of port pointers locations
+ */
+typedef struct {
+    PositionFeedbackPortsLocation hall_enc_select_port;  /**< hall_enc_select_port */
+    PositionFeedbackPortsLocation gpio_ports[4];         /**< gpio_ports */
+    PositionFeedbackPortsLocation qei_hall_port_1;       /**< qei_hall_port_1 */
+    PositionFeedbackPortsLocation qei_hall_port_2;       /**< qei_hall_port_2 */
+    PositionFeedbackPortsLocation spi_ports;             /**< spi_ports */
+} PositionFeedbackPortsCheck;
 
 /**
  * @brief Configuration structure of the position feedback service.
@@ -198,17 +223,11 @@ typedef struct {
 } SPIPorts;
 
 /**
- * @brief Structure for Hall/QEI input ports (can also be used for BiSS)
- */
-typedef struct {
-    in port p_qei_hall; /**< 4-bit Port for Encoder, BiSS or Hall signals input. */
-} QEIHallPort;
-
-/**
  * @brief Structure for the hall_enc_select port used to select the mode (differential or not) of Hall/qei ports. Also used for the BiSS clock output
  */
 typedef struct {
-    out port ?p_hall_enc_select; /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). Also used for the BiSS clock output */
+    port ?p_hall_enc_select;       /**< [Nullable] Port to control the signal input circuitry (if applicable in your SOMANET device). Also used for the BiSS clock output */
+    int hall_enc_select_inverted;  /**< Select if the logic is inverted (0 normal, 1 inverted) */
 } HallEncSelectPort;
 
 #include <shared_memory.h>
@@ -242,7 +261,7 @@ typedef struct {
  * @param i_position_feedback_2 Server interface for second service
  *
  */
-void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_hall_port_2, HallEncSelectPort &?hall_enc_select_port, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
+void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, HallEncSelectPort &?hall_enc_select_port_struct, SPIPorts &?spi_ports, port ?gpio_port_0, port ?gpio_port_1, port ?gpio_port_2, port ?gpio_port_3,
                                PositionFeedbackConfig &position_feedback_config_1,
                                client interface shared_memory_interface ?i_shared_memory_1,
                                server interface PositionFeedbackInterface i_position_feedback_1[3],

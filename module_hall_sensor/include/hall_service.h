@@ -21,7 +21,7 @@
  * @param i_position_feedback Server interface used by clients for configuration and direct position read.
  * @param gpio_on Set to 1 to enable GPIO read/write.
  */
-void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
+void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
                   client interface shared_memory_interface ?i_shared_memory,
                   server interface PositionFeedbackInterface i_position_feedback[3],
                   int gpio_on);

@@ -865,7 +865,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'f':
             UpstreamControlData upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
 
-            if (upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR)
+            if (upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR && upstream_control_data.watchdog_error == WATCHDOG_NO_ERROR)
             {
                 printf("No fault\n");
             }
@@ -875,10 +875,68 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 i_motion_control.disable();
                 brake_flag = 0;
 
-                if(upstream_control_data.error_status != NO_FAULT)
-                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
-                else if (upstream_control_data.sensor_error != SENSOR_NO_ERROR)
-                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.sensor_error);
+                //Software protection errors
+                switch(upstream_control_data.error_status) {
+                case DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1:
+                    printf("Software protection: Over current\n");
+                    break;
+                case PHASE_FAILURE_L1:
+                    printf("Software protection: PHASE_FAILURE_L1\n");
+                    break;
+                case PHASE_FAILURE_L2:
+                    printf("Software protection: PHASE_FAILURE_L2\n");
+                    break;
+                case PHASE_FAILURE_L3:
+                    printf("Software protection: PHASE_FAILURE_L3\n");
+                    break;
+                case OVER_VOLTAGE_NO_1:
+                    printf("Software protection: Over voltage\n");
+                    break;
+                case UNDER_VOLTAGE_NO_1:
+                    printf("Software protection: Under voltage\n");
+                    break;
+                case EXCESS_TEMPERATURE_DRIVE:
+                    printf("Software protection: Over temperature\n");
+                    break;
+                case NO_FAULT:
+                    break;
+                default:
+                    printf("Software protection: %d\n", upstream_control_data.error_status);
+                    break;
+                }
+
+                //watchdog errors
+                switch(upstream_control_data.watchdog_error) {
+                case WATCHDOG_NO_ERROR:
+                    break;
+                case WATCHDOG_TICKS_ERROR:
+                    printf("Watchdog: Ticks error\n");
+                    break;
+                case WATCHDOG_OVER_UNDER_VOLTAGE_OVER_TEMP_ERROR:
+                    printf("Watchdog: Over/Under voltage or Over temperature\n");
+                    break;
+                case WATCHDOG_OVER_CURRENT_ERROR:
+                    printf("Watchdog: Over current\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_A_ERROR:
+                    printf("Watchdog: Dead time phase A\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_B_ERROR:
+                    printf("Watchdog: Dead time phase B\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_C_ERROR:
+                    printf("Watchdog: Dead time phase C\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_D_ERROR:
+                    printf("Watchdog: Dead time phase D\n");
+                    break;
+                default:
+                    printf("Watchdog: Unknown error %d\n", upstream_control_data.watchdog_error);
+                    break;
+                }
+
+                if (upstream_control_data.sensor_error != SENSOR_NO_ERROR)
+                    printf(">>  Sensor Error ID %i DETECTED ...\n", upstream_control_data.sensor_error);
 
                 //reset fault
                 printf("Reset fault...\n");
@@ -887,11 +945,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 //check if reset worked
                 delay_ticks(500*1000*tile_usec);
                 upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
-                if(upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR)
+                if(upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR && upstream_control_data.watchdog_error == WATCHDOG_NO_ERROR)
                 {
                     printf(">>  FAULT REMOVED\n");
                 } else {
-                    printf(">>  FAULT ID %i NOT REMOVED!\n");
+                    printf(">>  FAULT ** NOT ** REMOVED!\n");
                 }
             }
             break;
