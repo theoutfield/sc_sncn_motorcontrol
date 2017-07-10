@@ -129,6 +129,7 @@ typedef struct
  */
 typedef struct
 {
+    int sign_phase_a;                   /**< Direction in which current on A Phase is measured [-1,1]. If 0, then phase A is not measured. */
     int sign_phase_b;                   /**< Direction in which current on B Phase is measured [-1,1]. */
     int sign_phase_c;                   /**< Direction in which current on C Phase is measured [-1,1]. */
     unsigned current_sensor_amplitude;  /**< Max amplitude of current the sensors that your DC board can handle. */
