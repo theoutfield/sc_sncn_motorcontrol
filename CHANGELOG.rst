@@ -9,7 +9,12 @@ sc_sncn_motorcontrol Change Log
 
     This is probably caused by differences in traces length between the GPIO ports used for SPI. A workaround is to flip the Clock (GPIO 1) and the MISO (GPIO 2) pins. For this you need to modify or make a new cable with the two wires flipped
     and also flip the definitions of GPIO ports 1 and 2 in the IFM module's bsp file.
-      
+
+
+3.0.3
+-----
+
+  * Fix value of Encoder Number of Channels to 2 for AB and 3 for ABI.
 
 
 3.0.2
@@ -18,10 +23,10 @@ sc_sncn_motorcontrol Change Log
   * Rename MOTOR_PHASES_CONFIGURATION in user_config.h and main.xc files.
   * Fix position control strategy values: POS_PID_CONTROLLER = 1, POS_PID_VELOCITY_CASCADED_CONTROLLER = 2, NL_POSITION_CONTROLLER = 3, VELOCITY_PID_CONTROLLER = 4
   * Fix bug in gpio service:
-   * only use gpio on the first position_feedback_service
-   * fix gpio ports config inside position_feedback_service
-   * disable gpio port when used by BiSS
-   * disable gpio service in motorcontrol demo apps
+  * only use gpio on the first position_feedback_service
+  * fix gpio ports config inside position_feedback_service
+  * disable gpio port when used by BiSS
+  * disable gpio service in motorcontrol demo apps
   * Fix BiSS multiturn with inverted sensor polarity
   * Fix sensor polarity in sensor test apps
 
