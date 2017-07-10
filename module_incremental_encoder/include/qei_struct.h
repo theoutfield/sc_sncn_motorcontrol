@@ -34,10 +34,13 @@
 
 /**
  * @brief Type for the sort of Encoder index.
+ *
+ * 2 is for two signals A and B
+ * 3 is for three signals A, B and I for index
  */
 typedef enum {
-    QEI_WITH_NO_INDEX,  /**< Encoder with no index signal. */
-    QEI_WITH_INDEX      /**< Encoder with index signal.  */
+    QEI_WITH_NO_INDEX = 2,  /**< Encoder with no index signal. */
+    QEI_WITH_INDEX    = 3   /**< Encoder with index signal. */
 } QEI_IndexType;
 
 
