@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+#include <motor_config_AMK_DT4.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -40,7 +40,7 @@
 #define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [0 - normal, 1 - inverted]
-#define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
+#define SENSOR_1_POLARITY                 SENSOR_POLARITY_INVERTED
 
 
 ///////////////////////
@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 80
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    0
+#define COMMUTATION_ANGLE_OFFSET    3200
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
