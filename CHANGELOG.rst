@@ -5,6 +5,7 @@ sc_sncn_motorcontrol Change Log
 -----
 
   * Fix value of Encoder Number of Channels to 2 for AB and 3 for ABI.
+  * Fix Hall service position initialization.
 
 
 3.0.2
