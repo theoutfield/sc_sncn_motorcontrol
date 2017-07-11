@@ -91,7 +91,6 @@ void adc_ad7265_service_demo(
 
     unsigned inp_val = 0, tmp_val = 0;
 
-    int out_a=0, out_b=0;
     //proper task startup
     t :> time;
     t when timerafter (time + (3000*20*250)) :> void;
@@ -182,15 +181,13 @@ void adc_ad7265(
 
     int v_dc_max=100 ;
     int v_dc_min=0   ;
-    int i_max   =100 ;
-    int current_limit = 2000;// i_max * 20
+    int current_limit = 2000;// (i_max=100) * 20
     int t_max         = 2000;
     int protection_counter=0;
 
     int fault_code=NO_FAULT;
 
     unsigned inp_val = 0, tmp_val = 0;
-    int i=0;
 
     int out_a=0, out_b=0;
 
