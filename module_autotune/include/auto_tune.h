@@ -124,6 +124,7 @@ typedef struct {
     double err_energy_ss_int;
     double err_energy_ss_int_min;
     double err_energy_ss_limit_soft;
+    double err_energy_ss_limit_hard;
     double overshoot;
     double overshoot_max;
 
