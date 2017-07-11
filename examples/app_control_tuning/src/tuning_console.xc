@@ -196,12 +196,10 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                      motion_ctrl_config.velocity_kp = 0;
                                      motion_ctrl_config.velocity_ki = 0;
                                      motion_ctrl_config.velocity_kd = 0;
-                                     motion_ctrl_config.velocity_integral_limit = 10000000;
 
                                      motion_ctrl_config.position_kp = 0;
                                      motion_ctrl_config.position_ki = 0;
                                      motion_ctrl_config.position_kd = 0;
-                                     motion_ctrl_config.position_integral_limit = 10000000;
                                      motion_ctrl_config.moment_of_inertia       = 0;
 
                                      i_motion_control.set_motion_control_config(motion_ctrl_config);
@@ -211,7 +209,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                              motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
                                              motion_ctrl_config.position_integral_limit);
                                      printf("Kvp:%d Kvi:%d Kvd:%d kvl:%d\n",  motion_ctrl_config.velocity_kp,
-                                             motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd);
+                                             motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd,
+                                             motion_ctrl_config.velocity_integral_limit);
 
                                      i_motion_control.enable_position_ctrl(POS_PID_VELOCITY_CASCADED_CONTROLLER);
                                      printf("cascaded-pid ctrl enabled\n");
