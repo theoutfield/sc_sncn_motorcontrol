@@ -10,9 +10,6 @@
 #define HALL_ERROR                   0
 #define HALL_SUCCESS                 1
 
-#define RPM_CONST           60000000 // 60s / 1us
-#define FILTER_LENGTH_HALL  16
-
 #define HALL_TICKS_PER_ELECTRICAL_ROTATION 4096
 
 // Hall_states
@@ -35,6 +32,8 @@
 #define HALL_PERIOD_MAX   1000000
 #define HALL_TRANSITION_PERIOD_MAX HALL_PERIOD_MAX/6
 
+#define HALL_FILTER_ORDER 3
+
 
 /**
  * @brief Structure for Hall sensor configuration
@@ -46,9 +45,7 @@ typedef struct {
 
 
 // variables related to hall measurement
-typedef struct
-{
-
+typedef struct {
     int hall_sector;
     int hall_period;
 
@@ -62,10 +59,7 @@ typedef struct
 
     int hall_direction_of_rotation;
 
-    int hall_position;
-
     int hall_angle;
-    int hall_increment;
     int hall_interpolated_angle;
 
     int hall_speed;
@@ -75,14 +69,10 @@ typedef struct
     unsigned int hall_transition_period_at_1rpm;
 
     unsigned int hall_f_clock;
-    int hall_pole_pairs;
-    int sensor_polarity;
 
     // filter constants
-    int hall_filter_order;
     int hall_filter_index_newest;
     int h[3];
     int hall_filter_buffer[3];
-
-}hall_variables;
+} hall_variables;
 

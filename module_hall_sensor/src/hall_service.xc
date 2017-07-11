@@ -113,11 +113,7 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
         i_shared_memory.write_hall_state_angle(position_feedback_config.hall_config.hall_state_angle);
     }
 
-    int hall_direction;
-    hall_direction = 0;
-
-    int hall_sector_and_state;
-    hall_sector_and_state=0;
+    int hall_sector_and_state = 0;
 
     int angle_out=0, last_angle=0, speed_out=0, count = 0, singleturn = 0;
     int singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
@@ -129,45 +125,30 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
     unsigned int hall_sector_number_and_state_temp;
     unsigned int hall_transient_period_temp;
 
-    int hall_position_temp;
+    unsigned int hall_last_state_period = HALL_TRANSITION_PERIOD_MAX;
 
-    unsigned int hall_last_state_period;
-    hall_last_state_period=HALL_TRANSITION_PERIOD_MAX;
+    unsigned int hall_state_old = 0;
 
-    unsigned int hall_state_old;
-    hall_state_old = 0;
+    unsigned int hall_state_new = 0;
 
-    unsigned int hall_state_new;
-    hall_state_new = 0;
+    unsigned int hall_state_1;
+    unsigned int hall_state_2;
 
-    unsigned int hall_state_1  ;
-    unsigned int hall_state_2  ;
-
-    unsigned int hall_state_next_local;
-    unsigned int hall_state_previous;
-
-    unsigned int hall_transition_timeout;
-    hall_transition_timeout=HALL_PERIOD_MAX;
+    unsigned int hall_transition_timeout = HALL_PERIOD_MAX;
 
     unsigned int hall_last_period;
     unsigned int hall_period[6];
 
-    int hall_error;
-    hall_error=0;
-
     // it is very important to set this variable to 0 at the beginning of the code
-    unsigned int hall_stable_states  ;
-    hall_stable_states = 0;
+    unsigned int hall_stable_states = 0;
 
-    int hall_transition_time;
-    hall_transition_time=0;
+    int hall_transition_time = 0;
 
-    hall_variables hv;
+    hall_variables hv = {0};
 
     int notification = MOTCTRL_NTF_EMPTY;
 
     // filter initialization:
-    hv.hall_filter_order = 3;
     hv.h[0] = 300;
     hv.h[1] = 380;
     hv.h[2] = 320;
@@ -177,15 +158,10 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
     hv.hall_filter_buffer[1] = 0;
     hv.hall_filter_buffer[2] = 0;
 
-    hv.hall_filter_index_newest=0;
-
     // clock frequency of defined timers in hall section
     hv.hall_f_clock = (position_feedback_config.ifm_usec*1000000); //1 second in ticks
     // motor pole pairs
-    hv.hall_pole_pairs = position_feedback_config.pole_pairs;
-    hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
-
-    hv.sensor_polarity=position_feedback_config.polarity;
+    hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (position_feedback_config.pole_pairs*6)) * 60 ;
 
     do
     {
@@ -241,10 +217,9 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
                 position_feedback_config = in_config;
                 singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
                 position_feedback_config.ifm_usec = ifm_usec;
-                hv.hall_pole_pairs = position_feedback_config.pole_pairs;
-                hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (hv.hall_pole_pairs*6)) * 60 ;
-                hv.sensor_polarity=position_feedback_config.polarity;
+                hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (position_feedback_config.pole_pairs*6)) * 60 ;
                 write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
+
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {
@@ -373,24 +348,8 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
 
                     hall_transition_timeout = 0;
 
-                    if(hall_state_new == hall_state_next_local)
-                    {
-                        hv.hall_position++;
-                        if(hall_direction < 1)  hall_direction++;
-                    }
-
-                    if(hall_state_new == hall_state_previous)
-                    {
-                        hv.hall_position--;
-
-                        if(hall_direction > -1) hall_direction--;
-                    }
-
-
                     if (hall_state_new >= 1 && hall_state_new <= 6)
                     {
-                        hall_state_next_local = hall_state_next[hall_state_new-1];
-                        hall_state_previous = hall_state_prev[hall_state_new-1];
                         if (hall_state_new == HALL_STATE_0) {
                             hall_sector_and_state = 0x80 + HALL_STATE_0;
                         } else {
@@ -398,10 +357,6 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
                         }
                         hall_last_period = hall_period[hall_state_new-1];
                         hall_period[hall_state_new-1] = 0;
-                    }
-                    else
-                    {
-                        hall_error++;
                     }
 
                     hall_last_state_period = 0;
@@ -426,8 +381,6 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
                         hall_transient_period_temp = hall_transition_time;
 
                         hall_sector_and_state = 0;
-
-                        hall_position_temp = hv.hall_position;
                     }
 
                     hv.hall_transition_period = hall_transient_period_temp;
@@ -484,11 +437,7 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
                     speed_out = -speed_out;
                 }
 
-                if (init_angle) {
-                    multiturn(count, last_angle, angle_out, HALL_TICKS_PER_ELECTRICAL_ROTATION);
-                } else {
-                    init_angle = 1;
-                }
+                multiturn(count, last_angle, angle_out, HALL_TICKS_PER_ELECTRICAL_ROTATION);
                 last_angle = angle_out;
 
                 singleturn = count % singleturn_resolution;
@@ -562,39 +511,38 @@ void hall_calculate_speed(hall_variables& hv)
 
 void hall_calculate_angle(hall_variables & hv)
 {
+    if(hv.hall_last_transition_period<(hv.hall_period/6)) {
+        int hall_increment = (hv.hall_last_transition_period *4096) / hv.hall_period;
 
-    if(hv.hall_last_transition_period<(hv.hall_period/6))
-    {
-        hv.hall_increment = hv.hall_last_transition_period *4096;
-        hv.hall_increment /= hv.hall_period;
+        if (hv.hall_direction_of_rotation == 1) {
+            hv.hall_interpolated_angle = hv.hall_angle + hall_increment;
+        } else if(hv.hall_direction_of_rotation == -1) {
+            hv.hall_interpolated_angle = hv.hall_angle - hall_increment;
+        }
 
-        if(hv.hall_direction_of_rotation == 1)   hv.hall_interpolated_angle = hv.hall_angle + hv.hall_increment;
-        if(hv.hall_direction_of_rotation == -1)  hv.hall_interpolated_angle = hv.hall_angle - hv.hall_increment;
+        if (hv.hall_interpolated_angle > 4095) {
+            hv.hall_interpolated_angle -= 4096;
+        } else if (hv.hall_interpolated_angle < 0) {
+            hv.hall_interpolated_angle += 4096;
+        }
     }
-    else
-    {
-        hv.hall_increment = 0;
-    }
-
-    if (hv.hall_interpolated_angle > 4095)   hv.hall_interpolated_angle -= 4096;
-    if (hv.hall_interpolated_angle <    0)   hv.hall_interpolated_angle += 4096;
 }
 
 
 
 void speed_LPF(hall_variables& hv)
 {
-    hv.hall_filter_index_newest = (hv.hall_filter_index_newest+1) % hv.hall_filter_order;
+    hv.hall_filter_index_newest = (hv.hall_filter_index_newest+1) % HALL_FILTER_ORDER;
 
     hv.hall_filter_buffer[hv.hall_filter_index_newest] = hv.hall_speed;
 
     int y = 0;
     int speed_index = hv.hall_filter_index_newest;
-    for(int k=0;k<hv.hall_filter_order;k++)
+    for(int k=0;k<HALL_FILTER_ORDER;k++)
     {
         y += hv.h[k] * hv.hall_filter_buffer[speed_index];
         --speed_index;
-        if(speed_index == -1)   speed_index = hv.hall_filter_order -1;
+        if(speed_index == -1)   speed_index = HALL_FILTER_ORDER -1;
     }
 
     hv.hall_filtered_speed = y / 1000;

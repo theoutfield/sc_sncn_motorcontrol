@@ -47,6 +47,8 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
     param.Kd = Kd;
     param.integral_limit = integral_limit;
 
+    if(param.Ki==0) param.integral=0; //reset the integrator to 0 in case ki is set to 0
+
     if (param.integral >  param.integral_limit ) param.integral = param.integral_limit;
     if (param.integral <(-param.integral_limit)) param.integral =-param.integral_limit;
 

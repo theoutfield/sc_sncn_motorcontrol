@@ -195,7 +195,6 @@ void pwm_service_general(
 
     timer t;
     unsigned int time    =0x00000000, ts   =0x00000000;
-    unsigned int t_start =0x00000000, t_end=0x00000000, t_idle=0x00000000;
 
     unsigned int ref_time=0x00000000;
     unsigned int inp_wid =0x0000FFFF;
@@ -207,9 +206,6 @@ void pwm_service_general(
     unsigned short v_high_rise=0x0000, v_low_rise=0x0000;
     unsigned short w_high_rise=0x0000, w_low_rise=0x0000;
 
-    unsigned short counter = 0x0001;
-    short delta   = 0x0001;
-    unsigned short pwm_value=0x0014;
     unsigned short pwm_init =0x0028;
     unsigned short pwm_value_a=0x0000, pwm_value_b=0x0000, pwm_value_c=0x0000, pwm_value_u=0x0000, pwm_value_v=0x0000, pwm_value_w=0x0000;
 
