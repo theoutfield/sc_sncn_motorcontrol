@@ -5,6 +5,7 @@ sc_sncn_motorcontrol Change Log
 -----
 
   * Fix value of Encoder Number of Channels to 2 for AB and 3 for ABI.
+  * Do not change the integral limits of position/velocity controllers in case automatic tuners are called
 
 
 3.0.2
