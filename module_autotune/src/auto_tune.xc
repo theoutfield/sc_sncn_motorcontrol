@@ -405,6 +405,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
     }
     else if(pos_ctrl_auto_tune.controller == LIMITED_TORQUE)
     {
+        /*
         if(pos_ctrl_auto_tune.activate==0)
         {
             pos_ctrl_auto_tune.position_init = position_k;
@@ -694,6 +695,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
             pos_ctrl_auto_tune.counter=0;
         }
+        */
     }
 
     /*
