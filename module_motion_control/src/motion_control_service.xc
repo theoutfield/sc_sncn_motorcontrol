@@ -187,7 +187,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // initialization
     MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
-    int temperature_ratio = motorcontrol_config.temperature_ratio;
 
     lt_position_control_reset(lt_pos_ctrl);
     lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
@@ -536,7 +535,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
+                xscope_int(TEMPERATURE, (upstream_control_data.temperature/motorcontrol_config.temperature_ratio));
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
                 xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
