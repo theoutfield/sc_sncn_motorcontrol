@@ -349,11 +349,11 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
-            /*
-            //step 6: increase kpi until overshoot is more than 2%
+
+            //step 6: increase kpi until overshoot is more than 2% or steady state error is less than 0.33%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_6 && pos_ctrl_auto_tune.rising_edge==0)
             {
-                if(pos_ctrl_auto_tune.overshoot_max>((20*pos_ctrl_auto_tune.step_amplitude)/1000))
+                if(pos_ctrl_auto_tune.overshoot_max>((20*2*pos_ctrl_auto_tune.step_amplitude)/1000) || pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_limit_hard/9)
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
@@ -378,6 +378,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
+
             //step 7: End autotuning
             if(pos_ctrl_auto_tune.active_step==END)
             {
@@ -387,7 +388,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.active_step_counter=0;
             }
 
-             */
+            /* */
             pos_ctrl_auto_tune.overshoot=0;
             pos_ctrl_auto_tune.overshoot_max=0;
 
