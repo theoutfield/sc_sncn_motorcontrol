@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 80
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET    0
+#define COMMUTATION_ANGLE_OFFSET       0
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -137,7 +137,7 @@
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY           MOTION_POLARITY_NORMAL
 
-#define FILTER_CUT_OFF_FREQ     1000000;//cut-off frequency of filter in motion control service (default value 100 kHz)
+#define FILTER_CUT_OFF_FREQ     0;//cut-off frequency of filter in motion control service (default value 100 kHz)
 
 /////////////////////////////////////////////////
 //////  PROFILES AND LIMITS CONFIGURATION
@@ -158,7 +158,7 @@
 #define MAX_DECELERATION_PROFILER               10000    // [rpm/sec]
 #define MAX_SPEED_PROFILER                      2000     // [rpm]
 
-#define POSITION_CONTROL_STRATEGY               LT_POSITION_CONTROLLER
+#define POSITION_CONTROL_STRATEGY               POS_PID_VELOCITY_CASCADED_CONTROLLER
 
 
 //////////////////////////////////////////////
