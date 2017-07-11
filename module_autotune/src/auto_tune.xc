@@ -194,7 +194,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             pos_ctrl_auto_tune.kpi = 0 ;
             pos_ctrl_auto_tune.kpd = 0 ;
             pos_ctrl_auto_tune.kpl = motion_ctrl_config.position_integral_limit;
-            pos_ctrl_auto_tune.j  = 0;
+            pos_ctrl_auto_tune.j   = 0 ;
 
             pos_ctrl_auto_tune.kvp = 0 ;
             pos_ctrl_auto_tune.kvi = 0 ;
@@ -249,6 +249,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             }
 
 
+            /*
             //step 2: increase kvp until it starts to vibrate or until the overshoot is higher than 2%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2 && pos_ctrl_auto_tune.rising_edge==0)
             {
@@ -389,6 +390,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.active_step_counter=0;
             }
 
+             */
             pos_ctrl_auto_tune.overshoot=0;
             pos_ctrl_auto_tune.overshoot_max=0;
 
