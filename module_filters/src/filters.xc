@@ -63,7 +63,7 @@ int filter(int filter_buffer[], int &index, int filter_length, int input)
  */
 void first_order_LP_filter_init(int f_c, int T_s, FirstOrderLPfilterParam &param )
 {
-    double f_c_max=0.00, omega_T=0.00;
+    double omega_T=0.00;
 
     param.y_k  =0.00;
     param.y_k_1=0.00;
