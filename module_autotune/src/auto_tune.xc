@@ -433,10 +433,10 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            //step 1: increase kpl until the load follows the reference value
+            //step 1: increase kpl until the load follows the reference value (steady state error is less than 20%)
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
             {
-                if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
+                if(pos_ctrl_auto_tune.err_energy_ss_int < pos_ctrl_auto_tune.err_energy_ss_limit_hard*400)
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
