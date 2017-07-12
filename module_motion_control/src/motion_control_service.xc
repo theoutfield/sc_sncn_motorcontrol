@@ -858,7 +858,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                             }
 
-                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
+                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
+                            position_ref_in_k_2n = position_ref_in_k_1n;
+                            position_ref_in_k_1n = position_ref_in_k;
+
+                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                         }
                         else
                         {
