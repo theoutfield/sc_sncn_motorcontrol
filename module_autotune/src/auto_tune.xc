@@ -433,10 +433,10 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            //step 1: increase kpl until the load follows the reference value (steady state error is less than 20%)
+            //step 1: increase kpl until the load follows the reference value (steady state error is less than 15%)
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
             {
-                if(pos_ctrl_auto_tune.err_energy_ss_int < pos_ctrl_auto_tune.err_energy_ss_limit_hard*400)
+                if(pos_ctrl_auto_tune.err_energy_ss_int < pos_ctrl_auto_tune.err_energy_ss_limit_hard*225)
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
@@ -458,10 +458,10 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            //reduce kpi until overshoot is less than 10%
+            //incraese kpi until overshoot is less than 15%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2 && pos_ctrl_auto_tune.rising_edge==0)
             {
-                if(pos_ctrl_auto_tune.overshoot_max>(10*pos_ctrl_auto_tune.step_amplitude)/100)
+                if(pos_ctrl_auto_tune.overshoot_max>(15*pos_ctrl_auto_tune.step_amplitude)/100)
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
@@ -482,17 +482,17 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
             }
 
-            /*
-            //increase kpl until vibration appears
+            //increase kpl until vibration appears or overshoot is higher than 20%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3 && pos_ctrl_auto_tune.rising_edge==0)
             {
-                if(pos_ctrl_auto_tune.err_energy_ss_int < 5*pos_ctrl_auto_tune.err_energy_ss_int_min)
+                if(pos_ctrl_auto_tune.err_energy_ss_int < 5*pos_ctrl_auto_tune.err_energy_ss_int_min && pos_ctrl_auto_tune.overshoot_max<(20*pos_ctrl_auto_tune.step_amplitude)/100)
                 {
                     int increment = (pos_ctrl_auto_tune.kpl*4)/100;
                     if(increment<10)
                         pos_ctrl_auto_tune.kpl += 10;
                     else
                         pos_ctrl_auto_tune.kpl += increment;
+                    pos_ctrl_auto_tune.active_step_counter=0;
                 }
                 else
                 {
@@ -510,6 +510,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
+            /*
             //reduce kpi until overshoot is less than 2%, and then increase speed limit to its default value
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4 && pos_ctrl_auto_tune.rising_edge==0)
             {
