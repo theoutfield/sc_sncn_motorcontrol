@@ -124,6 +124,7 @@ typedef struct {
     double err_energy_ss_int;
     double err_energy_ss_int_min;
     double err_energy_ss_limit_soft;
+    double err_energy_ss_limit_hard;
     double overshoot;
     double overshoot_max;
 
@@ -178,7 +179,6 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
  * @return void
  *  */
 int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k);
-
 
 
 
