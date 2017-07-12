@@ -815,9 +815,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                                 pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                                printf("step: %i step_counter: %i \n", pos_ctrl_auto_tune.active_step, pos_ctrl_auto_tune.active_step_counter);
-                                printf("kpp:%i kpi:%i kpd:%i kpl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
-                                printf("kvp:%i kvi:%i kvd:%i kvl:%d \n",  motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
                             }
 
                             velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
@@ -860,8 +857,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
                                         motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
                                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
-                                printf("step: %i step_counter: %i \n", pos_ctrl_auto_tune.active_step, pos_ctrl_auto_tune.active_step_counter);
-                                printf("kp:%i ki:%i kd:%i kl:%d j: %d\n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit, motion_ctrl_config.moment_of_inertia);
                             }
 
                             position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
@@ -981,215 +976,215 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
                 }
 
-//                /*
-//                 * open phase online detection
-//                 */
-//                if(error_phase == NO_ERROR)
-//                {
-//                    for (int i = A; i < NR_PHASES; i++)
-//                    {
-//                        switch (i)
-//                        {
-//                        case A:
-//                            phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
-//                            break;
-//                        case B:
-//                            phase_cur[B] = upstream_control_data.I_b;
-//                            break;
-//                        case C:
-//                            phase_cur[C] = upstream_control_data.I_c;
-//                            break;
-//                        }
-//
-//                        // observing abs value
-//                        if (phase_cur[i] < 0)
-//                            phase_cur[i] = -phase_cur[i];
-//
-//                        // calculating sum and sum of squares for currents
-//                        sum[i] += phase_cur[i];
-//                        sum_sq[i] += phase_cur[i]*phase_cur[i];
-//                    }
-//
-//                    ftr++;
-//                    // every 33 ms rms value is calculated
-//                    if (ftr > 1 && ftr % 100 == 0)
-//                    {
-//                        ++measurement;
-//                        float mean[NR_PHASES], sd[NR_PHASES];
-//                        // calculating mean, standard deviation and rms value
-//                        for (int i = A; i < NR_PHASES; i++)
-//                        {
-//                            mean[i] = (float)sum[i] / ftr;
-//                            sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
-//                            rms[i] += mean[i] + sqrt(sd[i]);
-//                        }
-//
-//                        for (int i = A; i < NR_PHASES; i++)
-//                            rms[i] = rms[i] / current_ratio;
-//
-//                        // if velocity is high
-//                        // if three times it's detected that there is high difference between phase currents, phase is opened
-//                        if (abs(upstream_control_data.velocity) > 50)
-//                        {
-//                            if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
-//                            {
-//                                detect[A]++;
-//
-//                                if (detect[A] == 3)
-//                                {
-//                                    error_phase = A;
-//                                    i_torque_control.set_brake_status(0);
-//                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-//                                    {
-//                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-//                                    }
-//                                    else
-//                                    {
-//                                        torque_enable_flag   =0;
-//                                        velocity_enable_flag =0;
-//                                        position_enable_flag =0;
-//                                        i_torque_control.set_torque_control_disabled();
-//                                    }
-//                                }
-//                            }
-//
-//                            if (rms[B] < curr_threshold && rms[A] > 8 * rms[B] && rms[C] > 8 * rms[B])
-//                            {
-//                                detect[B]++;
-//
-//                                if (detect[B] == 3)
-//                                {
-//                                    error_phase = B;
-//                                    i_torque_control.set_brake_status(0);
-//                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-//                                    {
-//                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-//                                    }
-//                                    else
-//                                    {
-//                                        torque_enable_flag   =0;
-//                                        velocity_enable_flag =0;
-//                                        position_enable_flag =0;
-//                                        i_torque_control.set_torque_control_disabled();
-//                                    }
-//                                }
-//                            }
-//
-//                            if (rms[C] < curr_threshold && rms[A] > 8 * rms[C] && rms[B] > 8 * rms[C])
-//                            {
-//                                detect[C]++;
-//
-//                                if (detect[C] == 3)
-//                                {
-//                                    error_phase = C;
-//                                    i_torque_control.set_brake_status(0);
-//                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-//                                    {
-//                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-//                                    }
-//                                    else
-//                                    {
-//                                        torque_enable_flag   =0;
-//                                        velocity_enable_flag =0;
-//                                        position_enable_flag =0;
-//                                        i_torque_control.set_torque_control_disabled();
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        else if (abs(upstream_control_data.velocity) > 5)// if velocity is low
-//                        {
-//                            if (abs(upstream_control_data.computed_torque) > 10)
-//                            {
-//                                if (rms[A] < curr_threshold && rms[B] > 4 * rms[A] && rms[C] > 4 * rms[A])
-//                                {
-//                                    detect_low[A]++;
-//                                    if (detect_low[A] == 2)
-//                                    {
-//                                        error_phase = A;
-//                                        i_torque_control.set_brake_status(0);
-//                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-//                                        {
-//                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-//                                        }
-//                                        else
-//                                        {
-//                                            torque_enable_flag   =0;
-//                                            velocity_enable_flag =0;
-//                                            position_enable_flag =0;
-//                                            i_torque_control.set_torque_control_disabled();
-//                                        }
-//                                    }
-//                                }
-//                                else
-//                                    detect_low[A] = 0;
-//
-//                                if (rms[B] < curr_threshold && rms[A] > 4 * rms[B] && rms[C] > 4 * rms[B])
-//                                {
-//                                    detect_low[B]++;
-//                                    if (detect_low[B] == 2)
-//                                    {
-//                                        error_phase = B;
-//                                        i_torque_control.set_brake_status(0);
-//                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-//                                        {
-//                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-//                                        }
-//                                        else
-//                                        {
-//                                            torque_enable_flag   =0;
-//                                            velocity_enable_flag =0;
-//                                            position_enable_flag =0;
-//                                            i_torque_control.set_torque_control_disabled();
-//                                        }
-//                                    }
-//                                }
-//                                else
-//                                    detect_low[B] = 0;
-//
-//                                if (rms[C] < curr_threshold && rms[A] > 4 * rms[C] && rms[B] > 4 * rms[C])
-//                                {
-//                                    detect_low[C]++;
-//                                    if (detect_low[C] == 2)
-//                                    {
-//                                        error_phase = C;
-//                                        i_torque_control.set_brake_status(0);
-//                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-//                                        {
-//                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-//                                        }
-//                                        else
-//                                        {
-//                                            torque_enable_flag   =0;
-//                                            velocity_enable_flag =0;
-//                                            position_enable_flag =0;
-//                                            i_torque_control.set_torque_control_disabled();
-//                                        }
-//                                    }
-//                                }
-//                                else
-//                                    detect_low[C] = 0;
-//                            }
-//                        }
-//
-//                        // every 20 measurements reset detection flag
-//                        if(measurement == 20)
-//                        {
-//                            measurement = 0;
-//                            for (int i = A; i < NR_PHASES; i++)
-//                                detect[i] = 0;
-//                        }
-//
-//                        ftr = 0;
-//                        for (int i = A; i < NR_PHASES; i++)
-//                        {
-//                            sum[i] = 0;
-//                            sum_sq[i] = 0;
-//                            rms[i] = 0;
-//                        }
-//                        //                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
-//                    }
-//                }
+                /*
+                 * open phase online detection
+                 */
+                if(error_phase == NO_ERROR)
+                {
+                    for (int i = A; i < NR_PHASES; i++)
+                    {
+                        switch (i)
+                        {
+                        case A:
+                            phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
+                            break;
+                        case B:
+                            phase_cur[B] = upstream_control_data.I_b;
+                            break;
+                        case C:
+                            phase_cur[C] = upstream_control_data.I_c;
+                            break;
+                        }
+
+                        // observing abs value
+                        if (phase_cur[i] < 0)
+                            phase_cur[i] = -phase_cur[i];
+
+                        // calculating sum and sum of squares for currents
+                        sum[i] += phase_cur[i];
+                        sum_sq[i] += phase_cur[i]*phase_cur[i];
+                    }
+
+                    ftr++;
+                    // every 33 ms rms value is calculated
+                    if (ftr > 1 && ftr % 100 == 0)
+                    {
+                        ++measurement;
+                        float mean[NR_PHASES], sd[NR_PHASES];
+                        // calculating mean, standard deviation and rms value
+                        for (int i = A; i < NR_PHASES; i++)
+                        {
+                            mean[i] = (float)sum[i] / ftr;
+                            sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                            rms[i] += mean[i] + sqrt(sd[i]);
+                        }
+
+                        for (int i = A; i < NR_PHASES; i++)
+                            rms[i] = rms[i] / current_ratio;
+
+                        // if velocity is high
+                        // if three times it's detected that there is high difference between phase currents, phase is opened
+                        if (abs(upstream_control_data.velocity) > 50)
+                        {
+                            if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
+                            {
+                                detect[A]++;
+
+                                if (detect[A] == 3)
+                                {
+                                    error_phase = A;
+                                    i_torque_control.set_brake_status(0);
+                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                    {
+                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                    }
+                                    else
+                                    {
+                                        torque_enable_flag   =0;
+                                        velocity_enable_flag =0;
+                                        position_enable_flag =0;
+                                        i_torque_control.set_torque_control_disabled();
+                                    }
+                                }
+                            }
+
+                            if (rms[B] < curr_threshold && rms[A] > 8 * rms[B] && rms[C] > 8 * rms[B])
+                            {
+                                detect[B]++;
+
+                                if (detect[B] == 3)
+                                {
+                                    error_phase = B;
+                                    i_torque_control.set_brake_status(0);
+                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                    {
+                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                    }
+                                    else
+                                    {
+                                        torque_enable_flag   =0;
+                                        velocity_enable_flag =0;
+                                        position_enable_flag =0;
+                                        i_torque_control.set_torque_control_disabled();
+                                    }
+                                }
+                            }
+
+                            if (rms[C] < curr_threshold && rms[A] > 8 * rms[C] && rms[B] > 8 * rms[C])
+                            {
+                                detect[C]++;
+
+                                if (detect[C] == 3)
+                                {
+                                    error_phase = C;
+                                    i_torque_control.set_brake_status(0);
+                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                    {
+                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                    }
+                                    else
+                                    {
+                                        torque_enable_flag   =0;
+                                        velocity_enable_flag =0;
+                                        position_enable_flag =0;
+                                        i_torque_control.set_torque_control_disabled();
+                                    }
+                                }
+                            }
+                        }
+                        else if (abs(upstream_control_data.velocity) > 5)// if velocity is low
+                        {
+                            if (abs(upstream_control_data.computed_torque) > 10)
+                            {
+                                if (rms[A] < curr_threshold && rms[B] > 4 * rms[A] && rms[C] > 4 * rms[A])
+                                {
+                                    detect_low[A]++;
+                                    if (detect_low[A] == 2)
+                                    {
+                                        error_phase = A;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
+                                }
+                                else
+                                    detect_low[A] = 0;
+
+                                if (rms[B] < curr_threshold && rms[A] > 4 * rms[B] && rms[C] > 4 * rms[B])
+                                {
+                                    detect_low[B]++;
+                                    if (detect_low[B] == 2)
+                                    {
+                                        error_phase = B;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
+                                }
+                                else
+                                    detect_low[B] = 0;
+
+                                if (rms[C] < curr_threshold && rms[A] > 4 * rms[C] && rms[B] > 4 * rms[C])
+                                {
+                                    detect_low[C]++;
+                                    if (detect_low[C] == 2)
+                                    {
+                                        error_phase = C;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
+                                }
+                                else
+                                    detect_low[C] = 0;
+                            }
+                        }
+
+                        // every 20 measurements reset detection flag
+                        if(measurement == 20)
+                        {
+                            measurement = 0;
+                            for (int i = A; i < NR_PHASES; i++)
+                                detect[i] = 0;
+                        }
+
+                        ftr = 0;
+                        for (int i = A; i < NR_PHASES; i++)
+                        {
+                            sum[i] = 0;
+                            sum_sq[i] = 0;
+                            rms[i] = 0;
+                        }
+                        //                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
+                    }
+                }
 
                 switch (error_phase)
                 {
@@ -1203,85 +1198,32 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         upstream_control_data.error_status = PHASE_FAILURE_L3;
                         break;
                 }
-//
-//#ifdef XSCOPE_POSITION_CTRL
-//                xscope_int(VELOCITY, upstream_control_data.velocity);
-//                xscope_int(POSITION, upstream_control_data.position);
-//                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
-//                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
-//                xscope_int(TORQUE,   upstream_control_data.computed_torque);
-//                xscope_int(POSITION_CMD, (int)position_ref_in_k);
-//                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
-//                xscope_int(TORQUE_CMD, torque_ref_k);
-//                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
-//                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-//#endif
-//
-//#ifdef XSCOPE_ANALOGUE_MEASUREMENT
-//                xscope_int(V_DC, upstream_control_data.V_dc);
-//                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-//                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
-//                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
-//                xscope_int(I_B, upstream_control_data.I_b);
-//                xscope_int(I_C, upstream_control_data.I_c);
-//                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
-//                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
-//                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
-//                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
-//#endif
 
-
-                xscope_int(POS_REF, ((int)(/*pos_ctrl_auto_tune.position_ref*/position_ref_in_k-pos_ctrl_auto_tune.position_init )));
-                xscope_int(POS_ACT, ((int)(position_k                     -pos_ctrl_auto_tune.position_init )));
-
-                xscope_int(ERR_EN_SS_INT_MIN, ((int)(pos_ctrl_auto_tune.err_energy_ss_int_min                         )));
-                xscope_int(ERR_EN_SS_INT    , ((int)(pos_ctrl_auto_tune.err_energy_ss_int                             )));
-                xscope_int(STEP_COUNTER     ,(pos_ctrl_auto_tune.active_step_counter*500 )                              );
-
-                xscope_int(VELOCITY     ,((int)(pos_ctrl_auto_tune.velocity_k)));
-                xscope_int(VELOCITY_FILTERED     ,((int)(pos_ctrl_auto_tune.velocity_k_filtered)));
-
-                xscope_int(ACCELERATION ,((int)(pos_ctrl_auto_tune.acceleration_k*100)));
-                xscope_int(ACCELERATION_FILTERED ,((int)(pos_ctrl_auto_tune.acceleration_k_filtered*100)));
-
-                xscope_int(JERK ,((int)(pos_ctrl_auto_tune.jerk_k*100)));
-                xscope_int(JERK_FILTERED ,((int)(pos_ctrl_auto_tune.jerk_k_filtered*100)));
-                xscope_int(JERK_FILTERED_ENERGY ,((int)(pos_ctrl_auto_tune.jerk_filtered_energy*100)));
-                xscope_int(JERK_ENERGY_LIMIT ,((int)(pos_ctrl_auto_tune.jerk_energy_limit*100)));
-                xscope_int(JERK_TRANSITION ,(pos_ctrl_auto_tune.jerk_k_transition*1000 + 100));
-                xscope_int(JERK_COUNTER_LIMIT ,(pos_ctrl_auto_tune.jerk_counter_limit));
-
-                xscope_int(ERR_EN_SS_LIM_HRD ,((int)(pos_ctrl_auto_tune.err_energy_ss_limit_hard)));
-                xscope_int(ERR_EN_SS_INT_MIN ,((int)(pos_ctrl_auto_tune.err_energy_ss_int_min)));
-                xscope_int(ERR_EN_SS_INT ,((int)(pos_ctrl_auto_tune.err_energy_ss_int)));
-
-
-
-
-//#ifdef XSCOPE_POSITION_CTRL
-//                xscope_int(VELOCITY, upstream_control_data.velocity);
+#ifdef XSCOPE_POSITION_CTRL
+                xscope_int(VELOCITY, upstream_control_data.velocity);
                 xscope_int(POSITION, upstream_control_data.position);
-//                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
-//                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
-//                xscope_int(TORQUE,   upstream_control_data.computed_torque);
+                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
+                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
+                xscope_int(TORQUE,   upstream_control_data.computed_torque);
                 xscope_int(POSITION_CMD, (int)position_ref_in_k);
-//                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
-//                xscope_int(TORQUE_CMD, torque_ref_k);
-//                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
-//                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-//#endif
-//
-//#ifdef XSCOPE_ANALOGUE_MEASUREMENT
-//                xscope_int(V_DC, upstream_control_data.V_dc);
-//                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-//                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
-//                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
-//                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
-//                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
-//                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
-//#endif
+                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
+                xscope_int(TORQUE_CMD, torque_ref_k);
+                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
+                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
+#endif
 
-
+#ifdef XSCOPE_ANALOGUE_MEASUREMENT
+                xscope_int(V_DC, upstream_control_data.V_dc);
+                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
+                xscope_int(TEMPERATURE, (upstream_control_data.temperature/temperature_ratio));
+                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
+                xscope_int(I_B, upstream_control_data.I_b);
+                xscope_int(I_C, upstream_control_data.I_c);
+                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
+                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
+                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
+                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+#endif
 
                 if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
                 {
