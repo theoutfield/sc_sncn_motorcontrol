@@ -454,25 +454,20 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
-                    pos_ctrl_auto_tune.err_energy_ss_int_min    = pos_ctrl_auto_tune.err_energy_ss_limit_soft;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
-            /*
             //reduce kpi until overshoot is less than 10%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2 && pos_ctrl_auto_tune.rising_edge==0)
             {
-                if(pos_ctrl_auto_tune.overshoot_max<((100*pos_ctrl_auto_tune.step_amplitude)/1000) && pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_limit_soft)
+                if(pos_ctrl_auto_tune.overshoot_max>(10*pos_ctrl_auto_tune.step_amplitude)/100)
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*100)/110;
-
-                    if(pos_ctrl_auto_tune.kpi==0) pos_ctrl_auto_tune.active_step=UNSUCCESSFUL;
-
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
@@ -480,7 +475,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_3;
                     pos_ctrl_auto_tune.active_step_counter=0;
-
                 }
 
                 if(pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
@@ -488,6 +482,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
             }
 
+            /*
             //increase kpl until vibration appears
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3 && pos_ctrl_auto_tune.rising_edge==0)
             {
