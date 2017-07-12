@@ -562,7 +562,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
-                    pos_ctrl_auto_tune.kpl = (9*pos_ctrl_auto_tune.kpl)/10;
+                    pos_ctrl_auto_tune.kpl = (8*pos_ctrl_auto_tune.kpl)/10;
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_6;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }

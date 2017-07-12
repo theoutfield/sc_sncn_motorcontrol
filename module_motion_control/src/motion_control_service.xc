@@ -864,7 +864,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                             }
 
-                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
+                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
+                            position_ref_in_k_2n = position_ref_in_k_1n;
+                            position_ref_in_k_1n = position_ref_in_k;
+
+                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                         }
                         else
                         {
@@ -1227,7 +1231,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 //#endif
 
 
-                xscope_int(POS_REF, ((int)(pos_ctrl_auto_tune.position_ref-pos_ctrl_auto_tune.position_init )));
+                xscope_int(POS_REF, ((int)(/*pos_ctrl_auto_tune.position_ref*/position_ref_in_k-pos_ctrl_auto_tune.position_init )));
                 xscope_int(POS_ACT, ((int)(position_k                     -pos_ctrl_auto_tune.position_init )));
 
                 xscope_int(ERR_EN_SS_INT_MIN, ((int)(pos_ctrl_auto_tune.err_energy_ss_int_min                         )));
