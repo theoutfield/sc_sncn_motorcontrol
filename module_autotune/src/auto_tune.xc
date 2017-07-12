@@ -187,6 +187,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
     if(pos_ctrl_auto_tune.controller == CASCADED)
     {
+        /*
         if(pos_ctrl_auto_tune.activate==0)
         {
             pos_ctrl_auto_tune.position_init = position_k;
@@ -277,52 +278,50 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
-            /*
-            //step 3: increase kvi until overshoot becomes more than 1%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3 && pos_ctrl_auto_tune.rising_edge==0)
-            {
-                if(pos_ctrl_auto_tune.overshoot_max>((10*pos_ctrl_auto_tune.step_amplitude)/1000))
-                {
-                    pos_ctrl_auto_tune.active_step_counter++;
-                }
-                else
-                {
-                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*110)/100;
-                    if(pos_ctrl_auto_tune.kvi<10) pos_ctrl_auto_tune.kvi=10;
-                }
-
-                if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int_min+pos_ctrl_auto_tune.err_energy_ss_int)/2;
-
-                if(pos_ctrl_auto_tune.active_step_counter==10)
-                {
-                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
-                    pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*90)/100;
-                    pos_ctrl_auto_tune.kvl = 10000;
-                    pos_ctrl_auto_tune.active_step_counter=0;
-                }
-            }
-
-            //step 4: reduce kvl until overshoot is less than 3%
-            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4 && pos_ctrl_auto_tune.rising_edge==0)
-            {
-                if(pos_ctrl_auto_tune.overshoot_max<((30*pos_ctrl_auto_tune.step_amplitude)/1000) || pos_ctrl_auto_tune.kvl==0)
-                {
-                    pos_ctrl_auto_tune.active_step_counter++;
-                }
-                else
-                {
-                    pos_ctrl_auto_tune.kvl = (pos_ctrl_auto_tune.kvl*90)/100;
-                }
-
-
-                if(pos_ctrl_auto_tune.active_step_counter==10)
-                {
-                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
-                    pos_ctrl_auto_tune.active_step_counter=0;
-                }
-            }
-            */
+            ////step 3: increase kvi until overshoot becomes more than 1%
+            //if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3 && pos_ctrl_auto_tune.rising_edge==0)
+            //{
+            //    if(pos_ctrl_auto_tune.overshoot_max>((10*pos_ctrl_auto_tune.step_amplitude)/1000))
+            //    {
+            //        pos_ctrl_auto_tune.active_step_counter++;
+            //    }
+            //    else
+            //    {
+            //        pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*110)/100;
+            //        if(pos_ctrl_auto_tune.kvi<10) pos_ctrl_auto_tune.kvi=10;
+            //    }
+            //
+            //    if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_int_min)
+            //        pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int_min+pos_ctrl_auto_tune.err_energy_ss_int)/2;
+            //
+            //    if(pos_ctrl_auto_tune.active_step_counter==10)
+            //    {
+            //        pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
+            //        pos_ctrl_auto_tune.kvi = (pos_ctrl_auto_tune.kvi*90)/100;
+            //        pos_ctrl_auto_tune.kvl = 10000;
+            //        pos_ctrl_auto_tune.active_step_counter=0;
+            //    }
+            //}
+            //
+            ////step 4: reduce kvl until overshoot is less than 3%
+            //if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4 && pos_ctrl_auto_tune.rising_edge==0)
+            //{
+            //    if(pos_ctrl_auto_tune.overshoot_max<((30*pos_ctrl_auto_tune.step_amplitude)/1000) || pos_ctrl_auto_tune.kvl==0)
+            //    {
+            //        pos_ctrl_auto_tune.active_step_counter++;
+            //    }
+            //    else
+            //    {
+            //        pos_ctrl_auto_tune.kvl = (pos_ctrl_auto_tune.kvl*90)/100;
+            //    }
+            //
+            //
+            //    if(pos_ctrl_auto_tune.active_step_counter==10)
+            //    {
+            //        pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
+            //        pos_ctrl_auto_tune.active_step_counter=0;
+            //    }
+            //}
 
             //step 5: increase kpp until vibration appears or steady state error becomes less than 1%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5 && pos_ctrl_auto_tune.rising_edge==0)
@@ -397,16 +396,16 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
             pos_ctrl_auto_tune.counter=0;
         }
+    */
     }
     else if(pos_ctrl_auto_tune.controller == LIMITED_TORQUE)
     {
-        /*
         if(pos_ctrl_auto_tune.activate==0)
         {
             pos_ctrl_auto_tune.position_init = position_k;
 
             pos_ctrl_auto_tune.kpp = 10000 ;
-            pos_ctrl_auto_tune.kpi = 1000  ;
+            pos_ctrl_auto_tune.kpi = 10    ;
             pos_ctrl_auto_tune.kpd = 40000 ;
             pos_ctrl_auto_tune.kpl = 1;
             pos_ctrl_auto_tune.j   = 0;
@@ -434,7 +433,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            //S1: increase kpl until the load follows the reference value
+            //step 1: increase kpl until the load follows the reference value
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
             {
                 if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
@@ -460,6 +459,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
             }
 
+            /*
             //reduce kpi until overshoot is less than 10%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2 && pos_ctrl_auto_tune.rising_edge==0)
             {
@@ -652,6 +652,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.kpl =0;
                 pos_ctrl_auto_tune.active_step_counter=0;
             }
+            */
             //show the tuning step with kvp (which is not important in the case of limited torque position controller
             pos_ctrl_auto_tune.kvp = pos_ctrl_auto_tune.active_step ;
 
@@ -690,7 +691,6 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
             pos_ctrl_auto_tune.counter=0;
         }
-        */
     }
 
     /*
