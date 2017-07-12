@@ -433,10 +433,10 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            //step 1: increase kpl until the load follows the reference value (steady state error is less than 15%)
+            //step 1: increase kpl until the load follows the reference value (steady state error is less than 20%)
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
             {
-                if(pos_ctrl_auto_tune.err_energy_ss_int < pos_ctrl_auto_tune.err_energy_ss_limit_hard*225)
+                if(pos_ctrl_auto_tune.err_energy_ss_int < pos_ctrl_auto_tune.err_energy_ss_limit_hard*400)
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
@@ -454,11 +454,12 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_2;
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = pos_ctrl_auto_tune.err_energy_ss_limit_hard;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
-            //incraese kpi until overshoot is less than 15%
+            //step 2: incraese kpi until overshoot is less than 15%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2 && pos_ctrl_auto_tune.rising_edge==0)
             {
                 if(pos_ctrl_auto_tune.overshoot_max>(15*pos_ctrl_auto_tune.step_amplitude)/100)
@@ -478,11 +479,11 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
 
                 if(pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(1.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/2.00;
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(3.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/4.00;
 
             }
 
-            //increase kpl until vibration appears or overshoot is higher than 20%
+            //step 3: increase kpl until vibration appears or overshoot is higher than 20%, and then reduce kpl to its 90%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_3 && pos_ctrl_auto_tune.rising_edge==0)
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < 5*pos_ctrl_auto_tune.err_energy_ss_int_min && pos_ctrl_auto_tune.overshoot_max<(20*pos_ctrl_auto_tune.step_amplitude)/100)
@@ -500,42 +501,70 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
 
                 if(pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
-                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(1.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/2;
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(3.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
 
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
+                    pos_ctrl_auto_tune.kpl = (9*pos_ctrl_auto_tune.kpl)/10;
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_4;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
 
-            /*
-            //reduce kpi until overshoot is less than 2%, and then increase speed limit to its default value
+            //step 4: reduce kpi until overshoot is less than 2%, and at the same time, update err_energy_ss_int_min value
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_4 && pos_ctrl_auto_tune.rising_edge==0)
             {
-                if(pos_ctrl_auto_tune.overshoot_max<((20*pos_ctrl_auto_tune.step_amplitude)/1000) && pos_ctrl_auto_tune.err_energy_ss_int<(pos_ctrl_auto_tune.err_energy_ss_limit_soft))
+                if(pos_ctrl_auto_tune.overshoot_max<(2*pos_ctrl_auto_tune.step_amplitude)/100)
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*100)/110;
-
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*98)/100;
                     if(pos_ctrl_auto_tune.kpi==0) pos_ctrl_auto_tune.active_step=UNSUCCESSFUL;
-
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
+
+                pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(3.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
-                //keeping updated for the value of err_en_ss_min
-                pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(4.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/5;
             }
 
+            //step 5: increase kpl until vibration appears
+            if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5 && pos_ctrl_auto_tune.rising_edge==0)
+            {
+                if(pos_ctrl_auto_tune.err_energy_ss_int < 5*pos_ctrl_auto_tune.err_energy_ss_int_min)
+                {
+                    int increment = (pos_ctrl_auto_tune.kpl*3)/100;
+                    if(increment<10)
+                        pos_ctrl_auto_tune.kpl += 10;
+                    else
+                        pos_ctrl_auto_tune.kpl += increment;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+                }
+                else
+                {
+                    pos_ctrl_auto_tune.active_step_counter++;
+                }
+
+                if(pos_ctrl_auto_tune.err_energy_ss_int<pos_ctrl_auto_tune.err_energy_ss_int_min)
+                    pos_ctrl_auto_tune.err_energy_ss_int_min = (pos_ctrl_auto_tune.err_energy_ss_int+(3.00*pos_ctrl_auto_tune.err_energy_ss_int_min))/4;
+
+
+                if(pos_ctrl_auto_tune.active_step_counter==10)
+                {
+                    pos_ctrl_auto_tune.kpl = (1000*pos_ctrl_auto_tune.kpl)/1344; // 1.03 ^ 10
+                    pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_6;
+                    pos_ctrl_auto_tune.active_step_counter=0;
+                }
+            }
+
+            /*
             //reduce kpi until overshoot is less than 2%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5 && pos_ctrl_auto_tune.rising_edge==0)
             {
