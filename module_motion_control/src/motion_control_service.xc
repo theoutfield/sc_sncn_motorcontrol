@@ -861,7 +861,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
                                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                                 printf("step: %i step_counter: %i \n", pos_ctrl_auto_tune.active_step, pos_ctrl_auto_tune.active_step_counter);
-                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                printf("kp:%i ki:%i kd:%i kl:%d j: %d\n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit, motion_ctrl_config.moment_of_inertia);
                             }
 
                             position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
