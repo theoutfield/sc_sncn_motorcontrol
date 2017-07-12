@@ -469,7 +469,11 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 else
                 {
                     pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;
-                    pos_ctrl_auto_tune.active_step_counter=0;
+                    if(pos_ctrl_auto_tune.kpi<1000)
+                        pos_ctrl_auto_tune.active_step_counter=0;
+                    else
+                        pos_ctrl_auto_tune.active_step_counter=10;
+
                 }
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
