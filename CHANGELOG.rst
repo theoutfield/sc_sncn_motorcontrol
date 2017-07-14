@@ -11,6 +11,7 @@ sc_sncn_motorcontrol Change Log
   * Add dual BiSS position sensor support (only DC1K-rev.D1 compatible)
   * Add error detection for open phase
   * Add automatic position sensor eveluation on offset tuning 
+  * Core C22 and C21-DX rev.A are no longer supported (memory limitation)
 
 
   Known Issues:
