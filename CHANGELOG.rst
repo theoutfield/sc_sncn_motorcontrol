@@ -3,11 +3,20 @@ sc_sncn_motorcontrol Change Log
 
 3.1
 ---
+  * Add automatic PID tuning for cascaded and limitted torque position controllers
+  * Add automatic velocity tuning
+  * Add cogging compensation
+  * Add low-pass filter into position control
+  * Add SSI position sensor support
+  * Add dual BiSS position sensor support (only DC1K-rev.D1 compatible)
+  * Add error detection for open phase
+  * Add automatic position sensor eveluation on offset tuning 
+
 
   Known Issues:
-    * REM 16MT sensor does not work with Core C21 and DC1K with long cables (more than 15 cm).
+    * REM 16MT sensor does not work with Core C21-DX_G2 and DC1K rev.C3-C4 with long cables (more than 15 cm).
 
-    This is probably caused by differences in traces length between the GPIO ports used for SPI. A workaround is to flip the Clock (GPIO 1) and the MISO (GPIO 2) pins. For this you need to modify or make a new cable with the two wires flipped
+    This is caused by differences in traces length between the GPIO ports used for SPI. A workaround is to flip the Clock (GPIO 1) and the MISO (GPIO 2) pins. For this you need to modify or make a new cable with the two wires flipped
     and also flip the definitions of GPIO ports 1 and 2 in the IFM module's bsp file.
 
 
