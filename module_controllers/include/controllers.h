@@ -16,6 +16,8 @@ typedef struct {
     double Kd;
     double integral_limit;
     double integral;
+    double derivative;
+    double derivative_1n;
     double actual_value_1n;
     int T_s;                // Sampling-Time in microseconds
     int v;                  // first order element in D part with time constant T_v
