@@ -12,13 +12,13 @@
 
 
 /**
- * @brief intializing the parameters of the PID controller.
+ * @brief intializing the parameters of the PIDT1 controller.
  *
  * @param the parameters of the controller
  *
  * @return void
  */
-void pid_init(PIDparam &param)
+void pid_init(PIDT1param &param)
 {
     param.Kp = 0;
     param.Ki = 0;
@@ -27,20 +27,21 @@ void pid_init(PIDparam &param)
     param.integral = 0;
     param.actual_value_1n = 0;
     param.T_s = 0;
+    param.v = 0;
 }
 
 /**
- * @brief setting the parameters of the PID controller.
+ * @brief setting the parameters of the PIDT1 controller.
  * @param input, P parameter
  * @param input, I parameter
  * @param input, D parameter
  * @param input, Integral limit
  * @param input, sample-time in us (microseconds).
- * @param structure including the parameters of the PID controller
+ * @param structure including the parameters of the PIDT1 controller
  *
  * @return void
  */
-void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDparam &param)
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDT1param &param)
 {
     param.Kp = Kp;
     param.Ki = Ki;
@@ -53,19 +54,20 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
     if (param.integral <(-param.integral_limit)) param.integral =-param.integral_limit;
 
     param.T_s = T_s;
+    param.v = 13;    // it is recommended to be in range [4, 20]
 }
 
 /**
- * @brief updating the PID controller.
+ * @brief updating the PIDT1 controller.
  * @param desired_value, the reference set point
  * @param actual_value, the actual value (measurement)
  * @param T_s, sampling time
- * @param param, the structure containing the pid controller parameters
+ * @param param, the structure containing the PIDT1 controller parameters
  *
  *
- * @return the output of pid controller
+ * @return the output of PIDT1 controller
  */
-double pid_update(double desired_value, double actual_value, int T_s, PIDparam &param)
+double pid_update(double desired_value, double actual_value, int T_s, PIDT1param &param)
 {
     double error=0.00, cmd=0.00;
 
@@ -84,12 +86,12 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDparam &
 }
 
 /**
- * @brief resetting the parameters of the PID controller.
+ * @brief resetting the parameters of the PIDT1 controller.
  * @param the parameters of the controller
  *
  * @return void
  */
-void pid_reset(PIDparam &param)
+void pid_reset(PIDT1param &param)
 {
     param.actual_value_1n = 0;
     param.integral = 0;
