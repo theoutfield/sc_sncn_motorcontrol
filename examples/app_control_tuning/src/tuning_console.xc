@@ -34,7 +34,7 @@ int general_system_evaluation(client interface MotionControlInterface i_motion_c
     }
     else
     {
-        printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n\n");
+        printf(">> MOTOR PHASES PROPERLY CONNECTED ...\n\n");
 
         printf("Evaluation of sensors is starting ...\n");
         printf("Motor will rotate couple of turns in both directions ...\n");
