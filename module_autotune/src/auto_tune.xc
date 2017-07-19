@@ -221,10 +221,10 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 pos_ctrl_auto_tune.rising_edge=1;
             }
 
-            // step 1: force the load to follow the reference value
+            // step 1: increase kvp and kpp until it starts to vibrate or until the steady state error is less than 5%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_1)
             {
-                if(pos_ctrl_auto_tune.err_energy_int < (pos_ctrl_auto_tune.err_energy_int_max/10))
+                if(pos_ctrl_auto_tune.err_energy_ss_int<(25*pos_ctrl_auto_tune.err_energy_ss_limit_hard))
                 {
                     pos_ctrl_auto_tune.active_step_counter++;
                 }
@@ -252,10 +252,10 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
 
 
-            //step 2: increase kvp until it starts to vibrate or until the steady state error is less than 2%
+            //step 2: increase kvp until it starts to vibrate or until the steady state error is less than 1%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_2 && pos_ctrl_auto_tune.rising_edge==0)
             {
-                if(pos_ctrl_auto_tune.err_energy_ss_int < (5*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.err_energy_ss_int>(4*pos_ctrl_auto_tune.err_energy_ss_limit_hard))
+                if(pos_ctrl_auto_tune.err_energy_ss_int < (5*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.err_energy_ss_int>(pos_ctrl_auto_tune.err_energy_ss_limit_hard))
                 {
                     pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*110)/100;
                     pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
@@ -323,12 +323,12 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             //    }
             //}
 
-            //step 5: increase kpp until vibration appears or steady state error becomes less than 1%
+            //step 5: increase kpp until steady state error becomes less than 0.3%
             if(pos_ctrl_auto_tune.active_step==AUTO_TUNE_STEP_5 && pos_ctrl_auto_tune.rising_edge==0)
             {
-                if(pos_ctrl_auto_tune.err_energy_ss_int < (2*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_limit_hard)
+                if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_limit_hard/10)
                 {
-                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*1010)/1000;
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*1050)/1000;
                     if(pos_ctrl_auto_tune.kpp<100) pos_ctrl_auto_tune.kpp =100;
                 }
                 else
@@ -469,11 +469,11 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 else
                 {
                     pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;
+
                     if(pos_ctrl_auto_tune.kpi<1000)
                         pos_ctrl_auto_tune.active_step_counter=0;
                     else
                         pos_ctrl_auto_tune.active_step_counter=10;
-
                 }
 
                 if(pos_ctrl_auto_tune.active_step_counter==10)
