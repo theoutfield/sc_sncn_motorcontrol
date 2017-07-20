@@ -7,6 +7,12 @@
 
 #include <motion_control_service.h>
 
+typedef enum
+{
+    PSEUDO_DERIVATIVE,  // pseudo derivative controller, acts on output
+    STANDARD            // derivative acts on error
+} derivative_feedback;
+
 /**
  * @brief Structure type to set the parameters of the PIDT1 controller.
  */
@@ -19,9 +25,11 @@ typedef struct {
     double derivative;
     double derivative_1n;
     double actual_value_1n;
-    int T_s;                // Sampling-Time in microseconds
+    double error_value_1n;
+    int T_s;                // sampling-Time in microseconds
     int v;                  // first order element in D part with time constant T_v
                             // T_v = Td / v => v €[4, 20]
+    derivative_feedback b;  // derivative feedback, error = b*ref-y
 } PIDT1param;
 
 /**

@@ -28,8 +28,10 @@ void pid_init(PIDT1param &param)
     param.derivative = 0;
     param.derivative_1n = 0;
     param.actual_value_1n = 0;
+    param.error_value_1n = 0;
     param.T_s = 0;
     param.v = 0;
+    param.b = 0;
 }
 
 /**
@@ -64,6 +66,7 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
         param.v = 13;    // it is recommended to be in range [4, 20]
 
     param.T_s = T_s;
+    param.b = PSEUDO_DERIVATIVE;
 }
 
 /**
@@ -72,34 +75,45 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
  * @param actual_value, the actual value (measurement)
  * @param T_s, sampling time
  * @param param, the structure containing the PIDT1 controller parameters
+ * @param b, set-point weight, i.e. error = b*y_ref - y
  *
  *
  * @return the output of PIDT1 controller
  */
 double pid_update(double desired_value, double actual_value, int T_s, PIDT1param &param)
 {
-    double error=0.00, cmd=0.00;
+    double error=0.00, cmd=0.00, derivat_input = 0.00;
 
     error = desired_value - actual_value;
 
     /*
-     * calculatin I part
+     * calculating I part
      */
-    param.integral += (param.Ki*T_s/2/1000000.00) * error;
+    param.integral += (param.Ki/2/1000000.00) * (error - param.error_value_1n);
 
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
         param.integral -= ((param.Ki/1000000.00) * error);
+
+    if (param.b == 1)
+    {
+        derivat_input = error - param.error_value_1n;
+    }
+    else if (param.b == 0)
+    {
+        derivat_input = -(actual_value-param.actual_value_1n);
+    }
 
     /*
      * calculating D part
      * pseudo derivative controller PDT, i.e. acting on the output of the system
      */
-    param.derivative = (((2-T_s*param.v)*param.derivative_1n) + ((2*param.Kd/1000000.00*param.v)*(actual_value-param.actual_value_1n))) / (2+T_s*param.v);
+    param.derivative = (((2-T_s*param.v)*param.derivative_1n) + ((2*param.Kd/1000000.00*param.v)*derivat_input)) / (2+T_s*param.v);
 
-    cmd = ((param.Kp/1000000.00) * error) + param.integral - param.derivative;
+    cmd = ((param.Kp/1000000.00) * error) + param.integral + param.derivative;
 
     param.actual_value_1n = actual_value;
     param.derivative_1n = param.derivative;
+    param.error_value_1n = error;
 
     return cmd;
 }
@@ -116,5 +130,6 @@ void pid_reset(PIDT1param &param)
     param.integral = 0;
     param.derivative = 0;
     param.derivative_1n = 0;
+    param.error_value_1n = 0;
 }
 
