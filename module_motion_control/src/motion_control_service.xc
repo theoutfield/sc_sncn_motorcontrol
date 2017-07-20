@@ -131,9 +131,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     VelCtrlAutoTuneParam velocity_auto_tune;
 
-    //autotune initialization
-    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
-
     downstream_control_data.velocity_cmd = 0;
     motion_ctrl_config.enable_velocity_auto_tuner = 0;
 
