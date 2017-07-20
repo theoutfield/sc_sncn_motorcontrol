@@ -105,6 +105,8 @@ typedef struct {
     QEIConfig qei_config;           /**< QEI sensor configuration */
     HallConfig hall_config;         /**< Hall sensor configuration */
     GPIOType gpio_config[4];        /**< GPIO configuration */
+    int non_linearity[128];
+    char linearization_enabled;
 } PositionFeedbackConfig;
 
 

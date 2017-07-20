@@ -25,8 +25,33 @@ typedef struct {
     unsigned int angle;
     SensorError status;
     unsigned int timestamp;
+    unsigned int singleturn;
 } PositionState;
 
+
+int compute_offset(int singleturn, int *lookup_table)
+{
+    int offset = 0;
+    int x_inf, y_inf, x_sup, y_sup;
+
+    x_inf = singleturn >> 9;
+    x_sup = x_inf+1;
+
+    y_inf = lookup_table[x_inf];
+
+    if (x_sup < 128)
+    {
+        y_sup = lookup_table[x_sup];
+    }
+    else y_sup = lookup_table[0];
+    x_inf = x_inf << 9;
+    x_sup = x_sup << 9;
+
+    double tmp_value = (double)(singleturn-x_inf)*(double)(y_sup-y_inf);
+    offset = y_inf+tmp_value/(x_sup-x_inf);
+
+    return offset;
+}
 
 void read_position(port * biss_clock_port, port * biss_data_port, SPIPorts * spi_ports,
         int biss_clock_low, int biss_clock_high,
@@ -38,6 +63,7 @@ void read_position(port * biss_clock_port, port * biss_data_port, SPIPorts * spi
     case REM_16MT_SENSOR:
         t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
         { state.status, state.count, state.position, state.angle, state.timestamp } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
+        state.singleturn = state.position;
         t :> last_read;
 #ifdef XSCOPE_REM_16MT
             xscope_int(POSITION_RAW, state.angle);
@@ -49,6 +75,7 @@ void read_position(port * biss_clock_port, port * biss_data_port, SPIPorts * spi
         t :> last_read;
         multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
+        state.singleturn = state.position << 2;
         break;
     case BISS_SENSOR:
     case SSI_SENSOR:
@@ -75,8 +102,23 @@ void read_position(port * biss_clock_port, port * biss_data_port, SPIPorts * spi
         } else {
             state.angle = (position_feedback_config.pole_pairs * (state.position << (12-position_feedback_config.biss_config.singleturn_resolution))) & 4095;
         }
+        if (position_feedback_config.biss_config.singleturn_resolution > 16) {
+            state.singleturn = state.position >> (position_feedback_config.biss_config.singleturn_resolution -16);
+        } else {
+            state.singleturn = state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
+        }
         break;
     }
+
+    if (position_feedback_config.linearization_enabled)
+            {
+                int offset_linearity = compute_offset(state.singleturn, position_feedback_config.non_linearity);
+                state.angle += offset_linearity;
+                state.angle &= 4095;
+                state.singleturn += offset_linearity;
+                state.singleturn &= 65535;
+                state.count += offset_linearity;
+            }
     state.last_position = state.position;
     return;
 }
@@ -375,24 +417,6 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
                 }
             }
 
-            //format the sensor singleturn position as a 16-bit data
-            switch(sensor_type)
-            {
-            case REM_16MT_SENSOR:
-                singleturn = pos_state.position;
-                break;
-            case REM_14_SENSOR:
-                singleturn = pos_state.position << 2;
-                break;
-            case BISS_SENSOR:
-            case SSI_SENSOR:
-                if (position_feedback_config.biss_config.singleturn_resolution > 16) {
-                    singleturn = pos_state.position >> (position_feedback_config.biss_config.singleturn_resolution -16);
-                } else {
-                    singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
-                }
-                break;
-            }
 
             //send data to shared memory
             write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, singleturn, velocity, pos_state.angle, 0, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);

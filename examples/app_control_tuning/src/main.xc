@@ -216,6 +216,11 @@ int main(void) {
                     position_feedback_config.gpio_config[2] = GPIO_OFF;
                     position_feedback_config.gpio_config[3] = GPIO_OFF;
 
+                    for (int i = 0; i<128; i++)
+                    {
+                        position_feedback_config.non_linearity[i] = 0;
+                    }
+                    position_feedback_config.linearization_enabled = 0;
                     //setting second sensor
                     PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
                     position_feedback_config_2.sensor_type = 0;
