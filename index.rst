@@ -157,8 +157,8 @@ To run your **Motor Control library** it is necessary to include :ref:`SOMANET B
 
 .. cssclass:: downloadable-button 
 
-  `Download SOMANET Base Library <https://github.com/synapticon/sc_somanet-base/archive/master.zip>`_
+  `Download SOMANET Base Library <https://github.com/synapticon/sc_somanet-base/archive/v2.0.0.zip>`_
 
 .. cssclass:: github
 
-  `Visit SOMANET Base Public Repository <https://github.com/synapticon/sc_somanet-base>`_
+  `Visit SOMANET Base Public Repository <https://github.com/synapticon/sc_somanet-base/tree/release_2.0.0>`_
