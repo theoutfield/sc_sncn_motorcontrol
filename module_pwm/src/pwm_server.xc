@@ -15,11 +15,7 @@
 
 #include "pwm_server.h"
 #include <pwm_ports.h>
-#include "app_global.h"
-#include "pwm_convert_width.h"
 #include <motor_control_interfaces.h>
-#include <a4935.h>
-#include <mc_internal_constants.h>
 
 ///**
 // * @brief Initialize the predriver circuit in your IFM SOMANET device (if applicable)
@@ -105,12 +101,12 @@ static void do_pwm_port_config_general(PwmPortsGeneral &ports)
         set_port_inv( ports.p_pwm_inv_w);
     }
 
-    // Check of ADC synchronisation is being used
-    if (1==_LOCK_ADC_TO_PWM && (!isnull(ports.dummy_port)))
-    {
-        // Configure dummy input port used to send ADC synchronisation pulse
-        configure_in_port( ports.dummy_port, ports.clk );
-    }
+//    // Check of ADC synchronisation is being used
+//    if (1==_LOCK_ADC_TO_PWM && (!isnull(ports.dummy_port)))
+//    {
+//        // Configure dummy input port used to send ADC synchronisation pulse
+//        configure_in_port( ports.dummy_port, ports.clk );
+//    }
 
 } // do_pwm_port_config_general
 
@@ -206,7 +202,7 @@ void pwm_service_general(
     unsigned short v_high_rise=0x0000, v_low_rise=0x0000;
     unsigned short w_high_rise=0x0000, w_low_rise=0x0000;
 
-    unsigned short pwm_init =40;
+    unsigned short pwm_init =GPWM_MAX_VALUE/2;
     unsigned short pwm_value_a=0x0000, pwm_value_b=0x0000, pwm_value_c=0x0000, pwm_value_u=0x0000, pwm_value_v=0x0000, pwm_value_w=0x0000;
 
     //proper task startup
@@ -227,10 +223,10 @@ void pwm_service_general(
     phase_w_inv_defined = !isnull(ports.p_pwm_inv_w);
 
     //constants optimized for the closest case to 16kHz commutation frequency frq at 100 MHz ref_clk_frq
-    period           = 6250;
-    port_clock_shift = 3125;
-    inactive_period  = 75;//deadtime equal to 750 ns
-    range_limit      = 5650;
+    period           = GPWM_MAX_VALUE;
+    port_clock_shift = GPWM_MAX_VALUE/2;
+    inactive_period  = DEADTIME;//deadtime equal to 750 ns
+    range_limit      = GPWM_LIMIT_HIGH;
 
     pwm_value_a=pwm_init;
     pwm_value_b=pwm_init;

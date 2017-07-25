@@ -48,7 +48,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 {
     timer t;
     unsigned int time=0x00000000;
-    unsigned int period = 10000;
+    unsigned int updating_period = 5 * GPWM_MAX_VALUE;
 
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
                     pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
@@ -59,8 +59,8 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
     unsigned short pwm_limit_low  = 0x0000;
     unsigned short pwm_limit_high = 0x0000;
 
-    pwm_limit_high= GENERAL_PWM_MAX_VALUE;
-    pwm_limit_low = GENERAL_PWM_MIN_VALUE;
+    pwm_limit_high= GPWM_LIMIT_HIGH;
+    pwm_limit_low = GPWM_LIMIT_LOW;
 
     pwm_delta = 1;
     pwm_value = pwm_limit_low;
@@ -98,7 +98,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
                      /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
                      /*received_pwm_on (not activated)*/0, /*recieved_safe_torque_off_mode  (not activated)*/0);
 
-             time     += period;
+             time     += updating_period;
             break;
         }
     }

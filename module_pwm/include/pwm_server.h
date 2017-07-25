@@ -26,13 +26,16 @@
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GENERAL_PWM_MAX_VALUE   10000
+#define GPWM_MAX_VALUE      10000
+#define GPWM_LIMIT_HIGH     10000
+#define DEADTIME            75
 
 /**
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GENERAL_PWM_MIN_VALUE   0
+#define GPWM_MIN_VALUE      0
+#define GPWM_LIMIT_LOW      0
 
 ///**
 // * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
