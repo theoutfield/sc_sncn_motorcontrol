@@ -21,6 +21,33 @@ PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
+void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase computational load of cpu
+{
+    int x=0;
+    int y=0;
+
+    x=10 * foo + 1;
+    y=13 * foo + 5;
+
+    while(1)
+    {
+        for(int i=100;i<=1000000;i++)
+        {
+            y = y*x + i;
+            x = x + foo;
+            x = x + 10;
+            x = x * y;
+
+            if (y>10000) y = 13 * foo + 5;
+            if (x>10000) x = 10 * foo + 1;
+        }
+
+        y++;
+        x++;
+        y+=foo;
+        x+=foo;
+    }
+}
 
 //Sends pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
 void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
@@ -90,7 +117,38 @@ int main(void) {
 
     par
     {
-        on tile[IFM_TILE]:
+        on tile[0]://APP TILE
+        {
+            par
+            {
+                {
+                    ocupy_core(10);
+                }
+                {
+                    ocupy_core(11);
+                }
+                {
+                    ocupy_core(12);
+                }
+                {
+                    ocupy_core(13);
+                }
+                {
+                    ocupy_core(14);
+                }
+                {
+                    ocupy_core(15);
+                }
+                {
+                    ocupy_core(16);
+                }
+                {
+                    ocupy_core(17);
+                }
+            }
+        }
+
+        on tile[1]://IFM TILE
         {
             par
             {
@@ -105,6 +163,25 @@ int main(void) {
 
                     delay_milliseconds(500);
                     pwm_service_general(pwm_ports, i_update_pwm);
+                }
+
+                {
+                    ocupy_core(20);
+                }
+                {
+                    ocupy_core(21);
+                }
+                {
+                    ocupy_core(22);
+                }
+                {
+                    ocupy_core(23);
+                }
+                {
+                    ocupy_core(24);
+                }
+                {
+                    ocupy_core(25);
                 }
 
             }
