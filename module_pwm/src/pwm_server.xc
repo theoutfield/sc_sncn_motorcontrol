@@ -123,7 +123,7 @@ static void do_pwm_port_config_general(PwmPortsGeneral &ports)
  */
 void pwm_config_general(PwmPortsGeneral &ports)
 {
-    // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz) -> in our application it is 250 MHz
+    // Configure clock rate to PLATFORM_REFERENCE_MHZ/1 (100 MHz)
     configure_clock_rate( ports.clk ,100 ,1 );
 
     do_pwm_port_config_general(ports);

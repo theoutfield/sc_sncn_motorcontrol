@@ -18,7 +18,6 @@
 #include <print.h>
 
 PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
-WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase computational load of cpu
@@ -112,7 +111,6 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 
 int main(void) {
 
-    interface WatchdogInterface i_watchdog[2];
     interface UpdatePWMGeneral i_update_pwm;
 
     par
@@ -152,17 +150,17 @@ int main(void) {
         {
             par
             {
-                {
-                    delay_milliseconds(1000);
-                    send_pwm_values(i_update_pwm);
-                }
-
                 /* PWM Service */
                 {
                     pwm_config_general(pwm_ports);
 
-                    delay_milliseconds(500);
+                    delay_milliseconds(10);
                     pwm_service_general(pwm_ports, i_update_pwm);
+                }
+
+                {
+                    delay_milliseconds(20);
+                    send_pwm_values(i_update_pwm);
                 }
 
                 {
