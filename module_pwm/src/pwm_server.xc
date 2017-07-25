@@ -206,7 +206,7 @@ void pwm_service_general(
     unsigned short v_high_rise=0x0000, v_low_rise=0x0000;
     unsigned short w_high_rise=0x0000, w_low_rise=0x0000;
 
-    unsigned short pwm_init =0x0028;
+    unsigned short pwm_init =40;
     unsigned short pwm_value_a=0x0000, pwm_value_b=0x0000, pwm_value_c=0x0000, pwm_value_u=0x0000, pwm_value_v=0x0000, pwm_value_w=0x0000;
 
     //proper task startup
@@ -227,10 +227,10 @@ void pwm_service_general(
     phase_w_inv_defined = !isnull(ports.p_pwm_inv_w);
 
     //constants optimized for the closest case to 16kHz commutation frequency frq at 100 MHz ref_clk_frq
-    period           = 0x186A;
-    port_clock_shift = 0x0C35;
-    inactive_period  = 0x0FA;
-    range_limit      = 0x1612;
+    period           = 6250;
+    port_clock_shift = 3125;
+    inactive_period  = 75;//deadtime equal to 750 ns
+    range_limit      = 5650;
 
     pwm_value_a=pwm_init;
     pwm_value_b=pwm_init;
