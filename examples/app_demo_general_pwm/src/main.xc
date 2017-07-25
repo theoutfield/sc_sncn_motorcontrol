@@ -107,11 +107,6 @@ int main(void) {
                     pwm_service_general(pwm_ports, i_update_pwm);
                 }
 
-                /* Watchdog Service */
-                {
-                    delay_milliseconds(200);
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
-                }
             }
         }
     }
