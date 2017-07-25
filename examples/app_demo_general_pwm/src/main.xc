@@ -9,16 +9,11 @@
  */
 
 #include <pwm_server.h>
-#include <user_config.h>
-#include <watchdog_service.h>
 
 #include <xscope.h>
 #include <timer.h>
-#include <stdio.h>
-#include <print.h>
 
 PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
-FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 
 void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase computational load of cpu
 {

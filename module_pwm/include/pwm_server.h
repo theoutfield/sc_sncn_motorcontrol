@@ -17,12 +17,7 @@
 #define _PWM_SERVER_H_
 
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <xs1.h>
-#include <assert.h>
-#include <print.h>
 
 #include <pwm_ports.h>
 #include <motor_control_interfaces.h>
@@ -31,33 +26,33 @@
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GENERAL_PWM_MAX_VALUE   0x1612
+#define GENERAL_PWM_MAX_VALUE   10000
 
 /**
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GENERAL_PWM_MIN_VALUE   0x0000
+#define GENERAL_PWM_MIN_VALUE   0
 
-/**
- * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
- */
-typedef struct {
-    port ?p_coast;                  /**< [Nullable] Port for management signals. */
-    out port ?p_esf_rst_pwml_pwmh;  /**< [Nullable] 4-bit Port to  enabling operation signals (if applicable in your SOMANET device). */
-    port ?p_ff1;                    /**< [Nullable] Port to read out faults (if applicable in your SOMANET device). */
-    port ?p_ff2;                    /**< [Nullable] Port to read out faults (if applicable in your SOMANET device). */
-} FetDriverPorts;
+///**
+// * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
+// */
+//typedef struct {
+//    port ?p_coast;                  /**< [Nullable] Port for management signals. */
+//    out port ?p_esf_rst_pwml_pwmh;  /**< [Nullable] 4-bit Port to  enabling operation signals (if applicable in your SOMANET device). */
+//    port ?p_ff1;                    /**< [Nullable] Port to read out faults (if applicable in your SOMANET device). */
+//    port ?p_ff2;                    /**< [Nullable] Port to read out faults (if applicable in your SOMANET device). */
+//} FetDriverPorts;
 
-/**
- * @brief Structure containing pwm server control data
- */
-typedef struct PWM_SERV_TAG
-{
-	int id;
-	unsigned ref_time;
-	int data_ready;
-} PWM_SERV_TYP;
+///**
+// * @brief Structure containing pwm server control data
+// */
+//typedef struct PWM_SERV_TAG
+//{
+//	int id;
+//	unsigned ref_time;
+//	int data_ready;
+//} PWM_SERV_TYP;
 
 
 ///**
