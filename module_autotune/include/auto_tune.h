@@ -108,6 +108,7 @@ typedef struct {
 
     int kpp;
     int kpi;
+    int kpi_min;
     int kpd;
     int kpl;
     int j;
