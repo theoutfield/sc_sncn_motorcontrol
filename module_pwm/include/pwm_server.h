@@ -26,8 +26,12 @@
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GPWM_MAX_VALUE      10000
-#define GPWM_LIMIT_HIGH     10000
+/*
+ * 6666  -> 15 kHz
+ * 10000 -> 10 kHz
+ */
+#define GPWM_MAX_VALUE      6666//10000
+#define GPWM_LIMIT_HIGH     6666//10000
 #define DEADTIME               75
 
 /**
