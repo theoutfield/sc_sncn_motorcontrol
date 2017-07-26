@@ -53,6 +53,8 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
                     pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
 
+    int counter=0;
+
     short pwm_delta =0x0000;
     unsigned short pwm_value=0;
 
@@ -73,11 +75,16 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
         {
         case t when timerafter(time) :> void:
 
-             pwm_value ++;
-             if(pwm_value>pwm_limit_high)
-             {
-                 pwm_value=pwm_limit_low;
-             }
+            counter++;
+            if(counter==50)
+            {
+                pwm_value ++;
+                if(pwm_value>pwm_limit_high)
+                {
+                    pwm_value=pwm_limit_low;
+                }
+                counter=0;
+            }
 
              pwm_value_a = pwm_value;
              pwm_value_b = pwm_value;
@@ -85,7 +92,6 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
              pwm_value_u = pwm_value;
              pwm_value_v = pwm_value;
              pwm_value_w = pwm_value;
-
 
              pwm_value_a &= 0x0000FFFF;
              pwm_value_b &= 0x0000FFFF;

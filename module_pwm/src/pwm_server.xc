@@ -203,7 +203,10 @@ void pwm_service_general(
     unsigned short port_clock_shift =0x0000;
     unsigned short period           =0x0000;
     unsigned short inactive_period  =0x0000;
-    unsigned short range_limit      =0x0000;
+    unsigned short pwm_limit_h      =0x0000;
+    unsigned short pwm_limit_l      =0x0000;
+    unsigned short limit_h_computational_margine = 0x0000;
+    unsigned short limit_l_computational_margine = 0x0000;
     unsigned short pulse_generation_flag = 0x0000;
 
     unsigned short pwm_init =0x0000;
@@ -216,9 +219,15 @@ void pwm_service_general(
     period           = GPWM_MAX_VALUE   ;
     port_clock_shift = GPWM_MAX_VALUE/2 ;
 
-    pwm_init         = GPWM_LIMIT_HIGH/2;
-    inactive_period  = DEADTIME         ;//deadtime equal to 750 ns
-    range_limit      = GPWM_LIMIT_HIGH - (2*DEADTIME)  - 20;
+
+    pwm_init         = GPWM_MAX_VALUE/2;
+    inactive_period  = DEADTIME        ;//deadtime equal to 750 ns
+
+    limit_h_computational_margine =350 ;
+    limit_l_computational_margine =350 ;
+
+    pwm_limit_l      = 2*DEADTIME                    + limit_h_computational_margine;
+    pwm_limit_h      = GPWM_MAX_VALUE - (2*DEADTIME) - limit_h_computational_margine;
 
     phase_a_defined     = !isnull(ports.p_pwm_a);
     phase_a_inv_defined = !isnull(ports.p_pwm_inv_a);
@@ -279,28 +288,28 @@ void pwm_service_general(
                 int received_pwm_on, int recieved_safe_torque_off_mode):
 
                         pwm_value_a = (pwm_a & 0x0000FFFF);
-                        if(pwm_value_a<pwm_init)    pwm_value_a=0x0000;
-                        if(pwm_value_a>range_limit) pwm_value_a=range_limit;
+                        if(pwm_value_a<pwm_limit_l) pwm_value_a=pwm_limit_l;
+                        if(pwm_value_a>pwm_limit_h) pwm_value_a=pwm_limit_h;
 
                         pwm_value_b = (pwm_b & 0x0000FFFF);
-                        if(pwm_value_b<pwm_init)    pwm_value_b=0x0000;
-                        if(pwm_value_b>range_limit) pwm_value_b=range_limit;
+                        if(pwm_value_b<pwm_limit_l) pwm_value_b=pwm_limit_l;
+                        if(pwm_value_b>pwm_limit_h) pwm_value_b=pwm_limit_h;
 
                         pwm_value_c = (pwm_c & 0x0000FFFF);
-                        if(pwm_value_c<pwm_init)    pwm_value_c=0x0000;
-                        if(pwm_value_c>range_limit) pwm_value_c=range_limit;
+                        if(pwm_value_c<pwm_limit_l) pwm_value_c=pwm_limit_l;
+                        if(pwm_value_c>pwm_limit_h) pwm_value_c=pwm_limit_h;
 
                         pwm_value_u = (pwm_u & 0x0000FFFF);
-                        if(pwm_value_u<pwm_init)    pwm_value_u=0x0000;
-                        if(pwm_value_u>range_limit) pwm_value_u=range_limit;
+                        if(pwm_value_u<pwm_limit_l) pwm_value_u=pwm_limit_l;
+                        if(pwm_value_u>pwm_limit_h) pwm_value_u=pwm_limit_h;
 
                         pwm_value_v = (pwm_v & 0x0000FFFF);
-                        if(pwm_value_v<pwm_init)    pwm_value_v=0x0000;
-                        if(pwm_value_v>range_limit) pwm_value_v=range_limit;
+                        if(pwm_value_v<pwm_limit_l) pwm_value_v=pwm_limit_l;
+                        if(pwm_value_v>pwm_limit_h) pwm_value_v=pwm_limit_h;
 
                         pwm_value_w = (pwm_w & 0x0000FFFF);
-                        if(pwm_value_w<pwm_init)    pwm_value_w=0x0000;
-                        if(pwm_value_w>range_limit) pwm_value_w=range_limit;
+                        if(pwm_value_w<pwm_limit_l) pwm_value_w=pwm_limit_l;
+                        if(pwm_value_w>pwm_limit_h) pwm_value_w=pwm_limit_h;
 
                         a_high_rise= (pwm_value_a >> 1);
                         a_low_rise =  a_high_rise+inactive_period;
