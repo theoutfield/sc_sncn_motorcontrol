@@ -223,8 +223,8 @@ void pwm_service_general(
     pwm_init         = GPWM_MAX_VALUE/2;
     inactive_period  = DEADTIME        ;//deadtime equal to 750 ns
 
-    limit_h_computational_margine =350 ;
-    limit_l_computational_margine =350 ;
+    limit_h_computational_margine =200 ;
+    limit_l_computational_margine =200 ;
 
     pwm_limit_h      = GPWM_MAX_VALUE - (2*DEADTIME) - limit_h_computational_margine;
     pwm_limit_l      = 2*DEADTIME                    + limit_l_computational_margine;
@@ -354,6 +354,7 @@ void pwm_service_general(
 
                         ref_time = partout_timestamped( ports.p_pwm_a ,1 ,pattern ); // Re-load output port with same bit-value
                         ref_time+= port_clock_shift;
+                        ref_time+= 100;
                         break;
 
         case i_update_pwm.status() -> {int status}:
