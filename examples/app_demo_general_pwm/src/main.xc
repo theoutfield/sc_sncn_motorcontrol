@@ -76,7 +76,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
         case t when timerafter(time) :> void:
 
             counter++;
-            if(counter==50)
+            if(counter==10)
             {
                 pwm_value ++;
                 if(pwm_value>pwm_limit_high)

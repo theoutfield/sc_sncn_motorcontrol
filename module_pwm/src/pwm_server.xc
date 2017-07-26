@@ -226,8 +226,8 @@ void pwm_service_general(
     limit_h_computational_margine =350 ;
     limit_l_computational_margine =350 ;
 
-    pwm_limit_l      = 2*DEADTIME                    + limit_h_computational_margine;
     pwm_limit_h      = GPWM_MAX_VALUE - (2*DEADTIME) - limit_h_computational_margine;
+    pwm_limit_l      = 2*DEADTIME                    + limit_l_computational_margine;
 
     phase_a_defined     = !isnull(ports.p_pwm_a);
     phase_a_inv_defined = !isnull(ports.p_pwm_inv_a);
@@ -288,27 +288,27 @@ void pwm_service_general(
                 int received_pwm_on, int recieved_safe_torque_off_mode):
 
                         pwm_value_a = (pwm_a & 0x0000FFFF);
-                        if(pwm_value_a<pwm_limit_l) pwm_value_a=pwm_limit_l;
+                        if(pwm_value_a<pwm_limit_l) pwm_value_a=0x0000;
                         if(pwm_value_a>pwm_limit_h) pwm_value_a=pwm_limit_h;
 
                         pwm_value_b = (pwm_b & 0x0000FFFF);
-                        if(pwm_value_b<pwm_limit_l) pwm_value_b=pwm_limit_l;
+                        if(pwm_value_b<pwm_limit_l) pwm_value_b=0x0000;
                         if(pwm_value_b>pwm_limit_h) pwm_value_b=pwm_limit_h;
 
                         pwm_value_c = (pwm_c & 0x0000FFFF);
-                        if(pwm_value_c<pwm_limit_l) pwm_value_c=pwm_limit_l;
+                        if(pwm_value_c<pwm_limit_l) pwm_value_c=0x0000;
                         if(pwm_value_c>pwm_limit_h) pwm_value_c=pwm_limit_h;
 
                         pwm_value_u = (pwm_u & 0x0000FFFF);
-                        if(pwm_value_u<pwm_limit_l) pwm_value_u=pwm_limit_l;
+                        if(pwm_value_u<pwm_limit_l) pwm_value_u=0x0000;
                         if(pwm_value_u>pwm_limit_h) pwm_value_u=pwm_limit_h;
 
                         pwm_value_v = (pwm_v & 0x0000FFFF);
-                        if(pwm_value_v<pwm_limit_l) pwm_value_v=pwm_limit_l;
+                        if(pwm_value_v<pwm_limit_l) pwm_value_v=0x0000;
                         if(pwm_value_v>pwm_limit_h) pwm_value_v=pwm_limit_h;
 
                         pwm_value_w = (pwm_w & 0x0000FFFF);
-                        if(pwm_value_w<pwm_limit_l) pwm_value_w=pwm_limit_l;
+                        if(pwm_value_w<pwm_limit_l) pwm_value_w=0x0000;
                         if(pwm_value_w>pwm_limit_h) pwm_value_w=pwm_limit_h;
 
                         a_high_rise= (pwm_value_a >> 1);
@@ -396,7 +396,7 @@ void pwm_service_general(
             //    break;
         }
 
-        if(pulse_generation_flag == 1)
+        if(pulse_generation_flag)
         {
             if(phase_a_inv_defined && pwm_value_a) ports.p_pwm_a           @ (unsigned short)((ref_time - a_high_rise)&(inp_wid)) <: 1;
             if(phase_a_inv_defined && pwm_value_a) ports.p_pwm_inv_a       @ (unsigned short)((ref_time - a_low_rise) &(inp_wid)) <: 1;
