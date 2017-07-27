@@ -223,8 +223,8 @@ void pwm_service_general(
     pwm_init         = GPWM_MAX_VALUE/2;
     inactive_period  = DEADTIME        ;//deadtime equal to 750 ns
 
-    limit_h_computational_margine =200 ;
-    limit_l_computational_margine =200 ;
+    limit_h_computational_margine =450 ;
+    limit_l_computational_margine =450 ;
 
     pwm_limit_h      = GPWM_MAX_VALUE - (2*DEADTIME) - limit_h_computational_margine;
     pwm_limit_l      = 2*DEADTIME                    + limit_l_computational_margine;

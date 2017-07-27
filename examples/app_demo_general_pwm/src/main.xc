@@ -20,26 +20,12 @@ void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase c
     int x=0;
     int y=0;
 
-    x=10 * foo + 1;
-    y=13 * foo + 5;
-
     while(1)
     {
-        for(int i=100;i<=1000000;i++)
-        {
-            y = y*x + i;
-            x = x + foo;
-            x = x + 10;
-            x = x * y;
-
-            if (y>10000) y = 13 * foo + 5;
-            if (x>10000) x = 10 * foo + 1;
-        }
-
-        y++;
         x++;
-        y+=foo;
-        x+=foo;
+        y++;
+        if(x>100) x=foo;
+        if(y>100) y=2*foo;
     }
 }
 
@@ -54,15 +40,18 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
                     pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
 
     int counter=0;
+    int pulse_counter=0;
+    int pulse_index=1;
 
     short pwm_delta =0x0000;
     unsigned short pwm_value=0;
+    unsigned short gpwm_value=0;
 
     unsigned short pwm_limit_low  = 0x0000;
     unsigned short pwm_limit_high = 0x0000;
 
-    pwm_limit_high= GPWM_LIMIT_HIGH;
-    pwm_limit_low = GPWM_LIMIT_LOW;
+    pwm_limit_high= GPWM_MAX_VALUE;
+    pwm_limit_low = GPWM_MIN_VALUE;
 
     pwm_delta = 1;
     pwm_value = pwm_limit_low;
@@ -75,20 +64,34 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
         {
         case t when timerafter(time) :> void:
 
-            p <: 0;
-            for(int j=0;j<=15;j++) p <: 1;
-            p <: 0;
-
             counter++;
-            if(counter==50)
+            if(counter==100)
             {
-                pwm_value ++;
+                gpwm_value ++;
                 if(pwm_value>pwm_limit_high)
                 {
-                    pwm_value=pwm_limit_low;
+                    gpwm_value=pwm_limit_low;
                 }
                 counter=0;
             }
+
+            if(pulse_index==1)
+            {
+                pulse_index=2;
+                pwm_value  =2*gpwm_value/3;
+            }
+            else if(pulse_index==2)
+            {
+                pulse_index=3;
+                pwm_value  =3*gpwm_value/3;
+            }
+            else if(pulse_index==3)
+            {
+                pulse_index=1;
+                pwm_value  =1*gpwm_value/3;
+            }
+
+
 
              pwm_value_a = pwm_value;
              pwm_value_b = pwm_value;
@@ -103,6 +106,18 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
              pwm_value_u &= 0x0000FFFF;
              pwm_value_v &= 0x0000FFFF;
              pwm_value_w &= 0x0000FFFF;
+
+             // ------------------------------------------
+             pulse_counter=pulse_index;
+             p <: 0;
+             for(int k=1;k<pulse_counter ;k++)
+             {
+                 for(int j=0;j<=15;j++) p <: 1;
+                 for(int j=0;j<=15;j++) p <: 0;
+             }
+             for(int j=0;j<=15;j++) p <: 1;
+             p <: 0;
+             // ------------------------------------------
              i_update_pwm.update_server_control_data(
                      /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
                      /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
