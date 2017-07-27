@@ -47,7 +47,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
     short pwm_delta =0x0000;
     unsigned short pwm_value=0;
     unsigned short gpwm_value=0;
-    unsigned short delta_duty=1110;//1110 2220 3330 4440 5550 6660
+    unsigned short delta_duty=555;//1110;//1110 2220 3330 4440 5550 6660
 
     unsigned short pwm_limit_low  = 0x0000;
     unsigned short pwm_limit_high = 0x0000;
@@ -150,12 +150,12 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
                 }
             }
 
-            xscope_int(PWM_VALUE_A, pwm_value_a);
-            xscope_int(PWM_VALUE_B, pwm_value_b);
-            xscope_int(PWM_VALUE_C, pwm_value_c);
-            xscope_int(PWM_VALUE_U, pwm_value_u);
-            xscope_int(PWM_VALUE_V, pwm_value_v);
-            xscope_int(PWM_VALUE_W, pwm_value_w);
+            xscope_int(PWM_VALUE_A, pwm_value_a-GPWM_MAX_VALUE);
+            xscope_int(PWM_VALUE_B, pwm_value_b-GPWM_MAX_VALUE);
+            xscope_int(PWM_VALUE_C, pwm_value_c-GPWM_MAX_VALUE);
+            xscope_int(PWM_VALUE_U, pwm_value_u-GPWM_MAX_VALUE);
+            xscope_int(PWM_VALUE_V, pwm_value_v-GPWM_MAX_VALUE);
+            xscope_int(PWM_VALUE_W, pwm_value_w-GPWM_MAX_VALUE);
             xscope_int(TIME_FREE, time_free);
 
             pwm_value_a &= 0x0000FFFF;
