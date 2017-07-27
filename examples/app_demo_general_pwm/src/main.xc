@@ -44,7 +44,7 @@ void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase c
 }
 
 //Sends pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
-void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
+void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
 {
     timer t;
     unsigned int time=0x00000000;
@@ -75,8 +75,12 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
         {
         case t when timerafter(time) :> void:
 
+            p <: 0;
+            for(int j=0;j<=15;j++) p <: 1;
+            p <: 0;
+
             counter++;
-            if(counter==10)
+            if(counter==50)
             {
                 pwm_value ++;
                 if(pwm_value>pwm_limit_high)
@@ -109,6 +113,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
         }
     }
 }
+out port p = GPWM_PORT_SIGNAL;
 
 int main(void) {
 
@@ -161,7 +166,7 @@ int main(void) {
 
                 {
                     delay_milliseconds(20);
-                    send_pwm_values(i_update_pwm);
+                    send_pwm_values(i_update_pwm, p);
                 }
 
                 {
