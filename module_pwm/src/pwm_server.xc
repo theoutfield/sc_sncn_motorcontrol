@@ -211,10 +211,6 @@ void pwm_service_general(
 
     unsigned short pwm_init =0x0000;
 
-    //proper task startup
-    t :> ts;
-    t when timerafter (ts + (4000*20*250)) :> void;
-
     // initialization:
     period           = GPWM_MAX_VALUE   ;
     port_clock_shift = GPWM_MAX_VALUE/2 ;

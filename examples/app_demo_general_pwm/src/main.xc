@@ -34,6 +34,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
 {
     timer t;
     unsigned int time=0x00000000;
+    unsigned int time_end=0x00000000, time_start=0x00000000, time_free=0x00000000;
     unsigned int updating_period = GPWM_MAX_VALUE;
 
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
@@ -46,6 +47,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
     short pwm_delta =0x0000;
     unsigned short pwm_value=0;
     unsigned short gpwm_value=0;
+    unsigned short delta_duty=1000;
 
     unsigned short pwm_limit_low  = 0x0000;
     unsigned short pwm_limit_high = 0x0000;
@@ -63,7 +65,11 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
         select
         {
         case t when timerafter(time) :> void:
+            t :> time_start;
+            time_free = time_start - time_end;
 
+
+            /*
             counter++;
             if(counter==100)
             {
@@ -100,12 +106,6 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
              pwm_value_v = pwm_value;
              pwm_value_w = pwm_value;
 
-             pwm_value_a &= 0x0000FFFF;
-             pwm_value_b &= 0x0000FFFF;
-             pwm_value_c &= 0x0000FFFF;
-             pwm_value_u &= 0x0000FFFF;
-             pwm_value_v &= 0x0000FFFF;
-             pwm_value_w &= 0x0000FFFF;
 
              // ------------------------------------------
              pulse_counter=pulse_index;
@@ -118,12 +118,62 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
              for(int j=0;j<=15;j++) p <: 1;
              p <: 0;
              // ------------------------------------------
-             i_update_pwm.update_server_control_data(
-                     /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
-                     /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
-                     /*received_pwm_on (not activated)*/0, /*recieved_safe_torque_off_mode  (not activated)*/0);
+             */
 
-             time     += updating_period;
+            pwm_value_a += delta_duty;
+            if(pwm_value_a>pwm_limit_high){
+                pwm_value_a = pwm_limit_low;
+
+                pwm_value_b += delta_duty;
+                if(pwm_value_b>pwm_limit_high){
+                    pwm_value_b = pwm_limit_low;
+
+                    pwm_value_c += delta_duty;
+                    if(pwm_value_c>pwm_limit_high){
+                        pwm_value_c = pwm_limit_low;
+
+                        pwm_value_u += delta_duty;
+                        if(pwm_value_u>pwm_limit_high){
+                            pwm_value_u = pwm_limit_low;
+
+                            pwm_value_v += delta_duty;
+                            if(pwm_value_v>pwm_limit_high){
+                                pwm_value_v = pwm_limit_low;
+
+                                pwm_value_w += delta_duty;
+                                if(pwm_value_w>pwm_limit_high){
+                                    pwm_value_w = pwm_limit_low;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            xscope_int(PWM_VALUE_A, pwm_value_a);
+            xscope_int(PWM_VALUE_B, pwm_value_b);
+            xscope_int(PWM_VALUE_C, pwm_value_c);
+            xscope_int(PWM_VALUE_U, pwm_value_u);
+            xscope_int(PWM_VALUE_V, pwm_value_v);
+            xscope_int(PWM_VALUE_W, pwm_value_w);
+            xscope_int(TIME_FREE, time_free);
+
+            pwm_value_a &= 0x0000FFFF;
+            pwm_value_b &= 0x0000FFFF;
+            pwm_value_c &= 0x0000FFFF;
+            pwm_value_u &= 0x0000FFFF;
+            pwm_value_v &= 0x0000FFFF;
+            pwm_value_w &= 0x0000FFFF;
+
+
+            i_update_pwm.update_server_control_data(
+                    /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
+                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
+                    /*received_pwm_on (not activated)*/0, /*recieved_safe_torque_off_mode  (not activated)*/0);
+
+            time     += updating_period;
+
+            t :> time_end;
             break;
         }
     }
