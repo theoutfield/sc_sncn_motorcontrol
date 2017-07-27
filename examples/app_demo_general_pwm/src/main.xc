@@ -47,7 +47,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
     short pwm_delta =0x0000;
     unsigned short pwm_value=0;
     unsigned short gpwm_value=0;
-    unsigned short delta_duty=1000;
+    unsigned short delta_duty=1110;//1110 2220 3330 4440 5550 6660
 
     unsigned short pwm_limit_low  = 0x0000;
     unsigned short pwm_limit_high = 0x0000;
