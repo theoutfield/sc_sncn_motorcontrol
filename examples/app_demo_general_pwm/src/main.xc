@@ -35,7 +35,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
     timer t;
     unsigned int time=0x00000000;
     unsigned int time_end=0x00000000, time_start=0x00000000, time_free=0x00000000;
-    unsigned int updating_period = GPWM_MAX_VALUE;
+    unsigned int updating_period = 20*GPWM_MAX_VALUE;
 
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
             pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
@@ -71,7 +71,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
 
 
             counter++;
-            if(counter==100)
+            if(counter==1)
             {
                 gpwm_value ++;
                 if(pwm_value>pwm_limit_high)
