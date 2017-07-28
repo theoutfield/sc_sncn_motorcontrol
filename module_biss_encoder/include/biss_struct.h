@@ -23,8 +23,10 @@
  * So the values of the enum should not be changed.
  */
 typedef enum {
+    BISS_CLOCK_PORT_EXT_D0=0,       /**< GPIO port number 0 */
+    BISS_CLOCK_PORT_EXT_D1=1,       /**< GPIO port number 1 */
     BISS_CLOCK_PORT_EXT_D2=2,       /**< GPIO port number 2 */
-    BISS_CLOCK_PORT_EXT_D3=3,       /**< GPIO port number 1 */
+    BISS_CLOCK_PORT_EXT_D3=3,       /**< GPIO port number 3 */
     BISS_CLOCK_PORT_EXT_D4=0b0100,  /**< hall_enc_select_port 3rd bit */
     BISS_CLOCK_PORT_EXT_D5=0b1000   /**< hall_enc_select_port 4th bit */
 } BISSClockPortConfig;

@@ -93,6 +93,10 @@ QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
 QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
 HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
+port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
+port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
+port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
 int main() {
     interface WatchdogInterface i_watchdog[2];
@@ -152,7 +156,7 @@ int main() {
                 position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
                 position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
 
-                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
+                position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
             }

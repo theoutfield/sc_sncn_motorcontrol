@@ -12,7 +12,7 @@
 extern char start_message[];
 
 
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[])
+SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, port * biss_data_port, BISSConfig & biss_config, unsigned int data[])
 {
     unsigned int crc  =  0;
     SensorError status = SENSOR_NO_ERROR;
@@ -31,9 +31,7 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
         clock_config = 1;
     }
     unsigned int data_port_config = 0;
-    if (biss_config.data_port_number == ENCODER_PORT_2) {
-        data_port_config = 1;
-    }
+    data_port_config = biss_config.data_port_number;
 
     //read the raw data
     while (read_limit) {
@@ -45,12 +43,15 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
             hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
             hall_enc_select_port->p_hall_enc_select <: biss_config.clock_port_config | hall_enc_select_config;
         }
-        if (data_port_config) {
+        if (data_port_config == ENCODER_PORT_1) {
             qei_hall_port_2->p_qei_hall :> bit;
-        } else {
+            bit = (bit >> BISS_DATA_PORT_BIT)&1;
+        } else if (data_port_config == ENCODER_PORT_2) {
             qei_hall_port_1->p_qei_hall :> bit;
+            bit = (bit >> BISS_DATA_PORT_BIT)&1;
+        } else {
+            *biss_data_port :> bit;
         }
-        bit = (bit >> BISS_DATA_PORT_BIT)&1;
 
         //check ack and start bits and save the data
         if (read_status == 2) { //ack and start bit received, save data

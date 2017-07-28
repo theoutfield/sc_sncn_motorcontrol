@@ -23,7 +23,7 @@
  *
  * @return error status (No Error, CRC Error, No Ack, No Start Bit)
  */
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[]);
+SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, port * biss_data_port, BISSConfig & biss_config, unsigned int data[]);
 
 
 /**

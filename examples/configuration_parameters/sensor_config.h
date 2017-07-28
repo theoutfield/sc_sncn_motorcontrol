@@ -17,8 +17,8 @@
 #define BISS_SENSOR_VELOCITY_COMPUTE_PERIOD 100 // velocity loop time in microseconds (will be rounded to the next multiple of the polling time)
 #define BISS_TIMEOUT               20           // BiSS timeout in microseconds
 #define BISS_BUSY                  30           // maximum number of bits to read before the start bit (= maximum duration of ACK bit in clock cycles)
-#define BISS_CLOCK_PORT            BISS_CLOCK_PORT_EXT_D5
-#define BISS_DATA_PORT_NUMBER      ENCODER_PORT_2 // [ENCODER_PORT_1, ENCODER_PORT_2]
+#define BISS_CLOCK_PORT            BISS_CLOCK_PORT_EXT_D0
+#define BISS_DATA_PORT_NUMBER      ENCODER_PORT_EXT_D1 // [ENCODER_PORT_1, ENCODER_PORT_2]
 #endif
 
 //REM 16MT config

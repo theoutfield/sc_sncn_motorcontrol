@@ -169,6 +169,16 @@ void check_ports(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, H
                 } else {
                     configure_in_port(qei_hall_port_2->p_qei_hall, (*spi_ports).spi_interface.blk1);
                 }
+            } else if (position_feedback_config.biss_config.data_port_number >= ENCODER_PORT_EXT_D0) { //gpio data port
+                if (gpio_ports[position_feedback_config.biss_config.data_port_number - ENCODER_PORT_EXT_D0] == null ||
+                    (!isnull(position_feedback_config_2) && (position_feedback_config_2.sensor_type == REM_16MT_SENSOR || position_feedback_config_2.sensor_type == REM_14_SENSOR) ) )
+                {
+                    position_feedback_config.sensor_type = 0;
+                } else {
+                    set_port_use_on(*gpio_ports[position_feedback_config.biss_config.data_port_number - ENCODER_PORT_EXT_D0]);
+                    configure_out_port(*gpio_ports[position_feedback_config.biss_config.data_port_number - ENCODER_PORT_EXT_D0], (*spi_ports).spi_interface.blk1, 1);
+                    position_feedback_config.gpio_config[position_feedback_config.biss_config.data_port_number - ENCODER_PORT_EXT_D0] = GPIO_OFF; //disable GPIO on this port
+                }
             }
             hall_enc_select_config |=  (1 << position_feedback_config.biss_config.data_port_number);  //RS422 (differential) mode
             //check and configure clock port
@@ -405,6 +415,8 @@ void position_feedback_service(QEIHallPort &?qei_hall_port_1, QEIHallPort &?qei_
                     qei_hall_port_1_2 = move(qei_hall_port_1_1);
                 } else if (position_feedback_config_2.biss_config.data_port_number == ENCODER_PORT_2) {
                     qei_hall_port_2_2 = move(qei_hall_port_2_1);
+                } else if (position_feedback_config_2.biss_config.data_port_number >= ENCODER_PORT_EXT_D0) { //gpio data port
+                    gpio_ports_2[position_feedback_config_2.biss_config.data_port_number - ENCODER_PORT_EXT_D0] = move(gpio_ports[position_feedback_config_2.biss_config.data_port_number - ENCODER_PORT_EXT_D0]);
                 }
                 //move clock port
                 if (position_feedback_config_2.biss_config.clock_port_config >= BISS_CLOCK_PORT_EXT_D4) { //hall_enc_select_port clock port
