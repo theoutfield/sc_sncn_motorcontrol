@@ -30,7 +30,7 @@
  * 6666  -> 15 kHz
  * 10000 -> 10 kHz
  */
-#define GPWM_MAX_VALUE      6666//10000
+#define GPWM_MAX_VALUE      6667//10000
 #define DEADTIME               75
 
 /**
