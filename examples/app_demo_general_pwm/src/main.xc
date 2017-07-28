@@ -38,7 +38,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
     unsigned int updating_period = GPWM_MAX_VALUE;
 
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
-                    pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
+            pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
 
     int counter=0;
     int pulse_counter=0;
@@ -69,7 +69,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
             time_free = time_start - time_end;
 
 
-            /*
+
             counter++;
             if(counter==100)
             {
@@ -80,7 +80,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
                 }
                 counter=0;
             }
-
+            /*
             if(pulse_index==1)
             {
                 pulse_index=2;
@@ -96,30 +96,30 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
                 pulse_index=1;
                 pwm_value  =1*gpwm_value/3;
             }
-
-
-
-             pwm_value_a = pwm_value;
-             pwm_value_b = pwm_value;
-             pwm_value_c = pwm_value;
-             pwm_value_u = pwm_value;
-             pwm_value_v = pwm_value;
-             pwm_value_w = pwm_value;
-
-
-             // ------------------------------------------
-             pulse_counter=pulse_index;
-             p <: 0;
-             for(int k=1;k<pulse_counter ;k++)
-             {
-                 for(int j=0;j<=15;j++) p <: 1;
-                 for(int j=0;j<=15;j++) p <: 0;
-             }
-             for(int j=0;j<=15;j++) p <: 1;
-             p <: 0;
-             // ------------------------------------------
              */
 
+            pwm_value = gpwm_value;
+            pwm_value_a = pwm_value;
+            pwm_value_b = pwm_value;
+            pwm_value_c = pwm_value;
+            pwm_value_u = pwm_value;
+            pwm_value_v = pwm_value;
+            pwm_value_w = pwm_value;
+
+
+            // ------------------------------------------
+            pulse_counter=pulse_index;
+            p <: 0;
+            for(int k=1;k<pulse_counter ;k++)
+            {
+                for(int j=0;j<=15;j++) p <: 1;
+                for(int j=0;j<=15;j++) p <: 0;
+            }
+            for(int j=0;j<=15;j++) p <: 1;
+            p <: 0;
+            // ------------------------------------------
+
+            /*
             pwm_value_a += delta_duty;
             if(pwm_value_a>pwm_limit_high){
                 pwm_value_a = pwm_limit_low;
@@ -149,7 +149,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm, out port p)
                     }
                 }
             }
-
+             */
             xscope_int(PWM_VALUE_A, pwm_value_a-GPWM_MAX_VALUE);
             xscope_int(PWM_VALUE_B, pwm_value_b-GPWM_MAX_VALUE);
             xscope_int(PWM_VALUE_C, pwm_value_c-GPWM_MAX_VALUE);
