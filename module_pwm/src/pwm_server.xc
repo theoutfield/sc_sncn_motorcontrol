@@ -214,6 +214,7 @@ void pwm_service_general(
     unsigned short pwm_limit_l      =0x0000;
     unsigned short limit_h_computational_margine = 0x0000;
     unsigned short limit_l_computational_margine = 0x0000;
+    unsigned short computational_delay = 0x0000;
     unsigned short pulse_generation_flag = 0x0000;
 
     unsigned short pwm_init =0x0000;
@@ -234,6 +235,8 @@ void pwm_service_general(
 
         pwm_limit_h      = (6667 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = (2*(DEADTIME/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
+
+        computational_delay = 100 & 0x0000FFFF;
         break;
 
     }
@@ -325,7 +328,7 @@ void pwm_service_general(
                         ref_time += port_clock_shift;
                         ref_time &= 0x0000FFFF;
 
-                        ref_time += 100;
+                        ref_time += computational_delay;
                         ref_time &= 0x0000FFFF;
 
                         pulse_generation_flag = 1;
