@@ -207,6 +207,7 @@ void pwm_service_general(
     unsigned inp_wid = 0x0000FFFF;
     unsigned pattern = 0x00000000;
 
+    unsigned short ref_time_delay   =0x0000;
     unsigned short port_clock_shift =0x0000;
     unsigned short period           =0x0000;
     unsigned short inactive_period  =0x0000;
@@ -215,6 +216,7 @@ void pwm_service_general(
     unsigned short limit_h_computational_margine = 0x0000;
     unsigned short limit_l_computational_margine = 0x0000;
     unsigned short computational_delay = 0x0000;
+    unsigned short dummy_delay         = 0x0000;
     unsigned short pulse_generation_flag = 0x0000;
     int i=0x00000000;
     unsigned int   pulse_counter = 0x00000000;
@@ -228,9 +230,11 @@ void pwm_service_general(
     case (15):
         // values for 15 kHz switching frequency, and 100 MHz of ref_clck_frq:
         // ======================================
+        ref_time_delay   = 6667 & 0x0000FFFF   ;
         port_clock_shift = 3333 & 0x0000FFFF   ;
         pwm_init         = 3333 & 0x0000FFFF   ;
         inactive_period  = (DEADTIME/10) & 0x0000FFFF   ;
+        dummy_delay      = 3333 & 0x0000FFFF   ;
 
         limit_h_computational_margine =220 & 0x0000FFFF   ;
         limit_l_computational_margine =220 & 0x0000FFFF   ;
@@ -240,6 +244,25 @@ void pwm_service_general(
 
         computational_delay = 100 & 0x0000FFFF;
         pulse_counter = 0x00000001;
+        break;
+
+    case (30):
+        // values for 30 kHz switching frequency, and 100 MHz of ref_clck_frq:
+        // ======================================
+        ref_time_delay   = 3333 & 0x0000FFFF   ;
+        port_clock_shift = 1667 & 0x0000FFFF   ;
+        pwm_init         = 1667 & 0x0000FFFF   ;
+        inactive_period  = (DEADTIME/10) & 0x0000FFFF   ;
+        dummy_delay      = 1667 & 0x0000FFFF   ;
+
+        limit_h_computational_margine =220 & 0x0000FFFF   ;
+        limit_l_computational_margine =220 & 0x0000FFFF   ;
+
+        pwm_limit_h      = (3333 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
+        pwm_limit_l      = (2*(DEADTIME/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
+
+        computational_delay = 100 & 0x0000FFFF;
+        pulse_counter = 0x00000002;
         break;
 
     }
@@ -375,6 +398,11 @@ void pwm_service_general(
                 if(phase_v_inv_defined && pwm_value_v) ports.p_pwm_inv_v       @ (unsigned short)((ref_time + v_low_rise) &(inp_wid)) <: 0;
                 if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_w           @ (unsigned short)((ref_time + w_high_rise)&(inp_wid)) <: 0;
                 if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_inv_w       @ (unsigned short)((ref_time + w_low_rise) &(inp_wid)) <: 0;
+
+                ports.dummy_port @ (unsigned short)((ref_time + dummy_delay) & (inp_wid)) :> dummy_value;
+
+                ref_time += ref_time_delay;
+                ref_time &= 0x0000FFFF;
             }
             pulse_generation_flag = 0;
         }// if(pulse_generation_flag)
