@@ -226,7 +226,7 @@ int main(void) {
                     pwm_config_general(pwm_ports);
 
                     delay_milliseconds(10);
-                    pwm_service_general(pwm_ports, i_update_pwm);
+                    pwm_service_general(pwm_ports, i_update_pwm, 15);
                 }
 
                 {

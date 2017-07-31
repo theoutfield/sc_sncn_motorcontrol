@@ -86,12 +86,14 @@ void pwm_config_general(PwmPortsGeneral &ports);
  *
  * @param ports                 Structure type for PWM ports
  * @param i_update_pwm          Interface to communicate with client and update the PWM values
+ * @param freq_kHz              pwm frequency - kHz
  *
  * @return void
  */
 void pwm_service_general(
         PwmPortsGeneral &ports,
-        server interface UpdatePWMGeneral i_update_pwm
+        server interface UpdatePWMGeneral i_update_pwm,
+        int freq_kHz
 );
 
 ///**

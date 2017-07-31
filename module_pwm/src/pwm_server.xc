@@ -175,7 +175,8 @@ void pwm_config_general(PwmPortsGeneral &ports)
  */
 void pwm_service_general(
         PwmPortsGeneral &ports,
-        server interface UpdatePWMGeneral i_update_pwm
+        server interface UpdatePWMGeneral i_update_pwm,
+        int freq_kHz
 )
 {
     unsigned short phase_a_defined    =0x0000, phase_b_defined    =0x0000, phase_c_defined    =0x0000;
@@ -219,20 +220,23 @@ void pwm_service_general(
 
     // initialization:
     // ===============
+    switch(freq_kHz)
+    {
+    case (15):
+        // values for 15 kHz switching frequency, and 100 MHz of ref_clck_frq:
+        // ======================================
+        port_clock_shift = 3333 & 0x0000FFFF   ;
+        pwm_init         = 3333 & 0x0000FFFF   ;
+        inactive_period  = (DEADTIME/10) & 0x0000FFFF   ;
 
-    // values for 15 kHz switching frequency, and 100 MHz of ref_clck_frq:
-    // ======================================
-    port_clock_shift = 3333 & 0x0000FFFF   ;
-    pwm_init         = 3333 & 0x0000FFFF   ;
-    inactive_period  = (DEADTIME/10) & 0x0000FFFF   ;
+        limit_h_computational_margine =220 & 0x0000FFFF   ;
+        limit_l_computational_margine =220 & 0x0000FFFF   ;
 
-    limit_h_computational_margine =220 & 0x0000FFFF   ;
-    limit_l_computational_margine =220 & 0x0000FFFF   ;
+        pwm_limit_h      = (6667 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
+        pwm_limit_l      = (2*(DEADTIME/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
+        break;
 
-    pwm_limit_h      = (6667 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
-    pwm_limit_l      = (2*DEADTIME                 + limit_l_computational_margine) & 0x0000FFFF   ;
-
-
+    }
 
     phase_a_defined     = !isnull(ports.p_pwm_a);
     phase_a_inv_defined = !isnull(ports.p_pwm_inv_a);
