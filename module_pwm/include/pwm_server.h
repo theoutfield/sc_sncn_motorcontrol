@@ -31,13 +31,15 @@
  * 10000 -> 10 kHz
  */
 #define GPWM_MAX_VALUE      6667//10000
-#define DEADTIME               75
-
 /**
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
 #define GPWM_MIN_VALUE         0
+
+
+#define DEADTIME            750 //nano-seconds
+
 
 ///**
 // * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
