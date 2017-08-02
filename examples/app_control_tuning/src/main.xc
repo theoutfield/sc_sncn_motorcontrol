@@ -231,10 +231,58 @@ int main(void) {
                 {
                     ocupy_core(10);
                 }
-                 */
 
                 {
                     ocupy_core(11);
+                }
+                 */
+                /* Position Control Loop */
+                {
+                    MotionControlConfig motion_ctrl_config;
+
+                    motion_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;
+                    motion_ctrl_config.max_pos_range_limit =                  MAX_POSITION_RANGE_LIMIT;
+                    motion_ctrl_config.max_motor_speed =                      MOTOR_MAX_SPEED;
+                    motion_ctrl_config.polarity =                             POLARITY;
+
+                    motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
+                    motion_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+                    motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
+                    motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
+
+                    motion_ctrl_config.position_control_strategy =            POSITION_CONTROL_STRATEGY;
+
+                    motion_ctrl_config.filter =                               FILTER_CUT_OFF_FREQ;
+
+                    motion_ctrl_config.position_kp =                          POSITION_Kp;
+                    motion_ctrl_config.position_ki =                          POSITION_Ki;
+                    motion_ctrl_config.position_kd =                          POSITION_Kd;
+                    motion_ctrl_config.position_integral_limit =              POSITION_INTEGRAL_LIMIT;
+                    motion_ctrl_config.moment_of_inertia =                    MOMENT_OF_INERTIA;
+
+                    motion_ctrl_config.velocity_kp =                          VELOCITY_Kp;
+                    motion_ctrl_config.velocity_ki =                          VELOCITY_Ki;
+                    motion_ctrl_config.velocity_kd =                          VELOCITY_Kd;
+                    motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
+                    motion_ctrl_config.enable_velocity_auto_tuner =           ENABLE_VELOCITY_AUTO_TUNER;
+                    motion_ctrl_config.enable_compensation_recording =        ENABLE_COMPENSATION_RECORDING;
+
+                    motion_ctrl_config.brake_release_strategy =               BRAKE_RELEASE_STRATEGY;
+                    motion_ctrl_config.brake_release_delay =                  BRAKE_RELEASE_DELAY;
+
+                    //select resolution of sensor used for motion control
+                    if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
+                        motion_ctrl_config.resolution  =                          SENSOR_2_RESOLUTION;
+                    } else {
+                        motion_ctrl_config.resolution  =                          SENSOR_1_RESOLUTION;
+                    }
+
+                    motion_ctrl_config.dc_bus_voltage=                        DC_BUS_VOLTAGE;
+                    motion_ctrl_config.pull_brake_voltage=                    PULL_BRAKE_VOLTAGE;
+                    motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
+                    motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
+
+                    motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
                 }
 
                 {
@@ -271,16 +319,16 @@ int main(void) {
                 {
                     pwm_config_general(pwm_ports);
 
+                    //if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
+                    //    predriver(fet_driver_ports);
+
                     delay_milliseconds(10);
                     pwm_service_general(pwm_ports, i_update_pwm, 15);
                 }
 
-
                 /* Motor Control Service */
                 {
                     delay_milliseconds(20);
-
-
                     MotorcontrolConfig motorcontrol_config;
 
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
@@ -324,13 +372,21 @@ int main(void) {
                     ocupy_core(21);
                 }
 
+                /* ADC Service */
+                {
+                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
+                }
+
                 {
                     ocupy_core(22);
                 }
 
-                {
-                    ocupy_core(23);
-                }
+                /* Shared memory Service */
+                [[distribute]] shared_memory_service(i_shared_memory, 3);
+
+                //{
+                //    ocupy_core(23);
+                //}
 
                 //{
                 //    ocupy_core(24);
@@ -409,101 +465,4 @@ int main(void) {
 
     return 0;
 }
-
-//int main(void) {
-//
-
-//
-//    par
-//    {
-
-//
-//        on tile[IFM_TILE]:
-//        /* Position Control Loop */
-//        {
-//            MotionControlConfig motion_ctrl_config;
-//
-//            motion_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;
-//            motion_ctrl_config.max_pos_range_limit =                  MAX_POSITION_RANGE_LIMIT;
-//            motion_ctrl_config.max_motor_speed =                      MOTOR_MAX_SPEED;
-//            motion_ctrl_config.polarity =                             POLARITY;
-//
-//            motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
-//            motion_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
-//            motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
-//            motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
-//
-//            motion_ctrl_config.position_control_strategy =            POSITION_CONTROL_STRATEGY;
-//
-//            motion_ctrl_config.filter =                               FILTER_CUT_OFF_FREQ;
-//
-//            motion_ctrl_config.position_kp =                          POSITION_Kp;
-//            motion_ctrl_config.position_ki =                          POSITION_Ki;
-//            motion_ctrl_config.position_kd =                          POSITION_Kd;
-//            motion_ctrl_config.position_integral_limit =              POSITION_INTEGRAL_LIMIT;
-//            motion_ctrl_config.moment_of_inertia =                    MOMENT_OF_INERTIA;
-//
-//            motion_ctrl_config.velocity_kp =                          VELOCITY_Kp;
-//            motion_ctrl_config.velocity_ki =                          VELOCITY_Ki;
-//            motion_ctrl_config.velocity_kd =                          VELOCITY_Kd;
-//            motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
-//            motion_ctrl_config.enable_velocity_auto_tuner =           ENABLE_VELOCITY_AUTO_TUNER;
-//            motion_ctrl_config.enable_compensation_recording =        ENABLE_COMPENSATION_RECORDING;
-//
-//            motion_ctrl_config.brake_release_strategy =               BRAKE_RELEASE_STRATEGY;
-//            motion_ctrl_config.brake_release_delay =                  BRAKE_RELEASE_DELAY;
-//
-//            //select resolution of sensor used for motion control
-//            if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
-//                motion_ctrl_config.resolution  =                          SENSOR_2_RESOLUTION;
-//            } else {
-//                motion_ctrl_config.resolution  =                          SENSOR_1_RESOLUTION;
-//            }
-//
-//            motion_ctrl_config.dc_bus_voltage=                        DC_BUS_VOLTAGE;
-//            motion_ctrl_config.pull_brake_voltage=                    PULL_BRAKE_VOLTAGE;
-//            motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
-//            motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
-//
-//            motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
-//        }
-//
-//
-//        on tile[IFM_TILE]:
-//        {
-//            par
-//            {
-//                /* PWM Service */
-//                {
-//                    pwm_config(pwm_ports);
-//
-//                    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
-//                        predriver(fet_driver_ports);
-//
-//                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-//                    pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-//                            i_update_brake, IFM_TILE_USEC);
-//
-//                }
-//
-//                /* ADC Service */
-//                {
-//                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
-//                }
-//
-//                /* Watchdog Service */
-//                {
-//                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
-//                }
-//
-//                /* Shared memory Service */
-//                [[distribute]] shared_memory_service(i_shared_memory, 3);
-//
-//
-//            }
-//        }
-//    }
-//
-//    return 0;
-//}
 
