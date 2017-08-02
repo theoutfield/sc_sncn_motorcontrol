@@ -237,8 +237,8 @@ void pwm_service_general(
         inactive_period  = (DEADTIME/10) & 0x0000FFFF   ;
         dummy_delay      = 3333 & 0x0000FFFF   ;
 
-        limit_h_computational_margine =220 & 0x0000FFFF   ;
-        limit_l_computational_margine =220 & 0x0000FFFF   ;
+        limit_h_computational_margine =350 & 0x0000FFFF   ;
+        limit_l_computational_margine =350 & 0x0000FFFF   ;
 
         pwm_limit_h      = (6667 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = (2*(DEADTIME/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
@@ -547,7 +547,7 @@ void pwm_service_general(
                     if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_w           @ (unsigned short)((ref_time + w_high_rise)&(inp_wid)) <: 0;
                     if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_inv_w       @ (unsigned short)((ref_time + w_low_rise) &(inp_wid)) <: 0;
 
-                    //ports.dummy_port @ (unsigned short)((ref_time + dummy_delay) & (inp_wid)) :> dummy_value;
+                    ports.dummy_port @ (unsigned short)((ref_time + dummy_delay) & (inp_wid)) :> dummy_value;
 
                     ref_time += ref_time_delay;
                     ref_time &= 0x0000FFFF;

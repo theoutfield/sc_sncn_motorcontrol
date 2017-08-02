@@ -38,7 +38,7 @@
 #define GPWM_MIN_VALUE         0
 
 
-#define DEADTIME            750 //nano-seconds
+#define DEADTIME             750 //nano-seconds
 
 
 ///**

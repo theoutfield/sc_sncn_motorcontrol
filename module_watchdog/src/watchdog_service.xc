@@ -11,16 +11,16 @@
  void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec)
 {
     unsigned int usec;
-    if(ifm_tile_usec==250)
-    {
-        //Set freq to 250MHz (always needed for proper timing)
-        write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
-        usec = 250;
-    }
-    else
-    {
-        usec = 100;
-    }
+    //if(ifm_tile_usec==250)
+    //{
+    //    //Set freq to 250MHz (always needed for proper timing)
+    //    write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
+    //    usec = 250;
+    //}
+    //else
+    //{
+    usec = 100;
+    //}
 
     int IFM_module_type = -1;
 
@@ -45,9 +45,9 @@
     int fault_counter=0;
     unsigned int times = 0;
 
-    //proper task startup
-    t :> ts;
-    t when timerafter (ts + (1000*20*250)) :> void;//FixMe: how is it proper?
+    ////proper task startup
+    //t :> ts;
+    //t when timerafter (ts + (1000*20*100)) :> void;//FixMe: how is it proper?
 
     //Do the IFM type identification only once
     if(!isnull(watchdog_ports.p_shared_enable_tick_led)){//DC100, DC300, or DC1K
@@ -94,9 +94,7 @@
     t :> ts;
     t when timerafter (ts + 100*usec) :> void;//100 us
 
-
     t :> ts;
-
     // Loop forever processing commands
     while (1) {
         select {
