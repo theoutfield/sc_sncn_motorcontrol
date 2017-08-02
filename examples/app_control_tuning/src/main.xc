@@ -55,7 +55,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
     short pwm_delta =0x0000;
     unsigned short pwm_value =0;
     unsigned short gpwm_value=0;
-    unsigned short delta_duty=1110;//1110;//1110 2220 3330 4440 5550 6660
+    unsigned short delta_duty=101;//1110;//1110 2220 3330 4440 5550 6660
 
     unsigned short pwm_limit_low  = 0x0000 & 0x0000FFFF;
     unsigned short pwm_limit_high = 0x0000 & 0x0000FFFF;
@@ -149,6 +149,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
                         if(pwm_value_u>pwm_limit_high){
                             pwm_value_u = pwm_limit_low;
 
+/*
                             pwm_value_v += delta_duty;
                             if(pwm_value_v>pwm_limit_high){
                                 pwm_value_v = pwm_limit_low;
@@ -158,6 +159,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
                                     pwm_value_w = pwm_limit_low;
                                 }
                             }
+*/
                         }
                     }
                 }
