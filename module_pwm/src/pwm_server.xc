@@ -277,8 +277,8 @@ void pwm_service_general(
         inactive_period  = (DEADTIME/10) & 0x0000FFFF   ;
         dummy_delay      = 1111 & 0x0000FFFF   ;
 
-        limit_h_computational_margine =350 & 0x0000FFFF   ;
-        limit_l_computational_margine =350 & 0x0000FFFF   ;
+        limit_h_computational_margine =400 & 0x0000FFFF   ;
+        limit_l_computational_margine =400 & 0x0000FFFF   ;
 
         pwm_limit_h      = (2222 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = (2*(DEADTIME/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
@@ -298,7 +298,7 @@ void pwm_service_general(
         dummy_delay      = 500 & 0x0000FFFF   ;
 
         limit_h_computational_margine =220 & 0x0000FFFF   ;
-        limit_l_computational_margine =220 & 0x0000FFFF   ;
+        limit_l_computational_margine =  0 & 0x0000FFFF   ;
 
         pwm_limit_h      = (1000 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = (2*(DEADTIME/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
@@ -446,7 +446,7 @@ void pwm_service_general(
             ports.dummy_port @ (unsigned short)((ref_time + dummy_delay) & (inp_wid)) :> dummy_value;
         }// while(1)__I
 
-    }//if(fast_switching)
+    }//eo if(fast_switching)
     else
     {
         while (1)
@@ -551,7 +551,7 @@ void pwm_service_general(
 
                     ref_time += ref_time_delay;
                     ref_time &= 0x0000FFFF;
-                }//for()
+                }//for
 
                 pulse_generation_flag = 0;
 

@@ -93,7 +93,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
             if(counter==500)
             {
                 gpwm_value ++;
-                if(pwm_value>GPWM_MAX_VALUE)
+                if(gpwm_value>GPWM_MAX_VALUE)
                 {
                     gpwm_value=GPWM_MIN_VALUE;
                 }
@@ -323,7 +323,7 @@ int main(void) {
                     //    predriver(fet_driver_ports);
 
                     delay_milliseconds(10);
-                    pwm_service_general(pwm_ports, i_update_pwm, 15);
+                    pwm_service_general(pwm_ports, i_update_pwm, 100);
                 }
 
                 /* Motor Control Service */
