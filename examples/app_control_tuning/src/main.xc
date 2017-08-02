@@ -55,7 +55,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
     short pwm_delta =0x0000;
     unsigned short pwm_value =0;
     unsigned short gpwm_value=0;
-    unsigned short delta_duty=555;//1110;//1110 2220 3330 4440 5550 6660
+    unsigned short delta_duty=1110;//1110;//1110 2220 3330 4440 5550 6660
 
     unsigned short pwm_limit_low  = 0x0000 & 0x0000FFFF;
     unsigned short pwm_limit_high = 0x0000 & 0x0000FFFF;
@@ -79,6 +79,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
             t :> time_start;
             time_free = time_start - time_end;
 
+            /*
             counter++;
             if(counter==500)
             {
@@ -89,6 +90,8 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
                 }
                 counter=0;
             }
+            */
+
             /*
             if(pulse_index==1)
             {
@@ -105,8 +108,9 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
                 pulse_index=1;
                 pwm_value  =1*gpwm_value/3;
             }
-             */
+            */
 
+            /*
             pwm_value = gpwm_value;
             pwm_value_a = pwm_value;
             pwm_value_b = pwm_value;
@@ -114,7 +118,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
             pwm_value_u = pwm_value;
             pwm_value_v = pwm_value;
             pwm_value_w = pwm_value;
-
+            */
 
             //// ------------------------------------------
             //pulse_counter=pulse_index;
@@ -128,7 +132,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
             //p <: 0;
             //// ------------------------------------------
 
-            /*
+
             pwm_value_a += delta_duty;
             if(pwm_value_a>pwm_limit_high){
                 pwm_value_a = pwm_limit_low;
@@ -158,7 +162,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
                     }
                 }
             }
-             */
+
             xscope_int(PWM_VALUE_A, pwm_value_a-GPWM_MAX_VALUE);
             xscope_int(PWM_VALUE_B, pwm_value_b-GPWM_MAX_VALUE);
             xscope_int(PWM_VALUE_C, pwm_value_c-GPWM_MAX_VALUE);
