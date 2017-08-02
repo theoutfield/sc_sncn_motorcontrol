@@ -46,161 +46,161 @@ void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase c
     }
 }
 
-//Sends pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
-void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
-{
-    timer t;
-    unsigned int time=0x00000000;
-    unsigned int time_end=0x00000000, time_start=0x00000000, time_free=0x00000000;
-    unsigned int updating_period = GPWM_MAX_VALUE;
-
-    unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
-                    pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
-
-    int counter=0;
-    int pulse_counter=0;
-    int pulse_index=1;
-
-    short pwm_delta =0x0000;
-    unsigned short pwm_value =0;
-    unsigned short gpwm_value=0;
-    unsigned short delta_duty=101;//1110;//1110 2220 3330 4440 5550 6660
-
-    unsigned short pwm_limit_low  = 0x0000 & 0x0000FFFF;
-    unsigned short pwm_limit_high = 0x0000 & 0x0000FFFF;
-
-    int pwm_on         =0x00000001;
-    int safe_torque_off=0x00000000;
-
-    pwm_limit_high= GPWM_MAX_VALUE;
-    pwm_limit_low = GPWM_MIN_VALUE;
-
-    pwm_delta = 1;
-    pwm_value = pwm_limit_low;
-
-    time    =0x00000000;
-    t :> time;
-    while(1)
-    {
-        select
-        {
-        case t when timerafter(time) :> void:
-            t :> time_start;
-            time_free = time_start - time_end;
-
-            /*
-            counter++;
-            if(counter==500)
-            {
-                gpwm_value ++;
-                if(gpwm_value>GPWM_MAX_VALUE)
-                {
-                    gpwm_value=GPWM_MIN_VALUE;
-                }
-                counter=0;
-            }
-            */
-
-            /*
-            if(pulse_index==1)
-            {
-                pulse_index=2;
-                pwm_value  =2*gpwm_value/3;
-            }
-            else if(pulse_index==2)
-            {
-                pulse_index=3;
-                pwm_value  =3*gpwm_value/3;
-            }
-            else if(pulse_index==3)
-            {
-                pulse_index=1;
-                pwm_value  =1*gpwm_value/3;
-            }
-            */
-
-            /*
-            pwm_value = gpwm_value;
-            pwm_value_a = pwm_value;
-            pwm_value_b = pwm_value;
-            pwm_value_c = pwm_value;
-            pwm_value_u = pwm_value;
-            pwm_value_v = pwm_value;
-            pwm_value_w = pwm_value;
-            */
-
-            //// ------------------------------------------
-            //pulse_counter=pulse_index;
-            //p <: 0;
-            //for(int k=1;k<pulse_counter ;k++)
-            //{
-            //    for(int j=0;j<=15;j++) p <: 1;
-            //    for(int j=0;j<=15;j++) p <: 0;
-            //}
-            //for(int j=0;j<=15;j++) p <: 1;
-            //p <: 0;
-            //// ------------------------------------------
-
-
-            pwm_value_a += delta_duty;
-            if(pwm_value_a>pwm_limit_high){
-                pwm_value_a = pwm_limit_low;
-
-                pwm_value_b += delta_duty;
-                if(pwm_value_b>pwm_limit_high){
-                    pwm_value_b = pwm_limit_low;
-
-                    pwm_value_c += delta_duty;
-                    if(pwm_value_c>pwm_limit_high){
-                        pwm_value_c = pwm_limit_low;
-
-                        pwm_value_u += delta_duty;
-                        if(pwm_value_u>pwm_limit_high){
-                            pwm_value_u = pwm_limit_low;
-
-/*
-                            pwm_value_v += delta_duty;
-                            if(pwm_value_v>pwm_limit_high){
-                                pwm_value_v = pwm_limit_low;
-
-                                pwm_value_w += delta_duty;
-                                if(pwm_value_w>pwm_limit_high){
-                                    pwm_value_w = pwm_limit_low;
-                                }
-                            }
-*/
-                        }
-                    }
-                }
-            }
-
-            xscope_int(PWM_VALUE_A, pwm_value_a-GPWM_MAX_VALUE);
-            xscope_int(PWM_VALUE_B, pwm_value_b-GPWM_MAX_VALUE);
-            xscope_int(PWM_VALUE_C, pwm_value_c-GPWM_MAX_VALUE);
-            xscope_int(PWM_VALUE_U, pwm_value_u-GPWM_MAX_VALUE);
-            xscope_int(PWM_VALUE_V, pwm_value_v-GPWM_MAX_VALUE);
-            xscope_int(PWM_VALUE_W, pwm_value_w-GPWM_MAX_VALUE);
-            xscope_int(TIME_FREE, time_free);
-
-            pwm_value_a &= 0x0000FFFF;
-            pwm_value_b &= 0x0000FFFF;
-            pwm_value_c &= 0x0000FFFF;
-            pwm_value_u &= 0x0000FFFF;
-            pwm_value_v &= 0x0000FFFF;
-            pwm_value_w &= 0x0000FFFF;
-
-            i_update_pwm.update_server_control_data(
-                    /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
-                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
-                    /*pwm_on              */pwm_on     , /*safe_torque_off_mode*/safe_torque_off);
-
-            time     += updating_period;
-
-            t :> time_end;
-            break;
-        }
-    }
-}
+////Sends pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
+//void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
+//{
+//    timer t;
+//    unsigned int time=0x00000000;
+//    unsigned int time_end=0x00000000, time_start=0x00000000, time_free=0x00000000;
+//    unsigned int updating_period = GPWM_MAX_VALUE;
+//
+//    unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
+//                    pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
+//
+//    int counter=0;
+//    int pulse_counter=0;
+//    int pulse_index=1;
+//
+//    short pwm_delta =0x0000;
+//    unsigned short pwm_value =0;
+//    unsigned short gpwm_value=0;
+//    unsigned short delta_duty=101;//1110;//1110 2220 3330 4440 5550 6660
+//
+//    unsigned short pwm_limit_low  = 0x0000 & 0x0000FFFF;
+//    unsigned short pwm_limit_high = 0x0000 & 0x0000FFFF;
+//
+//    int pwm_on         =0x00000001;
+//    int safe_torque_off=0x00000000;
+//
+//    pwm_limit_high= GPWM_MAX_VALUE;
+//    pwm_limit_low = GPWM_MIN_VALUE;
+//
+//    pwm_delta = 1;
+//    pwm_value = pwm_limit_low;
+//
+//    time    =0x00000000;
+//    t :> time;
+//    while(1)
+//    {
+//        select
+//        {
+//        case t when timerafter(time) :> void:
+//            t :> time_start;
+//            time_free = time_start - time_end;
+//
+//            /*
+//            counter++;
+//            if(counter==500)
+//            {
+//                gpwm_value ++;
+//                if(gpwm_value>GPWM_MAX_VALUE)
+//                {
+//                    gpwm_value=GPWM_MIN_VALUE;
+//                }
+//                counter=0;
+//            }
+//            */
+//
+//            /*
+//            if(pulse_index==1)
+//            {
+//                pulse_index=2;
+//                pwm_value  =2*gpwm_value/3;
+//            }
+//            else if(pulse_index==2)
+//            {
+//                pulse_index=3;
+//                pwm_value  =3*gpwm_value/3;
+//            }
+//            else if(pulse_index==3)
+//            {
+//                pulse_index=1;
+//                pwm_value  =1*gpwm_value/3;
+//            }
+//            */
+//
+//            /*
+//            pwm_value = gpwm_value;
+//            pwm_value_a = pwm_value;
+//            pwm_value_b = pwm_value;
+//            pwm_value_c = pwm_value;
+//            pwm_value_u = pwm_value;
+//            pwm_value_v = pwm_value;
+//            pwm_value_w = pwm_value;
+//            */
+//
+//            //// ------------------------------------------
+//            //pulse_counter=pulse_index;
+//            //p <: 0;
+//            //for(int k=1;k<pulse_counter ;k++)
+//            //{
+//            //    for(int j=0;j<=15;j++) p <: 1;
+//            //    for(int j=0;j<=15;j++) p <: 0;
+//            //}
+//            //for(int j=0;j<=15;j++) p <: 1;
+//            //p <: 0;
+//            //// ------------------------------------------
+//
+//
+//            pwm_value_a += delta_duty;
+//            if(pwm_value_a>pwm_limit_high){
+//                pwm_value_a = pwm_limit_low;
+//
+//                pwm_value_b += delta_duty;
+//                if(pwm_value_b>pwm_limit_high){
+//                    pwm_value_b = pwm_limit_low;
+//
+//                    pwm_value_c += delta_duty;
+//                    if(pwm_value_c>pwm_limit_high){
+//                        pwm_value_c = pwm_limit_low;
+//
+//                        pwm_value_u += delta_duty;
+//                        if(pwm_value_u>pwm_limit_high){
+//                            pwm_value_u = pwm_limit_low;
+//
+///*
+//                            pwm_value_v += delta_duty;
+//                            if(pwm_value_v>pwm_limit_high){
+//                                pwm_value_v = pwm_limit_low;
+//
+//                                pwm_value_w += delta_duty;
+//                                if(pwm_value_w>pwm_limit_high){
+//                                    pwm_value_w = pwm_limit_low;
+//                                }
+//                            }
+//*/
+//                        }
+//                    }
+//                }
+//            }
+//
+//            xscope_int(PWM_VALUE_A, pwm_value_a-GPWM_MAX_VALUE);
+//            xscope_int(PWM_VALUE_B, pwm_value_b-GPWM_MAX_VALUE);
+//            xscope_int(PWM_VALUE_C, pwm_value_c-GPWM_MAX_VALUE);
+//            xscope_int(PWM_VALUE_U, pwm_value_u-GPWM_MAX_VALUE);
+//            xscope_int(PWM_VALUE_V, pwm_value_v-GPWM_MAX_VALUE);
+//            xscope_int(PWM_VALUE_W, pwm_value_w-GPWM_MAX_VALUE);
+//            xscope_int(TIME_FREE, time_free);
+//
+//            pwm_value_a &= 0x0000FFFF;
+//            pwm_value_b &= 0x0000FFFF;
+//            pwm_value_c &= 0x0000FFFF;
+//            pwm_value_u &= 0x0000FFFF;
+//            pwm_value_v &= 0x0000FFFF;
+//            pwm_value_w &= 0x0000FFFF;
+//
+//            i_update_pwm.update_server_control_data(
+//                    /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
+//                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
+//                    /*pwm_on              */pwm_on     , /*safe_torque_off_mode*/safe_torque_off);
+//
+//            time     += updating_period;
+//
+//            t :> time_end;
+//            break;
+//        }
+//    }
+//}
 
 int main(void) {
 
@@ -221,68 +221,22 @@ int main(void) {
         {
             par
             {
+
                 /* WARNING: only one blocking task is possible per tile. */
                 /* Waiting for a user input blocks other tasks on the same tile from execution. */
                 {
-
+                    delay_milliseconds(60);
                     control_tuning_console(i_motion_control[0]);
                 }
+
                 /*
                 {
                     ocupy_core(10);
                 }
+                */
 
                 {
                     ocupy_core(11);
-                }
-                 */
-                /* Position Control Loop */
-                {
-                    MotionControlConfig motion_ctrl_config;
-
-                    motion_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;
-                    motion_ctrl_config.max_pos_range_limit =                  MAX_POSITION_RANGE_LIMIT;
-                    motion_ctrl_config.max_motor_speed =                      MOTOR_MAX_SPEED;
-                    motion_ctrl_config.polarity =                             POLARITY;
-
-                    motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
-                    motion_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
-                    motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
-                    motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
-
-                    motion_ctrl_config.position_control_strategy =            POSITION_CONTROL_STRATEGY;
-
-                    motion_ctrl_config.filter =                               FILTER_CUT_OFF_FREQ;
-
-                    motion_ctrl_config.position_kp =                          POSITION_Kp;
-                    motion_ctrl_config.position_ki =                          POSITION_Ki;
-                    motion_ctrl_config.position_kd =                          POSITION_Kd;
-                    motion_ctrl_config.position_integral_limit =              POSITION_INTEGRAL_LIMIT;
-                    motion_ctrl_config.moment_of_inertia =                    MOMENT_OF_INERTIA;
-
-                    motion_ctrl_config.velocity_kp =                          VELOCITY_Kp;
-                    motion_ctrl_config.velocity_ki =                          VELOCITY_Ki;
-                    motion_ctrl_config.velocity_kd =                          VELOCITY_Kd;
-                    motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
-                    motion_ctrl_config.enable_velocity_auto_tuner =           ENABLE_VELOCITY_AUTO_TUNER;
-                    motion_ctrl_config.enable_compensation_recording =        ENABLE_COMPENSATION_RECORDING;
-
-                    motion_ctrl_config.brake_release_strategy =               BRAKE_RELEASE_STRATEGY;
-                    motion_ctrl_config.brake_release_delay =                  BRAKE_RELEASE_DELAY;
-
-                    //select resolution of sensor used for motion control
-                    if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
-                        motion_ctrl_config.resolution  =                          SENSOR_2_RESOLUTION;
-                    } else {
-                        motion_ctrl_config.resolution  =                          SENSOR_1_RESOLUTION;
-                    }
-
-                    motion_ctrl_config.dc_bus_voltage=                        DC_BUS_VOLTAGE;
-                    motion_ctrl_config.pull_brake_voltage=                    PULL_BRAKE_VOLTAGE;
-                    motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
-                    motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
-
-                    motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
                 }
 
                 {
@@ -315,6 +269,9 @@ int main(void) {
         {
             par
             {
+                /* Shared memory Service */
+                [[distribute]] shared_memory_service(i_shared_memory, 3);
+
                 /* PWM Service */
                 {
                     pwm_config_general(pwm_ports);
@@ -322,81 +279,26 @@ int main(void) {
                     //if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                     //    predriver(fet_driver_ports);
 
-                    delay_milliseconds(10);
-                    pwm_service_general(pwm_ports, i_update_pwm, 100);
-                }
-
-                /* Motor Control Service */
-                {
                     delay_milliseconds(20);
-                    MotorcontrolConfig motorcontrol_config;
-
-                    motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
-                    motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
-                    motorcontrol_config.torque_P_gain =  TORQUE_Kp;
-                    motorcontrol_config.torque_I_gain =  TORQUE_Ki;
-                    motorcontrol_config.torque_D_gain =  TORQUE_Kd;
-                    motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
-                    motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
-                    motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
-                    motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
-                    motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
-                    motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
-                    motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
-                    motorcontrol_config.current_ratio =  CURRENT_RATIO;
-                    motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
-                    motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
-                    motorcontrol_config.rated_current =  MOTOR_RATED_CURRENT;
-                    motorcontrol_config.rated_torque  =  MOTOR_RATED_TORQUE;
-                    motorcontrol_config.percent_offset_torque =  APPLIED_TUNING_TORQUE_PERCENT;
-                    motorcontrol_config.protection_limit_over_current =  PROTECTION_MAXIMUM_CURRENT;
-                    motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
-                    motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
-                    motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
-
-                    for (int i = 0; i < 1024; i++)
-                    {
-                        motorcontrol_config.torque_offset[i] = 0;
-                    }
-                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
+                    pwm_service_general(pwm_ports, i_update_pwm, 15);
                 }
-
 
                 /* Watchdog Service */
                 {
+                    delay_milliseconds(10);
                     watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
-                }
-
-                {
-                    ocupy_core(21);
                 }
 
                 /* ADC Service */
                 {
+                    delay_milliseconds(20);
                     adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
                 }
 
-                {
-                    ocupy_core(22);
-                }
-
-                /* Shared memory Service */
-                [[distribute]] shared_memory_service(i_shared_memory, 3);
-
-                //{
-                //    ocupy_core(23);
-                //}
-
-                //{
-                //    ocupy_core(24);
-                //}
-
-                //{
-                //    ocupy_core(25);
-                //}
                 /* Position feedback service */
                 {
+                    delay_milliseconds(30);
+
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = SENSOR_1_TYPE;
                     position_feedback_config.resolution  = SENSOR_1_RESOLUTION;
@@ -459,6 +361,111 @@ int main(void) {
                             position_feedback_config, i_shared_memory[0], i_position_feedback_1,
                             position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
                 }
+
+                /* Motor Control Service */
+                {
+                    delay_milliseconds(40);
+                    MotorcontrolConfig motorcontrol_config;
+
+                    motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
+                    motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
+                    motorcontrol_config.torque_P_gain =  TORQUE_Kp;
+                    motorcontrol_config.torque_I_gain =  TORQUE_Ki;
+                    motorcontrol_config.torque_D_gain =  TORQUE_Kd;
+                    motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
+                    motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
+                    motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
+                    motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
+                    motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
+                    motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
+                    motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
+                    motorcontrol_config.current_ratio =  CURRENT_RATIO;
+                    motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
+                    motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
+                    motorcontrol_config.rated_current =  MOTOR_RATED_CURRENT;
+                    motorcontrol_config.rated_torque  =  MOTOR_RATED_TORQUE;
+                    motorcontrol_config.percent_offset_torque =  APPLIED_TUNING_TORQUE_PERCENT;
+                    motorcontrol_config.protection_limit_over_current =  PROTECTION_MAXIMUM_CURRENT;
+                    motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
+                    motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
+                    motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
+
+                    for (int i = 0; i < 1024; i++)
+                    {
+                        motorcontrol_config.torque_offset[i] = 0;
+                    }
+                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
+                }
+
+                /* Position Control Loop */
+                {
+                    delay_milliseconds(50);
+
+                    MotionControlConfig motion_ctrl_config;
+
+                    motion_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;
+                    motion_ctrl_config.max_pos_range_limit =                  MAX_POSITION_RANGE_LIMIT;
+                    motion_ctrl_config.max_motor_speed =                      MOTOR_MAX_SPEED;
+                    motion_ctrl_config.polarity =                             POLARITY;
+
+                    motion_ctrl_config.enable_profiler =                      ENABLE_PROFILER;
+                    motion_ctrl_config.max_acceleration_profiler =            MAX_ACCELERATION_PROFILER;
+                    motion_ctrl_config.max_deceleration_profiler =            MAX_DECELERATION_PROFILER;
+                    motion_ctrl_config.max_speed_profiler =                   MAX_SPEED_PROFILER;
+
+                    motion_ctrl_config.position_control_strategy =            POSITION_CONTROL_STRATEGY;
+
+                    motion_ctrl_config.filter =                               FILTER_CUT_OFF_FREQ;
+
+                    motion_ctrl_config.position_kp =                          POSITION_Kp;
+                    motion_ctrl_config.position_ki =                          POSITION_Ki;
+                    motion_ctrl_config.position_kd =                          POSITION_Kd;
+                    motion_ctrl_config.position_integral_limit =              POSITION_INTEGRAL_LIMIT;
+                    motion_ctrl_config.moment_of_inertia =                    MOMENT_OF_INERTIA;
+
+                    motion_ctrl_config.velocity_kp =                          VELOCITY_Kp;
+                    motion_ctrl_config.velocity_ki =                          VELOCITY_Ki;
+                    motion_ctrl_config.velocity_kd =                          VELOCITY_Kd;
+                    motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
+                    motion_ctrl_config.enable_velocity_auto_tuner =           ENABLE_VELOCITY_AUTO_TUNER;
+                    motion_ctrl_config.enable_compensation_recording =        ENABLE_COMPENSATION_RECORDING;
+
+                    motion_ctrl_config.brake_release_strategy =               BRAKE_RELEASE_STRATEGY;
+                    motion_ctrl_config.brake_release_delay =                  BRAKE_RELEASE_DELAY;
+
+                    //select resolution of sensor used for motion control
+                    if (SENSOR_2_FUNCTION == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL || SENSOR_2_FUNCTION == SENSOR_FUNCTION_MOTION_CONTROL) {
+                        motion_ctrl_config.resolution  =                          SENSOR_2_RESOLUTION;
+                    } else {
+                        motion_ctrl_config.resolution  =                          SENSOR_1_RESOLUTION;
+                    }
+
+                    motion_ctrl_config.dc_bus_voltage=                        DC_BUS_VOLTAGE;
+                    motion_ctrl_config.pull_brake_voltage=                    PULL_BRAKE_VOLTAGE;
+                    motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
+                    motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
+
+                    motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
+                }
+
+                {
+                    ocupy_core(21);
+                }
+
+                //{
+                //    ocupy_core(22);
+                //}
+                //{
+                //    ocupy_core(23);
+                //}
+                //{
+                //    ocupy_core(24);
+                //}
+                //{
+                //    ocupy_core(25);
+                //}
+
             }
         }
     }

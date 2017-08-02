@@ -407,6 +407,10 @@ void pwm_service_general(
                     status = ACTIVE;
                     break;
 
+            case i_update_pwm.frequency() -> {int frequency}:
+                    frequency = freq_kHz;
+                    break;
+
             case i_update_pwm.safe_torque_off_enabled():
                 break;
 
@@ -511,6 +515,10 @@ void pwm_service_general(
 
             case i_update_pwm.status() -> {int status}:
                     status = ACTIVE;
+                    break;
+
+            case i_update_pwm.frequency() -> {int frequency}:
+                    frequency = freq_kHz;
                     break;
 
             case i_update_pwm.safe_torque_off_enabled():

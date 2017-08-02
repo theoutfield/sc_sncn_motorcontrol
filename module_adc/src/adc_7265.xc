@@ -91,9 +91,9 @@ void adc_ad7265_service_demo(
 
     unsigned inp_val = 0, tmp_val = 0;
 
-    //proper task startup
-    t :> time;
-    t when timerafter (time + (3000*20*250)) :> void;
+    ////proper task startup
+    //t :> time;
+    //t when timerafter (time + (*1000*100)) :> void;
 
     configure_adc_ports_7265(adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
@@ -198,9 +198,9 @@ void adc_ad7265(
                                         AD7265_DIFF_A3A4_B3B4, AD7265_DIFF_A5A6_B5B6};
     int OUT_A[20];
 
-    //proper task startup
-    t :> time;
-    t when timerafter (time + (3000*20*250)) :> void;
+    ////proper task startup
+    //t :> time;
+    //t when timerafter (time + (3000*20*250)) :> void;
 
     configure_adc_ports_7265(adc_ports.p32_data[0], adc_ports.p32_data[1], adc_ports.xclk, adc_ports.p1_serial_clk, adc_ports.p1_ready, adc_ports.p4_mux ); // Configure all ADC data ports
 
