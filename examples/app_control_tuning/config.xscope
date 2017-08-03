@@ -42,12 +42,16 @@
 
     <Probe name="ACTUAL_VELOCITY_ARRAY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
-    <Probe name="PWM_VALUE_A" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_VALUE_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_VALUE_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_VALUE_U" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_VALUE_V" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_VALUE_W" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="PWM_VALUE_A" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_VALUE_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_VALUE_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_VALUE_U" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_VALUE_V" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_VALUE_W" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PATTERN" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="TIME_IDLE_I" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="TIME_IDLE_II" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="TIME_TOTAL_III" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_FREE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
     
