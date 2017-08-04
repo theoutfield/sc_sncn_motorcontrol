@@ -608,6 +608,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 upstream_control_data = i_torque_control.update_upstream_control_data();
 
+
+                if (motion_ctrl_config.enable_compensation_recording)
+                {
+                    downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
+                }
+
                 velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
                 velocity_k        = ((double) upstream_control_data.velocity);
 
@@ -742,6 +748,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 ct_parameters.torque_recording_started = 0;
                                 ct_parameters.delay_counter = 0;
                                 i_torque_control.set_torque_control_enabled();
+                                i_torque_control.set_brake_status(0);
+
+                                if(ct_parameters.back_and_forth == 2)
+                                {
+                                    torque_enable_flag   =0;
+                                    velocity_enable_flag =0;
+                                    position_enable_flag =0;
+                                    i_torque_control.set_torque_control_disabled();
+                                }
                             }
                         }
                         else
