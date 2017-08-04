@@ -739,7 +739,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         ct_parameters.torque_recording[i]= 0;
                                     }
                                     ct_parameters.rotation_sign = 0;
-                                    ct_parameters.back_and_forth = 0;
                                     motion_ctrl_config.enable_compensation_recording = 0;
                                     velocity_ref_k = 0;
                                 }
@@ -752,6 +751,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 if(ct_parameters.back_and_forth == 2)
                                 {
+                                    ct_parameters.back_and_forth = 0;
                                     torque_enable_flag   =0;
                                     velocity_enable_flag =0;
                                     position_enable_flag =0;
@@ -1261,7 +1261,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
+                    motion_ctrl_config.enable_compensation_recording = 0;
+                    init_cogging_torque_parameters(ct_parameters, 10);
                     i_torque_control.set_torque_control_disabled();
+
                 }
 
                 motion_ctrl_config.position_control_autotune =0;
