@@ -324,6 +324,16 @@ How to use
 
 3-	At the end of the measurement process, the variable **enable_compensation_recording** is automatically set to 0. You can then enable/disable the compensation of the cogging torque with the interface enable_cogging_compensation()
 
+.. warning ::
+
+	Warning
+	-------
+	Before the calibration process, make sure that the velocity PID parameters are set for a stable control at 10 RPM
+	To tune the controller, feel free to use the :ref:`Tuning application <app_control_tuning>`. (Bad tuning means the motor turns visibly step by step, stopping from time to time)
+
+	Once the cogging torque is calibrated for a motor, it is saved in the memory. It is possible to enable/disable the compensation without doing the calibration another time. 
+
+	Before doing the calibration, be sure that the compensation is disabled, otherwise the measures will be altered.
 
 Example
 -------
@@ -359,12 +369,3 @@ Example
             downstream_control_data.torque_cmd = 0;
 
         }
-
-Warning
--------
-Before the calibration process, make sure that the velocity PID parameters are set for a stable control at 10 RPM
-To tune the controller, feel free to use the :ref:`Tuning application <app_control_tuning>`.
-
-Once the cogging torque is calibrated for a motor, it is saved in the memory. It is possible to enable/disable the compensation without doing the calibration another time. 
-
-Before doing the calibration, be sure that the compensation is disabled, otherwise the measures will be altered.

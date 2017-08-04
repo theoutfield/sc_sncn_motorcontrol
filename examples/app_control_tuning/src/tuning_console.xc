@@ -137,14 +137,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.enable_compensation_recording = 1;
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
-//
-//                        while (motion_ctrl_config.enable_compensation_recording)
-//                        {
-//                            motion_ctrl_config = i_motion_control.get_motion_control_config();
-//                            delay_milliseconds(1);
-//                        }
-//                        i_motion_control.disable();
-//                        printf("Cogging torque calibrated\n");
                         break;
 
                 case 'v'://calculate optimal pid parameters for velocity controller
