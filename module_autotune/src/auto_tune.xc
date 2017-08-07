@@ -12,7 +12,7 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionCon
     velocity_auto_tune.counter=0;
     velocity_auto_tune.save_counter=0;
     velocity_auto_tune.array_length=1000;
-    for(int i=1; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i]=0;
+    for(int i=1; i<=/*velocity_auto_tune.array_length*/1000; i++) velocity_auto_tune.actual_velocity[i]=0;
 
     velocity_auto_tune.j = 0.00;
     velocity_auto_tune.f = 0.00;
@@ -121,7 +121,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
         motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
         motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
 
-        for(int i=0; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i] = 0;
+        for(int i=0; i<=/*velocity_auto_tune.array_length*/1000; i++) velocity_auto_tune.actual_velocity[i] = 0;
     }
 
     return 0;
@@ -231,8 +231,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 else
                 {
                     if(pos_ctrl_auto_tune.active_step_counter==0)
-                        pos_ctrl_auto_tune.kvp += 50000;
-                    else
+                        pos_ctrl_auto_tune.kvp += 50000;            //at first step, increase kvp by 50000 (corresponding to 0.05 after scaling in pid controller)
+                    else                                            //and in the next steps increase it by 10000.
                         pos_ctrl_auto_tune.kvp += 10000;
 
                     pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
@@ -257,8 +257,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int < (5*pos_ctrl_auto_tune.err_energy_ss_int_min) && pos_ctrl_auto_tune.err_energy_ss_int>(pos_ctrl_auto_tune.err_energy_ss_limit_hard))
                 {
-                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*110)/100;
-                    pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
+                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*110)/100;//increase kvp by 10% in each step
+                    pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;       //set kpp equal to 0.1 of kvp in this step (the focus is on tuning of velocity loop)
                 }
                 else
                 {
@@ -272,7 +272,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_5;
 
-                    pos_ctrl_auto_tune.kvp=(pos_ctrl_auto_tune.kvp*90)/100;
+                    pos_ctrl_auto_tune.kvp=(pos_ctrl_auto_tune.kvp*90)/100; //decrease all constants by 10% after this step is completed
                     pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
@@ -283,7 +283,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
             {
                 if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_limit_hard/10)
                 {
-                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*1050)/1000;
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*1050)/1000;    //increase kpp by 5% in each cycle of step-5
                     if(pos_ctrl_auto_tune.kpp<100) pos_ctrl_auto_tune.kpp =100;
                 }
                 else
@@ -298,7 +298,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_6;
 
-                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*90)/100;
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*90)/100;       //decrease kpp by 10% after step-5 of autotuning is finished
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
             }
@@ -312,7 +312,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;      //increase kpi by 10% in each cycle of step-6
                     if(pos_ctrl_auto_tune.kpi<10) pos_ctrl_auto_tune.kpi=10;
                 }
 
@@ -320,10 +320,10 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 {
                     pos_ctrl_auto_tune.active_step=END;
 
-                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*90)/100;
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*90)/100;
+                    pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*90)/100;       //decrease all constants by 10% after step-6 is completed
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*90)/100;       //decrease all constants by 10% after step-6 is completed
 
-                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*90)/100;
+                    pos_ctrl_auto_tune.kvp = (pos_ctrl_auto_tune.kvp*90)/100;       //decrease all constants by 10% after step-6 is completed
 
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
@@ -423,7 +423,8 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*110)/100;      //increase kpi by 10% in each cycle of step-2 of autotuning
+
                     if(pos_ctrl_auto_tune.kpi<1000)
                         pos_ctrl_auto_tune.active_step_counter=0;
                     else
@@ -433,7 +434,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.active_step_counter==10)
                 {
                     pos_ctrl_auto_tune.active_step=AUTO_TUNE_STEP_3;
-                    pos_ctrl_auto_tune.kpi_min = (pos_ctrl_auto_tune.kpi*80)/100;
+                    pos_ctrl_auto_tune.kpi_min = (pos_ctrl_auto_tune.kpi*80)/100;   //decrease all constants by 20% in case step-2 of autotuning is completed
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
 
@@ -485,7 +486,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*98)/100;
+                    pos_ctrl_auto_tune.kpi = (pos_ctrl_auto_tune.kpi*98)/100;   //in case of unsuccessful autotuning, decrease all constants slowly until they are all 0
                     if(pos_ctrl_auto_tune.kpi==0) pos_ctrl_auto_tune.active_step=UNSUCCESSFUL;
                     pos_ctrl_auto_tune.active_step_counter=0;
                 }
