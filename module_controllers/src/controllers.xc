@@ -9,8 +9,6 @@
 #include <math.h>
 #include <xscope.h>
 
-
-
 /**
  * @brief intializing the parameters of the PIDT1 controller.
  *
@@ -40,7 +38,7 @@ void pid_init(PIDT1param &param)
  * @param input, I parameter
  * @param input, D parameter
  * @param input, Integral limit
- * @param input, sample-time in us (microseconds).
+ * @param input, sampling time in us (microseconds)
  * @param structure including the parameters of the PIDT1 controller
  *
  * @return void
@@ -73,10 +71,8 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
  * @brief updating the PIDT1 controller.
  * @param desired_value, the reference set point
  * @param actual_value, the actual value (measurement)
- * @param T_s, sampling time
+ * @param T_s, sampling time in us (microseconds)
  * @param param, the structure containing the PIDT1 controller parameters
- * @param b, set-point weight, i.e. error = b*y_ref - y
- *
  *
  * @return the output of PIDT1 controller
  */
@@ -89,10 +85,10 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDT1param
     /*
      * calculating I part
      */
-    param.integral += (param.Ki/2/1000000.00) * (error - param.error_value_1n);
+    param.integral += (param.Ki/100*T_s/2/1000000.00) * (error - param.error_value_1n);
 
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= ((param.Ki/2/1000000.00) * (error - param.error_value_1n));
+        param.integral -= ((param.Ki/100*T_s/2/1000000.00) * (error - param.error_value_1n));
 
     if (param.b == 1)
     {
