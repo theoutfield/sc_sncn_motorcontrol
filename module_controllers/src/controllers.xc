@@ -34,9 +34,9 @@ void pid_init(PIDT1param &param)
 
 /**
  * @brief setting the parameters of the PIDT1 controller.
- * @param input, P parameter
- * @param input, I parameter
- * @param input, D parameter
+ * @param input, P parameter scaled by 1e6
+ * @param input, I parameter scaled by 1e8
+ * @param input, D parameter scaled by 1e6
  * @param input, Integral limit
  * @param input, sampling time in us (microseconds)
  * @param structure including the parameters of the PIDT1 controller
@@ -45,9 +45,9 @@ void pid_init(PIDT1param &param)
  */
 void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDT1param &param)
 {
-    param.Kp = Kp;
-    param.Ki = Ki;
-    param.Kd = Kd;
+    param.Kp = Kp/1000000.00;
+    param.Ki = Ki/100000000.00;
+    param.Kd = Kd/1000000.00;
     param.integral_limit = integral_limit;
 
     if(param.Ki == 0)
@@ -85,10 +85,10 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDT1param
     /*
      * calculating I part
      */
-    param.integral += (param.Ki/100*T_s/2/1000000.00) * (error - param.error_value_1n);
+    param.integral += (param.Ki*T_s/2) * (error - param.error_value_1n);
 
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= ((param.Ki/100*T_s/2/1000000.00) * (error - param.error_value_1n));
+        param.integral -= ((param.Ki*T_s/2) * (error - param.error_value_1n));
 
     if (param.b == 1)
     {
@@ -103,9 +103,9 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDT1param
      * calculating D part
      * pseudo derivative controller PDT, i.e. acting on the output of the system
      */
-    param.derivative = (((2-T_s*param.v)*param.derivative_1n) + ((2*param.Kd/1000000.00*param.v)*derivat_input)) / (2+T_s*param.v);
+    param.derivative = (((2-T_s*param.v)*param.derivative_1n) + ((2*param.Kd*param.v)*derivat_input)) / (2+T_s*param.v);
 
-    cmd = ((param.Kp/1000000.00) * error) + param.integral + param.derivative;
+    cmd = (param.Kp * error) + param.integral + param.derivative;
 
     param.actual_value_1n = actual_value;
     param.derivative_1n = param.derivative;
