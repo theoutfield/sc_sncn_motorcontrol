@@ -12,7 +12,7 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionCon
     velocity_auto_tune.counter=0;
     velocity_auto_tune.save_counter=0;
     velocity_auto_tune.array_length=1000;
-    for(int i=1; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i]=0;
+    for(int i=1; i<=1000; i++) velocity_auto_tune.actual_velocity[i]=0;
 
     velocity_auto_tune.j = 0.00;
     velocity_auto_tune.f = 0.00;
@@ -121,7 +121,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
         motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
         motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
 
-        for(int i=0; i<=velocity_auto_tune.array_length; i++) velocity_auto_tune.actual_velocity[i] = 0;
+        for(int i=0; i<=1000; i++) velocity_auto_tune.actual_velocity[i] = 0;
     }
 
     return 0;
