@@ -50,7 +50,6 @@ typedef struct {
     int counter;
     int save_counter;
     double velocity_ref;
-    int array_length;
     int  actual_velocity[1001];
     double j;
     double f;
