@@ -11,8 +11,7 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionCon
     velocity_auto_tune.enable=0;
     velocity_auto_tune.counter=0;
     velocity_auto_tune.save_counter=0;
-    velocity_auto_tune.array_length=1000;
-    for(int i=1; i<=/*velocity_auto_tune.array_length*/1000; i++) velocity_auto_tune.actual_velocity[i]=0;
+    for(int i=1; i<=MEASUREMENT_ARRAY_LENGTH; i++) velocity_auto_tune.actual_velocity[i]=0;
 
     velocity_auto_tune.j = 0.00;
     velocity_auto_tune.f = 0.00;
@@ -51,15 +50,15 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
         velocity_auto_tune.counter++;
     }
 
-    if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=velocity_auto_tune.array_length)
+    if(1<=velocity_auto_tune.counter && velocity_auto_tune.counter<=MEASUREMENT_ARRAY_LENGTH)
     {
         velocity_ref_in_k = velocity_auto_tune.velocity_ref;
         velocity_auto_tune.actual_velocity[velocity_auto_tune.counter] = ((int)(velocity_k));
 
-        if(velocity_auto_tune.counter==velocity_auto_tune.array_length)
+        if(velocity_auto_tune.counter==MEASUREMENT_ARRAY_LENGTH)
         {
             steady_state = 0;
-            for(int i=(velocity_auto_tune.array_length-100); i<=velocity_auto_tune.array_length; i++)
+            for(int i=(MEASUREMENT_ARRAY_LENGTH-100); i<=MEASUREMENT_ARRAY_LENGTH; i++)
                 steady_state +=  ((double)velocity_auto_tune.actual_velocity[i]);
             steady_state = steady_state/100.00;
 
@@ -67,7 +66,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
             g_speed = 60.00/(2.00*3.1416);
 
             speed_integral=0.00;
-            for(int i=1; i<=velocity_auto_tune.array_length; i++)
+            for(int i=1; i<=MEASUREMENT_ARRAY_LENGTH; i++)
                 speed_integral += (steady_state-((double)(velocity_auto_tune.actual_velocity[i])));
 
             speed_integral *= ((saving_reduction_factor*period)/1000000.00);
@@ -107,11 +106,11 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
             }
         }
     }
-    else if (velocity_auto_tune.counter<=((velocity_auto_tune.array_length*5)/4))//try to reach 0 rpm in 20% of testint time
+    else if (velocity_auto_tune.counter<=((MEASUREMENT_ARRAY_LENGTH*5)/4))//try to reach 0 rpm in 20% of testint time
     {
         velocity_ref_in_k = 0;
     }
-    else if (velocity_auto_tune.counter>((velocity_auto_tune.array_length*5)/4))
+    else if (velocity_auto_tune.counter>((MEASUREMENT_ARRAY_LENGTH*5)/4))
     {
         velocity_auto_tune.enable = 0;
         velocity_auto_tune.counter=0;
@@ -121,7 +120,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
         motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
         motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
 
-        for(int i=0; i<=/*velocity_auto_tune.array_length*/1000; i++) velocity_auto_tune.actual_velocity[i] = 0;
+        for(int i=0; i<=MEASUREMENT_ARRAY_LENGTH; i++) velocity_auto_tune.actual_velocity[i] = 0;
     }
 
     return 0;

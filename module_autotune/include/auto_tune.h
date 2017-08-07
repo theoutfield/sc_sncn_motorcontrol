@@ -13,6 +13,7 @@
 #define TUNING_VELOCITY 1000        //[rpm]
 #define KP_VELOCITY_TUNING  500000  //kp initial value while running the automatic tuning of velocity controller
 #define SETTLING_TIME   0.3         //preffered settling time for velocity controller [seconds]
+#define MEASUREMENT_ARRAY_LENGTH    1000    //length of measurement array which is used while sampling velocity in velocity autotuner
 
 // parameters of position controller autotuner
 #define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
