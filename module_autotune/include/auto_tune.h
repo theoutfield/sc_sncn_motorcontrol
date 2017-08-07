@@ -13,10 +13,11 @@
 #define TUNING_VELOCITY 1000        //[rpm]
 #define KP_VELOCITY_TUNING  500000  //kp initial value while running the automatic tuning of velocity controller
 #define SETTLING_TIME   0.3         //preffered settling time for velocity controller [seconds]
+#define MEASUREMENT_ARRAY_LENGTH    1000    //length of measurement array which is used while sampling velocity in velocity autotuner
 
 // parameters of position controller autotuner
 #define AUTO_TUNE_STEP_AMPLITUDE    20000 // The tuning procedure uses steps to evaluate the response of controller. This input is equal to half of step command amplitude.
-#define AUTO_TUNE_COUNTER_MAX        2000 // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
+#define AUTO_TUNE_COUNTER_MAX        5000 // The period of step commands in ticks. Each tick is corresponding to one execution sycle of motion_control_service. As a result, 3000 ticks when the frequency of motion_control_service is 1 ms leads to a period equal to 3 seconds for each step command.
 #define PER_THOUSAND_OVERSHOOT         10 // Overshoot limit while tuning (it is set as per thousand of step amplitude)
 
 /**
@@ -49,7 +50,6 @@ typedef struct {
     int counter;
     int save_counter;
     double velocity_ref;
-    int array_length;
     int  actual_velocity[1001];
     double j;
     double f;
@@ -108,6 +108,7 @@ typedef struct {
 
     int kpp;
     int kpi;
+    int kpi_min;
     int kpd;
     int kpl;
     int j;
@@ -179,7 +180,6 @@ int init_pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionContr
  * @return void
  *  */
 int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlConfig &motion_ctrl_config, double position_k);
-
 
 
 
