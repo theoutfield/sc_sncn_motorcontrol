@@ -1586,7 +1586,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
-                i_torque_control.set_brake_status(0);
+//                i_torque_control.set_brake_status(0);
                 torque_enable_flag   = 0;
                 velocity_enable_flag = 0;
                 position_enable_flag = 0;

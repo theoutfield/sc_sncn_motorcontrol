@@ -48,7 +48,7 @@
     <Probe name="PWM_VALUE_U" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="PWM_VALUE_V" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="PWM_VALUE_W" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="PATTERN" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PATTERN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_IDLE_COMPUTATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_IDLE_FINAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_TOTAL_SELECT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
