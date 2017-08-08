@@ -1580,9 +1580,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
-                error_sens = NO_ERROR;
-                i_torque_control.set_sensor_status(error_sens);
-                error_phase = NO_ERROR;
+//                error_sens = NO_ERROR;
+//                i_torque_control.set_sensor_status(error_sens);
+//                error_phase = NO_ERROR;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
