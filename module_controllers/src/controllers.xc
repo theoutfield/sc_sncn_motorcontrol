@@ -85,10 +85,10 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDT1param
     /*
      * calculating I part
      */
-    param.integral += (param.Ki*T_s/2) * (error - param.error_value_1n);
+    param.integral += (param.Ki*T_s/2.0) * (error - param.error_value_1n);
 
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= ((param.Ki*T_s/2) * (error - param.error_value_1n));
+        param.integral -= ((param.Ki*T_s/2.0) * (error - param.error_value_1n));
 
     if (param.b == 1)
     {
@@ -103,7 +103,7 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDT1param
      * calculating D part
      * pseudo derivative controller PDT, i.e. acting on the output of the system
      */
-    param.derivative = (((2-T_s*param.v)*param.derivative_1n) + ((2*param.Kd*param.v)*derivat_input)) / (2+T_s*param.v);
+    param.derivative = (((2-T_s*param.v)*param.derivative_1n) + ((2.0*param.Kd*param.v)*derivat_input)) / (2+T_s*param.v);
 
     cmd = (param.Kp * error) + param.integral + param.derivative;
 
