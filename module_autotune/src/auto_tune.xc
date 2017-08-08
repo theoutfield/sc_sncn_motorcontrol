@@ -283,6 +283,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_limit_hard/10)
                 {
                     pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*1050)/1000;    //increase kpp by 5% in each cycle of step-5
+
                     if(pos_ctrl_auto_tune.kpp<100) pos_ctrl_auto_tune.kpp =100;
                 }
                 else

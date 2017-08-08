@@ -403,9 +403,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
 
-    PIDparam velocity_control_pid_param;
+    PIDT1param velocity_control_pid_param;
 
-    PIDparam position_control_pid_param;
+    PIDT1param position_control_pid_param;
 
     LimitedTorquePosCtrl lt_pos_ctrl;
 
