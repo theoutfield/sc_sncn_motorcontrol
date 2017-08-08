@@ -151,22 +151,21 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
 
 
 unsigned int biss_crc(unsigned int data[], unsigned int data_length, unsigned int poly) {
-    //poly in reverse representation:  x^0 + x^1 + x^4 is 0b1100
-    unsigned int bytes = data_length/32; //number of complete bytes
-    unsigned int rest = data_length % 32; //rest of bits
-    // crc for first byte
-    unsigned int crc = bitrev(data[0]);
-    if (bytes == 0) {
-        crc = crc << (32-rest); // left align if first byte is incomplete
+    // poly is in reverse representation with high exponent omitted:  x^0 + x^1 + x^6 is 0b110000
+    unsigned int bytes = data_length/32;  // number of bytes used - 1
+    unsigned int rest = data_length % 32; // number of bits in the last byte
+    if (rest == 0) {
+        rest = 32;
+        bytes--;
     }
-    for (int i=1; i<bytes; i++) // crc for following the complete bytes if any
-        crc32(crc, bitrev(data[i]), poly);
-    if (bytes && rest) { // crc for the last incomplete byte
-        crc32(crc, bitrev(data[bytes]), poly);
-        crc = crc << (32 - rest);
+    // initial value is the first byte reversed and filled with (32-rest) zero bits on the right
+    unsigned int crc = bitrev(data[0]) << (32-rest);
+    for (int i=0; i<bytes; i++) {       // crc for the following complete bytes
+        unsigned int nextbyte = (bitrev(data[i])>>rest) | (bitrev(data[i+1])<<(32-rest));
+        crc32(crc, nextbyte, poly);
     }
-    crc32(crc, 0, poly); //final crc
-    crc = bitrev(~crc) >> clz(poly); // reverse and invert the crc for biss
+    crc32(crc, 0, poly);                // crc for the last byte
+    crc = bitrev(~crc) >> clz(poly);    // reverse and invert the crc for biss
     return crc;
 }
 
