@@ -1235,21 +1235,21 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].disable():
 
-                //                i_torque_control.set_brake_status(0);
-                //                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                //                {
-                //                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                //                }
-                //                else
-                //                {
+                i_torque_control.set_brake_status(0);
+//                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+//                {
+//                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+//                }
+//                else
+//                {
                 torque_enable_flag   =0;
                 velocity_enable_flag =0;
                 position_enable_flag =0;
                 i_torque_control.set_torque_control_disabled();
-                //                }
+//                }
 
-                //                motion_ctrl_config.position_control_autotune =0;
-                //                pos_ctrl_auto_tune.activate=0;
+                motion_ctrl_config.position_control_autotune =0;
+                pos_ctrl_auto_tune.activate=0;
 
                 break;
 
@@ -1310,7 +1310,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
-
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 if (update_brake_configuration_flag == 0) {
                     enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
@@ -1322,15 +1321,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
 
         case i_motion_control[int i].enable_torque_ctrl():
-                //                torque_enable_flag   =1;
-                //                velocity_enable_flag =0;
-                //                position_enable_flag =0;
-                //
-                //                downstream_control_data.torque_cmd = 0;
-                //                downstream_control_data.offset_torque = 0;
-                //
-                //                //start motorcontrol and release brake if update_brake_configuration is not ongoing
-                //                if (update_brake_configuration_flag == 0) {
+                torque_enable_flag   =1;
+                velocity_enable_flag =0;
+                position_enable_flag =0;
+
+                downstream_control_data.torque_cmd = 0;
+                downstream_control_data.offset_torque = 0;
+
+//                //start motorcontrol and release brake if update_brake_configuration is not ongoing
+//                if (update_brake_configuration_flag == 0) {
                 enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
                 //                }
 
@@ -1356,7 +1355,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         max_position = in_config.max_pos_range_limit;
                     }
                 }
-
 
                 //check if we need to update the brake config
                 if (in_config.dc_bus_voltage != motion_ctrl_config.dc_bus_voltage ||
@@ -1579,9 +1577,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 case i_motion_control[int i].reset_motorcontrol_faults():
                         i_torque_control.reset_faults();
-                        //                error_sens = NO_ERROR;
-                        //                i_torque_control.set_sensor_status(error_sens);
-                        //                error_phase = NO_ERROR;
+                        error_sens = NO_ERROR;
+                        i_torque_control.set_sensor_status(error_sens);
+                        error_phase = NO_ERROR;
                         break;
 
                 case i_motion_control[int i].set_safe_torque_off_enabled():
