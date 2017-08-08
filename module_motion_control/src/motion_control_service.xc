@@ -601,275 +601,275 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         {
         case t when timerafter(ts + app_tile_usec * POSITION_CONTROL_LOOP_PERIOD) :> ts:
 
-                time_start_old = time_start;
-                t :> time_start;
-                time_loop = time_start - time_start_old;
-                time_free = time_start - time_end;
-
-                upstream_control_data = i_torque_control.update_upstream_control_data();
-
-                velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
-                velocity_k        = ((double) upstream_control_data.velocity);
-
-                // torque control
-                if(torque_enable_flag == 1)
-                {
-                    if(motion_ctrl_config.enable_profiler==1)
-                    {
-                        torque_ref_in_k = torque_profiler(((double)(downstream_control_data.torque_cmd)), torque_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
-                        torque_ref_in_k_1n = torque_ref_in_k;
-                        torque_ref_k = ((int)(torque_ref_in_k));
-                    }
-                    else
-                    {
-                        torque_ref_k = downstream_control_data.torque_cmd;
-                    }
-                }
-                else if (velocity_enable_flag == 1)// velocity control
-                {
-                    if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
-                    {
-                        if(velocity_auto_tune.enable == 0)
-                        {
-                            init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
-                            pid_init(velocity_control_pid_param);
-                            pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-
-                            velocity_auto_tune.enable = 1;
-                        }
-
-                        velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                        if(velocity_auto_tune.enable == 0)
-                        {
-                            torque_ref_k=0;
-                            torque_enable_flag   =0;
-                            velocity_enable_flag =0;
-                            position_enable_flag =0;
-                            i_torque_control.set_torque_control_disabled();
-
-                            printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
-                        }
-                    }
-                    else if(motion_ctrl_config.enable_profiler==1)
-                    {
-                        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
-                        velocity_ref_in_k_1n = velocity_ref_in_k;
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                    }
-                    else if(motion_ctrl_config.enable_profiler==0)
-                    {
-                        velocity_ref_in_k = velocity_ref_k;
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                    }
-                    //Recording function for the cogging torque
-                    if (motion_ctrl_config.enable_compensation_recording)
-                    {
-                        downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
-                        if (ct_parameters.delay_counter < (1000 * 1000 * POSITION_CONTROL_LOOP_PERIOD))
-                        {
-                            if (!ct_parameters.torque_recording_started)
-                            {
-                                ct_parameters.torque_recording_started = 1;
-                                ct_parameters.count_start = upstream_control_data.position;
-
-                                if (ct_parameters.velocity_reference < 0)
-                                {
-                                    if (ct_parameters.rotation_sign != -1)
-                                    {
-                                        ct_parameters.back_and_forth++;
-                                    }
-                                    ct_parameters.rotation_sign = -1;
-                                }
-                                else
-                                {
-                                    if (ct_parameters.rotation_sign != 1)
-                                    {
-                                        ct_parameters.back_and_forth++;
-                                    }
-                                    ct_parameters.rotation_sign = 1;
-                                }
-                            }
-                            if (((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign < ct_parameters.number_turns * motion_ctrl_config.resolution) || ct_parameters.remaining_cells != 0)
-                            {
-                                if (upstream_control_data.singleturn % ct_parameters.position_step)
-                                {
-                                    int index = upstream_control_data.singleturn / ct_parameters.position_step;
-                                    ct_parameters.torque_recording[index] += torque_measurement;
-                                    if (ct_parameters.counter_average[index] == 0)
-                                    {
-                                        ct_parameters.remaining_cells--;
-                                    }
-                                    ct_parameters.counter_average[index] ++;
-                                }
-                            }
-                            else {
-                                printf("Measurement done\n");
-                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-                                {
-                                    ct_parameters.torque_recording[i] /= ct_parameters.counter_average[i];
-                                    ct_parameters.counter_average[i] = 0;
-                                }
-
-
-                                motorcontrol_config = i_torque_control.get_config();
-                                if (ct_parameters.back_and_forth == 1)
-                                {
-                                    printf("\nFirst turn done\n");
-                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
-                                    {
-                                        motorcontrol_config.torque_offset[i] = ct_parameters.torque_recording[i];
-                                        ct_parameters.torque_recording[i]= 0;
-                                    }
-                                    ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
-                                }
-                                else if(ct_parameters.back_and_forth == 2)
-                                {
-                                    printf("\nSecond turn done\n");
-                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
-                                    {
-                                        motorcontrol_config.torque_offset[i] += ct_parameters.torque_recording[i];
-                                        motorcontrol_config.torque_offset[i] /= 2;
-                                        ct_parameters.torque_recording[i]= 0;
-                                    }
-                                    ct_parameters.rotation_sign = 0;
-                                    ct_parameters.back_and_forth = 0;
-                                    motion_ctrl_config.enable_compensation_recording = 0;
-                                    velocity_ref_k = 0;
-                                }
-                                ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
-                                i_torque_control.set_config(motorcontrol_config);
-                                ct_parameters.torque_recording_started = 0;
-                                ct_parameters.delay_counter = 0;
-                                i_torque_control.set_torque_control_enabled();
-                            }
-                        }
-                        else
-                        {
-                            ct_parameters.delay_counter ++;
-                        }
-
-                    }
-                }
-                else if (position_enable_flag == 1)// position control
-                {
-                    //brake shutdown delay, don't update target position
-                    if (brake_shutdown_counter > 0)
-                    {
-                        brake_shutdown_counter--;
-                        if (brake_shutdown_counter == 0)
-                        {
-                            torque_enable_flag   =0;
-                            velocity_enable_flag =0;
-                            position_enable_flag =0;
-                            i_torque_control.set_torque_control_disabled();
-                        }
-                    }
-                    //profiler enabled, set target position
-                    else if (motion_ctrl_config.enable_profiler)
-                    {
-                        position_ref_in_k = pos_profiler((
-                                (double) downstream_control_data.position_cmd),
-                                position_ref_in_k_1n,
-                                position_ref_in_k_2n,
-                                position_k,
-                                profiler_param);
-
-                        acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(POSITION_CONTROL_LOOP_PERIOD * POSITION_CONTROL_LOOP_PERIOD);
-                        position_ref_in_k_3n = position_ref_in_k_2n;
-                        position_ref_in_k_2n = position_ref_in_k_1n;
-                        position_ref_in_k_1n = position_ref_in_k;
-                    }
-                    //use direct target position
-                    else
-                    {
-                        position_ref_in_k = (double) downstream_control_data.position_cmd;
-                    }
-                    position_k_1= position_k;
-                    position_k  = ((double) upstream_control_data.position);
-
-                    if (pos_control_mode == POS_PID_CONTROLLER)
-                    {
-                        torque_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                    }
-                    else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
-                    {
-                        if(motion_ctrl_config.position_control_autotune == 1)
-                        {
-                            if(pos_ctrl_auto_tune.activate==0)
-                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
-
-                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
-
-                            if(motion_ctrl_config.position_control_autotune == 0)
-                            {
-                                printf("TUNING ENDED: \n");
-                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
-                            }
-
-                            if(pos_ctrl_auto_tune.counter==0)
-                            {
-                                pid_init(velocity_control_pid_param);
-                                pid_init(position_control_pid_param);
-
-                                pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                            }
-
-                            velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
-                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
-                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                        }
-                        else
-                        {
-                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
-                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
-                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
-                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                        }
-                    }
-                    else if (pos_control_mode == LT_POSITION_CONTROLLER)
-                    {
-
-                        if(motion_ctrl_config.position_control_autotune == 1)
-                        {
-                            if(pos_ctrl_auto_tune.activate==0)
-                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, LIMITED_TORQUE);
-
-                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
-
-                            if(motion_ctrl_config.position_control_autotune == 0)
-                            {
-                                if(pos_ctrl_auto_tune.active_step==UNSUCCESSFUL)
-                                    printf("TUNING UNSECCESSFUL \n");
-                                else
-                                {
-                                    printf("TUNING ENDED \n");
-                                    printf("kp:%i ki:%i kd:%i kl:%d J:%d\n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit, motion_ctrl_config.moment_of_inertia);
-                                }
-                            }
-
-                            if(pos_ctrl_auto_tune.counter==0)
-                            {
-                                lt_position_control_reset(lt_pos_ctrl);
-                                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
-                                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
-                                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
-                            }
-
-                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
-                            position_ref_in_k_2n = position_ref_in_k_1n;
-                            position_ref_in_k_1n = position_ref_in_k;
-
-                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
-                        }
-                        else
-                        {
-                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
-                        }
-                    }
-                }
+//                time_start_old = time_start;
+//                t :> time_start;
+//                time_loop = time_start - time_start_old;
+//                time_free = time_start - time_end;
+//
+//                upstream_control_data = i_torque_control.update_upstream_control_data();
+//
+//                velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
+//                velocity_k        = ((double) upstream_control_data.velocity);
+//
+//                // torque control
+//                if(torque_enable_flag == 1)
+//                {
+//                    if(motion_ctrl_config.enable_profiler==1)
+//                    {
+//                        torque_ref_in_k = torque_profiler(((double)(downstream_control_data.torque_cmd)), torque_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
+//                        torque_ref_in_k_1n = torque_ref_in_k;
+//                        torque_ref_k = ((int)(torque_ref_in_k));
+//                    }
+//                    else
+//                    {
+//                        torque_ref_k = downstream_control_data.torque_cmd;
+//                    }
+//                }
+//                else if (velocity_enable_flag == 1)// velocity control
+//                {
+//                    if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
+//                    {
+//                        if(velocity_auto_tune.enable == 0)
+//                        {
+//                            init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
+//                            pid_init(velocity_control_pid_param);
+//                            pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+//
+//                            velocity_auto_tune.enable = 1;
+//                        }
+//
+//                        velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
+//                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+//                        if(velocity_auto_tune.enable == 0)
+//                        {
+//                            torque_ref_k=0;
+//                            torque_enable_flag   =0;
+//                            velocity_enable_flag =0;
+//                            position_enable_flag =0;
+//                            i_torque_control.set_torque_control_disabled();
+//
+//                            printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
+//                        }
+//                    }
+//                    else if(motion_ctrl_config.enable_profiler==1)
+//                    {
+//                        velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
+//                        velocity_ref_in_k_1n = velocity_ref_in_k;
+//                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+//                    }
+//                    else if(motion_ctrl_config.enable_profiler==0)
+//                    {
+//                        velocity_ref_in_k = velocity_ref_k;
+//                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+//                    }
+//                    //Recording function for the cogging torque
+//                    if (motion_ctrl_config.enable_compensation_recording)
+//                    {
+//                        downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
+//                        if (ct_parameters.delay_counter < (1000 * 1000 * POSITION_CONTROL_LOOP_PERIOD))
+//                        {
+//                            if (!ct_parameters.torque_recording_started)
+//                            {
+//                                ct_parameters.torque_recording_started = 1;
+//                                ct_parameters.count_start = upstream_control_data.position;
+//
+//                                if (ct_parameters.velocity_reference < 0)
+//                                {
+//                                    if (ct_parameters.rotation_sign != -1)
+//                                    {
+//                                        ct_parameters.back_and_forth++;
+//                                    }
+//                                    ct_parameters.rotation_sign = -1;
+//                                }
+//                                else
+//                                {
+//                                    if (ct_parameters.rotation_sign != 1)
+//                                    {
+//                                        ct_parameters.back_and_forth++;
+//                                    }
+//                                    ct_parameters.rotation_sign = 1;
+//                                }
+//                            }
+//                            if (((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign < ct_parameters.number_turns * motion_ctrl_config.resolution) || ct_parameters.remaining_cells != 0)
+//                            {
+//                                if (upstream_control_data.singleturn % ct_parameters.position_step)
+//                                {
+//                                    int index = upstream_control_data.singleturn / ct_parameters.position_step;
+//                                    ct_parameters.torque_recording[index] += torque_measurement;
+//                                    if (ct_parameters.counter_average[index] == 0)
+//                                    {
+//                                        ct_parameters.remaining_cells--;
+//                                    }
+//                                    ct_parameters.counter_average[index] ++;
+//                                }
+//                            }
+//                            else {
+//                                printf("Measurement done\n");
+//                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+//                                {
+//                                    ct_parameters.torque_recording[i] /= ct_parameters.counter_average[i];
+//                                    ct_parameters.counter_average[i] = 0;
+//                                }
+//
+//
+//                                motorcontrol_config = i_torque_control.get_config();
+//                                if (ct_parameters.back_and_forth == 1)
+//                                {
+//                                    printf("\nFirst turn done\n");
+//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+//                                    {
+//                                        motorcontrol_config.torque_offset[i] = ct_parameters.torque_recording[i];
+//                                        ct_parameters.torque_recording[i]= 0;
+//                                    }
+//                                    ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
+//                                }
+//                                else if(ct_parameters.back_and_forth == 2)
+//                                {
+//                                    printf("\nSecond turn done\n");
+//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+//                                    {
+//                                        motorcontrol_config.torque_offset[i] += ct_parameters.torque_recording[i];
+//                                        motorcontrol_config.torque_offset[i] /= 2;
+//                                        ct_parameters.torque_recording[i]= 0;
+//                                    }
+//                                    ct_parameters.rotation_sign = 0;
+//                                    ct_parameters.back_and_forth = 0;
+//                                    motion_ctrl_config.enable_compensation_recording = 0;
+//                                    velocity_ref_k = 0;
+//                                }
+//                                ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
+//                                i_torque_control.set_config(motorcontrol_config);
+//                                ct_parameters.torque_recording_started = 0;
+//                                ct_parameters.delay_counter = 0;
+//                                i_torque_control.set_torque_control_enabled();
+//                            }
+//                        }
+//                        else
+//                        {
+//                            ct_parameters.delay_counter ++;
+//                        }
+//
+//                    }
+//                }
+//                else if (position_enable_flag == 1)// position control
+//                {
+//                    //brake shutdown delay, don't update target position
+//                    if (brake_shutdown_counter > 0)
+//                    {
+//                        brake_shutdown_counter--;
+//                        if (brake_shutdown_counter == 0)
+//                        {
+//                            torque_enable_flag   =0;
+//                            velocity_enable_flag =0;
+//                            position_enable_flag =0;
+//                            i_torque_control.set_torque_control_disabled();
+//                        }
+//                    }
+//                    //profiler enabled, set target position
+//                    else if (motion_ctrl_config.enable_profiler)
+//                    {
+//                        position_ref_in_k = pos_profiler((
+//                                (double) downstream_control_data.position_cmd),
+//                                position_ref_in_k_1n,
+//                                position_ref_in_k_2n,
+//                                position_k,
+//                                profiler_param);
+//
+//                        acceleration_monitor = (position_ref_in_k - (2 * position_ref_in_k_1n) + position_ref_in_k_2n)/(POSITION_CONTROL_LOOP_PERIOD * POSITION_CONTROL_LOOP_PERIOD);
+//                        position_ref_in_k_3n = position_ref_in_k_2n;
+//                        position_ref_in_k_2n = position_ref_in_k_1n;
+//                        position_ref_in_k_1n = position_ref_in_k;
+//                    }
+//                    //use direct target position
+//                    else
+//                    {
+//                        position_ref_in_k = (double) downstream_control_data.position_cmd;
+//                    }
+//                    position_k_1= position_k;
+//                    position_k  = ((double) upstream_control_data.position);
+//
+//                    if (pos_control_mode == POS_PID_CONTROLLER)
+//                    {
+//                        torque_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+//                    }
+//                    else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
+//                    {
+//                        if(motion_ctrl_config.position_control_autotune == 1)
+//                        {
+//                            if(pos_ctrl_auto_tune.activate==0)
+//                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, CASCADED);
+//
+//                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+//
+//                            if(motion_ctrl_config.position_control_autotune == 0)
+//                            {
+//                                printf("TUNING ENDED: \n");
+//                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+//                            }
+//
+//                            if(pos_ctrl_auto_tune.counter==0)
+//                            {
+//                                pid_init(velocity_control_pid_param);
+//                                pid_init(position_control_pid_param);
+//
+//                                pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+//                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+//                            }
+//
+//                            velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+//                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+//                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
+//                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+//                        }
+//                        else
+//                        {
+//                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+//                            if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+//                            if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
+//                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+//                        }
+//                    }
+//                    else if (pos_control_mode == LT_POSITION_CONTROLLER)
+//                    {
+//
+//                        if(motion_ctrl_config.position_control_autotune == 1)
+//                        {
+//                            if(pos_ctrl_auto_tune.activate==0)
+//                                init_pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, LIMITED_TORQUE);
+//
+//                            pos_ctrl_autotune(pos_ctrl_auto_tune, motion_ctrl_config, position_k);
+//
+//                            if(motion_ctrl_config.position_control_autotune == 0)
+//                            {
+//                                if(pos_ctrl_auto_tune.active_step==UNSUCCESSFUL)
+//                                    printf("TUNING UNSECCESSFUL \n");
+//                                else
+//                                {
+//                                    printf("TUNING ENDED \n");
+//                                    printf("kp:%i ki:%i kd:%i kl:%d J:%d\n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit, motion_ctrl_config.moment_of_inertia);
+//                                }
+//                            }
+//
+//                            if(pos_ctrl_auto_tune.counter==0)
+//                            {
+//                                lt_position_control_reset(lt_pos_ctrl);
+//                                lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
+//                                        motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
+//                                        motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
+//                            }
+//
+//                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
+//                            position_ref_in_k_2n = position_ref_in_k_1n;
+//                            position_ref_in_k_1n = position_ref_in_k;
+//
+//                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+//                        }
+//                        else
+//                        {
+//                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
+//                        }
+//                    }
+//                }
 
 //
 //                //brake release, override target torque if we are in brake release
@@ -930,20 +930,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 //                    position_limit_reached = 0;
 //                }
 //                torque_ref_k += (double)(downstream_control_data.offset_torque);
-
-                //torque limit check
-                if(torque_ref_k > motion_ctrl_config.max_torque)
-                    torque_ref_k = motion_ctrl_config.max_torque;
-                else if (torque_ref_k < (-motion_ctrl_config.max_torque))
-                    torque_ref_k = (-motion_ctrl_config.max_torque);
-
-                filter_input  =  ((double)(torque_ref_k));
-                filter_output = second_order_LP_filter_update(&filter_input, torque_filter_param);
-
-                if(motion_ctrl_config.filter>0)
-                    i_torque_control.set_torque(((int)(filter_output))); // use the filter only if the filter cut-off frequency is bigger/equal to zero, otherwise, do not use filter
-                else
-                    i_torque_control.set_torque(((int)(torque_ref_k)));
+//
+//                //torque limit check
+//                if(torque_ref_k > motion_ctrl_config.max_torque)
+//                    torque_ref_k = motion_ctrl_config.max_torque;
+//                else if (torque_ref_k < (-motion_ctrl_config.max_torque))
+//                    torque_ref_k = (-motion_ctrl_config.max_torque);
+//
+//                filter_input  =  ((double)(torque_ref_k));
+//                filter_output = second_order_LP_filter_update(&filter_input, torque_filter_param);
+//
+//                if(motion_ctrl_config.filter>0)
+//                    i_torque_control.set_torque(((int)(filter_output))); // use the filter only if the filter cut-off frequency is bigger/equal to zero, otherwise, do not use filter
+//                else
+//                    i_torque_control.set_torque(((int)(torque_ref_k)));
 
 //                //update brake config when ready
 //                if (update_brake_configuration_flag && timeafter(ts, update_brake_configuration_time)) {
@@ -1226,7 +1226,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
                 {
-                    printf("TIMING ERR \n");
+//                    printf("TIMING ERR \n");
                 }
 
                 t :> time_end;
@@ -1236,21 +1236,21 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].disable():
 
-                i_torque_control.set_brake_status(0);
-                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                {
-                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                }
-                else
-                {
+//                i_torque_control.set_brake_status(0);
+//                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+//                {
+//                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+//                }
+//                else
+//                {
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
                     i_torque_control.set_torque_control_disabled();
-                }
+//                }
 
-                motion_ctrl_config.position_control_autotune =0;
-                pos_ctrl_auto_tune.activate=0;
+//                motion_ctrl_config.position_control_autotune =0;
+//                pos_ctrl_auto_tune.activate=0;
 
                 break;
 
@@ -1323,17 +1323,17 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
 
         case i_motion_control[int i].enable_torque_ctrl():
-                torque_enable_flag   =1;
-                velocity_enable_flag =0;
-                position_enable_flag =0;
-
-                downstream_control_data.torque_cmd = 0;
-                downstream_control_data.offset_torque = 0;
-
-                //start motorcontrol and release brake if update_brake_configuration is not ongoing
-                if (update_brake_configuration_flag == 0) {
+//                torque_enable_flag   =1;
+//                velocity_enable_flag =0;
+//                position_enable_flag =0;
+//
+//                downstream_control_data.torque_cmd = 0;
+//                downstream_control_data.offset_torque = 0;
+//
+//                //start motorcontrol and release brake if update_brake_configuration is not ongoing
+//                if (update_brake_configuration_flag == 0) {
                     enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-                }
+//                }
 
                 //start control loop just after
                 t :> ts;
