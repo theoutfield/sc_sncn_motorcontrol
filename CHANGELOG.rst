@@ -9,6 +9,8 @@ sc_sncn_motorcontrol Change Log
   * Fix integral issue in PID controllers (Reset integral value in case new ki is 0).
   * Do not change the integral limits of position/velocity controllers in case automatic tuners are called
   * Fix BiSS CRC computation
+  * Rename non-linear position controller into limited torque position controller
+  * Add automatic position control tuning for limitted torque and cascaded PID controllers
 
 3.0.2
 -----
