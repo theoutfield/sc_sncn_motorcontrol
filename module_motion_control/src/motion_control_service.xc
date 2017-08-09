@@ -886,47 +886,47 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     i_torque_control.set_torque_control_disabled();
                 }
 
-                //                //position limit check
-                //                if (upstream_control_data.position > max_position || upstream_control_data.position < min_position)
-                //                {
-                //                    //disable everything
-                //                    torque_enable_flag = 0;
-                //                    position_enable_flag = 0;
-                //                    velocity_enable_flag = 0;
-                //                    i_torque_control.set_brake_status(0);
-                //                    i_torque_control.set_torque_control_disabled();
-                //                    printstr("*** Position Limit Reached ***\n");
-                //                    //store original limits, with threshold if possible
-                //                    if (position_limit_reached == 0)
-                //                    {
-                //                        position_limit_reached = 1;
-                //                        if (max_position-min_position > 2*POSITION_LIMIT_THRESHOLD)
-                //                        {
-                //                            max_position_orig = max_position-POSITION_LIMIT_THRESHOLD;
-                //                            min_position_orig = min_position+POSITION_LIMIT_THRESHOLD;
-                //                        }
-                //                        else
-                //                        {
-                //                            max_position_orig = max_position;
-                //                            min_position_orig = min_position;
-                //                        }
-                //                    }
-                //                    //increase limit by threshold
-                //                    max_position += POSITION_LIMIT_THRESHOLD;
-                //                    min_position -= POSITION_LIMIT_THRESHOLD;
-                //                }
-                //                //test if we moved back inside the original limits, then restore the position limits
-                //                else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
-                //                {
-                //                    if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED) {
-                //                        min_position = -motion_ctrl_config.max_pos_range_limit;
-                //                        max_position = -motion_ctrl_config.min_pos_range_limit;
-                //                    } else {
-                //                        min_position = motion_ctrl_config.min_pos_range_limit;
-                //                        max_position = motion_ctrl_config.max_pos_range_limit;
-                //                    }
-                //                    position_limit_reached = 0;
-                //                }
+                //position limit check
+                if (upstream_control_data.position > max_position || upstream_control_data.position < min_position)
+                {
+                    //disable everything
+                    torque_enable_flag = 0;
+                    position_enable_flag = 0;
+                    velocity_enable_flag = 0;
+                    i_torque_control.set_brake_status(0);
+                    i_torque_control.set_torque_control_disabled();
+                    printstr("*** Position Limit Reached ***\n");
+                    //store original limits, with threshold if possible
+                    if (position_limit_reached == 0)
+                    {
+                        position_limit_reached = 1;
+                        if (max_position-min_position > 2*POSITION_LIMIT_THRESHOLD)
+                        {
+                            max_position_orig = max_position-POSITION_LIMIT_THRESHOLD;
+                            min_position_orig = min_position+POSITION_LIMIT_THRESHOLD;
+                        }
+                        else
+                        {
+                            max_position_orig = max_position;
+                            min_position_orig = min_position;
+                        }
+                    }
+                    //increase limit by threshold
+                    max_position += POSITION_LIMIT_THRESHOLD;
+                    min_position -= POSITION_LIMIT_THRESHOLD;
+                }
+                //test if we moved back inside the original limits, then restore the position limits
+                else if (position_limit_reached == 1 && upstream_control_data.position < max_position_orig && upstream_control_data.position > min_position_orig)
+                {
+                    if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED) {
+                        min_position = -motion_ctrl_config.max_pos_range_limit;
+                        max_position = -motion_ctrl_config.min_pos_range_limit;
+                    } else {
+                        min_position = motion_ctrl_config.min_pos_range_limit;
+                        max_position = motion_ctrl_config.max_pos_range_limit;
+                    }
+                    position_limit_reached = 0;
+                }
 
                 torque_ref_k += (double)(downstream_control_data.offset_torque);
 
