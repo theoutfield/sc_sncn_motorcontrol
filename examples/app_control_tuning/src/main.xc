@@ -32,6 +32,7 @@ port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
 port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
+
 void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase computational load of cpu
 {
     int x=0;
@@ -395,7 +396,7 @@ int main(void) {
                         motorcontrol_config.torque_offset[i] = 0;
                     }
                     torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
+                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC, /*gpio_port_0*/ null);
                 }
 
                 /* Position Control Loop */
