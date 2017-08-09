@@ -259,10 +259,10 @@ void adc_ad7265(
             out_b = (int)tmp_val;
 
 
-            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
+            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048) -36;
             phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
             if(current_sensor_config.sign_phase_a != 0)//if phase a is measured instead of phase C
-                phaseC_out = current_sensor_config.sign_phase_a * (phaseB_out+phaseC_out);
+                phaseC_out = current_sensor_config.sign_phase_a * (phaseB_out+phaseC_out) + 50;
 
             if((5000<protection_counter) && (fault_code==NO_FAULT))
             {

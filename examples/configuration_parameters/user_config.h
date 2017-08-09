@@ -88,7 +88,7 @@
 //////////////////////////////////////////////
 #define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 20
+#define APPLIED_TUNING_TORQUE_PERCENT 5
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
 #define COMMUTATION_ANGLE_OFFSET       3200
