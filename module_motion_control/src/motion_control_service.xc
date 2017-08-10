@@ -131,9 +131,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     VelCtrlAutoTuneParam velocity_auto_tune;
 
-    //autotune initialization
-    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
-
     downstream_control_data.velocity_cmd = 0;
     motion_ctrl_config.enable_velocity_auto_tuner = 0;
 
@@ -388,7 +385,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
                             }
 
-                            velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+
+                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
+                            position_ref_in_k_2n = position_ref_in_k_1n;
+                            position_ref_in_k_1n = position_ref_in_k;
+
+                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
                             if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
                             if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
                             torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
@@ -413,8 +415,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
-                                printf("TUNING ENDED \n");
-                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                if(pos_ctrl_auto_tune.active_step==UNSUCCESSFUL)
+                                    printf("TUNING UNSECCESSFUL \n");
+                                else
+                                {
+                                    printf("TUNING ENDED \n");
+                                    printf("kp:%i ki:%i kd:%i kl:%d J:%d\n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit, motion_ctrl_config.moment_of_inertia);
+                                }
                             }
 
                             if(pos_ctrl_auto_tune.counter==0)
@@ -425,7 +432,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                             }
 
-                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, pos_ctrl_auto_tune.position_ref, position_k_1, position_k);
+                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
+                            position_ref_in_k_2n = position_ref_in_k_1n;
+                            position_ref_in_k_1n = position_ref_in_k;
+
+                            torque_ref_k = update_lt_position_control(lt_pos_ctrl, position_ref_in_k, position_k_1, position_k);
                         }
                         else
                         {
