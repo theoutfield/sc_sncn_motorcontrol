@@ -126,6 +126,8 @@
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
 
 #define ENABLE_COMPENSATION_RECORDING           0 //set the cogging torque recording to 0 on startup
+#define ENABLE_OPEN_PHASE_DETECTION             0 //set to 0 to disable/1 to enable
+
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
 #define POSITION_Kp                             0
 #define POSITION_Ki                             0
