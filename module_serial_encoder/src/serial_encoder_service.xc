@@ -14,6 +14,7 @@
 #include <xscope.h>
 #include <mc_internal_constants.h>
 #include <filters.h>
+#include <stdio.h>
 
 extern char start_message[];
 
@@ -27,7 +28,8 @@ typedef struct {
 } PositionState;
 
 
-void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * biss_clock_port, int hall_enc_select_config,
+void read_position(port * biss_clock_port, port * biss_data_port, SPIPorts * spi_ports,
+        int biss_clock_low, int biss_clock_high,
         PositionFeedbackConfig &position_feedback_config, int sensor_type, PositionState &state,
         timer t, unsigned int &last_read)
 {
@@ -49,15 +51,15 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
         break;
     case BISS_SENSOR:
+    case SSI_SENSOR:
         unsigned int data[BISS_FRAME_BYTES];
-        t when timerafter(last_read + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec) :> void;
-        state.status = read_biss_sensor_data(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, hall_enc_select_config, biss_clock_port, position_feedback_config.biss_config, data);
+        state.status = read_biss_sensor_data(biss_clock_port, biss_data_port, biss_clock_low, biss_clock_high, t, position_feedback_config, data);
         t :> last_read;
         int count;
         if(state.status == SENSOR_NO_ERROR) {
-            { count, state.position, state.status } = biss_encoder(data, position_feedback_config.biss_config);
+            { count, state.position, state.status } = biss_encoder(data, position_feedback_config);
         } else {
-            { count, state.position, void } = biss_encoder(data, position_feedback_config.biss_config);
+            { count, state.position, void } = biss_encoder(data, position_feedback_config);
         }
         if (position_feedback_config.polarity == SENSOR_POLARITY_INVERTED) {
             count = -count;
@@ -79,8 +81,8 @@ void read_position(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2,
     return;
 }
 
-int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * biss_clock_port,
-        int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config, int sensor_type, PositionState &pos_state,
+int init_sensor(port * biss_clock_port, port * biss_data_port, SPIPorts * spi_ports,
+        int biss_clock_low, int biss_clock_high, PositionFeedbackConfig &position_feedback_config, int sensor_type, PositionState &pos_state,
         timer t, unsigned int &last_read)
 {
     int read_period = 0;
@@ -104,6 +106,7 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
         read_period = position_feedback_config.ifm_usec*REM_14_POLLING_TIME;
         break;
     case BISS_SENSOR:
+    case SSI_SENSOR:
 #ifdef DEBUG_POSITION_FEEDBACK
         //check if resolution is a power of 2
         if ( position_feedback_config.resolution & (position_feedback_config.resolution -1) )
@@ -116,7 +119,7 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
     }
     //read
     for (int i=0;i<2;i++) { //read 2 times
-        read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, biss_clock_port, hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+        read_position(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
     }
 
 
@@ -134,6 +137,13 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
             printstrln("biss_service: ERROR: initialization");
         printstr(start_message);
         printstrln("BISS");
+        break;
+    case SSI_SENSOR:
+        if (pos_state.status != SENSOR_NO_ERROR) {
+            printstrln("biss_service: ERROR: initialization");
+        }
+        printstr(start_message);
+        printstrln("SSI");
         break;
     case REM_16MT_SENSOR:
         if (pos_state.status != SENSOR_NO_ERROR) {
@@ -162,8 +172,8 @@ int init_sensor(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, Ha
 }
 
 
-void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, SPIPorts * spi_ports, port * (&?gpio_ports)[4],
-                int hall_enc_select_config, PositionFeedbackConfig &position_feedback_config,
+void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPorts * spi_ports, port * (&?gpio_ports)[4],
+                int biss_clock_low, int biss_clock_high, PositionFeedbackConfig &position_feedback_config,
                 client interface shared_memory_interface ?i_shared_memory,
                 interface PositionFeedbackInterface server i_position_feedback[3],
                 int gpio_on)
@@ -184,6 +194,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
     int timediff_long = 0;
     //position
     PositionState pos_state = {0};
+    int singleturn = 0;
     //timing
     timer t;
     unsigned int last_read = 0;
@@ -195,7 +206,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
     int notification = MOTCTRL_NTF_EMPTY;
 
-    int read_period = init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+    int read_period = init_sensor(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
 
 
     //main loop
@@ -208,13 +219,13 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
         //send electrical angle for commutation
         case i_position_feedback[int i].get_angle() -> unsigned int angle:
-                read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+                read_position(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
                 angle = pos_state.angle;
                 break;
 
         //send multiturn count and position
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int position , SensorError status }:
-                read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+                read_position(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
                 out_count = pos_state.count + position_feedback_config.offset;
                 position = pos_state.position;
                 status = pos_state.status;
@@ -232,8 +243,9 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
                 position_feedback_config.ifm_usec = ifm_usec;
-                read_period = init_sensor(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+                read_period = init_sensor(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
                 crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
+                write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
                 for (int i = 0; i < 3; i++) {
@@ -268,7 +280,8 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     { pos_state.last_position, pos_state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
                     break;
                 case BISS_SENSOR:
-                    read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+                case SSI_SENSOR:
+                    read_position(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
                     break;
                 }
                 t :> last_read;
@@ -302,7 +315,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
 
         //compute velocity
         case t when timerafter(next_read) :> next_read:
-            read_position(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_ports[position_feedback_config.biss_config.clock_port_config & 0b11], hall_enc_select_config, position_feedback_config, sensor_type, pos_state, t, last_read);
+            read_position(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
 
             //time between last velocity computation
             if (sensor_type == REM_16MT_SENSOR) {
@@ -325,7 +338,7 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                     velocity = velocity_compute(difference, timediff_long, position_feedback_config.resolution);
 
                     //filter for REM_16MT_SENSOR
-                    if (sensor_type == REM_16MT_SENSOR) {
+                    if (sensor_type == REM_16MT_SENSOR || sensor_type == BISS_SENSOR || sensor_type == SSI_SENSOR) {
                         velocity = filter(velocity_buffer, index, 8, velocity);
                         timediff_long = 0;
                     }
@@ -362,15 +375,34 @@ void serial_encoder_service(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hal
                 }
             }
 
+            //format the sensor singleturn position as a 16-bit data
+            switch(sensor_type)
+            {
+            case REM_16MT_SENSOR:
+                singleturn = pos_state.position;
+                break;
+            case REM_14_SENSOR:
+                singleturn = pos_state.position << 2;
+                break;
+            case BISS_SENSOR:
+            case SSI_SENSOR:
+                if (position_feedback_config.biss_config.singleturn_resolution > 16) {
+                    singleturn = pos_state.position >> (position_feedback_config.biss_config.singleturn_resolution -16);
+                } else {
+                    singleturn = pos_state.position << (16 - position_feedback_config.biss_config.singleturn_resolution);
+                }
+                break;
+            }
+
             //send data to shared memory
-            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, velocity, pos_state.angle, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
+            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, singleturn, velocity, pos_state.angle, 0, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
 
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
 
 
             //compute next loop time
-            if (sensor_type == BISS_SENSOR) {
+            if (sensor_type == BISS_SENSOR || sensor_type == SSI_SENSOR) {
                 //for BiSS we read just after the timeout is finished
                 next_read = last_read + (position_feedback_config.biss_config.timeout+2)*position_feedback_config.ifm_usec;
             } else {

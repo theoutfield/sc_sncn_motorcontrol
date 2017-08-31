@@ -48,7 +48,13 @@ typedef enum {
     SENSOR_BISS_ERROR_AND_WARNING_BIT_ERROR    = 17,
     SENSOR_BISS_NO_ACK_BIT_ERROR               = 18,
     SENSOR_BISS_NO_START_BIT_ERROR             = 19,
-    SENSOR_CHECKSUM_ERROR                      = 20
+    SENSOR_CHECKSUM_ERROR                      = 20,
+    SENSOR_BISS_DATA_LINE_ERROR                = 21,
+    SENSOR_QEI_INDEX_LOSING_TICKS              = 22,
+    SENSOR_HALL_FAULT                          = 23,
+    SENSOR_INCREMENTAL_FAULT                   = 24,    // 0x7305
+    SENSOR_SPEED_FAULT                         = 25,    // 0x7310
+    SENSOR_POSITION_FAULT                      = 26     // 0x7320
 } SensorError;
 
 /**
@@ -59,6 +65,22 @@ typedef enum {
     MOTION_CONTROL_NO_ERROR=0,
     MOTION_CONTROL_BRAKE_NOT_RELEASED=1
 } MotionControlError;
+
+/**
+ * @brief Type for Watchdog Error
+ *
+ */
+typedef enum {
+    WATCHDOG_NO_ERROR                           = 0,
+    WATCHDOG_TICKS_ERROR                        = 0b0001,
+    WATCHDOG_DEAD_TIME_PHASE_A_ERROR            = 0b0010,
+    WATCHDOG_DEAD_TIME_PHASE_B_ERROR            = 0b0011,
+    WATCHDOG_DEAD_TIME_PHASE_C_ERROR            = 0b0100,
+    WATCHDOG_DEAD_TIME_PHASE_D_ERROR            = 0b0101,
+    WATCHDOG_OVER_CURRENT_ERROR                 = 0b0110,
+    WATCHDOG_OVER_UNDER_VOLTAGE_OVER_TEMP_ERROR = 0b0111,
+    WATCHDOG_UNKNOWN_ERROR                      = 0b1111
+} WatchdogError;
 
 /**
  * @brief Type for motors.
@@ -109,12 +131,15 @@ typedef enum {
 
     //standard defined faults (IEC-61800)
     DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1 = 0X2221,
+    PHASE_FAILURE_L1                            = 0X3131,
+    PHASE_FAILURE_L2                            = 0X3132,
+    PHASE_FAILURE_L3                            = 0X3133,
     OVER_VOLTAGE_NO_1                           = 0X3211,
     UNDER_VOLTAGE_NO_1                          = 0X3221,
     EXCESS_TEMPERATURE_DRIVE                    = 0X4310,
 
     //user specific faults
-    WRONG_REF_CLK_FRQ=0XFF01
+    WRONG_REF_CLK_FRQ                           = 0XFF01,
 } FaultCode;
 
 /**
@@ -130,7 +155,6 @@ typedef struct {
     int ifm_tile_usec;
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int hall_state[6];                       /**< Hall port state while being in sector [1-6] */
-    int hall_state_angle[7];                 /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
 
     //variables added to be used in motor_control_service
     int pole_pairs;                        /**< motor pole pair*/
@@ -172,6 +196,9 @@ typedef struct {
     int protection_limit_under_voltage; //minimum tolerable value of dc-bus voltave (under abnormal conditions)
     int protection_limit_over_temperature; //maximum tolerable value of board temperature
 
+    //cogging torque compensation
+    int torque_offset [1024]; //values of torque to add to the torque command relative to the sensor position (in milliNm)
+
 } MotorcontrolConfig;
 
 /**
@@ -186,26 +213,33 @@ typedef struct
     int torque_set;
 
     int V_dc;
+    int I_b;
+    int I_c;
 
     unsigned int angle;
     unsigned int hall_state;
+    unsigned int qei_index_found;
     int angle_velocity;
     SensorError angle_sensor_error;
     SensorError angle_last_sensor_error;
 
     int position;
+    int singleturn;
     int velocity;
     SensorError  sensor_error;
     SensorError  last_sensor_error;
     unsigned int sensor_timestamp;
 
     int secondary_position;
+    int secondary_singleturn;
     int secondary_velocity;
     SensorError  secondary_sensor_error;
     SensorError  secondary_last_sensor_error;
     unsigned int secondary_sensor_timestamp;
 
     MotionControlError motion_control_error;
+
+    WatchdogError watchdog_error;
 
     int temperature;
 
@@ -215,7 +249,6 @@ typedef struct
     int analogue_input_b_2;
 
     unsigned int gpio[4];
-
 }UpstreamControlData;
 
 /**

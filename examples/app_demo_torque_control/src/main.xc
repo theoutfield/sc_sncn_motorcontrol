@@ -21,10 +21,10 @@ PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
+port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
@@ -91,12 +91,6 @@ int main(void) {
                     motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                     motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
-                    motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
-                    motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
-                    motorcontrol_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
-                    motorcontrol_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
-                    motorcontrol_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
-                    motorcontrol_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
                     motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
@@ -111,6 +105,10 @@ int main(void) {
                     motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
                     motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
+                    for (int i = 0; i < 1024; i++)
+                    {
+                        motorcontrol_config.torque_offset[i] = 0;
+                    }
 
                     torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
                             i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
@@ -140,6 +138,7 @@ int main(void) {
                     position_feedback_config.biss_config.busy = BISS_BUSY;
                     position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
                     position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                    position_feedback_config.biss_config.data_port_signal_type = BISS_DATA_PORT_SIGNAL_TYPE;
 
                     position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
@@ -151,8 +150,15 @@ int main(void) {
                     position_feedback_config.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
                     position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
                     position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
+                    position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
 
                     position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+                    position_feedback_config.hall_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
+                    position_feedback_config.hall_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
+                    position_feedback_config.hall_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
+                    position_feedback_config.hall_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
+                    position_feedback_config.hall_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
+                    position_feedback_config.hall_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
 
                     position_feedback_config.gpio_config[0] = GPIO_OFF;
                     position_feedback_config.gpio_config[1] = GPIO_OFF;

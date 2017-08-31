@@ -40,6 +40,8 @@
  */
 #define BRAKE_UPDATE_CONFIG_WAIT        2000
 
+
+
 /**
  * @brief Position/Velocity control strategie
  */
@@ -112,6 +114,8 @@ typedef struct {
     int velocity_integral_limit;        /**< Parameter for integral limit of velocity pid controller */
 
     int enable_velocity_auto_tuner;     /**< Parameter for enabling/disabling auto tuner for velocity controller */
+    int enable_compensation_recording;  /**< Parameter for enabling/disabling the cogging torque compensator recording*/
+    int enable_open_phase_detection;    /**< Parameter for enabling/disabling the open phase detection functionality*/
 
     int k_fb;                           /**< Parameter for setting the feedback position sensor gain */
     int resolution;                     /**< Parameter for setting the resolution of position sensor [ticks/rotation] */
@@ -240,6 +244,18 @@ interface MotionControlInterface
     int get_velocity();
 
     /**
+     * @brief return the error for the open phase (0 = no error, 1 = phase A, 2 = phase B, 3 = phase C) and the value of phase resistance, if there was no error detected
+     */
+    {int, float} open_phase_detection();
+
+    /**
+     * @brief Enables the sensors evaluation
+     *
+     * @return sensor status (0 = no error, != 0 error)
+     */
+    int sensors_evaluation();
+
+    /**
      * @brief responsible for data communication between torque controller and higher level controllers
      *
      * @param downstreamcontroldata -> structure including the commands for torque/velocity/position controller
@@ -247,6 +263,13 @@ interface MotionControlInterface
      * @return structure of type UpstreamControlData -> structure including the actual parameters (measurements, ...) from torque controller to higher controlling levels
      */
     UpstreamControlData update_control_data(DownstreamControlData downstreamcontroldata);
+
+    /**
+     * @brief           Enables/disables the cogging torque compensation
+     *
+     * @param   flag    value : 0 (disable) or 1 (enable)
+     */
+    void enable_cogging_compensation(int flag);
 };
 
 
@@ -298,6 +321,8 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
  * @brief Service to perform torque, velocity or position control.
  *        You will need a Motor Control Stack running parallel to this Service,
  *        have a look at Motor Control Service for more information.
+ *        Service monitors if the open circuit exists in phases of the motor by observing the behaviour of phase currents.
+ *        If the error exists, fault code for phase failure is generated.
  *
  *  Note: It is important to allocate this service in a different tile from the remaining Motor Control stack.
  *

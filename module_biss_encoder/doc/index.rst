@@ -1,18 +1,18 @@
 .. _module_biss_encoder:
 
-=====================
-BiSS Encoder Module
-=====================
+=========================
+BiSS / SSI Encoder Module
+=========================
 
 .. contents:: In this document
     :backlinks: none
     :depth: 3
 
-This module provides functions to read data transmitted using the BiSS protocol and process the data coming from a BiSS Encoder into position data.
+This module provides functions to read data transmitted using the BiSS protocol and process the data coming from a BiSS Encoder into position data. The module is also compatible with SSI encoders.
 
 BiSS is an open source digital interface for sensors and actuators. BiSS is hardware compatible to the industrial standard SSI (Serial Synchronous Interface). The standardization process is coordinated on biss-interface.com_.
 
-Those functions are used in :ref:`Serial Encoder Module <module_serial_encoder>` itself used by :ref:`Position Feedback Module <module_position_feedback>` to create a service for reading a BiSS encoder.
+Those functions are used in :ref:`Serial Encoder Module <module_serial_encoder>` itself used by :ref:`Position Feedback Module <module_position_feedback>` to create a service for reading a BiSS or SSI encoders.
 
 The BiSS functions should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
@@ -29,7 +29,7 @@ How to use
 
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
 
-.. seealso:: You might find useful the :ref:`BiSS Sensor Demo <app_test_biss>`, which illustrates the use of this module.
+.. seealso:: You might find useful the :ref:`BiSS Sensor Demo <app_test_biss>` and :ref:`SSI Sensor Demo <app_test_ssi>`, which illustrates the use of this module.
 
 1. First, add all the :ref:`SOMANET Motor Control <somanet_motor_control>` modules to your app Makefile.
 
@@ -44,11 +44,11 @@ How to use
 
 3. Instantiate the ports for the BiSS.
 
-     BiSS needs a clock output port, a data input port and a clock block. The ports structures are defined in ``position_feedback_service.h``.
-     The clock block is taken for the SPI ports sturcture. Depending on the BiSS configuration the output clock port is taken from ``hall_enc_select_port`` or from a GPIO port and the data input port is taken from ``qei_hall_port`` ``1`` or ``2``.
-     The functions take pointers for parameters, so you need to pass the addresses of the port structures. If ``qei_hall_ports`` are used the ``hall_enc_select_config`` parameter also needs to be set to configure the ports in differential mode.
+     BiSS needs a clock output port, a data input port and a clock block. The read function takes pointers for parameters, so you need to pass the addresses of the ports.
+     The ``biss_clock_low`` and ``biss_clock_high`` parameters need to be set. When the clock port is a 1-bit port they should be ``0`` and ``1``. 
+     When the clock port is more than 1 bit and the other bits are used for external config ``biss_clock_low`` and ``biss_clock_high`` should be set accordingly.
 
-4. Fill up the BiSS configuration structure.
+4. Fill up the BiSS configuration structure. BiSS and SSI use the same parameters. The protocol type is selected with the ``position_feedback_config.sensor_type`` parameters. Usually SSI encoders don't support CRC or multiturn, they can be disabled by setting them to `0`.
 
 5. At your IFM tile, You can use the functions to read BiSS data and process it into position data.
     .. code-block:: c
@@ -61,11 +61,8 @@ How to use
         #include <biss_service.h>
         
         // 3.Instantiate the ports for the BiSS.
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
-        port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
+        port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
+        port ? gpio_port_3 = SOMANET_IFM_GPIO_D3; // 1-bit port
 
         int main(void)
         {
@@ -73,25 +70,31 @@ How to use
             {
                 on tile[IFM_TILE]:
                 {
-                    // 4. Fill up the BiSS configuration structure.
-                    BiSSConfig biss_config; 
-                    biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    biss_config.filling_bits = BISS_FILLING_BITS;
-                    biss_config.crc_poly = BISS_CRC_POLY;
-                    biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
-                    biss_config.timeout = BISS_TIMEOUT;
-                    biss_config.busy = BISS_BUSY;
-                    biss_config.clock_port_config = BISS_CLOCK_PORT;
-                    biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                    // 4. Fill up the BiSS configuration structure.                 
+                    PositionFeedbackConfig position_feedback_config;
+                    position_feedback_config.sensor_type = BISS_SENSOR; // or SSI_SENSOR for SSI
+                    position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
+                    position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
+                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+                    position_feedback_config.biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
+                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+                    position_feedback_config.biss_config.busy = BISS_BUSY;
+                    position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
+                    position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                    position_feedback_config.biss_config.data_port_signal_type = BISS_DATA_PORT_SIGNAL_TYPE;
                     
                     // 5. Use the functions to read BiSS data and process it into position data.
                     // read BiSS data
                     int data[BISS_FRAME_BYTES]; // array of 32 bit bytes to store the data. The size needs to be enough to store all the data bits. 
-                    int hall_enc_select_config = 0b0011; //to configure qei_hall_ports in differential mode
-                    int error = read_biss_sensor_data(&qei_hall_port_1, &qei_hall_port_2, &hall_enc_select_port, hall_enc_select_config, &gpio_port_2, biss_config, data);
+                    timer t;
+                    int biss_clock_low = 0;
+                    int biss_clock_high = 1;
+                    int error = read_biss_sensor_data(&gpio_port_3, &qei_hall_port_2, biss_clock_low, biss_clock_high, t, position_feedback_config, data);
                     // process data
                     int count, position, status;
-                    { count, position, status } = biss_encoder(data, biss_config);
+                    { count, position, status } = biss_encoder(data, position_feedback_config);
                 }
             }
 
@@ -111,6 +114,7 @@ Definitions
 Types
 -----
 
+.. doxygenstruct:: PositionFeedbackConfig
 .. doxygenstruct:: BISSConfig
 .. doxygenenum:: SensorError
 .. doxygenenum:: EncoderPortNumber

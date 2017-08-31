@@ -8,6 +8,43 @@
 #include <stdio.h>
 #include <ctype.h>
 
+int general_system_evaluation(client interface MotionControlInterface i_motion_control)
+{
+    float resistance;
+    int phase_error = 0, sensor_error = 0;
+
+    printf("Evaluation of phases is starting ...\n");
+    printf("Voltages are applied to phase terminals ...\n");
+    {phase_error, resistance} = i_motion_control.open_phase_detection();
+
+    if (phase_error == 1)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+        return phase_error;
+    }
+    else if (phase_error == 2)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+        return phase_error;
+    }
+    else if(phase_error == 3)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+        return phase_error;
+    }
+    else
+    {
+        printf(">>  OPEN CIRCUIT FAULT NOT DETECTED ...\n\n");
+
+        printf("Evaluation of sensors is starting ...\n");
+        printf("Motor will rotate couple of turns in both directions ...\n");
+        delay_seconds(1);
+        sensor_error = i_motion_control.sensors_evaluation();
+        if (sensor_error == 0)
+            printf("SENSOR IS WORKING PROPERLY ...\n\n");
+        return sensor_error;
+    }
+}
 
 void control_tuning_console(client interface MotionControlInterface i_motion_control)
 {
@@ -74,37 +111,41 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
         switch(mode_1)
         {
+        case 'g':
+                switch (mode_2)
+                {
+                   case 's':
+                       switch(mode_3)
+                       {
+                           case 'e':
+                               general_system_evaluation(i_motion_control);
+                               break;
+                       }
+                   break;
+                }
+            break;
 
         //automatic tuning
         case 'a':
                 motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
-                case 'o'://find motor commutation offset automatically
-                         printf("Sending offset_detection command ...\n");
+                case 'c' :
+                        printf("Start Cogging torque detection\n");
+                        i_motion_control.enable_velocity_ctrl();
 
-                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        motion_ctrl_config.enable_compensation_recording = 1;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
-                         if(motorcontrol_config.commutation_angle_offset == -1)
-                         {
-                             printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-                         }
-                         else
-                         {
-                             motorcontrol_config = i_motion_control.get_motorcontrol_config();
-                             printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-
-                             printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
-
-                             if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
-                             {
-                                 printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
-                                 for (int i=0;i<6;i++) {
-                                     printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
-                                 }
-                             }
-                         }
-                         break;
+                        while (motion_ctrl_config.enable_compensation_recording)
+                        {
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            delay_milliseconds(1);
+                        }
+                        i_motion_control.disable();
+                        printf("Cogging torque calibrated\n");
+                        break;
 
                 case 'v'://calculate optimal pid parameters for velocity controller
 
@@ -265,7 +306,43 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 break;
                         }
                         break;
-                 }
+
+                default://find motor commutation offset automatically
+
+                    if (general_system_evaluation(i_motion_control) == 0)
+                    {
+                        printf("Sending offset_detection command ...\n");
+
+                        motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+
+                        if(motorcontrol_config.commutation_angle_offset == -1)
+                        {
+                            printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                        }
+                        else
+                        {
+                            motorcontrol_config = i_motion_control.get_motorcontrol_config();
+                            printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+
+                            printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
+
+                            if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                            {
+                                printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
+                                for (int i=0;i<6;i++) {
+                                    printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        printf("OFFSET DETECTION NOT POSSIBLE ...\n");
+                    }
+
+                    break;
+
+                 } //end switch(mode_2)
 
                 break;
 
@@ -574,6 +651,20 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'e':
                 switch(mode_2)
                 {
+                case 'c':
+                        if (value == 1)
+                        {
+
+                            i_motion_control.enable_cogging_compensation(1);
+                            printf("cogging torque compensation enabled\n");
+                        }
+                        else
+                        {
+                            i_motion_control.enable_cogging_compensation(0);
+                            printf("cogging torque compensation disabled\n");
+                        }
+                        break;
+
                 case 'p':
                         if (value == 1)
                         {
@@ -775,7 +866,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'f':
             UpstreamControlData upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
 
-            if (upstream_control_data.error_status == NO_FAULT)
+            if (upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR && upstream_control_data.watchdog_error == WATCHDOG_NO_ERROR)
             {
                 printf("No fault\n");
             }
@@ -785,8 +876,68 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 i_motion_control.disable();
                 brake_flag = 0;
 
-                if(upstream_control_data.error_status != NO_FAULT)
-                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+                //Software protection errors
+                switch(upstream_control_data.error_status) {
+                case DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1:
+                    printf("Software protection: Over current\n");
+                    break;
+                case PHASE_FAILURE_L1:
+                    printf("Software protection: PHASE_FAILURE_L1\n");
+                    break;
+                case PHASE_FAILURE_L2:
+                    printf("Software protection: PHASE_FAILURE_L2\n");
+                    break;
+                case PHASE_FAILURE_L3:
+                    printf("Software protection: PHASE_FAILURE_L3\n");
+                    break;
+                case OVER_VOLTAGE_NO_1:
+                    printf("Software protection: Over voltage\n");
+                    break;
+                case UNDER_VOLTAGE_NO_1:
+                    printf("Software protection: Under voltage\n");
+                    break;
+                case EXCESS_TEMPERATURE_DRIVE:
+                    printf("Software protection: Over temperature\n");
+                    break;
+                case NO_FAULT:
+                    break;
+                default:
+                    printf("Software protection: %d\n", upstream_control_data.error_status);
+                    break;
+                }
+
+                //watchdog errors
+                switch(upstream_control_data.watchdog_error) {
+                case WATCHDOG_NO_ERROR:
+                    break;
+                case WATCHDOG_TICKS_ERROR:
+                    printf("Watchdog: Ticks error\n");
+                    break;
+                case WATCHDOG_OVER_UNDER_VOLTAGE_OVER_TEMP_ERROR:
+                    printf("Watchdog: Over/Under voltage or Over temperature\n");
+                    break;
+                case WATCHDOG_OVER_CURRENT_ERROR:
+                    printf("Watchdog: Over current\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_A_ERROR:
+                    printf("Watchdog: Dead time phase A\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_B_ERROR:
+                    printf("Watchdog: Dead time phase B\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_C_ERROR:
+                    printf("Watchdog: Dead time phase C\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_D_ERROR:
+                    printf("Watchdog: Dead time phase D\n");
+                    break;
+                default:
+                    printf("Watchdog: Unknown error %d\n", upstream_control_data.watchdog_error);
+                    break;
+                }
+
+                if (upstream_control_data.sensor_error != SENSOR_NO_ERROR)
+                    printf(">>  Sensor Error ID %i DETECTED ...\n", upstream_control_data.sensor_error);
 
                 //reset fault
                 printf("Reset fault...\n");
@@ -795,11 +946,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 //check if reset worked
                 delay_ticks(500*1000*tile_usec);
                 upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
-                if(upstream_control_data.error_status == NO_FAULT)
+                if(upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR && upstream_control_data.watchdog_error == WATCHDOG_NO_ERROR)
                 {
                     printf(">>  FAULT REMOVED\n");
                 } else {
-                    printf(">>  FAULT ID %i NOT REMOVED!\n");
+                    printf(">>  FAULT ** NOT ** REMOVED!\n");
                 }
             }
             break;

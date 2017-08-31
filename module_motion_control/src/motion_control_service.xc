@@ -21,8 +21,299 @@
 #include <refclk.h>
 #include <mc_internal_constants.h>
 #include <stdio.h>
+#include <cogging_torque_compensation.h>
+
+#define HALL_MASK_A 0x4
+#define HALL_MASK_B 0x2
+#define HALL_MASK_C 0x1
+
+enum
+{
+    NO_ERROR,
+    A,
+    B,
+    C,
+    NR_PHASES
+};
+
+typedef enum
+{
+    POS_ERR =   1,
+    SPEED_ERR = 2,
+    ANGLE_ERR = 3,
+    PORTS_ERR = 4
+} sensor_fault;
+
+/*
+ * checking the position, velocity and angle reading from the sensor, when user triggers 'gse' command in tuning console or prior to commutation offset detection
+ */
+sensor_fault sensor_functionality_evaluation(client interface TorqueControlInterface i_torque_control, MotorcontrolConfig motorcontrol_config, int app_tile_usec)
+{
+    UpstreamControlData upstream_control_data;
+    int angle = 0, position = 0, hall_state = 0, velocity = 0;
+
+    unsigned counter = 0;
+    int max_pos = 0, mean_pos = 0, real_mean_pos = 0, tq_pos = 0, real_tq_pos = 0, fq_pos = 0, real_fq_pos = 0;
+    int max_angle = 0, mean_angle = 0, real_mean_angle = 0, tq_angle = 0, real_tq_angle = 0, fq_angle = 0, real_fq_angle = 0;
+    int hall_state_old = 0, max_pos_found = 0, max_angle_found = 0;
+    int filter_diff = 0, filter_vel = 0, hall_state_ch[NR_PHASES] = { 0 };
+    int index_v = 0, velocity_arr[500], index_d = 0, difference_arr[500],  old_position = 0;
+    sensor_fault error_sens = NO_ERROR;
+    timer t;
+    unsigned ts;
+
+    // starts rotating the motor
+    i_torque_control.enable_index_detection();
+
+    while(counter < 15000)
+    {
+        upstream_control_data = i_torque_control.update_upstream_control_data();
+        position = upstream_control_data.singleturn;
+        angle = upstream_control_data.angle;
+        hall_state = upstream_control_data.hall_state;
+
+        // remembering the first element
+        if (counter == 0)
+        {
+            if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                hall_state_old = hall_state;
+        }
+
+        // checking if hall ports are toggling
+        // if they are not, hall_state variables will be zero and will signal an error
+        if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+        {
+            if (hall_state & HALL_MASK_A && !(hall_state_old & HALL_MASK_A))
+                ++hall_state_ch[A];
+            if (hall_state & HALL_MASK_B && !(hall_state_old & HALL_MASK_B))
+                ++hall_state_ch[B];
+            if (hall_state & HALL_MASK_C && !(hall_state_old & HALL_MASK_C))
+                ++hall_state_ch[C];
+
+            hall_state_old = hall_state;
+        }
+
+        // finding the max angle which should be 4095 (12 bits resolution)
+        // calculating the expected mean angle, point between mean and max, point between mean and 0
+        if (angle > 4000 && !max_angle_found)
+        {
+            max_angle_found = 1;
+            max_angle = angle;
+            mean_angle = max_angle / 2;
+            tq_angle = (max_angle + mean_angle) / 2;
+            fq_angle = mean_angle / 2;
+        }
+
+        // calculating the real mean angle, point between mean and max, point between mean and 0
+        // given threshold is 50
+        if (max_angle_found)
+        {
+            if (angle > mean_angle - 50 && angle < mean_angle + 50)
+                real_mean_angle = angle;
+            if (angle > tq_angle - 50 && angle < tq_angle + 50)
+                real_tq_angle = angle;
+            if (angle > fq_angle - 50 && angle < fq_angle + 50)
+                real_fq_angle = angle;
+        }
 
 
+        // finding the max pos which should be 65535 (16 bits resolution)
+        // calculating the expected mean position, point between mean and max, point between mean and 0
+        if (!max_pos_found && position > 60000)
+        {
+            max_pos_found = 1;
+            max_pos = position;
+            mean_pos = max_pos / 2;
+            tq_pos = (max_pos + mean_pos) / 2;
+            fq_pos = mean_pos / 2;
+        }
+
+        // calculating the real mean position, point between mean and max, point between mean and 0
+        // given threshold is 5000
+        if (max_pos_found)
+        {
+            if (position > mean_pos -5000 && position < mean_pos + 5000)
+                real_mean_pos = position;
+            if (position > tq_pos - 5000 && position < tq_pos + 5000)
+                real_tq_pos = position;
+            if (position > fq_pos - 5000 && position < fq_pos + 5000)
+                real_fq_pos = position;
+        }
+
+        ++counter;
+
+
+        t :> ts;
+        if (motorcontrol_config.commutation_sensor == BISS_SENSOR)
+            t when timerafter (ts + 1500*app_tile_usec) :> void;
+        else
+            t when timerafter (ts + 500*app_tile_usec) :> void;
+    }
+
+    // evaluating velocity readings by comparing velocity data from the sensor and computed velocity from position data from the sensor
+    while (counter > 5000)
+    {
+        upstream_control_data = i_torque_control.update_upstream_control_data();
+        position = upstream_control_data.singleturn;
+        velocity = upstream_control_data.velocity;
+
+        if (counter == 15000)
+            old_position = position;
+
+        // calculating velocity from position readings as simple derivative
+        if (position != old_position)
+        {
+            if(position - old_position > -60000 && position - old_position < 60000)
+            {
+                difference_arr[index_d] = ((position - old_position) * (60000000/1000)) / 65535;
+                index_d++;
+                old_position = position;
+            }
+        }
+
+        // mean average filter of velocity data from the sensor
+        velocity_arr[index_v] = velocity;
+        index_v++;
+        if (index_v == 500)
+        {
+            index_v = 0;
+            filter_vel = 0;
+            for (int i = 0; i < 500; i++)
+                filter_vel += velocity_arr[i];
+            filter_vel /= 500;
+            filter_vel = abs(filter_vel);
+        }
+
+        // mean average filter of computed velocity from the sensor
+        if (index_d == 500)
+        {
+            index_d = 0;
+            filter_diff = 0;
+            for (int i = 0; i < 500; i++)
+                filter_diff += difference_arr[i];
+            filter_diff /= 500;
+            filter_diff = abs(filter_diff);
+        }
+
+        --counter;
+        t :> ts;
+        t when timerafter (ts + 1000*app_tile_usec) :> void;
+    }
+
+    // comparison of position data
+    if ((mean_pos-real_mean_pos < -5000 || mean_pos-real_mean_pos > 5000)
+            || (tq_pos - real_tq_pos < -5000 || tq_pos - real_tq_pos > 5000)
+            || (fq_pos - real_fq_pos < -5000 || fq_pos - real_fq_pos > 5000)
+            || max_pos < 60000)
+        error_sens = POS_ERR;
+
+    // comparison of velocity data for low and high velocities
+    if (filter_vel < 60 && filter_vel > -60)
+    {
+        if (filter_vel - filter_diff < -30 || filter_vel - filter_diff > 30)
+            error_sens = SPEED_ERR;
+    }
+    else
+    {
+        if (filter_vel - filter_diff < -50 || filter_vel - filter_diff > 50)
+                    error_sens = SPEED_ERR;
+    }
+
+    // comparison of angle data
+    if ((mean_angle-real_mean_angle < -50 || mean_angle-real_mean_angle > 50)
+            || (tq_angle - real_tq_angle < -50 || tq_angle - real_tq_angle > 50)
+            || (fq_angle - real_fq_angle < -50 || fq_angle - real_fq_angle > 50)
+            || max_angle < 4000)
+        error_sens = ANGLE_ERR;
+
+    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+    {
+        if (!hall_state_ch[A] || !hall_state_ch[B] || !hall_state_ch[C])
+            error_sens = PORTS_ERR;
+    }
+
+//    printf("%d\n", error_sens);
+//    printf("%d %d %d %d\n", max_pos, real_mean_pos, real_tq_pos, real_fq_pos);
+    i_torque_control.disable_index_detection();
+    i_torque_control.set_sensor_status(error_sens);
+    return error_sens;
+}
+
+/*
+ * detection of open phase prior to starting the motorcontrol
+ * voltage difference between terminal a and terminals b,c (on the same potential) should establish electric circuit consisting of phase a in series with a branch consisting of parallel branches b and c
+ */
+int open_phase_detection_offline(client interface TorqueControlInterface i_torque_control,
+        MotorcontrolConfig motorcontrol_config, int app_tile_usec, int current_ratio, float * ret)
+{
+    UpstreamControlData upstream_control_data;
+    float I[NR_PHASES] = { 0 };
+    int refer[NR_PHASES] = {0, 20, 20, 20};
+    unsigned counter = 1;
+    float voltage = 0;
+    float rated_curr = (float)motorcontrol_config.rated_current/1000;
+    int error_phase = NO_ERROR;
+
+    timer tmr;
+    unsigned ts;
+
+    i_torque_control.set_torque_control_disabled();
+    i_torque_control.start_system_eval();
+    i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
+
+    // algorithm is applied until all currents become high enough, i.e. have enough information to make a conclusion that phases are not open
+    while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
+    {
+        upstream_control_data = i_torque_control.update_upstream_control_data();
+
+        I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
+        I[C] = (float)upstream_control_data.I_c/(float)(current_ratio);
+        I[A] = -(I[B]+I[C]);
+
+        for(int i = 0; i < NR_PHASES; i++)
+            if (I[i] < 0)
+                I[i] = -I[i];
+
+        // change terminal b and c voltages
+        if (counter % 100 == 0)
+        {
+            refer[B] += 1;
+            refer[C] += 1;
+            i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
+        }
+
+        // break the algortihm if voltage on terminals goes over the max limit or currents went over 80 % raed current
+        // at this moment we can conclude if the phase is opened
+        // at such a high voltage at the terminals, if the current is below 10 % of rated current it can be said that the phase is opened
+        // if non of the conditions here are met, it can be said that phases are not opened
+        if (refer[B] > 90 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
+        {
+            if (I[A] < rated_curr/10)
+                error_phase = A;
+            else if (I[B] < rated_curr/10)
+                error_phase = B;
+            else if (I[C] < rated_curr/10)
+                error_phase = C;
+            break;
+        }
+
+        tmr :> ts;
+        tmr when timerafter (ts + 1000*app_tile_usec) :> ts;
+
+        ++counter;
+    }
+
+//    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
+
+    // calculation of phase resistance
+    voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
+    if (error_phase == 0)
+        *ret = voltage / I[B];
+
+    i_torque_control.set_evaluation_references(0, 0, 0);
+
+    return error_phase;
+}
 
 int special_brake_release(int &counter, int start_position, int actual_position, int range, int duration, int max_torque, MotionControlError &motion_control_error)
 {
@@ -104,13 +395,17 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
     double filter_input=0.00, filter_output=0.00;
 
+    int torque_measurement;
+    int torque_buffer [8] = {0};
+    int index = 0;
+
     // structure definition
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
 
-    PIDparam velocity_control_pid_param;
+    PIDT1param velocity_control_pid_param;
 
-    PIDparam position_control_pid_param;
+    PIDT1param position_control_pid_param;
 
     LimitedTorquePosCtrl lt_pos_ctrl;
 
@@ -128,6 +423,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     double velocity_ref_k = 0;
     double velocity_ref_in_k=0, velocity_ref_in_k_1n=0;
     double velocity_k = 0.00;
+
+    //cogging compensation
+    CoggingTorqueParam ct_parameters;
+
+    init_cogging_torque_parameters(ct_parameters, 10);
 
     VelCtrlAutoTuneParam velocity_auto_tune;
 
@@ -184,6 +484,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // initialization
     MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
+    int current_ratio = motorcontrol_config.current_ratio;
 
     lt_position_control_reset(lt_pos_ctrl);
     lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
@@ -236,6 +537,44 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         app_tile_usec = USEC_FAST;
     }
 
+    int error_phase = NO_ERROR;
+    float resist = 0;
+    sensor_fault error_sens = NO_ERROR;
+    unsigned qei_ctr = 100000;
+    float curr_threshold = (float)motorcontrol_config.rated_current /1000 / 10;
+    unsigned measurement = 0;
+    int ftr = 0;
+    float rms[NR_PHASES] = { 0 };
+    int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect[NR_PHASES] = { 0 };
+    int detect_low[NR_PHASES] = { 0 }, phase_cur[NR_PHASES] = { 0 };
+
+    //QEI index calibration
+    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+    {
+        printf("Find encoder index \n");
+        int index_found = 0;
+        i_torque_control.enable_index_detection();
+        while (!index_found)
+        {
+            upstream_control_data = i_torque_control.update_upstream_control_data();
+            index_found = upstream_control_data.qei_index_found;
+            if (qei_ctr == 0)
+            {
+                error_sens = POS_ERR;
+                index_found = 1;
+            }
+
+            --qei_ctr;
+        }
+
+        if (error_sens == NO_ERROR)
+            printf("Incremental encoder index found\n");
+        else
+            printf("Incremental encoder index not found \n Check if the sensor is connected\n\n");
+
+        i_torque_control.disable_index_detection();
+    }
+
     //brake
     int special_brake_release_counter = BRAKE_RELEASE_DURATION+1;
     int special_brake_release_initial_position = 0;
@@ -251,6 +590,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
+
     while(1)
     {
 #pragma ordered
@@ -318,6 +658,94 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         velocity_ref_in_k = velocity_ref_k;
                         torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                    }
+                    //Recording function for the cogging torque
+                    if (motion_ctrl_config.enable_compensation_recording)
+                    {
+                        downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
+                        if (ct_parameters.delay_counter < (1000 * 1000 * POSITION_CONTROL_LOOP_PERIOD))
+                        {
+                            if (!ct_parameters.torque_recording_started)
+                            {
+                                ct_parameters.torque_recording_started = 1;
+                                ct_parameters.count_start = upstream_control_data.position;
+
+                                if (ct_parameters.velocity_reference < 0)
+                                {
+                                    if (ct_parameters.rotation_sign != -1)
+                                    {
+                                        ct_parameters.back_and_forth++;
+                                    }
+                                    ct_parameters.rotation_sign = -1;
+                                }
+                                else
+                                {
+                                    if (ct_parameters.rotation_sign != 1)
+                                    {
+                                        ct_parameters.back_and_forth++;
+                                    }
+                                    ct_parameters.rotation_sign = 1;
+                                }
+                            }
+                            if (((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign < ct_parameters.number_turns * motion_ctrl_config.resolution) || ct_parameters.remaining_cells != 0)
+                            {
+                                if (upstream_control_data.singleturn % ct_parameters.position_step)
+                                {
+                                    int index = upstream_control_data.singleturn / ct_parameters.position_step;
+                                    ct_parameters.torque_recording[index] += torque_measurement;
+                                    if (ct_parameters.counter_average[index] == 0)
+                                    {
+                                        ct_parameters.remaining_cells--;
+                                    }
+                                    ct_parameters.counter_average[index] ++;
+                                }
+                            }
+                            else {
+                                printf("Measurement done\n");
+                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+                                {
+                                    ct_parameters.torque_recording[i] /= ct_parameters.counter_average[i];
+                                    ct_parameters.counter_average[i] = 0;
+                                }
+
+
+                                motorcontrol_config = i_torque_control.get_config();
+                                if (ct_parameters.back_and_forth == 1)
+                                {
+                                    printf("\nFirst turn done\n");
+                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+                                    {
+                                        motorcontrol_config.torque_offset[i] = ct_parameters.torque_recording[i];
+                                        ct_parameters.torque_recording[i]= 0;
+                                    }
+                                    ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
+                                }
+                                else if(ct_parameters.back_and_forth == 2)
+                                {
+                                    printf("\nSecond turn done\n");
+                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+                                    {
+                                        motorcontrol_config.torque_offset[i] += ct_parameters.torque_recording[i];
+                                        motorcontrol_config.torque_offset[i] /= 2;
+                                        ct_parameters.torque_recording[i]= 0;
+                                    }
+                                    ct_parameters.rotation_sign = 0;
+                                    ct_parameters.back_and_forth = 0;
+                                    motion_ctrl_config.enable_compensation_recording = 0;
+                                    velocity_ref_k = 0;
+                                }
+                                ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
+                                i_torque_control.set_config(motorcontrol_config);
+                                ct_parameters.torque_recording_started = 0;
+                                ct_parameters.delay_counter = 0;
+                                i_torque_control.set_torque_control_enabled();
+                            }
+                        }
+                        else
+                        {
+                            ct_parameters.delay_counter ++;
+                        }
+
                     }
                 }
                 else if (position_enable_flag == 1)// position control
@@ -487,7 +915,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             min_position_orig = min_position;
                         }
                     }
-                    //increase limit by threashold
+                    //increase limit by threshold
                     max_position += POSITION_LIMIT_THRESHOLD;
                     min_position -= POSITION_LIMIT_THRESHOLD;
                 }
@@ -503,7 +931,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                     position_limit_reached = 0;
                 }
-
                 torque_ref_k += (double)(downstream_control_data.offset_torque);
 
                 //torque limit check
@@ -529,6 +956,252 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
+                torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
+
+                switch (error_sens)
+                {
+                    case POS_ERR:
+                        upstream_control_data.sensor_error = SENSOR_POSITION_FAULT;
+                        break;
+                    case SPEED_ERR:
+                        upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
+                        break;
+                    case ANGLE_ERR:
+                        if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                            upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                        else
+                            upstream_control_data.sensor_error = SENSOR_INCREMENTAL_FAULT;
+                        break;
+                    case PORTS_ERR:
+                        upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                        break;
+                }
+
+                /*
+                 * open phase online detection
+                 */
+                if(motion_ctrl_config.enable_open_phase_detection)
+                {
+                    if(error_phase == NO_ERROR)
+                    {
+                        for (int i = A; i < NR_PHASES; i++)
+                        {
+                            switch (i)
+                            {
+                            case A:
+                                phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
+                                break;
+                            case B:
+                                phase_cur[B] = upstream_control_data.I_b;
+                                break;
+                            case C:
+                                phase_cur[C] = upstream_control_data.I_c;
+                                break;
+                            }
+
+                            // observing abs value
+                            if (phase_cur[i] < 0)
+                                phase_cur[i] = -phase_cur[i];
+
+                            // calculating sum and sum of squares for currents
+                            sum[i] += phase_cur[i];
+                            sum_sq[i] += phase_cur[i]*phase_cur[i];
+                        }
+
+                        ftr++;
+                        // every 33 ms rms value is calculated
+                        if (ftr > 1 && ftr % 100 == 0)
+                        {
+                            ++measurement;
+                            float mean[NR_PHASES], sd[NR_PHASES];
+                            // calculating mean, standard deviation and rms value
+                            for (int i = A; i < NR_PHASES; i++)
+                            {
+                                mean[i] = (float)sum[i] / ftr;
+                                sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                                rms[i] += mean[i] + sqrt(sd[i]);
+                            }
+
+                            for (int i = A; i < NR_PHASES; i++)
+                                rms[i] = rms[i] / current_ratio;
+
+                            // if velocity is high
+                            // if three times it's detected that there is high difference between phase currents, phase is opened
+                            if (abs(upstream_control_data.velocity) > 50)
+                            {
+                                if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
+                                {
+                                    detect[A]++;
+
+                                    if (detect[A] == 3)
+                                    {
+                                        error_phase = A;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
+                                }
+
+                                if (rms[B] < curr_threshold && rms[A] > 8 * rms[B] && rms[C] > 8 * rms[B])
+                                {
+                                    detect[B]++;
+
+                                    if (detect[B] == 3)
+                                    {
+                                        error_phase = B;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
+                                }
+
+                                if (rms[C] < curr_threshold && rms[A] > 8 * rms[C] && rms[B] > 8 * rms[C])
+                                {
+                                    detect[C]++;
+
+                                    if (detect[C] == 3)
+                                    {
+                                        error_phase = C;
+                                        i_torque_control.set_brake_status(0);
+                                        if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                        {
+                                            brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                        }
+                                        else
+                                        {
+                                            torque_enable_flag   =0;
+                                            velocity_enable_flag =0;
+                                            position_enable_flag =0;
+                                            i_torque_control.set_torque_control_disabled();
+                                        }
+                                    }
+                                }
+                            }
+                            else if (abs(upstream_control_data.velocity) > 5)// if velocity is low
+                            {
+                                if (abs(upstream_control_data.computed_torque) > 10)
+                                {
+                                    if (rms[A] < curr_threshold && rms[B] > 4 * rms[A] && rms[C] > 4 * rms[A])
+                                    {
+                                        detect_low[A]++;
+                                        if (detect_low[A] == 2)
+                                        {
+                                            error_phase = A;
+                                            i_torque_control.set_brake_status(0);
+                                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                            {
+                                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                            }
+                                            else
+                                            {
+                                                torque_enable_flag   =0;
+                                                velocity_enable_flag =0;
+                                                position_enable_flag =0;
+                                                i_torque_control.set_torque_control_disabled();
+                                            }
+                                        }
+                                    }
+                                    else
+                                        detect_low[A] = 0;
+
+                                    if (rms[B] < curr_threshold && rms[A] > 4 * rms[B] && rms[C] > 4 * rms[B])
+                                    {
+                                        detect_low[B]++;
+                                        if (detect_low[B] == 2)
+                                        {
+                                            error_phase = B;
+                                            i_torque_control.set_brake_status(0);
+                                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                            {
+                                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                            }
+                                            else
+                                            {
+                                                torque_enable_flag   =0;
+                                                velocity_enable_flag =0;
+                                                position_enable_flag =0;
+                                                i_torque_control.set_torque_control_disabled();
+                                            }
+                                        }
+                                    }
+                                    else
+                                        detect_low[B] = 0;
+
+                                    if (rms[C] < curr_threshold && rms[A] > 4 * rms[C] && rms[B] > 4 * rms[C])
+                                    {
+                                        detect_low[C]++;
+                                        if (detect_low[C] == 2)
+                                        {
+                                            error_phase = C;
+                                            i_torque_control.set_brake_status(0);
+                                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                            {
+                                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                            }
+                                            else
+                                            {
+                                                torque_enable_flag   =0;
+                                                velocity_enable_flag =0;
+                                                position_enable_flag =0;
+                                                i_torque_control.set_torque_control_disabled();
+                                            }
+                                        }
+                                    }
+                                    else
+                                        detect_low[C] = 0;
+                                }
+                            }
+
+                            // every 20 measurements reset detection flag
+                            if(measurement == 20)
+                            {
+                                measurement = 0;
+                                for (int i = A; i < NR_PHASES; i++)
+                                    detect[i] = 0;
+                            }
+
+                            ftr = 0;
+                            for (int i = A; i < NR_PHASES; i++)
+                            {
+                                sum[i] = 0;
+                                sum_sq[i] = 0;
+                                rms[i] = 0;
+                            }
+                            //                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
+                        }
+                    }
+                }
+
+                switch (error_phase)
+                {
+                    case A:
+                        upstream_control_data.error_status = PHASE_FAILURE_L1;
+                        break;
+                    case B:
+                        upstream_control_data.error_status = PHASE_FAILURE_L2;
+                        break;
+                    case C:
+                        upstream_control_data.error_status = PHASE_FAILURE_L3;
+                        break;
+                }
 
 #ifdef XSCOPE_POSITION_CTRL
                 xscope_int(VELOCITY, upstream_control_data.velocity);
@@ -547,12 +1220,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(V_DC, upstream_control_data.V_dc);
                 xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
                 xscope_int(TEMPERATURE, (upstream_control_data.temperature/motorcontrol_config.temperature_ratio));
+                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
+                xscope_int(I_B, upstream_control_data.I_b);
+                xscope_int(I_C, upstream_control_data.I_c);
                 xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
                 xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
                 xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
                 xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
 #endif
-
 
                 if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
                 {
@@ -756,6 +1431,38 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 upstream_control_data_out = i_torque_control.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
 
+                switch (error_phase)
+                {
+                    case A:
+                        upstream_control_data_out.error_status = PHASE_FAILURE_L1;
+                        break;
+                    case B:
+                        upstream_control_data_out.error_status = PHASE_FAILURE_L2;
+                        break;
+                    case C:
+                        upstream_control_data_out.error_status = PHASE_FAILURE_L3;
+                        break;
+                }
+
+                switch (error_sens)
+                {
+                    case POS_ERR:
+                        upstream_control_data_out.sensor_error = SENSOR_POSITION_FAULT;
+                        break;
+                    case SPEED_ERR:
+                        upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
+                        break;
+                    case ANGLE_ERR:
+                        if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                            upstream_control_data_out.sensor_error = SENSOR_HALL_FAULT;
+                        else
+                            upstream_control_data_out.sensor_error = SENSOR_INCREMENTAL_FAULT;
+                        break;
+                    case PORTS_ERR:
+                        upstream_control_data_out.sensor_error = SENSOR_HALL_FAULT;
+                        break;
+                }
+
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
                 {
@@ -878,6 +1585,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].reset_motorcontrol_faults():
                 i_torque_control.reset_faults();
+                error_sens = NO_ERROR;
+                i_torque_control.set_sensor_status(error_sens);
+                error_phase = NO_ERROR;
                 break;
 
         case i_motion_control[int i].set_safe_torque_off_enabled():
@@ -886,6 +1596,29 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 velocity_enable_flag = 0;
                 position_enable_flag = 0;
                 i_torque_control.set_safe_torque_off_enabled();
+                break;
+
+        case i_motion_control[int i].enable_cogging_compensation(int flag):
+                if (flag)
+                {
+                    i_torque_control.enable_cogging_compensation();
+                }
+                else
+                {
+                    i_torque_control.disable_cogging_compensation();
+                }
+                break;
+
+
+        case i_motion_control[int i].open_phase_detection() -> {int error_phase_out, float resistance_out}:
+                error_phase = open_phase_detection_offline(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
+                error_phase_out = error_phase;
+                resistance_out = resist;
+                break;
+
+        case i_motion_control[int i].sensors_evaluation() -> int sensor_status_out :
+                error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, app_tile_usec);
+                sensor_status_out = error_sens;
                 break;
         }
     }

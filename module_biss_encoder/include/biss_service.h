@@ -13,30 +13,33 @@
 /**
  * @brief Read generic BiSS sensor data
  *
- * @param qei_hall_port_1 BiSS input port 1
- * @param qei_hall_port_2 BiSS input port 2
- * @param hall_enc_select_port port used to select the mode (differential or not) of Hall/qei ports and optionally output the BiSS clock
- * @param hall_enc_select_config config to select the mode (differential or not) of Hall/qei ports
- * @param biss_clock_port port used to optionally output the BiSS clock
- * @param biss_config Configuration of the BiSS sensor (data lengths, crc polynomial, etc)
+ * @param biss_clock_port BiSS/SSI clock port
+ * @param biss_data_port BiSS/SSI data port
+ * @param biss_clock_low value of the BiSS clock when low
+ * @param biss_clock_high value of the BiSS clock when high
+ * @param t used for the timeout
+ * @param position_feedback_config Configuration of the BiSS sensor (data lengths, crc polynomial, etc)
  * @param[out] data Array to store the read bits, should be large enough to store all the data bits + crc bits
  *
  * @return error status (No Error, CRC Error, No Ack, No Start Bit)
  */
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[]);
+SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
+        int biss_clock_low, int biss_clock_high,
+        timer t,
+        PositionFeedbackConfig &position_feedback_config, unsigned int data[]);
 
 
 /**
  * @brief Extract position data from a BiSS encoder raw sensor data
  *
  * @param data BiSS raw sensor data
- * @param biss_config structure definition for the BiSS encoder data lengths
+ * @param position_feedback_config structure definition for the BiSS encoder data lengths
  *
  * @return absolute count
  * @return position in the range [0 - (2^singleturn_resolution - 1)]
  * @return status (error and warning bits)
  */
-{ int, unsigned int, SensorError } biss_encoder(unsigned int data[], BISSConfig biss_config);
+{ int, unsigned int, SensorError } biss_encoder(unsigned int data[], PositionFeedbackConfig &position_feedback_config);
 
 
 /**

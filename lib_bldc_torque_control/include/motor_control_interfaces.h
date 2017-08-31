@@ -48,6 +48,13 @@ interface TorqueControlInterface
     void set_offset_detection_enabled();
 
     /**
+     * @brief Sends the status of the sensor to the motorcontrol
+     *
+     * @return void
+     */
+    void set_sensor_status(int error_sensor);
+
+    /**
      * @brief Enables the safe-torque-off mode
      *
      * @return void
@@ -110,7 +117,50 @@ interface TorqueControlInterface
      */
     void reset_faults();
 
+    /**
+     * @brief   starts global system evaluation (fault detection)
+     *
+     * @return  void
+     */
+    void start_system_eval();
+
+    /**
+     * @brief   sets reference of phase voltages directly on the output of inverter
+     *
+     * @return  void
+     */
+    void set_evaluation_references(int phase_a, int phase_b, int phase_c);
+
+
     UpstreamControlData update_upstream_control_data ();
+
+    /**
+     * @brief   Enables the cogging torque compensation
+     *
+     * @return  void
+     */
+    void enable_cogging_compensation();
+
+    /**
+     * @brief   Disables the cogging torque compensation
+     *
+     * @return  void
+     */
+    void disable_cogging_compensation();
+
+    /**
+     * @brief   Enables the rotation of the motor to find the index of the incremental encoder
+     *
+     * @return  void
+     */
+    void enable_index_detection();
+
+    /**
+     * @brief   Disables the rotation of the motor when the index of the incremental encoder would be found
+     *
+     * @return  void
+     */
+    void disable_index_detection();
 };
 
 /**
@@ -212,37 +262,40 @@ interface shared_memory_interface
     *
     * @param Electrical angle.
     * @param Hall state (in case HALL sensor is used).
+    * @param Qei_index_found flag that indicates if the position data is absolute or not
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status.
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write electrical angle to shared memory.
     *
     * @param Electrical angle.
     * @param Hall state (in case HALL sensor is used).
+    * @param Qei_index_found flag that indicates if the position data is absolute or not
     * @param Velocity.
     * @param sensor_error the sensor error status.
     * @param last_sensor_error the last non zero sensor error status.
     */
-    void write_angle(unsigned int angle, unsigned int hall_state, int velocity, SensorError sensor_error, SensorError last_sensor_error);
+    void write_angle(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int velocity, SensorError sensor_error, SensorError last_sensor_error);
 
     /**
     * @brief Write electrical angle and secondary position feedback (display only) to shared memory.
     *
     * @param Electrical angle.
     * @param Hall state (in case HALL sensor is used).
+    * @param Qei_index_found flag that indicates if the position data is absolute or not
     * @param Position.
     * @param Velocity.
     * @param sensor_error the sensor error status
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_angle_and_secondary_feedback(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write primary position feedback (used for motion control) to shared memory.
@@ -253,7 +306,7 @@ interface shared_memory_interface
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_primary_feedback(int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_primary_feedback(int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
     * @brief Write secondary position feedback (display only) to shared memory.
@@ -264,7 +317,7 @@ interface shared_memory_interface
     * @param last_sensor_error the last non zero sensor error status.
     * @param timestamp timestamp in microseconds of when the position data was read.
     */
-    void write_secondary_feedback(int position, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
+    void write_secondary_feedback(int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp);
 
     /**
      * @brief Write write gpio input data to shared memory, return the gpio output data.
@@ -276,11 +329,27 @@ interface shared_memory_interface
     unsigned int gpio_write_input_read_output(unsigned int in_gpio);
 
     /**
-     * @brief Write write gpio output data to shared memory.
+     * @brief Write gpio output data to shared memory.
      *
      * @param  gpio output data.
      */
     void write_gpio_output(unsigned int out_gpio);
+
+    /**
+     * @brief Write hall state angle to shared memory.
+     *
+     * @param in_hall_state_angle Hall state angle array
+     */
+    void write_hall_state_angle(int in_hall_state_angle[6]);
+
+    /**
+     * @brief Read hall state angle from shared memory.
+     *
+     * @param out_hall_state_angle Hall state angle array
+     *
+     * @return 1 if the data is valid
+     */
+    int read_hall_state_angle(int out_hall_state_angle[6]);
 };
 
 /**
@@ -359,29 +428,19 @@ interface UpdatePWMGeneral
 interface WatchdogInterface
 {
     /**
-     * @brief send the status of WD service to the client (ACTIVE/INACTIVE)
-     */
-    int status(void);
-
-    /**
-     * @brief Initialize and starts ticking the watchdog.
-     */
-    void start(void);
-
-    /**
-     * @brief Stops ticking the watchdog. Therefore, any output through the phases is disabled.
-     */
-    void stop(void);
-
-    /**
-     * @reacts on any detected fault. Any output through the phases will be disabled.
+     * @brief reacts on any detected fault. Any output through the phases will be disabled.
      */
     void protect(int fault_id);
 
     /**
-     * @resets the state of fault in watchdog service, and starts the watchdog from the beginning
+     * @brief resets the state of fault in watchdog service, and starts the watchdog from the beginning
      */
     void reset_faults();
+
+    /**
+     * @brief read the fault monitor led
+     */
+    WatchdogError read_fault_monitor();
 };
 
 #endif /* MOTOR_CONTROL_INTERFACES_H_ */

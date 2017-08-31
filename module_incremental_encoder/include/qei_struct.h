@@ -33,14 +33,6 @@
 
 
 /**
- * @brief Type for the kind of Encoder output signals.
- */
-typedef enum {
-    QEI_RS422_SIGNAL,  /**< Encoder signal output over RS422 (differential). */
-    QEI_TTL_SIGNAL     /**< Encoder signal output over standard TTL signal.  */
-} QEI_SignalType;
-
-/**
  * @brief Type for the sort of Encoder index.
  *
  * 2 is for two signals A and B
@@ -57,6 +49,7 @@ typedef enum {
  */
 typedef struct {
     QEI_IndexType   number_of_channels; /**< Encoder index type. */
-    QEI_SignalType  signal_type;        /**< Encoder output signal type. */
+    int ticks_lost_threshold;           /**< Number of ticks that is allowed to be lost */
     EncoderPortNumber port_number;      /**< Configure which input port is used */
+    EncoderPortSignalType signal_type;  /**< Configure of the input port signal type (RS422 (differential) or TTL) */
 } QEIConfig;

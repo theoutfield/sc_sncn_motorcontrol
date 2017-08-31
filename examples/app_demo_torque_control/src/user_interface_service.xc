@@ -11,7 +11,6 @@
 #include <print.h>
 
 #include <user_interface_service.h>
-
 #include <position_feedback_service.h>
 #include <motor_control_interfaces.h>
 #include <xscope.h>

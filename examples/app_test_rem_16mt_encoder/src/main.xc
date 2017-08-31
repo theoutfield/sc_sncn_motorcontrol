@@ -44,8 +44,6 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
     delay_milliseconds(500);
     PositionFeedbackConfig position_feedback_config = i_position_feedback.get_config();
     printstr(">>   SOMANET REM_16MT SENSOR COMMANDS SERVICE STARTING...\n");
-    i_torque_control.set_torque_control_enabled();
-    i_torque_control.set_brake_status(1);
 
     while(1) {
         char mode = 0;
@@ -133,6 +131,11 @@ void rem_16mt_commands_test(client interface PositionFeedbackInterface i_positio
         case 's':
             i_position_feedback.send_command(REM_16MT_CONF_STPRESET, value, 16);
             printf("singleturn\n");
+            break;
+        //start motorcontrol
+        case 'S':
+            i_torque_control.set_torque_control_enabled();
+            i_torque_control.set_brake_status(1);
             break;
         //calibration table size
         case 't':
@@ -230,12 +233,6 @@ int main(void)
                 motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                 motorcontrol_config.commutation_sensor=REM_16MT_SENSOR;
                 motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
-                motorcontrol_config.hall_state_angle[0]=0;
-                motorcontrol_config.hall_state_angle[1]=0;
-                motorcontrol_config.hall_state_angle[2]=0;
-                motorcontrol_config.hall_state_angle[3]=0;
-                motorcontrol_config.hall_state_angle[4]=0;
-                motorcontrol_config.hall_state_angle[5]=0;
                 motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
                 motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
                 motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
@@ -250,6 +247,10 @@ int main(void)
                 motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                 motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
                 motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
+                for (int i = 0; i < 1024; i++)
+                {
+                    motorcontrol_config.torque_offset[i] = 0;
+                }
 
                 torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                         i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);

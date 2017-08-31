@@ -23,8 +23,8 @@
 // SENSOR 1 SETTINGS //
 ///////////////////////
 
-// SENSOR 1 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
+// SENSOR 1 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
+#define SENSOR_1_TYPE                     REM_16MT_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -47,7 +47,7 @@
 // SENSOR 2 SETTINGS //
 ///////////////////////
 
-// SENSOR 2 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
+// SENSOR 2 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
 #define SENSOR_2_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_2 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        40000    //maximum tolerable value of phase current in milliamps (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        40000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
@@ -88,7 +88,7 @@
 //////////////////////////////////////////////
 #define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 80
+#define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
 #define COMMUTATION_ANGLE_OFFSET       0
@@ -123,6 +123,10 @@
 #define VELOCITY_Ki                             0
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
+#define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
+
+#define ENABLE_COMPENSATION_RECORDING           0 //set the cogging torque recording to 0 on startup
+#define ENABLE_OPEN_PHASE_DETECTION             0 //set to 0 to disable/1 to enable
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
 #define POSITION_Kp                             0
@@ -135,7 +139,7 @@
 #define POSITION_INTEGRAL_LIMIT                 PEAK_SPEED
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
-#define POLARITY           MOTION_POLARITY_NORMAL
+#define POLARITY                MOTION_POLARITY_NORMAL
 
 #define FILTER_CUT_OFF_FREQ     0;//cut-off frequency of filter in motion control service (default value 100 kHz)
 
