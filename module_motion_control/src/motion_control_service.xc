@@ -582,12 +582,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int special_brake_release_initial_position = 0;
     int special_brake_release_torque = 0;
     int brake_shutdown_counter = 0;
-    unsigned int update_brake_configuration_time;
+//    unsigned int update_brake_configuration_time;
     i_torque_control.set_safe_torque_off_enabled();
     i_torque_control.set_brake_status(0);
-    t :> update_brake_configuration_time;
-    update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
-    int update_brake_configuration_flag = 1;
+//    t :> update_brake_configuration_time;
+//    update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
+//    int update_brake_configuration_flag = 1;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -1275,7 +1275,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 pid_reset(position_control_pid_param);
 
-
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
                 //if (update_brake_configuration_flag == 0) {
                     enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
@@ -1356,24 +1355,24 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     }
                 }
 
-                //check if we need to update the brake config
-                if (in_config.dc_bus_voltage != motion_ctrl_config.dc_bus_voltage ||
-                        in_config.pull_brake_voltage != motion_ctrl_config.pull_brake_voltage ||
-                        in_config.pull_brake_time != motion_ctrl_config.pull_brake_time ||
-                        in_config.hold_brake_voltage != motion_ctrl_config.hold_brake_voltage)
-                {
-                    torque_enable_flag   =0;
-                    velocity_enable_flag =0;
-                    position_enable_flag =0;
-                    torque_ref_k = 0;
-
-                    i_torque_control.set_safe_torque_off_enabled();
-                    i_torque_control.set_brake_status(0);
-
-                    t :> update_brake_configuration_time;
-                    update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
-                    update_brake_configuration_flag = 1;
-                }
+                ////check if we need to update the brake config
+                //if (in_config.dc_bus_voltage != motion_ctrl_config.dc_bus_voltage ||
+                //        in_config.pull_brake_voltage != motion_ctrl_config.pull_brake_voltage ||
+                //        in_config.pull_brake_time != motion_ctrl_config.pull_brake_time ||
+                //        in_config.hold_brake_voltage != motion_ctrl_config.hold_brake_voltage)
+                //{
+                //    torque_enable_flag   =0;
+                //    velocity_enable_flag =0;
+                //    position_enable_flag =0;
+                //    torque_ref_k = 0;
+                //
+                //    i_torque_control.set_safe_torque_off_enabled();
+                //    i_torque_control.set_brake_status(0);
+                //
+                //    t :> update_brake_configuration_time;
+                //    update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
+                //    update_brake_configuration_flag = 1;
+                //}
 
                 motion_ctrl_config = in_config;
 
@@ -1537,17 +1536,23 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
                 case i_motion_control[int i].update_brake_configuration():
-                        torque_enable_flag   =0;
-                        velocity_enable_flag =0;
-                        position_enable_flag =0;
-                        torque_ref_k = 0;
+                        //torque_enable_flag   =0;
+                        //velocity_enable_flag =0;
+                        //position_enable_flag =0;
+                        //torque_ref_k = 0;
+                        //
+                        //i_torque_control.set_safe_torque_off_enabled();
+                        //i_torque_control.set_brake_status(0);
+                        //
+                        //t :> update_brake_configuration_time;
+                        //update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
+                        //update_brake_configuration_flag = 1;
 
-                        i_torque_control.set_safe_torque_off_enabled();
-                        i_torque_control.set_brake_status(0);
+                        i_torque_control.configure_brake(
+                                motion_ctrl_config.pull_brake_voltage,
+                                motion_ctrl_config.pull_brake_time,
+                                motion_ctrl_config.hold_brake_voltage);
 
-                        t :> update_brake_configuration_time;
-                        update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
-                        update_brake_configuration_flag = 1;
                         break;
 
                 case i_motion_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
