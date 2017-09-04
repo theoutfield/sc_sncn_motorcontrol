@@ -1235,18 +1235,18 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].disable():
 
-                i_torque_control.set_brake_status(0);
-                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                {
-                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                }
-                else
-                {
+//                i_torque_control.set_brake_status(0);
+//                if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+//                {
+//                    brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+//                }
+//                else
+//                {
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
                     i_torque_control.set_torque_control_disabled();
-                }
+//                }
 
                 motion_ctrl_config.position_control_autotune =0;
                 pos_ctrl_auto_tune.activate=0;
