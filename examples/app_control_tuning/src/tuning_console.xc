@@ -68,7 +68,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
     delay_ticks(100*1000*tile_usec);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
-
+/*
     delay_milliseconds(10000);
     i_motion_control.enable_torque_ctrl();
     printf("torque ctrl enabled\n");
@@ -78,7 +78,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         for(int i=0;i<=1000;i++)
             i++;
     }
-
+*/
     fflush(stdout);
     //read and adjust the offset.
     while (1)
