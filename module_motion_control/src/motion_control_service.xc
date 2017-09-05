@@ -1536,18 +1536,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
                 case i_motion_control[int i].update_brake_configuration():
-                        //torque_enable_flag   =0;
-                        //velocity_enable_flag =0;
-                        //position_enable_flag =0;
-                        //torque_ref_k = 0;
-                        //
-                        //i_torque_control.set_safe_torque_off_enabled();
-                        //i_torque_control.set_brake_status(0);
-                        //
-                        //t :> update_brake_configuration_time;
-                        //update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
-                        //update_brake_configuration_flag = 1;
+                        torque_enable_flag   =0;
+                        velocity_enable_flag =0;
+                        position_enable_flag =0;
+                        torque_ref_k = 0;
 
+                        i_torque_control.set_safe_torque_off_enabled();
+                        i_torque_control.set_brake_status(0);
+
+                        update_brake_configuration_flag = 1;
                         update_brake_configuration(motion_ctrl_config, i_torque_control);
 
                         break;
@@ -1585,7 +1582,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
 
                 case i_motion_control[int i].set_safe_torque_off_enabled():
-                        //                i_torque_control.set_brake_status(0);
+                        i_torque_control.set_brake_status(0);
                         torque_enable_flag   = 0;
                         velocity_enable_flag = 0;
                         position_enable_flag = 0;
