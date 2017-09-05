@@ -417,18 +417,18 @@ void pwm_service_general(
                 pwm_on = 0x0000;
                 for(int i=0; i<=1000; i++)
                 {
-                    if(phase_a_inv_defined && pwm_value_a) ports.p_pwm_a       <: 0;
-                    if(phase_a_inv_defined && pwm_value_a) ports.p_pwm_inv_a   <: 1;
-                    if(phase_b_inv_defined && pwm_value_b) ports.p_pwm_b       <: 0;
-                    if(phase_b_inv_defined && pwm_value_b) ports.p_pwm_inv_b   <: 1;
-                    if(phase_c_inv_defined && pwm_value_c) ports.p_pwm_c       <: 0;
-                    if(phase_c_inv_defined && pwm_value_c) ports.p_pwm_inv_c   <: 1;
-                    if(phase_u_inv_defined && pwm_value_u) ports.p_pwm_u       <: 0;
-                    if(phase_u_inv_defined && pwm_value_u) ports.p_pwm_inv_u   <: 1;
-                    if(phase_v_inv_defined && pwm_value_v) ports.p_pwm_v       <: 0;
-                    if(phase_v_inv_defined && pwm_value_v) ports.p_pwm_inv_v   <: 1;
-                    if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_w       <: 0;
-                    if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_inv_w   <: 1;
+                    if(phase_a_inv_defined) ports.p_pwm_a       <: 0;
+                    if(phase_a_inv_defined) ports.p_pwm_inv_a   <: 1;
+                    if(phase_b_inv_defined) ports.p_pwm_b       <: 0;
+                    if(phase_b_inv_defined) ports.p_pwm_inv_b   <: 1;
+                    if(phase_c_inv_defined) ports.p_pwm_c       <: 0;
+                    if(phase_c_inv_defined) ports.p_pwm_inv_c   <: 1;
+                    if(phase_u_inv_defined) ports.p_pwm_u       <: 0;
+                    if(phase_u_inv_defined) ports.p_pwm_inv_u   <: 1;
+                    if(phase_v_inv_defined) ports.p_pwm_v       <: 0;
+                    if(phase_v_inv_defined) ports.p_pwm_inv_v   <: 1;
+                    if(phase_w_inv_defined) ports.p_pwm_w       <: 0;
+                    if(phase_w_inv_defined) ports.p_pwm_inv_w   <: 1;
                 }
                 break;
 
@@ -546,18 +546,18 @@ void pwm_service_general(
                 pwm_on = 0x0000;
                 for(int i=0; i<=1000; i++)
                 {
-                    if(phase_a_inv_defined && pwm_value_a) ports.p_pwm_a       <: 0;
-                    if(phase_a_inv_defined && pwm_value_a) ports.p_pwm_inv_a   <: 1;
-                    if(phase_b_inv_defined && pwm_value_b) ports.p_pwm_b       <: 0;
-                    if(phase_b_inv_defined && pwm_value_b) ports.p_pwm_inv_b   <: 1;
-                    if(phase_c_inv_defined && pwm_value_c) ports.p_pwm_c       <: 0;
-                    if(phase_c_inv_defined && pwm_value_c) ports.p_pwm_inv_c   <: 1;
-                    if(phase_u_inv_defined && pwm_value_u) ports.p_pwm_u       <: 0;
-                    if(phase_u_inv_defined && pwm_value_u) ports.p_pwm_inv_u   <: 1;
-                    if(phase_v_inv_defined && pwm_value_v) ports.p_pwm_v       <: 0;
-                    if(phase_v_inv_defined && pwm_value_v) ports.p_pwm_inv_v   <: 1;
-                    if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_w       <: 0;
-                    if(phase_w_inv_defined && pwm_value_w) ports.p_pwm_inv_w   <: 1;
+                    if(phase_a_inv_defined) ports.p_pwm_a       <: 0;
+                    if(phase_a_inv_defined) ports.p_pwm_inv_a   <: 1;
+                    if(phase_b_inv_defined) ports.p_pwm_b       <: 0;
+                    if(phase_b_inv_defined) ports.p_pwm_inv_b   <: 1;
+                    if(phase_c_inv_defined) ports.p_pwm_c       <: 0;
+                    if(phase_c_inv_defined) ports.p_pwm_inv_c   <: 1;
+                    if(phase_u_inv_defined) ports.p_pwm_u       <: 0;
+                    if(phase_u_inv_defined) ports.p_pwm_inv_u   <: 1;
+                    if(phase_v_inv_defined) ports.p_pwm_v       <: 0;
+                    if(phase_v_inv_defined) ports.p_pwm_inv_v   <: 1;
+                    if(phase_w_inv_defined) ports.p_pwm_w       <: 0;
+                    if(phase_w_inv_defined) ports.p_pwm_inv_w   <: 1;
                 }
                 break;
             }//select
