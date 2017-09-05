@@ -944,14 +944,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 else
                     i_torque_control.set_torque(((int)(torque_ref_k)));
 
-                ////update brake config when ready
-                //if (update_brake_configuration_flag && timeafter(ts, update_brake_configuration_time)) {
-                //    update_brake_configuration(motion_ctrl_config, i_torque_control, i_update_brake);
-                //    update_brake_configuration_flag = 0;
-                //    if (torque_enable_flag+velocity_enable_flag+position_enable_flag) { //one of the control is enabled, start motorcontrol and brake
-                //        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-                //    }
-                //}
+                //update brake config when ready
+//                if (update_brake_configuration_flag/* && timeafter(ts, update_brake_configuration_time)*/) {
+//                    update_brake_configuration(motion_ctrl_config, i_torque_control, i_update_brake);
+//                    update_brake_configuration_flag = 0;
+//                    if (torque_enable_flag+velocity_enable_flag+position_enable_flag) { //one of the control is enabled, start motorcontrol and brake
+//                        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
+//                    }
+//                }
 
                 //torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
                 //
@@ -1548,10 +1548,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         //update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
                         //update_brake_configuration_flag = 1;
 
-                        i_torque_control.configure_brake(
-                                motion_ctrl_config.pull_brake_voltage,
-                                motion_ctrl_config.pull_brake_time,
-                                motion_ctrl_config.hold_brake_voltage);
+                        update_brake_configuration(motion_ctrl_config, i_torque_control);
 
                         break;
 
@@ -1622,81 +1619,42 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     }
 
 
-    void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake)
+void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control)
+{
+
+    int pull_brake_voltage=0x00000000; //pull brake voltage in per thousand of nominal V_dc
+    int hold_brake_voltage=0x00000000; //hold brake voltage in per thousand of nominal V_dc
+
+    pull_brake_voltage = motion_ctrl_config.pull_brake_voltage/motion_ctrl_config.dc_bus_voltage ;
+    hold_brake_voltage = motion_ctrl_config.hold_brake_voltage/motion_ctrl_config.dc_bus_voltage ;
+
+    if(motion_ctrl_config.dc_bus_voltage <= 0)
     {
-        int error=0;
-        int duty_min=0, duty_max=0, duty_divider=0;
-        int duty_start_brake =0, duty_maintain_brake=0, period_start_brake=0;
-
-
-        if(motion_ctrl_config.dc_bus_voltage <= 0)
-        {
-            printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
-            return;
-        }
-
-        if(motion_ctrl_config.pull_brake_voltage > (motion_ctrl_config.dc_bus_voltage*1000))
-        {
-            printstr("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
-            return;
-        }
-
-        if(motion_ctrl_config.pull_brake_voltage < 0)
-        {
-            printstr("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
-            return;
-        }
-
-        if(motion_ctrl_config.hold_brake_voltage > (motion_ctrl_config.dc_bus_voltage*1000))
-        {
-            printstr("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
-            return;
-        }
-
-        if(motion_ctrl_config.hold_brake_voltage < 0)
-        {
-            printstr("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
-            return;
-        }
-
-        if(period_start_brake < 0)
-        {
-            printstr("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
-            return;
-        }
-
-
-        MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
-
-        if(motorcontrol_config.ifm_tile_usec==250)
-        {
-            duty_min = 1500;
-            duty_max = 13000;
-            duty_divider = 16384;
-            period_start_brake = (motion_ctrl_config.pull_brake_time * 15); //pwm is runnig at 15 kHz
-        }
-        else if(motorcontrol_config.ifm_tile_usec==100)
-        {
-            duty_min = 600;
-            duty_max = 7000;
-            duty_divider = 8192;
-            period_start_brake = (motion_ctrl_config.pull_brake_time * 12); //pwm is runnig at 12 kHz
-        }
-        else if (motorcontrol_config.ifm_tile_usec!=100 && motorcontrol_config.ifm_tile_usec!=250)
-        {
-            error = 1;
-        }
-
-        duty_start_brake    = (duty_divider * motion_ctrl_config.pull_brake_voltage)/(1000*motion_ctrl_config.dc_bus_voltage);
-        if(duty_start_brake < duty_min) duty_start_brake = duty_min;
-        if(duty_start_brake > duty_max) duty_start_brake = duty_max;
-
-        duty_maintain_brake = (duty_divider * motion_ctrl_config.hold_brake_voltage)/(1000*motion_ctrl_config.dc_bus_voltage);
-        if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
-        if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
-
-        i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
+        printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
     }
+    else if(motion_ctrl_config.pull_brake_voltage > (motion_ctrl_config.dc_bus_voltage*1000))
+    {
+        printstr("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+    }
+    else if(motion_ctrl_config.pull_brake_voltage < 0)
+    {
+        printstr("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+    }
+    else if(motion_ctrl_config.hold_brake_voltage > (motion_ctrl_config.dc_bus_voltage*1000))
+    {
+        printstr("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+    }
+    else if(motion_ctrl_config.hold_brake_voltage < 0)
+    {
+        printstr("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+    }
+    else if(motion_ctrl_config.pull_brake_time < 0)
+    {
+        printstr("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+    }
+    else
+        i_torque_control.configure_brake(pull_brake_voltage, motion_ctrl_config.pull_brake_time, hold_brake_voltage);
+}
 
 
     void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, int position,

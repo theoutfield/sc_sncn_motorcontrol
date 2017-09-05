@@ -295,7 +295,7 @@ void init_motion_control(interface MotionControlInterface client i_motion_contro
  * @param i_update_brake client enterface to the pwm service to send the brake configuration
  *
  */
-void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, client interface UpdateBrake i_update_brake);
+void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control);
 
 
 /**

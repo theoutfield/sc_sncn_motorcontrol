@@ -784,45 +784,37 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
                         switch(mode_3)
                         {
-                        //case 'n':// nominal voltage of dc-bus
-                        //        // set
-                        //        motion_ctrl_config.dc_bus_voltage=value;
-                        //        i_motion_control.set_motion_control_config(motion_ctrl_config);
-                        //        // check
-                        //        motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        //        i_motion_control.update_brake_configuration();
-                        //        printf("nominal voltage of dc-bus is %d Volts \n", motion_ctrl_config.dc_bus_voltage);
-                        //        break;
+                        case 'n':// nominal voltage of dc-bus
+                                // set
+                                motion_ctrl_config.dc_bus_voltage=value;
+                                i_motion_control.set_motion_control_config(motion_ctrl_config);
+                                // check
+                                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                i_motion_control.update_brake_configuration();
+                                printf("nominal voltage of dc-bus is %d Volts \n", motion_ctrl_config.dc_bus_voltage);
+                                break;
 
                         case 'p':// pull voltage for releasing the brake at startup
                                 //set
                                 motion_ctrl_config.pull_brake_voltage=value;
 
-                                if(motion_ctrl_config.pull_brake_voltage<0)    motion_ctrl_config.pull_brake_voltage = 0;
-                                if(motion_ctrl_config.pull_brake_voltage>1000) motion_ctrl_config.pull_brake_voltage = 1000;
-
-
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
                                 i_motion_control.update_brake_configuration();
-                                printf("brake pull voltage is %d [per thousand of real V_dc] \n", motion_ctrl_config.pull_brake_voltage);
+                                printf("brake pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage);
                                 break;
 
                         case 'h':// hold voltage for holding the brake after it is pulled
                                 //set
-
                                 motion_ctrl_config.hold_brake_voltage=value;
-
-                                if(motion_ctrl_config.hold_brake_voltage<0)    motion_ctrl_config.hold_brake_voltage = 0;
-                                if(motion_ctrl_config.hold_brake_voltage>1000) motion_ctrl_config.hold_brake_voltage = 1000;
 
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 i_motion_control.update_brake_configuration();
-                                printf("brake hold voltage is %d [per thousand of real V_dc] \n", motion_ctrl_config.hold_brake_voltage);
+                                printf("brake hold voltage is %d milli-Volts \n", motion_ctrl_config.hold_brake_voltage);
                                 break;
                         default:
                                 break;
