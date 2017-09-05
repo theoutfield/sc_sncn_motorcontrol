@@ -587,7 +587,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     i_torque_control.set_brake_status(0);
 //    t :> update_brake_configuration_time;
 //    update_brake_configuration_time += BRAKE_UPDATE_CONFIG_WAIT*1000*app_tile_usec;
-//    int update_brake_configuration_flag = 1;
+    int update_brake_configuration_flag = 1;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -945,13 +945,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     i_torque_control.set_torque(((int)(torque_ref_k)));
 
                 //update brake config when ready
-//                if (update_brake_configuration_flag/* && timeafter(ts, update_brake_configuration_time)*/) {
-//                    update_brake_configuration(motion_ctrl_config, i_torque_control, i_update_brake);
-//                    update_brake_configuration_flag = 0;
-//                    if (torque_enable_flag+velocity_enable_flag+position_enable_flag) { //one of the control is enabled, start motorcontrol and brake
-//                        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-//                    }
-//                }
+                if (update_brake_configuration_flag)
+                {
+                    update_brake_configuration(motion_ctrl_config, i_torque_control);
+                    update_brake_configuration_flag = 0;
+                    if (torque_enable_flag+velocity_enable_flag+position_enable_flag) { //one of the control is enabled, start motorcontrol and brake
+                        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
+                    }
+                }
 
                 //torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
                 //
@@ -1657,21 +1658,23 @@ void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client 
 }
 
 
-    void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, int position,
-            int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque, MotionControlError &motion_control_error)
+void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interface TorqueControlInterface i_torque_control, int position,
+        int &special_brake_release_counter, int &special_brake_release_initial_position, int &special_brake_release_torque, MotionControlError &motion_control_error)
+{
+
+    motion_control_error = MOTION_CONTROL_NO_ERROR;
+    //special brake release
+    if (motion_ctrl_config.brake_release_strategy > 1)
     {
-
-        motion_control_error = MOTION_CONTROL_NO_ERROR;
-        //special brake release
-        if (motion_ctrl_config.brake_release_strategy > 1) {
-            special_brake_release_counter = 0;
-            special_brake_release_initial_position = position;
-            special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
-        }
-        if (motion_ctrl_config.brake_release_strategy > 0) {
-            i_torque_control.set_brake_status(1);
-        }
-
-        //enable motorcontrol and release brake
-        i_torque_control.set_torque_control_enabled();
+        special_brake_release_counter = 0;
+        special_brake_release_initial_position = position;
+        special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
     }
+    if (motion_ctrl_config.brake_release_strategy > 0)
+    {
+        i_torque_control.set_brake_status(1);
+    }
+
+    //enable motorcontrol and release brake
+    i_torque_control.set_torque_control_enabled();
+}
