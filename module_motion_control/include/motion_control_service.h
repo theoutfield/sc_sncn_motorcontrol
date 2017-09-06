@@ -52,6 +52,13 @@ typedef enum {
     VELOCITY_PID_CONTROLLER                 = 4
 } MotionControlStrategies;
 
+/**
+ * @brief Brake control commands
+ */
+typedef enum {
+  DISABLE_BRAKE = 0,
+  ENABLE_BRAKE = 1
+} BrakeCommands;
 
 /**
  * @brief Motion polarity
@@ -115,6 +122,7 @@ typedef struct {
 
     int enable_velocity_auto_tuner;     /**< Parameter for enabling/disabling auto tuner for velocity controller */
     int enable_compensation_recording;  /**< Parameter for enabling/disabling the cogging torque compensator recording*/
+    int enable_open_phase_detection;    /**< Parameter for enabling/disabling the open phase detection functionality*/
 
     int k_fb;                           /**< Parameter for setting the feedback position sensor gain */
     int resolution;                     /**< Parameter for setting the resolution of position sensor [ticks/rotation] */

@@ -403,9 +403,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data;
 
-    PIDparam velocity_control_pid_param;
+    PIDT1param velocity_control_pid_param;
 
-    PIDparam position_control_pid_param;
+    PIDT1param position_control_pid_param;
 
     LimitedTorquePosCtrl lt_pos_ctrl;
 
@@ -430,9 +430,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     init_cogging_torque_parameters(ct_parameters, 10);
 
     VelCtrlAutoTuneParam velocity_auto_tune;
-
-    //autotune initialization
-    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
 
     downstream_control_data.velocity_cmd = 0;
     motion_ctrl_config.enable_velocity_auto_tuner = 0;
@@ -583,7 +580,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int special_brake_release_torque = 0;
     int brake_shutdown_counter = 0;
     i_torque_control.set_safe_torque_off_enabled();
-    i_torque_control.set_brake_status(0);
+    i_torque_control.set_brake_status(DISABLE_BRAKE);
 
     int update_brake_configuration_flag = 1;
 
@@ -604,6 +601,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 time_free = time_start - time_end;
 
                 upstream_control_data = i_torque_control.update_upstream_control_data();
+
+
+                if (motion_ctrl_config.enable_compensation_recording)
+                {
+                    downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
+                }
 
                 velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
                 velocity_k        = ((double) upstream_control_data.velocity);
@@ -730,7 +733,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         ct_parameters.torque_recording[i]= 0;
                                     }
                                     ct_parameters.rotation_sign = 0;
-                                    ct_parameters.back_and_forth = 0;
                                     motion_ctrl_config.enable_compensation_recording = 0;
                                     velocity_ref_k = 0;
                                 }
@@ -739,6 +741,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 ct_parameters.torque_recording_started = 0;
                                 ct_parameters.delay_counter = 0;
                                 i_torque_control.set_torque_control_enabled();
+                                i_torque_control.set_brake_status(DISABLE_BRAKE);
+
+                                if(ct_parameters.back_and_forth == 2)
+                                {
+                                    ct_parameters.back_and_forth = 0;
+                                    torque_enable_flag   =0;
+                                    velocity_enable_flag =0;
+                                    position_enable_flag =0;
+                                    i_torque_control.set_torque_control_disabled();
+                                }
                             }
                         }
                         else
@@ -813,7 +825,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
                             }
 
-                            velocity_ref_k =pid_update(pos_ctrl_auto_tune.position_ref, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+
+                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
+                            position_ref_in_k_2n = position_ref_in_k_1n;
+                            position_ref_in_k_1n = position_ref_in_k;
+
+                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
                             if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
                             if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
                             torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
@@ -877,7 +894,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 // check error code
                 if (motion_control_error != MOTION_CONTROL_NO_ERROR) {
-                    i_torque_control.set_brake_status(0);
+                    i_torque_control.set_brake_status(DISABLE_BRAKE);
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
@@ -891,7 +908,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     torque_enable_flag = 0;
                     position_enable_flag = 0;
                     velocity_enable_flag = 0;
-                    i_torque_control.set_brake_status(0);
+                    i_torque_control.set_brake_status(DISABLE_BRAKE);
                     i_torque_control.set_torque_control_disabled();
                     printstr("*** Position Limit Reached ***\n");
                     //store original limits, with threshold if possible
@@ -977,127 +994,60 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 /*
                  * open phase online detection
                  */
-                if(error_phase == NO_ERROR)
+                if(motion_ctrl_config.enable_open_phase_detection)
                 {
-                    for (int i = A; i < NR_PHASES; i++)
+                    if(error_phase == NO_ERROR)
                     {
-                        switch (i)
-                        {
-                        case A:
-                            phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
-                            break;
-                        case B:
-                            phase_cur[B] = upstream_control_data.I_b;
-                            break;
-                        case C:
-                            phase_cur[C] = upstream_control_data.I_c;
-                            break;
-                        }
-
-                        // observing abs value
-                        if (phase_cur[i] < 0)
-                            phase_cur[i] = -phase_cur[i];
-
-                        // calculating sum and sum of squares for currents
-                        sum[i] += phase_cur[i];
-                        sum_sq[i] += phase_cur[i]*phase_cur[i];
-                    }
-
-                    ftr++;
-                    // every 33 ms rms value is calculated
-                    if (ftr > 1 && ftr % 100 == 0)
-                    {
-                        ++measurement;
-                        float mean[NR_PHASES], sd[NR_PHASES];
-                        // calculating mean, standard deviation and rms value
                         for (int i = A; i < NR_PHASES; i++)
                         {
-                            mean[i] = (float)sum[i] / ftr;
-                            sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
-                            rms[i] += mean[i] + sqrt(sd[i]);
+                            switch (i)
+                            {
+                            case A:
+                                phase_cur[A] = -(upstream_control_data.I_b+upstream_control_data.I_c);
+                                break;
+                            case B:
+                                phase_cur[B] = upstream_control_data.I_b;
+                                break;
+                            case C:
+                                phase_cur[C] = upstream_control_data.I_c;
+                                break;
+                            }
+
+                            // observing abs value
+                            if (phase_cur[i] < 0)
+                                phase_cur[i] = -phase_cur[i];
+
+                            // calculating sum and sum of squares for currents
+                            sum[i] += phase_cur[i];
+                            sum_sq[i] += phase_cur[i]*phase_cur[i];
                         }
 
-                        for (int i = A; i < NR_PHASES; i++)
-                            rms[i] = rms[i] / current_ratio;
-
-                        // if velocity is high
-                        // if three times it's detected that there is high difference between phase currents, phase is opened
-                        if (abs(upstream_control_data.velocity) > 50)
+                        ftr++;
+                        // every 33 ms rms value is calculated
+                        if (ftr > 1 && ftr % 100 == 0)
                         {
-                            if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
+                            ++measurement;
+                            float mean[NR_PHASES], sd[NR_PHASES];
+                            // calculating mean, standard deviation and rms value
+                            for (int i = A; i < NR_PHASES; i++)
                             {
-                                detect[A]++;
-
-                                if (detect[A] == 3)
-                                {
-                                    error_phase = A;
-                                    i_torque_control.set_brake_status(0);
-                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                    {
-                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                    }
-                                    else
-                                    {
-                                        torque_enable_flag   =0;
-                                        velocity_enable_flag =0;
-                                        position_enable_flag =0;
-                                        i_torque_control.set_torque_control_disabled();
-                                    }
-                                }
+                                mean[i] = (float)sum[i] / ftr;
+                                sd[i] = ((float)sum_sq[i] - sum[i]*sum[i]/ftr)/(ftr-1);
+                                rms[i] += mean[i] + sqrt(sd[i]);
                             }
 
-                            if (rms[B] < curr_threshold && rms[A] > 8 * rms[B] && rms[C] > 8 * rms[B])
-                            {
-                                detect[B]++;
+                            for (int i = A; i < NR_PHASES; i++)
+                                rms[i] = rms[i] / current_ratio;
 
-                                if (detect[B] == 3)
-                                {
-                                    error_phase = B;
-                                    i_torque_control.set_brake_status(0);
-                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                    {
-                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                    }
-                                    else
-                                    {
-                                        torque_enable_flag   =0;
-                                        velocity_enable_flag =0;
-                                        position_enable_flag =0;
-                                        i_torque_control.set_torque_control_disabled();
-                                    }
-                                }
-                            }
-
-                            if (rms[C] < curr_threshold && rms[A] > 8 * rms[C] && rms[B] > 8 * rms[C])
+                            // if velocity is high
+                            // if three times it's detected that there is high difference between phase currents, phase is opened
+                            if (abs(upstream_control_data.velocity) > 50)
                             {
-                                detect[C]++;
+                                if (rms[A] < curr_threshold && rms[B] > 8 * rms[A] && rms[C] > 8 * rms[A])
+                                {
+                                    detect[A]++;
 
-                                if (detect[C] == 3)
-                                {
-                                    error_phase = C;
-                                    i_torque_control.set_brake_status(0);
-                                    if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
-                                    {
-                                        brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
-                                    }
-                                    else
-                                    {
-                                        torque_enable_flag   =0;
-                                        velocity_enable_flag =0;
-                                        position_enable_flag =0;
-                                        i_torque_control.set_torque_control_disabled();
-                                    }
-                                }
-                            }
-                        }
-                        else if (abs(upstream_control_data.velocity) > 5)// if velocity is low
-                        {
-                            if (abs(upstream_control_data.computed_torque) > 10)
-                            {
-                                if (rms[A] < curr_threshold && rms[B] > 4 * rms[A] && rms[C] > 4 * rms[A])
-                                {
-                                    detect_low[A]++;
-                                    if (detect_low[A] == 2)
+                                    if (detect[A] == 3)
                                     {
                                         error_phase = A;
                                         i_torque_control.set_brake_status(0);
@@ -1114,13 +1064,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         }
                                     }
                                 }
-                                else
-                                    detect_low[A] = 0;
 
-                                if (rms[B] < curr_threshold && rms[A] > 4 * rms[B] && rms[C] > 4 * rms[B])
+                                if (rms[B] < curr_threshold && rms[A] > 8 * rms[B] && rms[C] > 8 * rms[B])
                                 {
-                                    detect_low[B]++;
-                                    if (detect_low[B] == 2)
+                                    detect[B]++;
+
+                                    if (detect[B] == 3)
                                     {
                                         error_phase = B;
                                         i_torque_control.set_brake_status(0);
@@ -1137,13 +1086,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         }
                                     }
                                 }
-                                else
-                                    detect_low[B] = 0;
 
-                                if (rms[C] < curr_threshold && rms[A] > 4 * rms[C] && rms[B] > 4 * rms[C])
+                                if (rms[C] < curr_threshold && rms[A] > 8 * rms[C] && rms[B] > 8 * rms[C])
                                 {
-                                    detect_low[C]++;
-                                    if (detect_low[C] == 2)
+                                    detect[C]++;
+
+                                    if (detect[C] == 3)
                                     {
                                         error_phase = C;
                                         i_torque_control.set_brake_status(0);
@@ -1160,27 +1108,99 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         }
                                     }
                                 }
-                                else
-                                    detect_low[C] = 0;
                             }
-                        }
+                            else if (abs(upstream_control_data.velocity) > 5)// if velocity is low
+                            {
+                                if (abs(upstream_control_data.computed_torque) > 10)
+                                {
+                                    if (rms[A] < curr_threshold && rms[B] > 4 * rms[A] && rms[C] > 4 * rms[A])
+                                    {
+                                        detect_low[A]++;
+                                        if (detect_low[A] == 2)
+                                        {
+                                            error_phase = A;
+                                            i_torque_control.set_brake_status(0);
+                                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                            {
+                                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                            }
+                                            else
+                                            {
+                                                torque_enable_flag   =0;
+                                                velocity_enable_flag =0;
+                                                position_enable_flag =0;
+                                                i_torque_control.set_torque_control_disabled();
+                                            }
+                                        }
+                                    }
+                                    else
+                                        detect_low[A] = 0;
 
-                        // every 20 measurements reset detection flag
-                        if(measurement == 20)
-                        {
-                            measurement = 0;
+                                    if (rms[B] < curr_threshold && rms[A] > 4 * rms[B] && rms[C] > 4 * rms[B])
+                                    {
+                                        detect_low[B]++;
+                                        if (detect_low[B] == 2)
+                                        {
+                                            error_phase = B;
+                                            i_torque_control.set_brake_status(0);
+                                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                            {
+                                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                            }
+                                            else
+                                            {
+                                                torque_enable_flag   =0;
+                                                velocity_enable_flag =0;
+                                                position_enable_flag =0;
+                                                i_torque_control.set_torque_control_disabled();
+                                            }
+                                        }
+                                    }
+                                    else
+                                        detect_low[B] = 0;
+
+                                    if (rms[C] < curr_threshold && rms[A] > 4 * rms[C] && rms[B] > 4 * rms[C])
+                                    {
+                                        detect_low[C]++;
+                                        if (detect_low[C] == 2)
+                                        {
+                                            error_phase = C;
+                                            i_torque_control.set_brake_status(0);
+                                            if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
+                                            {
+                                                brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
+                                            }
+                                            else
+                                            {
+                                                torque_enable_flag   =0;
+                                                velocity_enable_flag =0;
+                                                position_enable_flag =0;
+                                                i_torque_control.set_torque_control_disabled();
+                                            }
+                                        }
+                                    }
+                                    else
+                                        detect_low[C] = 0;
+                                }
+                            }
+
+                            // every 20 measurements reset detection flag
+                            if(measurement == 20)
+                            {
+                                measurement = 0;
+                                for (int i = A; i < NR_PHASES; i++)
+                                    detect[i] = 0;
+                            }
+
+                            ftr = 0;
                             for (int i = A; i < NR_PHASES; i++)
-                                detect[i] = 0;
+                            {
+                                sum[i] = 0;
+                                sum_sq[i] = 0;
+                                rms[i] = 0;
+                            }
+                            //                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
                         }
-
-                        ftr = 0;
-                        for (int i = A; i < NR_PHASES; i++)
-                        {
-                            sum[i] = 0;
-                            sum_sq[i] = 0;
-                            rms[i] = 0;
-                        }
-                        //                            printf("%.2f %.2f %.2f\n", rms[A], rms[B], rms[C]);
                     }
                 }
 
@@ -1235,7 +1255,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].disable():
 
-                i_torque_control.set_brake_status(0);
+                i_torque_control.set_brake_status(DISABLE_BRAKE);
                 if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                 {
                     brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1245,7 +1265,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
+                    motion_ctrl_config.enable_compensation_recording = 0;
+                    init_cogging_torque_parameters(ct_parameters, 10);
                     i_torque_control.set_torque_control_disabled();
+
                 }
 
                 motion_ctrl_config.position_control_autotune =0;
@@ -1368,7 +1391,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     torque_ref_k = 0;
 
                     i_torque_control.set_safe_torque_off_enabled();
-                    i_torque_control.set_brake_status(0);
+                    i_torque_control.set_brake_status(DISABLE_BRAKE);
 
                     update_brake_configuration_flag = 1;
                 }
@@ -1523,16 +1546,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
 
                 case i_motion_control[int i].set_brake_status(int in_brake_status):
-                        if(in_brake_status==1)
-                        {
-                            i_torque_control.set_brake_status(1);
-                        }
-                        else if (in_brake_status==0)
-                        {
-                            i_torque_control.set_brake_status(in_brake_status);
-                        }
+                        i_torque_control.set_brake_status(in_brake_status);
                         break;
-
 
                 case i_motion_control[int i].update_brake_configuration():
                         torque_enable_flag   =0;
@@ -1541,7 +1556,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         torque_ref_k = 0;
 
                         i_torque_control.set_safe_torque_off_enabled();
-                        i_torque_control.set_brake_status(0);
+                        i_torque_control.set_brake_status(DISABLE_BRAKE);
 
                         update_brake_configuration_flag = 1;
                         update_brake_configuration(motion_ctrl_config, i_torque_control);
@@ -1581,7 +1596,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
 
                 case i_motion_control[int i].set_safe_torque_off_enabled():
-                        i_torque_control.set_brake_status(0);
+                        i_torque_control.set_brake_status(DISABLE_BRAKE);
                         torque_enable_flag   = 0;
                         velocity_enable_flag = 0;
                         position_enable_flag = 0;
@@ -1665,9 +1680,9 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
         special_brake_release_initial_position = position;
         special_brake_release_torque = (motion_ctrl_config.brake_release_strategy*motion_ctrl_config.max_torque)/100;
     }
-    if (motion_ctrl_config.brake_release_strategy > 0)
-    {
-        i_torque_control.set_brake_status(1);
+
+    if (motion_ctrl_config.brake_release_strategy > 0) {
+        i_torque_control.set_brake_status(ENABLE_BRAKE);
     }
 
     //enable motorcontrol and release brake

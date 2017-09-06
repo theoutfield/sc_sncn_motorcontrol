@@ -47,7 +47,7 @@ SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
  *
  * @param data BiSS data
  * @param data_length length of data in bits
- * @param crc_poly crc polynomial in reverse representation:  x^0 + x^1 + x^4 is 0b1100
+ * @param crc_poly crc polynomial in reverse representation with high exponent omitted:  x^0 + x^1 + x^6 is 0b110000
  *
  * @return inverted crc for BiSS
  */
