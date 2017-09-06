@@ -953,6 +953,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
 
                 torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
+                xscope_int(TORQUE_MEASUREMENT, torque_measurement);
 
                 switch (error_sens)
                 {

@@ -54,6 +54,9 @@
     <Probe name="TIME_TOTAL_SELECT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_IDLE_ADC" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_FREE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="COGGING_TORQUE_OFFSET" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="COGGING_TORQUE_ENABLED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="TORQUE_MEASUREMENT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     
     
 </xSCOPEconfig>
