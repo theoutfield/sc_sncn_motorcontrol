@@ -52,6 +52,13 @@ typedef enum {
     VELOCITY_PID_CONTROLLER                 = 4
 } MotionControlStrategies;
 
+/**
+ * @brief Brake control commands
+ */
+typedef enum {
+  DISABLE_BRAKE = 0,
+  ENABLE_BRAKE = 1
+} BrakeCommands;
 
 /**
  * @brief Motion polarity
