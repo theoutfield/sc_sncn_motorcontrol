@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config_AMK_DT4.h>
+#include <motor_config_Maxon_411678.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -40,7 +40,7 @@
 #define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [0 - normal, 1 - inverted]
-#define SENSOR_1_POLARITY                 SENSOR_POLARITY_INVERTED
+#define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
 
 
 ///////////////////////
@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 5
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       3200
+#define COMMUTATION_ANGLE_OFFSET       280
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -119,17 +119,17 @@
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
-#define VELOCITY_Kp                             0
-#define VELOCITY_Ki                             0
+#define VELOCITY_Kp                             270000
+#define VELOCITY_Ki                             4000
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
 
 #define ENABLE_COMPENSATION_RECORDING           0 //set the cogging torque recording to 0 on startup
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             10000
-#define POSITION_Ki                             100
-#define POSITION_Kd                             40000
+#define POSITION_Kp                             100000
+#define POSITION_Ki                             800
+#define POSITION_Kd                             10000
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
