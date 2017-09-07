@@ -73,6 +73,11 @@ int main(void)
                 position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
                 position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
 
+                position_feedback_config.gpio_config[0] = GPIO_OFF;
+                position_feedback_config.gpio_config[1] = GPIO_OFF;
+                position_feedback_config.gpio_config[2] = GPIO_OFF;
+                position_feedback_config.gpio_config[3] = GPIO_OFF;
+
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, null, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);

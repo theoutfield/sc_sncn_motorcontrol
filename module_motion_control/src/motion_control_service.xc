@@ -106,7 +106,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     // structure definition
     UpstreamControlData upstream_control_data;
-    DownstreamControlData downstream_control_data;
+    DownstreamControlData downstream_control_data = {0};
 
     PIDparam velocity_control_pid_param;
 
@@ -220,7 +220,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     downstream_control_data.torque_cmd   = 0;
     downstream_control_data.offset_torque = 0;
 
-    upstream_control_data = i_torque_control.update_upstream_control_data();
+    upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
     position_k  = ((double) upstream_control_data.position);
     position_k_1= position_k;
@@ -263,7 +263,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 time_loop = time_start - time_start_old;
                 time_free = time_start - time_end;
 
-                upstream_control_data = i_torque_control.update_upstream_control_data();
+                upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
                 velocity_ref_k    = ((double) downstream_control_data.velocity_cmd);
                 velocity_k        = ((double) upstream_control_data.velocity);
@@ -753,8 +753,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
 
         case i_motion_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
-                upstream_control_data_out = i_torque_control.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
+                upstream_control_data_out = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
                 //reverse position/velocity feedback/commands when polarity is inverted
                 if (motion_ctrl_config.polarity == MOTION_POLARITY_INVERTED)
