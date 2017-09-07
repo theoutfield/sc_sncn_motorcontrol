@@ -73,26 +73,21 @@ int main(void) {
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    delay_milliseconds(20);
                     pwm_service_general(pwm_ports, i_update_pwm, 15);
                 }
 
                 /* Watchdog Service */
                 {
-                    delay_milliseconds(10);
                     watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
                 }
 
                 /* ADC Service */
                 {
-                    delay_milliseconds(20);
                     adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
                 }
 
                 /* Position feedback service */
                 {
-                    delay_milliseconds(30);
-
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = SENSOR_1_TYPE;
                     position_feedback_config.resolution  = SENSOR_1_RESOLUTION;
@@ -158,7 +153,6 @@ int main(void) {
 
                 /* Motor Control Service */
                 {
-                    delay_milliseconds(40);
                     MotorcontrolConfig motorcontrol_config;
 
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
@@ -194,8 +188,6 @@ int main(void) {
 
                 /* Position Control Loop */
                 {
-                    delay_milliseconds(50);
-
                     MotionControlConfig motion_ctrl_config;
 
                     motion_ctrl_config.min_pos_range_limit =                  MIN_POSITION_RANGE_LIMIT;

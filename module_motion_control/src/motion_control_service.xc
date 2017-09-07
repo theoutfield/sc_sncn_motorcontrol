@@ -389,6 +389,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 {
     timer t;
     unsigned int ts;
+
+    //proper task startup
+    t :> ts;
+    t when timerafter (ts + (1000*100*50)) :> void;
+
     unsigned time_start=0, time_start_old=0, time_loop=0, time_end=0, time_free=0, time_used=0;
 
     SecondOrderLPfilterParam torque_filter_param;

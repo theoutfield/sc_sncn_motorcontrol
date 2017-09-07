@@ -200,9 +200,6 @@ void pwm_service_general(
     unsigned short v_high_rise=0x0000, v_low_rise=0x0000;
     unsigned short w_high_rise=0x0000, w_low_rise=0x0000;
 
-    //    timer t;
-    //    unsigned int time    =0x00000000, ts   =0x00000000;
-
     unsigned int ref_time      = 0x00000000;
 
     unsigned int period_start  = 0x00000000;
@@ -229,6 +226,13 @@ void pwm_service_general(
     unsigned int   pulse_counter = 0x00000000;
 
     unsigned short pwm_init =0x0000;
+
+    timer t;
+    unsigned ts;
+
+    //proper task startup
+    t :> ts;
+    t when timerafter (ts + (1000*100*20)) :> void;
 
     // initialization:
     // ===============
@@ -747,8 +751,9 @@ void pwm_service_task(
     }
 
 
+    //proper task startup
     t :> ts;
-    t when timerafter (ts + (4000*20*250)) :> void;    //proper task startup
+    t when timerafter (ts + (1000*100*20)) :> void;
 
 //    select
 //    {
