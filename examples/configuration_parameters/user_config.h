@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config_Maxon_411678.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -88,10 +88,10 @@
 //////////////////////////////////////////////
 #define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 5
+#define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       280
+#define COMMUTATION_ANGLE_OFFSET       0
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -119,8 +119,8 @@
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
-#define VELOCITY_Kp                             270000
-#define VELOCITY_Ki                             4000
+#define VELOCITY_Kp                             0
+#define VELOCITY_Ki                             0
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
@@ -129,14 +129,14 @@
 #define ENABLE_OPEN_PHASE_DETECTION             0 //set to 0 to disable/1 to enable
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
-#define POSITION_Kp                             100000
-#define POSITION_Ki                             800
-#define POSITION_Kd                             10000
+#define POSITION_Kp                             0
+#define POSITION_Ki                             0
+#define POSITION_Kd                             0
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
 //     "PEAK_SPEED"           in case of using position controller in "POS_PID_VELOCITY_CASCADED_CONTROLLER" mode
 //     "1000"                 in case of using position controller in "LT_POSITION_CONTROLLER"               mode
-#define POSITION_INTEGRAL_LIMIT                 1000
+#define POSITION_INTEGRAL_LIMIT                 PEAK_SPEED
 
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY                MOTION_POLARITY_NORMAL
@@ -146,6 +146,7 @@
 /////////////////////////////////////////////////
 //////  PROFILES AND LIMITS CONFIGURATION
 /////////////////////////////////////////////////
+
 #define MOTION_PROFILE_TYPE LINEAR
 
 //home offset
@@ -163,7 +164,6 @@
 
 #define POSITION_CONTROL_STRATEGY               POS_PID_VELOCITY_CASCADED_CONTROLLER
 
-
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
@@ -171,11 +171,11 @@
 #define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 // Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define PULL_BRAKE_VOLTAGE     22500    // [milli-Volts]
+#define PULL_BRAKE_VOLTAGE         0    // [milli-Volts]
 // Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define HOLD_BRAKE_VOLTAGE     11250     // [milli-Volts]
-#define PULL_BRAKE_TIME        2000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define HOLD_BRAKE_VOLTAGE         0     // [milli-Volts]
+#define PULL_BRAKE_TIME         1000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
 /////////////////////////////////////////////////
