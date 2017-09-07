@@ -1334,9 +1334,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
                 //start motorcontrol and release brake if update_brake_configuration is not ongoing
-                //if (update_brake_configuration_flag == 0) {
+                if (update_brake_configuration_flag == 0) {
                     enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-                //}
+                }
 
                 //start control loop just after
                 t :> ts;
