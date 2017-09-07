@@ -95,6 +95,11 @@ int main(void)
                 position_feedback_config.rem_14_config.dyn_angle_error_comp    = REM_14_DYN_ANGLE_ERROR_COMPENSATION;
                 position_feedback_config.rem_14_config.abi_resolution_settings = REM_14_ABI_RESOLUTION_SETTINGS;
 
+                position_feedback_config.gpio_config[0] = GPIO_OFF;
+                position_feedback_config.gpio_config[1] = GPIO_OFF;
+                position_feedback_config.gpio_config[2] = GPIO_OFF;
+                position_feedback_config.gpio_config[3] = GPIO_OFF;
+
                 position_feedback_service(null, null, null, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);

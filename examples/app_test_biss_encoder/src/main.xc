@@ -152,6 +152,11 @@ int main() {
                 position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
                 position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
 
+                position_feedback_config.gpio_config[0] = GPIO_OFF;
+                position_feedback_config.gpio_config[1] = GPIO_OFF;
+                position_feedback_config.gpio_config[2] = GPIO_OFF;
+                position_feedback_config.gpio_config[3] = GPIO_OFF;
+
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, null, null, null, null,
                         position_feedback_config, i_shared_memory[0], i_position_feedback,
                         null, null, null);
