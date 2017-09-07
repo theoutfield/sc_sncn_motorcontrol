@@ -131,8 +131,14 @@ interface TorqueControlInterface
      */
     void set_evaluation_references(int phase_a, int phase_b, int phase_c);
 
-
-    UpstreamControlData update_upstream_control_data ();
+   /**
+    * @brief   Send upstream control data and receive GPIO output values
+    *
+    * @param   gpio_output value to ouput to the GPIO pins (rightmost bit is GPIO 1)
+    *
+    * @return  upstream control data
+    */
+   UpstreamControlData update_upstream_control_data(unsigned int gpio_output);
 
     /**
      * @brief   Enables the cogging torque compensation
@@ -246,16 +252,20 @@ interface ADCInterface
 interface shared_memory_interface
 {
     /**
-     * @brief send the status of memory manager task (ACTIVE or INACTIVE) to client side
-     */
-    int status(void);
-
-    /**
     * @brief Getter for UpstreamControlData in shared memory.
     *
     * @return  UpstreamControlData in shared memory.
     */
     UpstreamControlData read();
+
+    /**
+    * @brief Getter for UpstreamControlData in shared memory. Also write GPIO output to shared memory.
+    *
+    * @param   gpio_output value to ouput to the GPIO pins (rightmost bit is GPIO 1)
+    *
+    * @return  UpstreamControlData in shared memory.
+    */
+    UpstreamControlData read_upstream_data_and_write_gpio_output(unsigned int gpio_output);
 
     /**
     * @brief Write electrical angle and primary position feedback (used for motion control) to shared memory.
