@@ -140,6 +140,7 @@ typedef enum {
 
     //user specific faults
     WRONG_REF_CLK_FRQ                           = 0XFF01,
+    WRONG_PWM_CLK_FRQ                           = 0XFF02,
 } FaultCode;
 
 /**
