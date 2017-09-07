@@ -228,6 +228,7 @@ typedef struct
     int velocity_cmd;
     int torque_cmd;
     int offset_torque;
+    unsigned int gpio_output;
 }DownstreamControlData;
 
 #endif /* MOTOR_CONTROL_STRUCTURES_H_ */
