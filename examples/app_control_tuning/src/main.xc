@@ -21,7 +21,7 @@
 
 PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-//FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
 HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
@@ -31,21 +31,6 @@ port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
 port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
-
-
-void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase computational load of cpu
-{
-    int x=0;
-    int y=0;
-
-    while(1)
-    {
-        x++;
-        y++;
-        if(x>100) x=foo;
-        if(y>100) y=2*foo;
-    }
-}
 
 int main(void) {
 
@@ -69,36 +54,7 @@ int main(void) {
                 /* WARNING: only one blocking task is possible per tile. */
                 /* Waiting for a user input blocks other tasks on the same tile from execution. */
                 {
-                    delay_milliseconds(60);
                     control_tuning_console(i_motion_control[0]);
-                }
-
-                {
-                    ocupy_core(11);
-                }
-
-                {
-                    ocupy_core(12);
-                }
-
-                {
-                    ocupy_core(13);
-                }
-
-                {
-                    ocupy_core(14);
-                }
-
-                {
-                    ocupy_core(15);
-                }
-
-                {
-                    ocupy_core(16);
-                }
-
-                {
-                    ocupy_core(17);
                 }
             }
         }
@@ -114,8 +70,8 @@ int main(void) {
                 {
                     pwm_config_general(pwm_ports);
 
-                    //if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
-                    //    predriver(fet_driver_ports);
+                    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
+                        predriver(fet_driver_ports);
 
                     delay_milliseconds(20);
                     pwm_service_general(pwm_ports, i_update_pwm, 15);
@@ -287,9 +243,6 @@ int main(void) {
                     motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
                 }
 
-                {
-                    ocupy_core(21);
-                }
             }
         }
     }
