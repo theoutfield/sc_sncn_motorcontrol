@@ -1,6 +1,12 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+3.1.2
+-----
+
+  * Integrate GPIO service in ethercat drive enabled for SDK 3.0.4
+
+
 3.1
 ---
   * Add automatic PID tuning for cascaded and limitted torque position controllers
@@ -19,6 +25,12 @@ sc_sncn_motorcontrol Change Log
 
     This is caused by differences in traces length between the GPIO ports used for SPI. A workaround is to flip the Clock (GPIO 1) and the MISO (GPIO 2) pins. For this you need to modify or make a new cable with the two wires flipped
     and also flip the definitions of GPIO ports 1 and 2 in the IFM module's bsp file.
+
+
+3.0.4
+-----
+
+  * Add GPIO support in ethercat drive
 
 
 3.0.3

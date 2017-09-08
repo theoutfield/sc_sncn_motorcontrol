@@ -47,7 +47,8 @@ typedef enum
 /*
  * checking the position, velocity and angle reading from the sensor, when user triggers 'gse' command in tuning console or prior to commutation offset detection
  */
-sensor_fault sensor_functionality_evaluation(client interface TorqueControlInterface i_torque_control, MotorcontrolConfig motorcontrol_config, int app_tile_usec)
+sensor_fault sensor_functionality_evaluation(client interface TorqueControlInterface i_torque_control,
+        MotorcontrolConfig motorcontrol_config, DownstreamControlData &downstream_control_data, int app_tile_usec)
 {
     UpstreamControlData upstream_control_data;
     int angle = 0, position = 0, hall_state = 0, velocity = 0;
@@ -67,7 +68,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
 
     while(counter < 15000)
     {
-        upstream_control_data = i_torque_control.update_upstream_control_data();
+        upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
         position = upstream_control_data.singleturn;
         angle = upstream_control_data.angle;
         hall_state = upstream_control_data.hall_state;
@@ -153,7 +154,7 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
     // evaluating velocity readings by comparing velocity data from the sensor and computed velocity from position data from the sensor
     while (counter > 5000)
     {
-        upstream_control_data = i_torque_control.update_upstream_control_data();
+        upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
         position = upstream_control_data.singleturn;
         velocity = upstream_control_data.velocity;
 
@@ -244,7 +245,8 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
  * voltage difference between terminal a and terminals b,c (on the same potential) should establish electric circuit consisting of phase a in series with a branch consisting of parallel branches b and c
  */
 int open_phase_detection_offline(client interface TorqueControlInterface i_torque_control,
-        MotorcontrolConfig motorcontrol_config, int app_tile_usec, int current_ratio, float * ret)
+        MotorcontrolConfig motorcontrol_config, DownstreamControlData &downstream_control_data,
+        int app_tile_usec, int current_ratio, float * ret)
 {
     UpstreamControlData upstream_control_data;
     float I[NR_PHASES] = { 0 };
@@ -264,7 +266,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     // algorithm is applied until all currents become high enough, i.e. have enough information to make a conclusion that phases are not open
     while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
     {
-        upstream_control_data = i_torque_control.update_upstream_control_data();
+        upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
         I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
         I[C] = (float)upstream_control_data.I_c/(float)(current_ratio);
@@ -401,7 +403,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     // structure definition
     UpstreamControlData upstream_control_data;
-    DownstreamControlData downstream_control_data;
+    DownstreamControlData downstream_control_data = {0};
 
     PIDT1param velocity_control_pid_param;
 
@@ -521,7 +523,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     downstream_control_data.torque_cmd   = 0;
     downstream_control_data.offset_torque = 0;
 
-    upstream_control_data = i_torque_control.update_upstream_control_data();
+    upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
     position_k  = ((double) upstream_control_data.position);
     position_k_1= position_k;
@@ -556,7 +558,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         i_torque_control.enable_index_detection();
         while (!index_found)
         {
-            upstream_control_data = i_torque_control.update_upstream_control_data();
+            upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
             index_found = upstream_control_data.qei_index_found;
             if (qei_ctr == 0)
             {
@@ -603,7 +605,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 time_loop = time_start - time_start_old;
                 time_free = time_start - time_end;
 
-                upstream_control_data = i_torque_control.update_upstream_control_data();
+                upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
 
                 if (motion_ctrl_config.enable_compensation_recording)
@@ -1446,8 +1448,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
 
         case i_motion_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
-                upstream_control_data_out = i_torque_control.update_upstream_control_data();
                 downstream_control_data = downstream_control_data_in;
+                upstream_control_data_out = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
                 switch (error_phase)
                 {
@@ -1622,13 +1624,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
 
         case i_motion_control[int i].open_phase_detection() -> {int error_phase_out, float resistance_out}:
-                error_phase = open_phase_detection_offline(i_torque_control, motorcontrol_config, app_tile_usec, current_ratio, &resist);
+                error_phase = open_phase_detection_offline(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec, current_ratio, &resist);
                 error_phase_out = error_phase;
                 resistance_out = resist;
                 break;
 
         case i_motion_control[int i].sensors_evaluation() -> int sensor_status_out :
-                error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, app_tile_usec);
+                error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec);
                 sensor_status_out = error_sens;
                 break;
         }

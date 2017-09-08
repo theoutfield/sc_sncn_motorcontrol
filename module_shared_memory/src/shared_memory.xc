@@ -17,9 +17,6 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
 
     while (1) {
         select {
-        case i_shared_memory[int j].status() -> {int status}:
-                status = ACTIVE;
-                break;
         case i_shared_memory[int j].gpio_write_input_read_output(unsigned int in_gpio) -> unsigned int out_gpio_write:
                 out_gpio_write = gpio_write_buffer;
                 for (int i=0 ; i<4 ; i++) {
@@ -31,6 +28,10 @@ void shared_memory_service(server interface shared_memory_interface i_shared_mem
                 break;
         case i_shared_memory[int j].read() -> UpstreamControlData out_data:
                 out_data = data;
+                break;
+        case i_shared_memory[int j].read_upstream_data_and_write_gpio_output(unsigned int in_gpio_write_buffer) -> UpstreamControlData out_data:
+                out_data = data;
+                gpio_write_buffer = in_gpio_write_buffer;
                 break;
 
         case i_shared_memory[int j].write_angle_and_primary_feedback(unsigned int angle, unsigned int hall_state, unsigned int qei_index_found, int position, int singleturn, int velocity, SensorError sensor_error, SensorError last_sensor_error, unsigned int timestamp):

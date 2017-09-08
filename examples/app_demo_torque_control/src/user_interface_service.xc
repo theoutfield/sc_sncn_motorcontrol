@@ -136,7 +136,7 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
     i_torque_control.set_torque_control_enabled();
     printf(" please enter torque reference in [milli-Nm]\n");
 
-    upstream_control_data = i_torque_control.update_upstream_control_data();
+    upstream_control_data = i_torque_control.update_upstream_control_data(0);
 
     fflush(stdout);
     while (1)
@@ -312,7 +312,7 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
                  printf("activate xscope during 20 seconds ...\n");
                  for(int i=0; i<=10000;i++)
                  {
-                     upstream_control_data = i_torque_control.update_upstream_control_data();
+                     upstream_control_data = i_torque_control.update_upstream_control_data(0);
 
                      xscope_int(COMPUTED_TORQUE, upstream_control_data.computed_torque);
                      xscope_int(V_DC, upstream_control_data.V_dc);
@@ -332,7 +332,7 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
                  i_torque_control.reset_faults();
 
                  delay_milliseconds(500);
-                 upstream_control_data = i_torque_control.update_upstream_control_data();
+                 upstream_control_data = i_torque_control.update_upstream_control_data(0);
 
                  if(upstream_control_data.error_status != NO_FAULT)
                      printf(">>system status: faulty (fault ID %x)\n", upstream_control_data.error_status);
@@ -401,7 +401,7 @@ void demo_torque_control(interface TorqueControlInterface client i_torque_contro
                 motorcontrol_config = i_torque_control.get_config();
                 if(torque_ref>motorcontrol_config.max_torque || torque_ref<-motorcontrol_config.max_torque)
                 {
-                    upstream_control_data = i_torque_control.update_upstream_control_data();
+                    upstream_control_data = i_torque_control.update_upstream_control_data(0);
                     printf("above limits! torque %d [milli-Nm]\n", upstream_control_data.torque_set);
                 }
                 else
