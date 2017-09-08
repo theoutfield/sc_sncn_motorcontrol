@@ -88,7 +88,7 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDT1param
     param.integral += (param.Ki*T_s/2.0) * (error + param.error_value_1n);
 
     if ((param.integral >= param.integral_limit) || (param.integral <= -param.integral_limit))
-        param.integral -= ((param.Ki*T_s/2.0) * (error - param.error_value_1n));
+        param.integral -= ((param.Ki*T_s/2.0) * (error + param.error_value_1n));
 
     if (param.b == 1)
     {
