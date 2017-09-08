@@ -5,6 +5,7 @@ sc_sncn_motorcontrol Change Log
 -----
 
   * Integrate GPIO service in ethercat drive enabled for SDK 3.0.4
+  * Fix Incremental encoder position update to the shared memory
 
 
 3.1
