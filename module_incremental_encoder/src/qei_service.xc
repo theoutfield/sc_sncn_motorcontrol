@@ -163,7 +163,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
                         angle = ((position * position_feedback_config.pole_pairs* (1<<12))/ position_feedback_config.resolution) & ((1<<12)-1);
                         unsigned int timestamp;
                         t_velocity :> timestamp;
-                        write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, position * (1 << (16 - shift_counter)) / shift, velocity, angle, 0, index_found, sensor_error, last_sensor_error, ts_velocity/ifm_usec);
+                        write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, position * (1 << (16 - shift_counter)) / shift, velocity, angle, 0, index_found, sensor_error, last_sensor_error, timestamp/ifm_usec);
                     }
                 }
                 break;
