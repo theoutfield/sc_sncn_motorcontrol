@@ -1,6 +1,12 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+3.1.2
+-----
+
+  * Integrate GPIO service in ethercat drive enabled for SDK 3.0.4
+
+
 3.1
 ---
   * Add automatic PID tuning for cascaded and limitted torque position controllers
