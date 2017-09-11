@@ -38,9 +38,6 @@
 #define GPWM_MIN_VALUE         0
 
 
-#define DEADTIME             750 //nano-seconds
-
-
 /**
  * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
  */
@@ -93,7 +90,7 @@ void pwm_config_general(PwmPortsGeneral &ports);
 void pwm_service_general(
         PwmPortsGeneral &ports,
         server interface UpdatePWMGeneral i_update_pwm,
-        int freq_kHz
+        int freq_kHz, int deadtime_ns
 );
 
 /**
