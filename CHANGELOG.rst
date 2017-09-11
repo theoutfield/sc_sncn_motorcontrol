@@ -6,11 +6,21 @@ sc_sncn_motorcontrol Change Log
 
   * Integrate GPIO service in ethercat drive enabled for SDK 3.0.4
   * Fix Incremental encoder position update to the shared memory
+  * Integrate BiSS CRC error fix from SDK 3.0.3
+  * Add configuration parameter to enable/disable open phase detection
+    * The feature is disabled by default due to frequent false positives 
+  * Change simple PID controllers to PIDT1
+
+3.1.1
+-----
+
+  * Enable enterrup of cogging torque compensation reccord
+  * Improve position controller autotuner
 
 
-3.1
----
-  * Add automatic PID tuning for cascaded and limitted torque position controllers
+3.1.0
+-----
+  * Integrate automatic PID tuning for cascaded and limitted torque position controllers from SDK v3.0.3
   * Add automatic velocity tuning
   * Add cogging compensation
   * Add low-pass filter into position control
