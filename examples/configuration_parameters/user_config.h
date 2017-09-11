@@ -81,7 +81,7 @@
 //////////////////////////////////////////////
 // Warning!!! This parameter alters PWM switching frequency.
 // Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
-#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile.
+#define IFM_TILE_USEC       USEC_STD      // Number of ticks in a microsecond for IFM Tile.
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
@@ -170,7 +170,6 @@
 
 #define POSITION_CONTROL_STRATEGY               POS_PID_VELOCITY_CASCADED_CONTROLLER
 
-
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
@@ -178,11 +177,11 @@
 #define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 // Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define PULL_BRAKE_VOLTAGE     18000    // [milli-Volts]
+#define PULL_BRAKE_VOLTAGE         0    // [milli-Volts]
 // Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define HOLD_BRAKE_VOLTAGE     7000     // [milli-Volts]
-#define PULL_BRAKE_TIME        3000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define HOLD_BRAKE_VOLTAGE         0     // [milli-Volts]
+#define PULL_BRAKE_TIME         1000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
 /////////////////////////////////////////////////

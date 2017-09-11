@@ -17,12 +17,7 @@
 #define _PWM_SERVER_H_
 
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <xs1.h>
-#include <assert.h>
-#include <print.h>
 
 #include <pwm_ports.h>
 #include <motor_control_interfaces.h>
@@ -31,13 +26,20 @@
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GENERAL_PWM_MAX_VALUE   0x1612
-
+/*
+ * 6666  -> 15 kHz
+ * 10000 -> 10 kHz
+ */
+#define GPWM_MAX_VALUE      6667//10000
 /**
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GENERAL_PWM_MIN_VALUE   0x0000
+#define GPWM_MIN_VALUE         0
+
+
+#define DEADTIME             750 //nano-seconds
+
 
 /**
  * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
@@ -84,12 +86,14 @@ void pwm_config_general(PwmPortsGeneral &ports);
  *
  * @param ports                 Structure type for PWM ports
  * @param i_update_pwm          Interface to communicate with client and update the PWM values
+ * @param freq_kHz              pwm frequency - kHz
  *
  * @return void
  */
 void pwm_service_general(
         PwmPortsGeneral &ports,
-        server interface UpdatePWMGeneral i_update_pwm
+        server interface UpdatePWMGeneral i_update_pwm,
+        int freq_kHz
 );
 
 /**
@@ -122,7 +126,5 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         server interface UpdateBrake i_update_brake,
         int ifm_tile_usec
 );
-
-
 
 #endif // _PWM_SERVER_H_

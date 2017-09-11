@@ -28,9 +28,9 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
     timer t;
     unsigned ts;
 
-    //proper task startup
-    t :> ts;
-    t when timerafter (ts + (2000*20*250)) :> ts;
+    ////proper task startup
+    //t :> ts;
+    //t when timerafter (ts + (2000*20*250)) :> ts;
 
     //main loop
     int loop_flag = 1;
@@ -366,6 +366,14 @@ void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, Hal
                                client interface shared_memory_interface ?i_shared_memory_2,
                                server interface PositionFeedbackInterface (&?i_position_feedback_2)[3])
 {
+
+    timer t;
+    unsigned ts;
+
+    //proper task startup
+    t :> ts;
+    t when timerafter (ts + (1000*100*30)) :> void;
+
     if (position_feedback_config_1.ifm_usec == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }

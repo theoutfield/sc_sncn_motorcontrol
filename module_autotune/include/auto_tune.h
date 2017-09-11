@@ -11,7 +11,7 @@
  *        Note: The dc-bus voltage should be high enough for the selected velocity.
  */
 #define TUNING_VELOCITY 1000        //[rpm]
-#define KP_VELOCITY_TUNING  500000  //kp initial value while running the automatic tuning of velocity controller
+#define KP_VELOCITY_TUNING  100000  //kp initial value while running the automatic tuning of velocity controller
 #define SETTLING_TIME   0.3         //preffered settling time for velocity controller [seconds]
 #define MEASUREMENT_ARRAY_LENGTH    1000    //length of measurement array which is used while sampling velocity in velocity autotuner
 

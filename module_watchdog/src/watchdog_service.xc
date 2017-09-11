@@ -47,7 +47,7 @@
 
     //proper task startup
     t :> ts;
-    t when timerafter (ts + (1000*20*250)) :> void;//FixMe: how is it proper?
+    t when timerafter (ts + (1000*100*10)) :> void;
 
     //Do the IFM type identification only once
     if(!isnull(watchdog_ports.p_shared_enable_tick_led)){//DC100, DC300, or DC1K
@@ -94,9 +94,7 @@
     t :> ts;
     t when timerafter (ts + 100*usec) :> void;//100 us
 
-
     t :> ts;
-
     // Loop forever processing commands
     while (1) {
         select {
