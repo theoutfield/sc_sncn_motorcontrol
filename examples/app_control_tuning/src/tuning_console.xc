@@ -760,6 +760,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.brake_release_strategy = value;
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
+                        printf("set brake release strategy to %d\n", motion_ctrl_config.brake_release_strategy);
                         break;
 
                 case 'v'://brake voltage configure
@@ -773,8 +774,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                i_motion_control.update_brake_configuration();
                                 printf("nominal voltage of dc-bus is %d Volts \n", motion_ctrl_config.dc_bus_voltage);
+                                brake_flag = 0;
                                 break;
 
                         case 'p':// pull voltage for releasing the brake at startup
@@ -784,8 +785,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                i_motion_control.update_brake_configuration();
                                 printf("brake pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage);
+                                brake_flag = 0;
                                 break;
 
                         case 'h':// hold voltage for holding the brake after it is pulled
@@ -795,9 +796,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                i_motion_control.set_motion_control_config(motion_ctrl_config);
-                                i_motion_control.update_brake_configuration();
                                 printf("brake hold voltage is %d milli-Volts \n", motion_ctrl_config.hold_brake_voltage);
+                                brake_flag = 0;
                                 break;
                         default:
                                 break;
@@ -805,6 +805,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
 
                 case 't'://set pull time
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         //set
                         motion_ctrl_config.pull_brake_time=value;
 
@@ -813,7 +814,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         // check
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        i_motion_control.update_brake_configuration();
                         printf("brake pull time is %d [milli-seconds] \n", motion_ctrl_config.pull_brake_time);
                         brake_flag = 0;
                         break;

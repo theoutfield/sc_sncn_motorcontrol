@@ -493,6 +493,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
     int current_ratio = motorcontrol_config.current_ratio;
 
+    //init brake config
+    update_brake_configuration(motion_ctrl_config, i_torque_control);
+
     lt_position_control_reset(lt_pos_ctrl);
     lt_position_control_set_parameters(lt_pos_ctrl, motion_ctrl_config.max_motor_speed, motion_ctrl_config.resolution, motion_ctrl_config.moment_of_inertia,
             motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit,
@@ -588,8 +591,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int brake_shutdown_counter = 0;
     i_torque_control.set_safe_torque_off_enabled();
     i_torque_control.set_brake_status(DISABLE_BRAKE);
-
-    int update_brake_configuration_flag = 1;
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -966,16 +967,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 else
                     i_torque_control.set_torque(((int)(torque_ref_k)));
 
-                //update brake config when ready
-                if (update_brake_configuration_flag)
-                {
-                    update_brake_configuration(motion_ctrl_config, i_torque_control);
-                    update_brake_configuration_flag = 0;
-                    if (torque_enable_flag+velocity_enable_flag+position_enable_flag) { //one of the control is enabled, start motorcontrol and brake
-                        enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-                    }
-                }
-
                 torque_measurement = filter(torque_buffer, index, 8, torque_ref_k);
 
                 switch (error_sens)
@@ -1229,8 +1220,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
                 xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
                 xscope_int(TORQUE,   upstream_control_data.computed_torque);
-                xscope_int(POSITION_CMD, (int)position_ref_in_k);
-                xscope_int(VELOCITY_CMD, (int)velocity_ref_in_k);
+                xscope_int(POSITION_CMD, downstream_control_data.position_cmd);
+                xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
                 xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
@@ -1304,11 +1295,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         motion_ctrl_config.max_torque, POSITION_CONTROL_LOOP_PERIOD);
                 pid_reset(position_control_pid_param);
 
-                //start motorcontrol and release brake if update_brake_configuration is not ongoing
-                if (update_brake_configuration_flag == 0)
-                {
-                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-                }
+                enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
 
                 //start control loop just after
                 t :> ts;
@@ -1339,10 +1326,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
                         POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 
-                //start motorcontrol and release brake if update_brake_configuration is not ongoing
-                if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-                }
+                enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
 
                 //start control loop just after
                 t :> ts;
@@ -1357,10 +1341,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 downstream_control_data.torque_cmd = 0;
                 downstream_control_data.offset_torque = 0;
 
-                //start motorcontrol and release brake if update_brake_configuration is not ongoing
-                if (update_brake_configuration_flag == 0) {
-                    enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
-                }
+                enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
 
                 //start control loop just after
                 t :> ts;
@@ -1399,7 +1380,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     i_torque_control.set_safe_torque_off_enabled();
                     i_torque_control.set_brake_status(DISABLE_BRAKE);
 
-                    update_brake_configuration_flag = 1;
+                    update_brake_configuration(in_config, i_torque_control);
                 }
 
                 motion_ctrl_config = in_config;
@@ -1564,7 +1545,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         i_torque_control.set_safe_torque_off_enabled();
                         i_torque_control.set_brake_status(DISABLE_BRAKE);
 
-                        update_brake_configuration_flag = 1;
                         update_brake_configuration(motion_ctrl_config, i_torque_control);
 
                         break;
@@ -1671,7 +1651,9 @@ void update_brake_configuration(MotionControlConfig &motion_ctrl_config, client 
         printstr("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
     }
     else
+    {
         i_torque_control.configure_brake(pull_brake_voltage, motion_ctrl_config.pull_brake_time, hold_brake_voltage);
+    }
 }
 
 
