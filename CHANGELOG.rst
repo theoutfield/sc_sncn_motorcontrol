@@ -14,7 +14,7 @@ sc_sncn_motorcontrol Change Log
 3.1.1
 -----
 
-  * Enable enterrup of cogging torque compensation reccord
+  * Allow interrupt of cogging torque compensation reccording
   * Improve position controller autotuner
 
 
