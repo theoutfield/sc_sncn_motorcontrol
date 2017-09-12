@@ -524,6 +524,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
             POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
+    init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
 
     downstream_control_data.position_cmd = 0;
     downstream_control_data.velocity_cmd = 0;
@@ -640,6 +641,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         if(velocity_auto_tune.enable == 0)
                         {
                             init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
+                            motion_ctrl_config.velocity_kp = KP_VELOCITY_TUNING;
+                            motion_ctrl_config.velocity_ki = 0;
+                            motion_ctrl_config.velocity_kd = 0;
                             pid_init(velocity_control_pid_param);
                             pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
 

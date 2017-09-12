@@ -165,7 +165,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         downstream_control_data.velocity_cmd  = 0;
 
                         i_motion_control.update_control_data(downstream_control_data);
-                        printf("set velocity %d\n", downstream_control_data.velocity_cmd);
 
                         delay_milliseconds(500);//wait until the actual speed goes to 0.
 

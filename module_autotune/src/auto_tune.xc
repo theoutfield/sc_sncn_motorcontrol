@@ -18,9 +18,6 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionCon
     velocity_auto_tune.z = 0.70;
     velocity_auto_tune.st= settling_time;
 
-    motion_ctrl_config.velocity_kp = KP_VELOCITY_TUNING;
-    motion_ctrl_config.velocity_ki = 0;
-    motion_ctrl_config.velocity_kd = 0;
 
     velocity_auto_tune.kp   = 0.00;
     velocity_auto_tune.ki   = 0.00;
