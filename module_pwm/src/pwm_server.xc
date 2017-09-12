@@ -67,42 +67,42 @@ static void do_pwm_port_config_general(PwmPortsGeneral &ports)
     if (!isnull(ports.p_pwm_a))
     {
         configure_out_port( ports.p_pwm_a    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_a, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        if (!isnull(ports.p_pwm_inv_a)) configure_out_port( ports.p_pwm_inv_a, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_a);
     }
 
     if (!isnull(ports.p_pwm_b))
     {
         configure_out_port( ports.p_pwm_b    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_b, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        if (!isnull(ports.p_pwm_inv_b)) configure_out_port( ports.p_pwm_inv_b, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_b);
     }
 
     if (!isnull(ports.p_pwm_c))
     {
         configure_out_port( ports.p_pwm_c    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_c, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        if (!isnull(ports.p_pwm_inv_c)) configure_out_port( ports.p_pwm_inv_c, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_c);
     }
 
     if (!isnull(ports.p_pwm_u))
     {
         configure_out_port( ports.p_pwm_u    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_u, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        if (!isnull(ports.p_pwm_inv_u)) configure_out_port( ports.p_pwm_inv_u, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_u);
     }
 
     if (!isnull(ports.p_pwm_v))
     {
         configure_out_port( ports.p_pwm_v    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_v, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        if (!isnull(ports.p_pwm_inv_v)) configure_out_port( ports.p_pwm_inv_v, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_v);
     }
 
     if (!isnull(ports.p_pwm_w))
     {
         configure_out_port( ports.p_pwm_w    , ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
-        configure_out_port( ports.p_pwm_inv_w, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
+        if (!isnull(ports.p_pwm_inv_w)) configure_out_port( ports.p_pwm_inv_w, ports.clk ,0 );     // Set initial value of port to 0 (Switched Off)
         set_port_inv( ports.p_pwm_inv_w);
     }
 
