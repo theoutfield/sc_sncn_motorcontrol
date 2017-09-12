@@ -88,7 +88,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
                 velocity_auto_tune.ki/= (0.001*g_speed);
 
                 velocity_auto_tune.kp *= 1000000.00;
-                velocity_auto_tune.ki *= 1000.00;
+                velocity_auto_tune.ki *= 100000000.00;
 
                 if(velocity_auto_tune.kp<0 || velocity_auto_tune.ki<0) //wrong calculation
                 {
