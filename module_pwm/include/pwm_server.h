@@ -37,6 +37,12 @@
  */
 #define GPWM_MIN_VALUE         0
 
+/**
+ * @brief PWM frequency in kHz.
+ * Warning: So far, only GPWM_FRQ_15 is supported.
+ */
+#define GPWM_FRQ_15               15 // PWM frequency in kHz.
+
 
 /**
  * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
