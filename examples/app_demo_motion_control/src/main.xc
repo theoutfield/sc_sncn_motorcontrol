@@ -16,7 +16,7 @@
 #include <advanced_motor_control.h>
 #include <position_feedback_service.h>
 
-PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
+PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
 WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
 FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
 ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
@@ -33,7 +33,7 @@ int main(void) {
 
     // Motor control interfaces
     interface WatchdogInterface i_watchdog[2];
-    interface UpdatePWM i_update_pwm;
+    interface UpdatePWMGeneral i_update_pwm;
     interface UpdateBrake i_update_brake;
     interface ADCInterface i_adc[2];
     interface TorqueControlInterface i_torque_control[2];
@@ -110,14 +110,12 @@ int main(void) {
             {
                 /* PWM Service */
                 {
-                    pwm_config(pwm_ports);
+                    pwm_config_general(pwm_ports);
 
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                            i_update_brake, IFM_TILE_USEC);
+                    pwm_service_general(pwm_ports, i_update_pwm, GPWM_FRQ_15, DEADTIME_NS);
 
                 }
 
@@ -162,7 +160,7 @@ int main(void) {
                         motorcontrol_config.torque_offset[i] = 0;
                     }
                     torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
+                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC, /*gpio_port_0*/null);
                 }
 
                 /* Shared memory Service */
