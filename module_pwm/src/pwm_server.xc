@@ -298,26 +298,6 @@ void pwm_service_general(
         fast_switching= 0x0000;
         break;
 
-    case (45):
-        // values for 45 kHz switching frequency, and 100 MHz of ref_clck_frq:
-        // ======================================
-        ref_time_delay   = 2222 & 0x0000FFFF   ;
-        port_clock_shift = 1111 & 0x0000FFFF   ;
-        pwm_init         = 1111 & 0x0000FFFF   ;
-        inactive_period  = (deadtime_ns/10) & 0x0000FFFF   ;
-        dummy_delay      = 1111 & 0x0000FFFF   ;
-
-        limit_h_computational_margine =400 & 0x0000FFFF   ;
-        limit_l_computational_margine =400 & 0x0000FFFF   ;
-
-        pwm_limit_h      = (2222 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
-        pwm_limit_l      = (2*(deadtime_ns/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
-
-        computational_delay = 100 & 0x0000FFFF;
-        pulse_counter = 0x00000003;
-        fast_switching= 0x0000;
-        break;
-
     case (100):
         // values for 100 kHz switching frequency, and 100 MHz of ref_clck_frq:
         // ======================================
