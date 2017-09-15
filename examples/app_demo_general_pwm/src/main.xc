@@ -36,7 +36,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 {
     timer t;
     unsigned int time=0x00000000;
-    unsigned int updating_period = GPWM_MAX_VALUE;
+    unsigned int updating_period = GPWM_UPDATING_PERIOD;
 
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
                     pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
@@ -58,7 +58,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
             if(counter==50)
             {
                 pwm_value ++;
-                if(pwm_value>GPWM_MAX_VALUE)
+                if(pwm_value>GPWM_MAX_VALUE_15_kHz)
                 {
                     pwm_value=GPWM_MIN_VALUE;
                 }
@@ -88,7 +88,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 
             i_update_pwm.update_server_control_data(
                     /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
-                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w, 1);
+                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w);
 
             time     += updating_period;
             break;
