@@ -134,9 +134,9 @@ static void do_pwm_port_config_general(PwmPortsGeneral &ports)
 } // do_pwm_port_config_general
 
 /**
- * @brief Configure the pwm ports (all FETs open) before starting pwm service.
+ * @brief Configure the pwm ports before starting pwm service.
  *
- * @param ports  Structure type for general PWM ports (up to 6 inverter outputs)
+ * @param ports  Structure type for PWM ports.
  *
  * @return void
  */
@@ -189,10 +189,12 @@ void pwm_config_general(PwmPortsGeneral &ports)
 
 /**
  * @brief Service to generate center-alligned PWM signals for 6 inverter outputs (2 power switch for each leg).
- * It recieves 6 pwm values through i_update_pwm interface. The commutation frequency is 16 kHz, and the deadtime is 3 us.
+ * It recieves 6 pwm values through i_update_pwm interface. The commutation frequency is 15 kHz.
  *
- * @param ports                 Structure type for PWM ports
+ * @param ports                 Structure type for general PWM ports
  * @param i_update_pwm          Interface to communicate with client and update the PWM values
+ * @param freq_kHz              pwm frequency - kHz
+ * @param deadtime_ns           deadtime in [ns] (depends on board)
  *
  * @return void
  */
