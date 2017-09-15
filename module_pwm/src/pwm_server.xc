@@ -271,7 +271,7 @@ void pwm_service_general(
         limit_l_computational_margine =350 & 0x0000FFFF   ;
 
         pwm_limit_h      = (6667 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
-        pwm_limit_l      = (2*(deadtime_ns/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
+        pwm_limit_l      = (2*(deadtime_ns/10)         + limit_l_computational_margine) & 0x0000FFFF   ;
 
         computational_delay = 100 & 0x0000FFFF;
         pulse_counter = 0x00000001;
@@ -287,11 +287,11 @@ void pwm_service_general(
         inactive_period  = (deadtime_ns/10) & 0x0000FFFF   ;
         dummy_delay      = 1667 & 0x0000FFFF   ;
 
-        limit_h_computational_margine =220 & 0x0000FFFF   ;
-        limit_l_computational_margine =220 & 0x0000FFFF   ;
+        limit_h_computational_margine =100 & 0x0000FFFF   ;
+        limit_l_computational_margine = 40 & 0x0000FFFF   ;
 
         pwm_limit_h      = (3333 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
-        pwm_limit_l      = (2*(deadtime_ns/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
+        pwm_limit_l      = limit_l_computational_margine ;
 
         computational_delay = 100 & 0x0000FFFF;
         pulse_counter = 0x00000002;
@@ -322,16 +322,16 @@ void pwm_service_general(
         // values for 100 kHz switching frequency, and 100 MHz of ref_clck_frq:
         // ======================================
         ref_time_delay   = 1000 & 0x0000FFFF   ;
-        port_clock_shift = 500 & 0x0000FFFF   ;
-        pwm_init         = 500 & 0x0000FFFF   ;
-        inactive_period  = (deadtime_ns/10) & 0x0000FFFF   ;
-        dummy_delay      = 500 & 0x0000FFFF   ;
+        port_clock_shift =  500 & 0x0000FFFF   ;
+        pwm_init         =  500 & 0x0000FFFF   ;
+        inactive_period  = (deadtime_ns/10) & 0x0000FFFF  ;
+        dummy_delay      =  500 & 0x0000FFFF   ;
 
-        limit_h_computational_margine =220 & 0x0000FFFF   ;
-        limit_l_computational_margine =  0 & 0x0000FFFF   ;
+        limit_h_computational_margine = 40 & 0x0000FFFF   ;
+        limit_l_computational_margine = 40 & 0x0000FFFF   ;
 
         pwm_limit_h      = (1000 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
-        pwm_limit_l      = (2*(deadtime_ns/10)            + limit_l_computational_margine) & 0x0000FFFF   ;
+        pwm_limit_l      = limit_l_computational_margine & 0x0000FFFF   ;
 
         computational_delay = 100 & 0x0000FFFF;
         pulse_counter = 0x00000000;
