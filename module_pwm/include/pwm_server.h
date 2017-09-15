@@ -23,6 +23,19 @@
 #include <motor_control_interfaces.h>
 
 /**
+ * @brief Define updating period for general purpose pwm server while the ref_clk_freq is 100 MHz.
+ */
+#define GPWM_UPDATING_PERIOD          6667
+
+/**
+ * @brief Define maximum possible values for general PWM server (which is able to
+ * generate PWM pulses for up to 6 outputs.
+ */
+#define GPWM_MAX_VALUE_15_kHz         6666
+#define GPWM_MAX_VALUE_30_kHz         3333
+#define GPWM_MAX_VALUE_100_kHz        1000
+
+/**
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
