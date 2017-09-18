@@ -438,7 +438,7 @@ interface UpdatePWMGeneral
      *
      * @return  void
      */
-    void update_server_control_data(unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c, unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w,unsigned short pwm_on);
+    void update_server_control_data(unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c, unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w);
 
     /**
      * @brief send safe_torque_off_mode command to pwm service
