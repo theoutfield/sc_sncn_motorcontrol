@@ -140,6 +140,15 @@ typedef struct {
     int filter;
 } MotionControlConfig;
 
+
+typedef struct {
+    unsigned int buffer[30];
+    int head;
+    int tail;
+    const int maxLen;
+} ErrBuf_t;
+
+
 /**
  * @brief Interface type to communicate with the Motion Control Service.
  */

@@ -44,6 +44,8 @@ typedef enum
     PORTS_ERR = 4
 } sensor_fault;
 
+ErrBuf_t ErrBuf;
+
 /*
  * checking the position, velocity and angle reading from the sensor, when user triggers 'gse' command in tuning console or prior to commutation offset detection
  */
@@ -367,6 +369,72 @@ int special_brake_release(int &counter, int start_position, int actual_position,
     counter++;
 
     return target;
+}
+
+
+int ErrBufPush(ErrBuf_t *c, unsigned int data)
+{
+    // next is where head will point to after this write.
+    int next = c->head + 1;
+    if (next >= c->maxLen)
+        next = 0;
+
+    if (next == c->tail) // check if circular buffer is full
+        return -1;       // and return with an error.
+
+    c->buffer[c->head] = data; // Load data and then move
+    c->head = next;            // head to next data offset.
+    return 0;  // return success to indicate successful push.
+}
+
+
+
+int ErrBufPop(ErrBuf_t *c, unsigned int * data)
+{
+    // if the head isn't ahead of the tail, we don't have any characters
+    if (c->head == c->tail) // check if circular buffer is empty
+        return -1;          // and return with an error
+
+    // next is where tail will point to after this read.
+    int next = c->tail + 1;
+    if(next >= c->maxLen)
+        next = 0;
+
+    *data = c->buffer[c->tail]; // Read data and then move
+    c->tail = next;             // tail to next data offset.
+    return 0;  // return success to indicate successful push.
+}
+
+
+void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
+{
+    int res;
+    static int last_angle_sensor_error, last_sensor_error,  last_sec_sensor_error;
+
+    if ((ucd.angle_sensor_error != 0) && (ucd.angle_sensor_error != last_angle_sensor_error))
+    {
+         printf(" %d, %5d, %s\n", ucd.sensor_timestamp, ucd.angle_sensor_error, "Angle sensor error");
+
+         ErrBufPush(&ErrBuf, ucd.angle_sensor_error);
+         last_angle_sensor_error = ucd.angle_sensor_error;
+    }
+
+    if ((ucd.sensor_error != 0) && (ucd.sensor_error != last_sensor_error))
+    {
+         printf(" %d, %5d, %s\n", ucd.sensor_timestamp, ucd.sensor_error, "Sensor error");
+
+         ErrBufPush(&ErrBuf, ucd.sensor_error);
+         last_sensor_error = ucd.sensor_error;
+    }
+
+    if ((ucd.secondary_sensor_error != 0) && (ucd.secondary_sensor_error != last_sec_sensor_error))
+    {
+         printf(" %d, %5d, %s\n", ucd.secondary_sensor_timestamp, "Second. sensor error");
+
+         ErrBufPush(&ErrBuf, ucd.secondary_last_sensor_error);
+         last_sec_sensor_error = ucd.secondary_last_sensor_error;
+     }
+
 }
 
 
@@ -1616,6 +1684,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         sensor_status_out = error_sens;
                         break;
         }
+
+        error_detect(i_torque_control.update_upstream_control_data(0), downstream_control_data);
 
         }
     }
