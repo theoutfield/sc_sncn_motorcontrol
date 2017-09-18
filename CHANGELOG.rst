@@ -3,6 +3,7 @@ sc_sncn_motorcontrol Change Log
 3.1.3
 -----
 
+  * Have three options for switching frequency namely 15 kHz, 30 kHz and 100 kHz
   * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq
   * Add support for DC30 in watchdog service
 
