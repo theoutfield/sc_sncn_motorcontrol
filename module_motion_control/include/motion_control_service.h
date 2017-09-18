@@ -40,6 +40,8 @@
  */
 #define BRAKE_UPDATE_CONFIG_WAIT        2000
 
+#define ERROR_BUF_SIZE                  30
+
 
 
 /**
@@ -142,10 +144,15 @@ typedef struct {
 
 
 typedef struct {
-    unsigned int buffer[30];
+    unsigned int timestamp;
+    unsigned int err_code;
+    unsigned char sensor_type;
+} ErrItem_t;
+
+typedef struct {
+    ErrItem_t buffer[ERROR_BUF_SIZE];
     int head;
     int tail;
-    const int maxLen;
 } ErrBuf_t;
 
 

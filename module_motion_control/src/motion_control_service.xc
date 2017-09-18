@@ -372,24 +372,24 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-int ErrBufPush(ErrBuf_t *c, unsigned int data)
+int ErrBufPush(ErrBuf_t *c, ErrItem_t ErrItem)
 {
     // next is where head will point to after this write.
     int next = c->head + 1;
-    if (next >= c->maxLen)
+    if (next >= ERROR_BUF_SIZE)
         next = 0;
 
     if (next == c->tail) // check if circular buffer is full
         return -1;       // and return with an error.
 
-    c->buffer[c->head] = data; // Load data and then move
+    c->buffer[c->head] = ErrItem; // Load data and then move
     c->head = next;            // head to next data offset.
     return 0;  // return success to indicate successful push.
 }
 
 
 
-int ErrBufPop(ErrBuf_t *c, unsigned int * data)
+int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
 {
     // if the head isn't ahead of the tail, we don't have any characters
     if (c->head == c->tail) // check if circular buffer is empty
@@ -397,10 +397,10 @@ int ErrBufPop(ErrBuf_t *c, unsigned int * data)
 
     // next is where tail will point to after this read.
     int next = c->tail + 1;
-    if(next >= c->maxLen)
+    if(next >= ERROR_BUF_SIZE)
         next = 0;
 
-    *data = c->buffer[c->tail]; // Read data and then move
+    *ErrItem = c->buffer[c->tail]; // Read data and then move
     c->tail = next;             // tail to next data offset.
     return 0;  // return success to indicate successful push.
 }
@@ -409,13 +409,18 @@ int ErrBufPop(ErrBuf_t *c, unsigned int * data)
 void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
 {
     int res;
+    ErrItem_t ErrItem;
     static int last_angle_sensor_error, last_sensor_error,  last_sec_sensor_error;
 
     if ((ucd.angle_sensor_error != 0) && (ucd.angle_sensor_error != last_angle_sensor_error))
     {
          printf(" %d, %5d, %s\n", ucd.sensor_timestamp, ucd.angle_sensor_error, "Angle sensor error");
 
-         ErrBufPush(&ErrBuf, ucd.angle_sensor_error);
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.angle_sensor_error;
+         ErrItem.sensor_type = 1;
+
+         ErrBufPush(&ErrBuf, ErrItem);
          last_angle_sensor_error = ucd.angle_sensor_error;
     }
 
@@ -423,16 +428,24 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
     {
          printf(" %d, %5d, %s\n", ucd.sensor_timestamp, ucd.sensor_error, "Sensor error");
 
-         ErrBufPush(&ErrBuf, ucd.sensor_error);
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.sensor_error;
+         ErrItem.sensor_type = 2;
+
+         ErrBufPush(&ErrBuf, ErrItem);
          last_sensor_error = ucd.sensor_error;
     }
 
     if ((ucd.secondary_sensor_error != 0) && (ucd.secondary_sensor_error != last_sec_sensor_error))
     {
-         printf(" %d, %5d, %s\n", ucd.secondary_sensor_timestamp, "Second. sensor error");
+         printf(" %d, %5d, %s\n", ucd.secondary_sensor_timestamp, ucd.secondary_sensor_error, "Second. sensor error");
 
-         ErrBufPush(&ErrBuf, ucd.secondary_last_sensor_error);
-         last_sec_sensor_error = ucd.secondary_last_sensor_error;
+         ErrItem.timestamp = ucd.secondary_sensor_timestamp;
+         ErrItem.err_code = ucd.secondary_sensor_error;
+         ErrItem.sensor_type = 3;
+
+         ErrBufPush(&ErrBuf, ErrItem);
+         last_sec_sensor_error = ucd.secondary_sensor_error;
      }
 
 }
