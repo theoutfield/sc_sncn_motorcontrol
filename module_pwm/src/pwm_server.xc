@@ -427,8 +427,10 @@ void pwm_service_general(
                     status = ACTIVE;
                     break;
 
-            case i_update_pwm.frequency() -> {int frequency}:
+            case i_update_pwm.settings() -> {int frequency, int limit_l, int limit_h}:
                     frequency = freq_kHz;
+                    limit_l   = pwm_limit_l;
+                    limit_h   = pwm_limit_h;
                     break;
 
             case i_update_pwm.safe_torque_off_enabled():
@@ -556,8 +558,10 @@ void pwm_service_general(
                     status = ACTIVE;
                     break;
 
-            case i_update_pwm.frequency() -> {int frequency}:
+            case i_update_pwm.settings() -> {int frequency, int limit_l, int limit_h}:
                     frequency = freq_kHz;
+                    limit_l   = pwm_limit_l;
+                    limit_h   = pwm_limit_h;
                     break;
 
             case i_update_pwm.safe_torque_off_enabled():
