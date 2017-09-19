@@ -419,6 +419,8 @@ void pwm_service_general(
                             v_low_rise =  v_high_rise+inactive_period;
                             w_high_rise= (pwm_value_w >> 1);
                             w_low_rise =  w_high_rise+inactive_period;
+
+                            pwm_on = 0x0001;
                             break;
 
             case i_update_pwm.status() -> {int status}:
@@ -430,6 +432,8 @@ void pwm_service_general(
                     break;
 
             case i_update_pwm.safe_torque_off_enabled():
+                pwm_on = 0x0000;
+
                 for(int i=0; i<=1000; i++)
                 {
                     if(phase_a_inv_defined) ports.p_pwm_a       <: 0;
@@ -451,36 +455,39 @@ void pwm_service_general(
                 break;
             }//select
 
-            if(phase_a_inv_defined) ports.p_pwm_a           @ (unsigned short)((ref_time - a_high_rise)&(inp_wid)) <: 1;
-            if(phase_a_inv_defined) ports.p_pwm_inv_a       @ (unsigned short)((ref_time - a_low_rise) &(inp_wid)) <: 1;
-            if(phase_b_inv_defined) ports.p_pwm_b           @ (unsigned short)((ref_time - b_high_rise)&(inp_wid)) <: 1;
-            if(phase_b_inv_defined) ports.p_pwm_inv_b       @ (unsigned short)((ref_time - b_low_rise) &(inp_wid)) <: 1;
-            if(phase_c_inv_defined) ports.p_pwm_c           @ (unsigned short)((ref_time - c_high_rise)&(inp_wid)) <: 1;
-            if(phase_c_inv_defined) ports.p_pwm_inv_c       @ (unsigned short)((ref_time - c_low_rise) &(inp_wid)) <: 1;
-            if(phase_u_inv_defined) ports.p_pwm_u           @ (unsigned short)((ref_time - u_high_rise)&(inp_wid)) <: 1;
-            if(phase_u_inv_defined) ports.p_pwm_inv_u       @ (unsigned short)((ref_time - u_low_rise) &(inp_wid)) <: 1;
-            if(phase_v_inv_defined) ports.p_pwm_v           @ (unsigned short)((ref_time - v_high_rise)&(inp_wid)) <: 1;
-            if(phase_v_inv_defined) ports.p_pwm_inv_v       @ (unsigned short)((ref_time - v_low_rise) &(inp_wid)) <: 1;
-            if(phase_w_inv_defined) ports.p_pwm_w           @ (unsigned short)((ref_time - w_high_rise)&(inp_wid)) <: 1;
-            if(phase_w_inv_defined) ports.p_pwm_inv_w       @ (unsigned short)((ref_time - w_low_rise) &(inp_wid)) <: 1;
+            if(pwm_on)
+            {
+                if(phase_a_inv_defined) ports.p_pwm_a           @ (unsigned short)((ref_time - a_high_rise)&(inp_wid)) <: 1;
+                if(phase_a_inv_defined) ports.p_pwm_inv_a       @ (unsigned short)((ref_time - a_low_rise) &(inp_wid)) <: 1;
+                if(phase_b_inv_defined) ports.p_pwm_b           @ (unsigned short)((ref_time - b_high_rise)&(inp_wid)) <: 1;
+                if(phase_b_inv_defined) ports.p_pwm_inv_b       @ (unsigned short)((ref_time - b_low_rise) &(inp_wid)) <: 1;
+                if(phase_c_inv_defined) ports.p_pwm_c           @ (unsigned short)((ref_time - c_high_rise)&(inp_wid)) <: 1;
+                if(phase_c_inv_defined) ports.p_pwm_inv_c       @ (unsigned short)((ref_time - c_low_rise) &(inp_wid)) <: 1;
+                if(phase_u_inv_defined) ports.p_pwm_u           @ (unsigned short)((ref_time - u_high_rise)&(inp_wid)) <: 1;
+                if(phase_u_inv_defined) ports.p_pwm_inv_u       @ (unsigned short)((ref_time - u_low_rise) &(inp_wid)) <: 1;
+                if(phase_v_inv_defined) ports.p_pwm_v           @ (unsigned short)((ref_time - v_high_rise)&(inp_wid)) <: 1;
+                if(phase_v_inv_defined) ports.p_pwm_inv_v       @ (unsigned short)((ref_time - v_low_rise) &(inp_wid)) <: 1;
+                if(phase_w_inv_defined) ports.p_pwm_w           @ (unsigned short)((ref_time - w_high_rise)&(inp_wid)) <: 1;
+                if(phase_w_inv_defined) ports.p_pwm_inv_w       @ (unsigned short)((ref_time - w_low_rise) &(inp_wid)) <: 1;
 
-            if(phase_a_inv_defined) ports.p_pwm_a           @ (unsigned short)((ref_time + a_high_rise)&(inp_wid)) <: 0;
-            if(phase_a_inv_defined) ports.p_pwm_inv_a       @ (unsigned short)((ref_time + a_low_rise) &(inp_wid)) <: 0;
-            if(phase_b_inv_defined) ports.p_pwm_b           @ (unsigned short)((ref_time + b_high_rise)&(inp_wid)) <: 0;
-            if(phase_b_inv_defined) ports.p_pwm_inv_b       @ (unsigned short)((ref_time + b_low_rise) &(inp_wid)) <: 0;
-            if(phase_c_inv_defined) ports.p_pwm_c           @ (unsigned short)((ref_time + c_high_rise)&(inp_wid)) <: 0;
-            if(phase_c_inv_defined) ports.p_pwm_inv_c       @ (unsigned short)((ref_time + c_low_rise) &(inp_wid)) <: 0;
-            if(phase_u_inv_defined) ports.p_pwm_u           @ (unsigned short)((ref_time + u_high_rise)&(inp_wid)) <: 0;
-            if(phase_u_inv_defined) ports.p_pwm_inv_u       @ (unsigned short)((ref_time + u_low_rise) &(inp_wid)) <: 0;
-            if(phase_v_inv_defined) ports.p_pwm_v           @ (unsigned short)((ref_time + v_high_rise)&(inp_wid)) <: 0;
-            if(phase_v_inv_defined) ports.p_pwm_inv_v       @ (unsigned short)((ref_time + v_low_rise) &(inp_wid)) <: 0;
-            if(phase_w_inv_defined) ports.p_pwm_w           @ (unsigned short)((ref_time + w_high_rise)&(inp_wid)) <: 0;
-            if(phase_w_inv_defined) ports.p_pwm_inv_w       @ (unsigned short)((ref_time + w_low_rise) &(inp_wid)) <: 0;
+                if(phase_a_inv_defined) ports.p_pwm_a           @ (unsigned short)((ref_time + a_high_rise)&(inp_wid)) <: 0;
+                if(phase_a_inv_defined) ports.p_pwm_inv_a       @ (unsigned short)((ref_time + a_low_rise) &(inp_wid)) <: 0;
+                if(phase_b_inv_defined) ports.p_pwm_b           @ (unsigned short)((ref_time + b_high_rise)&(inp_wid)) <: 0;
+                if(phase_b_inv_defined) ports.p_pwm_inv_b       @ (unsigned short)((ref_time + b_low_rise) &(inp_wid)) <: 0;
+                if(phase_c_inv_defined) ports.p_pwm_c           @ (unsigned short)((ref_time + c_high_rise)&(inp_wid)) <: 0;
+                if(phase_c_inv_defined) ports.p_pwm_inv_c       @ (unsigned short)((ref_time + c_low_rise) &(inp_wid)) <: 0;
+                if(phase_u_inv_defined) ports.p_pwm_u           @ (unsigned short)((ref_time + u_high_rise)&(inp_wid)) <: 0;
+                if(phase_u_inv_defined) ports.p_pwm_inv_u       @ (unsigned short)((ref_time + u_low_rise) &(inp_wid)) <: 0;
+                if(phase_v_inv_defined) ports.p_pwm_v           @ (unsigned short)((ref_time + v_high_rise)&(inp_wid)) <: 0;
+                if(phase_v_inv_defined) ports.p_pwm_inv_v       @ (unsigned short)((ref_time + v_low_rise) &(inp_wid)) <: 0;
+                if(phase_w_inv_defined) ports.p_pwm_w           @ (unsigned short)((ref_time + w_high_rise)&(inp_wid)) <: 0;
+                if(phase_w_inv_defined) ports.p_pwm_inv_w       @ (unsigned short)((ref_time + w_low_rise) &(inp_wid)) <: 0;
 
-            ref_time += ref_time_delay;
-            ref_time &= 0x0000FFFF;
+                ref_time += ref_time_delay;
+                ref_time &= 0x0000FFFF;
 
-            ports.dummy_port @ (unsigned short)((ref_time + dummy_delay) & (inp_wid)) :> dummy_value;
+                ports.dummy_port @ (unsigned short)((ref_time + dummy_delay) & (inp_wid)) :> dummy_value;
+            }
         }// while(1)__I
 
     }//eo if(fast_switching)
@@ -554,7 +561,6 @@ void pwm_service_general(
                     break;
 
             case i_update_pwm.safe_torque_off_enabled():
-                pwm_on = 0x0000;
                 for(int i=0; i<=1000; i++)
                 {
                     if(phase_a_inv_defined) ports.p_pwm_a       <: 0;
