@@ -261,19 +261,22 @@ void pwm_service_general(
     case (15):
         // values for 15 kHz switching frequency, and 100 MHz of ref_clck_frq:
         // ======================================
-        ref_time_delay   = 6667 & 0x0000FFFF   ;
+        ref_time_delay   = 6666 & 0x0000FFFF   ;
         port_clock_shift = 3333 & 0x0000FFFF   ;
         pwm_init         = 3333 & 0x0000FFFF   ;
+
+        if(deadtime_ns<750) deadtime_ns=750;
         inactive_period  = (deadtime_ns/10) & 0x0000FFFF   ;
+
         dummy_delay      = 3333 & 0x0000FFFF   ;
 
-        limit_h_computational_margine =350 & 0x0000FFFF   ;
-        limit_l_computational_margine =350 & 0x0000FFFF   ;
+        limit_h_computational_margine = 300 & 0x0000FFFF   ;
+        limit_l_computational_margine =  40 & 0x0000FFFF   ;
 
         pwm_limit_h      = (6667 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
-        pwm_limit_l      = (2*(deadtime_ns/10)         + limit_l_computational_margine) & 0x0000FFFF   ;
+        pwm_limit_l      = limit_l_computational_margine & 0x0000FFFF   ;
 
-        computational_delay = 100 & 0x0000FFFF;
+        computational_delay = 0 & 0x0000FFFF;
         pulse_counter = 0x00000001;
         fast_switching= 0x0000;
         break;
@@ -284,16 +287,19 @@ void pwm_service_general(
         ref_time_delay   = 3333 & 0x0000FFFF   ;
         port_clock_shift = 1667 & 0x0000FFFF   ;
         pwm_init         = 1667 & 0x0000FFFF   ;
+
+        if(deadtime_ns<750) deadtime_ns=750;
         inactive_period  = (deadtime_ns/10) & 0x0000FFFF   ;
+
         dummy_delay      = 1667 & 0x0000FFFF   ;
 
-        limit_h_computational_margine =100 & 0x0000FFFF   ;
+        limit_h_computational_margine =300 & 0x0000FFFF   ;
         limit_l_computational_margine = 40 & 0x0000FFFF   ;
 
         pwm_limit_h      = (3333 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
-        pwm_limit_l      = limit_l_computational_margine ;
+        pwm_limit_l      = limit_l_computational_margine & 0x0000FFFF   ;
 
-        computational_delay = 100 & 0x0000FFFF;
+        computational_delay = 0 & 0x0000FFFF;
         pulse_counter = 0x00000002;
         fast_switching= 0x0000;
         break;
@@ -304,7 +310,10 @@ void pwm_service_general(
         ref_time_delay   = 1000 & 0x0000FFFF   ;
         port_clock_shift =  500 & 0x0000FFFF   ;
         pwm_init         =  500 & 0x0000FFFF   ;
+
+        if(deadtime_ns<750) deadtime_ns=750;
         inactive_period  = (deadtime_ns/10) & 0x0000FFFF  ;
+
         dummy_delay      =  500 & 0x0000FFFF   ;
 
         limit_h_computational_margine = 40 & 0x0000FFFF   ;
@@ -313,7 +322,7 @@ void pwm_service_general(
         pwm_limit_h      = (1000 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = limit_l_computational_margine & 0x0000FFFF   ;
 
-        computational_delay = 100 & 0x0000FFFF;
+        computational_delay = 0 & 0x0000FFFF;
         pulse_counter = 0x00000000;
         fast_switching= 0x0001;
         break;
