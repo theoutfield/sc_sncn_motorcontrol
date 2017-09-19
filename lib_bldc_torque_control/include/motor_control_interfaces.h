@@ -418,11 +418,10 @@ interface UpdatePWMGeneral
     int status(void);
 
     /**
-     * @brief send the frequency of pwm service to the client side (kHz)
+     * @brief send the settings of pwm service to the client side (kHz)
      *
-     * @return frequency of pwm service (kHz)
      */
-    int frequency(void);
+    {int, int, int} settings(void);
 
     /**
      * @brief send the pwm values and pwm controling commands to pwm service
