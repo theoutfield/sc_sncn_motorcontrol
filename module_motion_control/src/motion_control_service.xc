@@ -372,7 +372,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
-int ErrBufPush(ErrBuf_t *c, ErrItem_t ErrItem)
+int ErrBufPush(ErrBuf_t *c, ErrItem_t ErrItem,  interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
 {
     // next is where head will point to after this write.
     int next = c->head + 1;
@@ -384,6 +384,11 @@ int ErrBufPush(ErrBuf_t *c, ErrItem_t ErrItem)
 
     c->buffer[c->head] = ErrItem; // Load data and then move
     c->head = next;            // head to next data offset.
+
+    //new error notification to all clients
+    for (int i = 0; i < N_MOTION_CONTROL_INTERFACES; i++)
+        i_motion_control[i].new_error();
+
     return 0;  // return success to indicate successful push.
 }
 
@@ -406,7 +411,7 @@ int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
 }
 
 
-void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
+void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
 {
     int res;
     ErrItem_t ErrItem;
@@ -420,7 +425,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
          ErrItem.err_code = ucd.angle_sensor_error;
          ErrItem.sensor_type = 1;
 
-         ErrBufPush(&ErrBuf, ErrItem);
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_angle_sensor_error = ucd.angle_sensor_error;
     }
     else
@@ -434,7 +439,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
          ErrItem.err_code = ucd.sensor_error;
          ErrItem.sensor_type = 2;
 
-         ErrBufPush(&ErrBuf, ErrItem);
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_sensor_error = ucd.sensor_error;
     }
     else
@@ -448,7 +453,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
          ErrItem.err_code = ucd.secondary_sensor_error;
          ErrItem.sensor_type = 3;
 
-         ErrBufPush(&ErrBuf, ErrItem);
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_sec_sensor_error = ucd.secondary_sensor_error;
     }
     else
@@ -462,7 +467,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
           ErrItem.err_code = ucd.error_status;
           ErrItem.sensor_type = 4;
 
-          ErrBufPush(&ErrBuf, ErrItem);
+          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
           last_error_status = ucd.error_status;
     }
     else
@@ -476,7 +481,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
           ErrItem.err_code = ucd.motion_control_error;
           ErrItem.sensor_type = 5;
 
-          ErrBufPush(&ErrBuf, ErrItem);
+          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
           last_motion_control_error = ucd.motion_control_error;
     }
     else
@@ -490,7 +495,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
          ErrItem.err_code = ucd.watchdog_error;
          ErrItem.sensor_type = 6;
 
-         ErrBufPush(&ErrBuf, ErrItem);
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_watchdog_error = ucd.watchdog_error;
     }
     else
@@ -515,7 +520,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd)
  *  */
 void motion_control_service(MotionControlConfig &motion_ctrl_config,
         interface TorqueControlInterface client i_torque_control,
-        interface MotionControlInterface server i_motion_control[3],client interface UpdateBrake i_update_brake)
+        interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES], client interface UpdateBrake i_update_brake)
 {
     timer t;
     unsigned int ts;
@@ -1743,9 +1748,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec);
                         sensor_status_out = error_sens;
                         break;
+
+                case i_motion_control[int i].get_last_error(ErrItem_t ErrItem) -> int status :
+                          //ErrItem_t TempErrItem;
+                          status = ErrBufPop(&ErrBuf, &ErrItem);
+                          //memcpy(ErrItem, TempErrItem, sizeof(ErrItem_t));
+                break;
         }
 
-        error_detect(i_torque_control.update_upstream_control_data(0), downstream_control_data);
+        error_detect(i_torque_control.update_upstream_control_data(0), downstream_control_data, i_motion_control);
 
         }
     }

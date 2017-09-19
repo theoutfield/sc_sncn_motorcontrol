@@ -42,6 +42,8 @@
 
 #define ERROR_BUF_SIZE                  30
 
+#define N_MOTION_CONTROL_INTERFACES     3
+
 
 
 /**
@@ -293,6 +295,15 @@ interface MotionControlInterface
      * @param   flag    value : 0 (disable) or 1 (enable)
      */
     void enable_cogging_compensation(int flag);
+
+    /**
+     * @brief    Pop last error item from error buffer
+     *
+     * @param    Error item
+     */
+    [[clears_notification]] int get_last_error(ErrItem_t ErrItem);
+
+    [[notification]] slave void new_error(void);
 };
 
 
