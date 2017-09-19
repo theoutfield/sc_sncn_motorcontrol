@@ -301,7 +301,7 @@ interface MotionControlInterface
      *
      * @param    Error item
      */
-    [[clears_notification]] int get_last_error(ErrItem_t ErrItem);
+    [[clears_notification]] int get_last_error(ErrItem_t &ErrItem);
 
     [[notification]] slave void new_error(void);
 };

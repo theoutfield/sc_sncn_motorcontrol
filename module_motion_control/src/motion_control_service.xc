@@ -413,7 +413,6 @@ int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
 
 void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
 {
-    int res;
     ErrItem_t ErrItem;
     static int last_angle_sensor_error, last_sensor_error,  last_sec_sensor_error, last_error_status, last_motion_control_error, last_watchdog_error;
 
@@ -1737,10 +1736,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         sensor_status_out = error_sens;
                         break;
 
-                case i_motion_control[int i].get_last_error(ErrItem_t ErrItem) -> int status :
-                          //ErrItem_t TempErrItem;
-                          status = ErrBufPop(&ErrBuf, &ErrItem);
-                          //memcpy(ErrItem, TempErrItem, sizeof(ErrItem_t));
+                case i_motion_control[int i].get_last_error(ErrItem_t &ErrItem) -> int status :
+                        ErrItem_t TempErrItem;
+                        status = ErrBufPop(&ErrBuf, &TempErrItem);
+                        ErrItem = TempErrItem;
+                        if (status == 0)
+                        {
+                            //renew notification if we have unreaded items in buffer notification to all clients
+                            i_motion_control[i].new_error();
+                        }
                 break;
         }
 
