@@ -77,6 +77,17 @@ typedef enum {
     MOTION_POLARITY_INVERTED    = 1
 } MotionPolarity;
 
+
+typedef enum {
+    ERR_STATUS = 1,
+    ERR_MOTION,
+    ERR_SENSOR,
+    ERR_SEC_SENSOR,
+    ERR_ANGLE_SENSOR,
+    ERR_WATCHDOG
+
+} ErrType;
+
 /**
  * @brief Structure definition for a Control Loop Service configuration.
  */

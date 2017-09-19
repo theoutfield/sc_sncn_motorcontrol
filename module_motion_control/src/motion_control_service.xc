@@ -420,7 +420,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     {
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.angle_sensor_error;
-         ErrItem.sensor_type = 1;
+         ErrItem.sensor_type = ERR_ANGLE_SENSOR;
 
          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_angle_sensor_error = ucd.angle_sensor_error;
@@ -432,7 +432,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     {
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.sensor_error;
-         ErrItem.sensor_type = 2;
+         ErrItem.sensor_type = ERR_SENSOR;
 
          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_sensor_error = ucd.sensor_error;
@@ -444,7 +444,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     {
          ErrItem.timestamp = ucd.secondary_sensor_timestamp;
          ErrItem.err_code = ucd.secondary_sensor_error;
-         ErrItem.sensor_type = 3;
+         ErrItem.sensor_type = ERR_SEC_SENSOR;
 
          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_sec_sensor_error = ucd.secondary_sensor_error;
@@ -456,7 +456,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     {
           ErrItem.timestamp = ucd.sensor_timestamp;
           ErrItem.err_code = ucd.error_status;
-          ErrItem.sensor_type = 4;
+          ErrItem.sensor_type = ERR_STATUS;
 
           ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
           last_error_status = ucd.error_status;
@@ -468,7 +468,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     {
           ErrItem.timestamp = ucd.sensor_timestamp;
           ErrItem.err_code = ucd.motion_control_error;
-          ErrItem.sensor_type = 5;
+          ErrItem.sensor_type = ERR_MOTION;
 
           ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
           last_motion_control_error = ucd.motion_control_error;
@@ -480,7 +480,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     {
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.watchdog_error;
-         ErrItem.sensor_type = 6;
+         ErrItem.sensor_type = ERR_WATCHDOG;
 
          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
          last_watchdog_error = ucd.watchdog_error;
