@@ -419,8 +419,6 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.angle_sensor_error != 0) && (ucd.angle_sensor_error != last_angle_sensor_error))
     {
-         printf(" %d, 0x%x, %s\n", ucd.sensor_timestamp, ucd.angle_sensor_error, "Angle sensor error");
-
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.angle_sensor_error;
          ErrItem.sensor_type = 1;
@@ -433,8 +431,6 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.sensor_error != 0) && (ucd.sensor_error != last_sensor_error))
     {
-         printf(" %d, 0x%x, %s\n", ucd.sensor_timestamp, ucd.sensor_error, "Sensor error");
-
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.sensor_error;
          ErrItem.sensor_type = 2;
@@ -447,8 +443,6 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.secondary_sensor_error != 0) && (ucd.secondary_sensor_error != last_sec_sensor_error))
     {
-         printf(" %d, 0x%x, %s\n", ucd.secondary_sensor_timestamp, ucd.secondary_sensor_error, "Second. sensor error");
-
          ErrItem.timestamp = ucd.secondary_sensor_timestamp;
          ErrItem.err_code = ucd.secondary_sensor_error;
          ErrItem.sensor_type = 3;
@@ -461,8 +455,6 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.error_status != 0) && (ucd.error_status != last_error_status))
     {
-          printf(" %d, 0x%x, %s\n", ucd.sensor_timestamp, ucd.error_status, "Error status");
-
           ErrItem.timestamp = ucd.sensor_timestamp;
           ErrItem.err_code = ucd.error_status;
           ErrItem.sensor_type = 4;
@@ -475,8 +467,6 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.motion_control_error != 0) && (ucd.motion_control_error != last_motion_control_error))
     {
-          printf(" %d, 0x%x, %s\n", ucd.sensor_timestamp, ucd.motion_control_error, "Motion control error");
-
           ErrItem.timestamp = ucd.sensor_timestamp;
           ErrItem.err_code = ucd.motion_control_error;
           ErrItem.sensor_type = 5;
@@ -489,8 +479,6 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.watchdog_error != 0) && (ucd.watchdog_error != last_watchdog_error))
     {
-         printf(" %d, 0x%x, %s\n", ucd.sensor_timestamp, ucd.watchdog_error, "Watchdog error");
-
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.watchdog_error;
          ErrItem.sensor_type = 6;
