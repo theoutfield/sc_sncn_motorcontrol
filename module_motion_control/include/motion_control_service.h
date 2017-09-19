@@ -159,7 +159,7 @@ typedef struct {
 typedef struct {
     unsigned int timestamp;
     unsigned int err_code;
-    unsigned char sensor_type;
+    unsigned char err_type;
 } ErrItem_t;
 
 typedef struct {
