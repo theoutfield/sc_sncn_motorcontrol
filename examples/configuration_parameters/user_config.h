@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+#include <motor_config_AMK_DD7_28_10_T00.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        40000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        110000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
@@ -88,10 +88,10 @@
 //////////////////////////////////////////////
 #define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 20
+#define APPLIED_TUNING_TORQUE_PERCENT 5
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       0
+#define COMMUTATION_ANGLE_OFFSET       2920
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -120,13 +120,13 @@
 #define MOTOR_ID 0
 
 // PID GAINS FOR TORQUE CONTROL [will be divided by 10000]
-#define TORQUE_Kp         40
+#define TORQUE_Kp         70
 #define TORQUE_Ki         40
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
-#define VELOCITY_Kp                             0
-#define VELOCITY_Ki                             0
+#define VELOCITY_Kp                             200000
+#define VELOCITY_Ki                             40
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
