@@ -420,6 +420,9 @@ interface UpdatePWMGeneral
     /**
      * @brief send the settings of pwm service to the client side (kHz)
      *
+     * @return pwm frequency in kHz
+     * @return pwm minimum value
+     * @return pwm maximum value
      */
     {int, int, int} settings(void);
 
