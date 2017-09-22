@@ -300,9 +300,9 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
 
                 default://find motor commutation offset automatically
-
-                    if (general_system_evaluation(i_motion_control) == 0)
-                    {
+//
+//                    if (general_system_evaluation(i_motion_control) == 0)
+//                    {
                         printf("Sending offset_detection command ...\n");
 
                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
@@ -326,11 +326,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        printf("OFFSET DETECTION NOT POSSIBLE ...\n");
-                    }
+//                    }
+//                    else
+//                    {
+//                        printf("OFFSET DETECTION NOT POSSIBLE ...\n");
+//                    }
 
                     break;
 
