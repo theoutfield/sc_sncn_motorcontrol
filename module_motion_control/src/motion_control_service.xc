@@ -742,14 +742,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     velocity_ref_k = 0;
                                 }
                                 ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
-                                i_torque_control.set_config(motorcontrol_config);
+                                i_torque_control.save_cogging_offset(motorcontrol_config);
                                 ct_parameters.torque_recording_started = 0;
                                 ct_parameters.delay_counter = 0;
                                 i_torque_control.set_torque_control_enabled();
-                                i_torque_control.set_brake_status(DISABLE_BRAKE);
 
                                 if(ct_parameters.back_and_forth == 2)
                                 {
+                                    i_torque_control.set_brake_status(DISABLE_BRAKE);
                                     ct_parameters.back_and_forth = 0;
                                     torque_enable_flag   =0;
                                     velocity_enable_flag =0;
