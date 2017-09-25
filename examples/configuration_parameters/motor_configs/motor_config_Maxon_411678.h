@@ -21,7 +21,7 @@
 // OTHER PARAMETERS (do not change if not having access to the following parameter values)
 #define RATED_POWER             100     // rated power [W]
 #define PEAK_SPEED              4250    // maximum motor speed [rpm]
-#define MOTOR_PHASE_RESISTANCE  307000  // motor phase resistance [micro-ohm]
+#define MOTOR_PHASE_RESISTANCE  160000  // motor phase resistance [micro-ohm]
 #define MOTOR_PHASE_INDUCTANCE  188     // motor phase inductance [micro-Henry]
 
 // GENERAL PARAMETERS
