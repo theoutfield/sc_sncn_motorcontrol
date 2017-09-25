@@ -46,5 +46,6 @@
     <Probe name="TIME_IDLE_ADC" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_IDLE_COMPUTATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="TIME_IDLE_FINAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="V_DC_FILTERED" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     
 </xSCOPEconfig>
