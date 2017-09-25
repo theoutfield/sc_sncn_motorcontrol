@@ -565,6 +565,7 @@ void pwm_service_general(
                     break;
 
             case i_update_pwm.safe_torque_off_enabled():
+                pulse_generation_flag =0;
                 for(int i=0; i<=1000; i++)
                 {
                     if(phase_a_inv_defined) ports.p_pwm_a       <: 0;
