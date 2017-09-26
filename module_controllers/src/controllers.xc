@@ -216,27 +216,27 @@ void gain_scheduling_update(int velocity, GSCparam &param_gsc, MotionControlConf
         motion_ctrl_config.velocity_kd = param_gsc.vel_Kd_l;
     }
     else if (abs(velocity) > (double)param_gsc.velocity_hi_l)
-        {
-            // gain scheduling controller in a high velocity operating point
-            motion_ctrl_config.position_kp = param_gsc.pos_Kp_h;
-            motion_ctrl_config.position_ki = param_gsc.pos_Ki_h;
-            motion_ctrl_config.position_kd = param_gsc.pos_Kd_h;
+    {
+        // gain scheduling controller in a high velocity operating point
+        motion_ctrl_config.position_kp = param_gsc.pos_Kp_h;
+        motion_ctrl_config.position_ki = param_gsc.pos_Ki_h;
+        motion_ctrl_config.position_kd = param_gsc.pos_Kd_h;
 
-            motion_ctrl_config.velocity_kp = param_gsc.vel_Kp_h;
-            motion_ctrl_config.velocity_ki = param_gsc.vel_Ki_h;
-            motion_ctrl_config.velocity_kd = param_gsc.vel_Kd_h;
-        }
-        else
-        {
-            // position controller gains scheduling by linear interpolation
-            motion_ctrl_config.position_kp = ((param_gsc.pos_Kp_h - param_gsc.pos_Kp_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.pos_Kp_l;
-            motion_ctrl_config.position_ki = ((param_gsc.pos_Ki_h - param_gsc.pos_Ki_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.pos_Ki_l;
-            motion_ctrl_config.position_kd = ((param_gsc.pos_Kd_h - param_gsc.pos_Kd_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.pos_Kd_l;
-
-            // velocity controller gains scheduling by linear interpolation
-            motion_ctrl_config.velocity_kp = ((param_gsc.vel_Kp_h - param_gsc.vel_Kp_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.vel_Kp_l;
-            motion_ctrl_config.velocity_ki = ((param_gsc.vel_Ki_h - param_gsc.vel_Ki_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.vel_Ki_l;
-            motion_ctrl_config.velocity_kd = ((param_gsc.vel_Kd_h - param_gsc.vel_Kd_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.vel_Kd_l;
-        }
+        motion_ctrl_config.velocity_kp = param_gsc.vel_Kp_h;
+        motion_ctrl_config.velocity_ki = param_gsc.vel_Ki_h;
+        motion_ctrl_config.velocity_kd = param_gsc.vel_Kd_h;
     }
+    else
+    {
+        // position controller gains scheduling by linear interpolation
+        motion_ctrl_config.position_kp = ((param_gsc.pos_Kp_h - param_gsc.pos_Kp_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.pos_Kp_l;
+        motion_ctrl_config.position_ki = ((param_gsc.pos_Ki_h - param_gsc.pos_Ki_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.pos_Ki_l;
+        motion_ctrl_config.position_kd = ((param_gsc.pos_Kd_h - param_gsc.pos_Kd_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.pos_Kd_l;
+
+        // velocity controller gains scheduling by linear interpolation
+        motion_ctrl_config.velocity_kp = ((param_gsc.vel_Kp_h - param_gsc.vel_Kp_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.vel_Kp_l;
+        motion_ctrl_config.velocity_ki = ((param_gsc.vel_Ki_h - param_gsc.vel_Ki_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.vel_Ki_l;
+        motion_ctrl_config.velocity_kd = ((param_gsc.vel_Kd_h - param_gsc.vel_Kd_l)/(param_gsc.velocity_hi_l - param_gsc.velocity_lo_l)) * (velocity - param_gsc.velocity_lo_l) + param_gsc.vel_Kd_l;
+    }
+}
 
