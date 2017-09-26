@@ -216,6 +216,7 @@ int main(void) {
                     motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
                     motion_ctrl_config.enable_velocity_auto_tuner =           ENABLE_VELOCITY_AUTO_TUNER;
                     motion_ctrl_config.enable_compensation_recording =        ENABLE_COMPENSATION_RECORDING;
+                    motion_ctrl_config.enable_open_phase_detection =          ENABLE_OPEN_PHASE_DETECTION;
 
                     motion_ctrl_config.position_kp_l =                        GAIN_SCHEDULING_POSITION_Kp_0;
                     motion_ctrl_config.position_ki_l =                        GAIN_SCHEDULING_POSITION_Ki_0;
