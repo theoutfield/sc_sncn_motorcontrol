@@ -49,7 +49,8 @@ typedef enum {
     POS_PID_CONTROLLER                      = 1,
     POS_PID_VELOCITY_CASCADED_CONTROLLER    = 2,
     LT_POSITION_CONTROLLER                  = 3,
-    VELOCITY_PID_CONTROLLER                 = 4
+    POS_PID_GAIN_SCHEDULING_CONTROLLER      = 4,
+    VELOCITY_PID_CONTROLLER                 = 5
 } MotionControlStrategies;
 
 /**

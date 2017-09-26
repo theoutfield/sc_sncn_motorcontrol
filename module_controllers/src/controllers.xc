@@ -7,6 +7,7 @@
 #include <controllers.h>
 #include <motion_control_service.h>
 #include <math.h>
+#include <stdlib.h>
 #include <xscope.h>
 
 /**

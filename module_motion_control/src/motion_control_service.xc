@@ -416,6 +416,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     LimitedTorquePosCtrl lt_pos_ctrl;
 
+    GSCparam gain_sch_param;
 
     // variable definition
     int torque_enable_flag = 0;
@@ -850,6 +851,22 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     if (pos_control_mode == POS_PID_CONTROLLER)
                     {
                         torque_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                    }
+                    else if (pos_control_mode == POS_PID_GAIN_SCHEDULING_CONTROLLER)
+                    {
+                        // between two operating points gains are scheduled linearly
+                        // resulting gains are stored in GSC structure variable
+                        gain_scheduling_update(velocity_k, gain_sch_param, motion_ctrl_config);
+
+                        // set params of PID controllers
+                        pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+
+                        velocity_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                        if(velocity_ref_k > motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
+                        if(velocity_ref_k < -motion_ctrl_config.max_motor_speed) velocity_ref_k = -motion_ctrl_config.max_motor_speed;
+
+                        torque_ref_k = pid_update(velocity_ref_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
