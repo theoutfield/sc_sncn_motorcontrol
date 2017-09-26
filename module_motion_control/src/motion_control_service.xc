@@ -524,6 +524,44 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
             (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
             POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
+    // initialize GS controller params to zero
+    gain_scheduling_init(gain_sch_param);
+    // set GS controller params to default ones from configuration file
+    if(motion_ctrl_config.position_kp_l<0)            motion_ctrl_config.position_kp_l=0;
+    if(motion_ctrl_config.position_kp_l>100000000)    motion_ctrl_config.position_kp_l=100000000;
+    if(motion_ctrl_config.position_ki_l<0)            motion_ctrl_config.position_ki_l=0;
+    if(motion_ctrl_config.position_ki_l>100000000)    motion_ctrl_config.position_ki_l=100000000;
+    if(motion_ctrl_config.position_kd_l<0)            motion_ctrl_config.position_kd_l=0;
+    if(motion_ctrl_config.position_kd_l>100000000)    motion_ctrl_config.position_kd_l=100000000;
+    if(motion_ctrl_config.position_kp_h<0)            motion_ctrl_config.position_kp_h=0;
+    if(motion_ctrl_config.position_kp_h>100000000)    motion_ctrl_config.position_kp_h=100000000;
+    if(motion_ctrl_config.position_ki_h<0)            motion_ctrl_config.position_ki_h=0;
+    if(motion_ctrl_config.position_ki_h>100000000)    motion_ctrl_config.position_ki_h=100000000;
+    if(motion_ctrl_config.position_kd_h<0)            motion_ctrl_config.position_kd_h=0;
+    if(motion_ctrl_config.position_kd_h>100000000)    motion_ctrl_config.position_kd_h=100000000;
+    if(motion_ctrl_config.velocity_kp_l<0)            motion_ctrl_config.velocity_kp_l=0;
+    if(motion_ctrl_config.velocity_kp_l>100000000)    motion_ctrl_config.velocity_kp_l=100000000;
+    if(motion_ctrl_config.velocity_ki_l<0)            motion_ctrl_config.velocity_ki_l=0;
+    if(motion_ctrl_config.velocity_ki_l>100000000)    motion_ctrl_config.velocity_ki_l=100000000;
+    if(motion_ctrl_config.velocity_kd_l<0)            motion_ctrl_config.velocity_kd_l=0;
+    if(motion_ctrl_config.velocity_kd_l>100000000)    motion_ctrl_config.velocity_kd_l=100000000;
+    if(motion_ctrl_config.velocity_kp_h<0)            motion_ctrl_config.velocity_kp_h=0;
+    if(motion_ctrl_config.velocity_kp_h>100000000)    motion_ctrl_config.velocity_kp_h=100000000;
+    if(motion_ctrl_config.velocity_ki_h<0)            motion_ctrl_config.velocity_ki_h=0;
+    if(motion_ctrl_config.velocity_ki_h>100000000)    motion_ctrl_config.velocity_ki_h=100000000;
+    if(motion_ctrl_config.velocity_kd_h<0)            motion_ctrl_config.velocity_kd_h=0;
+    if(motion_ctrl_config.velocity_kd_h>100000000)    motion_ctrl_config.velocity_kd_h=100000000;
+    if(motion_ctrl_config.velocity_lo_l<0)            motion_ctrl_config.velocity_lo_l=0;
+    if(motion_ctrl_config.velocity_lo_l>motion_ctrl_config.max_motor_speed)  motion_ctrl_config.velocity_lo_l=motion_ctrl_config.max_motor_speed;
+    if(motion_ctrl_config.velocity_hi_l<0)            motion_ctrl_config.velocity_hi_l=0;
+    if(motion_ctrl_config.velocity_hi_l>motion_ctrl_config.max_motor_speed)  motion_ctrl_config.velocity_hi_l=motion_ctrl_config.max_motor_speed;
+
+    gain_scheduling_set_param((double)motion_ctrl_config.position_kp_l, (double)motion_ctrl_config.position_ki_l, (double)motion_ctrl_config.position_kd_l,
+            (double)motion_ctrl_config.position_kp_h, (double)motion_ctrl_config.position_ki_h, (double)motion_ctrl_config.position_kd_h,
+            (double)motion_ctrl_config.velocity_kp_l, (double)motion_ctrl_config.velocity_ki_l, (double)motion_ctrl_config.velocity_kd_l,
+            (double)motion_ctrl_config.velocity_kp_h, (double)motion_ctrl_config.velocity_ki_h, (double)motion_ctrl_config.velocity_kd_h,
+            motion_ctrl_config.velocity_lo_l, motion_ctrl_config.velocity_hi_l, gain_sch_param);
+
     init_velocity_auto_tuner(velocity_auto_tune, motion_ctrl_config, TUNING_VELOCITY, SETTLING_TIME);
 
     downstream_control_data.position_cmd = 0;
