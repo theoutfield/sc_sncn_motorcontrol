@@ -368,7 +368,40 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 
     return target;
 }
+sensor_fault find_encoder_index(interface TorqueControlInterface client i_torque_control)
+{
+    UpstreamControlData upstream_control_data;
+    DownstreamControlData downstream_control_data;
 
+    sensor_fault error_sens = NO_ERROR;
+    printf("Find encoder index \n");
+    int index_found = 0;
+    i_torque_control.enable_index_detection();
+
+    while (!index_found)
+    {
+        upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
+        index_found = upstream_control_data.qei_index_found;
+
+        unsigned qei_ctr = 100000;
+
+        if (qei_ctr == 0)
+        {
+            error_sens = POS_ERR;
+            index_found = 1;
+        }
+
+        --qei_ctr;
+    }
+
+    if (error_sens == NO_ERROR)
+        printf("Incremental encoder index found\n");
+    else
+        printf("Incremental encoder index not found \n Check if the sensor is connected\n\n");
+
+    i_torque_control.disable_index_detection();
+    return error_sens;
+}
 
 /**
  * @brief Service to perform torque, velocity or position control.
@@ -550,7 +583,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int error_phase = NO_ERROR;
     float resist = 0;
     sensor_fault error_sens = NO_ERROR;
-    unsigned qei_ctr = 100000;
     float curr_threshold = (float)motorcontrol_config.rated_current /1000 / 10;
     unsigned measurement = 0;
     int ftr = 0;
@@ -558,32 +590,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int sum_sq[NR_PHASES] = { 0 }, sum[NR_PHASES] = { 0 }, detect[NR_PHASES] = { 0 };
     int detect_low[NR_PHASES] = { 0 }, phase_cur[NR_PHASES] = { 0 };
 
-    //QEI index calibration
-    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
-    {
-        printf("Find encoder index \n");
-        int index_found = 0;
-        i_torque_control.enable_index_detection();
-        while (!index_found)
-        {
-            upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
-            index_found = upstream_control_data.qei_index_found;
-            if (qei_ctr == 0)
-            {
-                error_sens = POS_ERR;
-                index_found = 1;
-            }
 
-            --qei_ctr;
-        }
-
-        if (error_sens == NO_ERROR)
-            printf("Incremental encoder index found\n");
-        else
-            printf("Incremental encoder index not found \n Check if the sensor is connected\n\n");
-
-        i_torque_control.disable_index_detection();
-    }
 
     //brake
     int special_brake_release_counter = BRAKE_RELEASE_DURATION+1;
@@ -623,6 +630,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 // torque control
                 if(torque_enable_flag == 1)
                 {
+                    //QEI index calibration
+                    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                    {
+                        if(!upstream_control_data.qei_index_found)
+                        {
+                            error_sens = find_encoder_index(i_torque_control);
+                        }
+                    }
                     if(motion_ctrl_config.enable_profiler==1)
                     {
                         torque_ref_in_k = torque_profiler(((double)(downstream_control_data.torque_cmd)), torque_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
@@ -636,6 +651,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
+                    //QEI index calibration
+                    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                    {
+                        if(!upstream_control_data.qei_index_found)
+                        {
+                            error_sens = find_encoder_index(i_torque_control);
+                        }
+                    }
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
                         if(velocity_auto_tune.enable == 0)
@@ -774,6 +797,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
                 else if (position_enable_flag == 1)// position control
                 {
+                    //QEI index calibration
+                    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                    {
+                        if(!upstream_control_data.qei_index_found)
+                        {
+                            error_sens = find_encoder_index(i_torque_control);
+                        }
+                    }
                     //brake shutdown delay, don't update target position
                     if (brake_shutdown_counter > 0)
                     {
@@ -1555,6 +1586,13 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 case i_motion_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
                         //offset detection
+                        if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                        {
+                            if(!upstream_control_data.qei_index_found)
+                            {
+                                error_sens = find_encoder_index(i_torque_control);
+                            }
+                        }
                         out_motorcontrol_config = i_torque_control.get_config();
                         out_motorcontrol_config.commutation_angle_offset = -1;
                         i_torque_control.set_offset_detection_enabled();
