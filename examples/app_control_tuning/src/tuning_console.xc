@@ -76,6 +76,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         char mode_1 = 0;
         char mode_2 = 0;
         char mode_3 = 0;
+        char mode_4 = 0;
         char c;
         int value = 0;
         int sign = 1;
@@ -101,10 +102,12 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 {
                     mode_2 = c;
                 }
-                else
+                else if (mode_3 == 0)
                 {
                     mode_3 = c;
                 }
+                else
+                    mode_4 = c;
             }
         }
         value *= sign;
@@ -112,17 +115,39 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         switch(mode_1)
         {
         case 'g':
-                switch (mode_2)
-                {
-                   case 's':
-                       switch(mode_3)
-                       {
-                           case 'e':
-                               general_system_evaluation(i_motion_control);
-                               break;
-                       }
-                   break;
-                }
+            motion_ctrl_config = i_motion_control.get_motion_control_config();
+            switch (mode_2)
+            {
+                case 's':
+                    switch(mode_3)
+                    {
+                        case 'l':
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_lo_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_hi_l = value;
+                                    break;
+                            }
+                            break;
+
+                            case 'e':
+                                general_system_evaluation(i_motion_control);
+                                break;
+                    }
+                    break;
+            }
+
+            i_motion_control.set_motion_control_config(motion_ctrl_config);
+            if (mode_4 != 0)
+            {
+                printf("Low velicty limit for gain scheduling controller: %d\n",  motion_ctrl_config.velocity_lo_l);
+                printf("High velicty limit for gain scheduling controller: %d\n",  motion_ctrl_config.velocity_hi_l);
+            }
+
             break;
 
         //automatic tuning
@@ -507,13 +532,52 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         switch(mode_3)
                         {
                         case 'p':
-                                motion_ctrl_config.position_kp = value;
+                                switch(mode_4)
+                                {
+                                    case 'l':
+                                        motion_ctrl_config.position_kp_l = value;
+                                        break;
+
+                                    case 'h':
+                                        motion_ctrl_config.position_kp_h = value;
+                                        break;
+
+                                    default:
+                                        motion_ctrl_config.position_kp = value;
+                                        break;
+                                }
                                 break;
                         case 'i':
-                                motion_ctrl_config.position_ki = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.position_ki_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.position_ki_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.position_ki = value;
+                                    break;
+                            }
+                            break;
                         case 'd':
-                                motion_ctrl_config.position_kd = value;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.position_kd_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.position_kd_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.position_kd = value;
+                                    break;
+                            }
                                 break;
                         case 'l':
                                 motion_ctrl_config.position_integral_limit = value;
@@ -524,36 +588,98 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         default:
                                 break;
                         }
+
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
-                                motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
-                                motion_ctrl_config.moment_of_inertia, motion_ctrl_config.position_integral_limit);
+
+                        if (mode_4 == 0)
+                            printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
+                                    motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                    motion_ctrl_config.moment_of_inertia, motion_ctrl_config.position_integral_limit);
+                        else
+                        {
+                            printf("Kp_l:%d Ki_l:%d Kd_l:%d i_lim:%d\n",
+                                    motion_ctrl_config.position_kp_l, motion_ctrl_config.position_ki_l, motion_ctrl_config.position_kd_l, motion_ctrl_config.position_integral_limit);
+                            printf("Kp_h:%d Ki_h:%d Kd_h:%d i_lim:%d\n",
+                                motion_ctrl_config.position_kp_h, motion_ctrl_config.position_ki_h, motion_ctrl_config.position_kd_h, motion_ctrl_config.position_integral_limit);
+                        }
+
                         break;
 
                 case 'v': //velocity
                         switch(mode_3)
                         {
                         case 'p':
-                                motion_ctrl_config.velocity_kp = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_kp_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_kp_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.velocity_kp = value;
+                                    break;
+                            }
+                            break;
                         case 'i':
-                                motion_ctrl_config.velocity_ki = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_ki_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_ki_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.velocity_ki = value;
+                                    break;
+                            }
+                            break;
                         case 'd':
-                                motion_ctrl_config.velocity_kd = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_kd_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_kd_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.velocity_kd = value;
+                                    break;
+                            }
+                            break;
+
                         case 'l':
                                 motion_ctrl_config.velocity_integral_limit = value;
                                 break;
                         default:
                                 break;
                         }
+
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",
+
+                        if(mode_4 == 0)
+                            printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",
                                 motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd,
                                 motion_ctrl_config.velocity_integral_limit);
+                        else
+                        {
+                            printf("Kp_l:%d Ki_l:%d Kd_l:%d i_lim:%d\n",
+                                    motion_ctrl_config.velocity_kp_l, motion_ctrl_config.velocity_ki_l, motion_ctrl_config.velocity_kd_l, motion_ctrl_config.velocity_integral_limit);
+                        printf("Kp_h:%d Ki_h:%d Kd_h:%d i_lim:%d\n",
+                                motion_ctrl_config.velocity_kp_h, motion_ctrl_config.velocity_ki_h, motion_ctrl_config.velocity_kd_h, motion_ctrl_config.velocity_integral_limit);
+                        }
+
                         break;
 
                 case 't': //torque
@@ -672,6 +798,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         {
                             i_motion_control.enable_position_ctrl(LT_POSITION_CONTROLLER);
                             printf("limited torque pos ctrl enabled\n");
+                        }
+                        else if (value == 4)
+                        {
+                            i_motion_control.enable_position_ctrl(POS_PID_GAIN_SCHEDULING_CONTROLLER);
+                            printf("gain scheduling pos ctrl enabled\n");
                         }
                         else
                         {

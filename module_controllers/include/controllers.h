@@ -75,6 +75,67 @@ double pid_update(double desired_value, double actual_value, int T_s, PIDT1param
  */
 void pid_reset(PIDT1param &param);
 
+/**
+ * @brief Structure type to set the parameters of the Gain scheduling controller.
+ */
+typedef struct
+{
+    double pos_Kp_l;
+    double pos_Ki_l;
+    double pos_Kd_l;
+    double pos_Kp_h;
+    double pos_Ki_h;
+    double pos_Kd_h;
+    double vel_Kp_l;
+    double vel_Ki_l;
+    double vel_Kd_l;
+    double vel_Kp_h;
+    double vel_Ki_h;
+    double vel_Kd_h;
+    int velocity_lo_l;
+    int velocity_hi_l;
+}GSCparam;
+
+/**
+ * @brief initializing params of gains scheduling controller
+ * @param the parameters of the controller
+ *
+ * @return void
+ */
+void gain_scheduling_init(GSCparam &param);
+
+/**
+ * @brief setting params of gains scheduling controller
+ * @param position controller P constant for low velocities
+ * @param position controller I constant for low velocities
+ * @param position controller D constant for low velocitiess
+ * @param position controller P constant for high velocities
+ * @param position controller I constant for high velocities
+ * @param position controller D constant for high velocities
+ * @param velocity controller P constant for low velocities
+ * @param velocity controller I constant for low velocities
+ * @param velocity controller D constant for low velocitiess
+ * @param velocity controller P constant for high velocities
+ * @param velocity controller I constant for high velocities
+ * @param velocity controller D constant for high velocities
+ * @param the parameters of the controller
+ *
+ * @return void
+ */
+void gain_scheduling_set_param(double pos_Kp_l, double pos_Ki_l, double pos_Kd_l, double pos_Kp_h, double pos_Ki_h, double pos_Kd_h,
+        double vel_Kp_l, double vel_Ki_l, double vel_Kd_l, double vel_Kp_h, double vel_Ki_h, double vel_Kd_h,
+        int velocity_lo_lim, int velocity_hi_lim, GSCparam &param);
+
+/**
+ * @brief adjusting gains of controller based on scheduling variable (velocity)
+ * @param velocity
+ * @param GS controller
+ * @param motion control configuration structure
+ *
+ * @return void
+ */
+
+void gain_scheduling_update(int velocity, GSCparam &param_gsc, MotionControlConfig &motion_ctrl_config);
 
 
 
