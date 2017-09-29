@@ -82,7 +82,7 @@ static const unsigned int hall_half_angle[6] = {
         (HALL_ANGLE_1+HALL_ANGLE_2)/2
 };
 
-void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
+void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackConfig &position_feedback_config,
         client interface shared_memory_interface ?i_shared_memory,
                 server interface PositionFeedbackInterface i_position_feedback[3],
                 int gpio_on)
@@ -108,9 +108,16 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
     unsigned int hall_transition_period_at_low_speeds;
     unsigned int speed_reduction_factor;
 
+    //send hall state angle to motorcontrol through shared memory
+    if (!isnull(i_shared_memory)) {
+        i_shared_memory.write_hall_state_angle(position_feedback_config.hall_config.hall_state_angle);
+    }
+
     int hall_sector_and_state = 0;
 
-    int angle_out=0, last_angle=0, speed_out=0, count = 0;
+    int angle_out=0, last_angle=0, speed_out=0, count = 0, singleturn = 0;
+    int singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
+    int init_angle = 0;
 
     int hall_sector_and_state_temp;
 
@@ -158,12 +165,15 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
     do
     {
-        qei_hall_port.p_qei_hall :> hall_state_1;
-        qei_hall_port.p_qei_hall :> hall_state_2;
+        qei_hall_port :> hall_state_1;
+        qei_hall_port :> hall_state_2;
     } while(hall_state_1 != hall_state_2);
 
     hall_state_new = hall_state_1;
     hall_state_old = hall_state_1;
+
+    SensorError sensor_error = SENSOR_NO_ERROR, last_sensor_error = SENSOR_NO_ERROR;
+    int hall_error_counter = 0;
 
     tx :> time1;
 
@@ -182,7 +192,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
         case i_position_feedback[int i].get_position() -> { int out_count, unsigned int out_position, SensorError status }:
                 out_count = count;
-                out_position = angle_out;
+                out_position = singleturn;
                 status = SENSOR_NO_ERROR;
                 break;
 
@@ -200,10 +210,15 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 break;
 
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
+                sensor_error = SENSOR_NO_ERROR;
+                last_sensor_error = SENSOR_NO_ERROR;
+                hall_error_counter = 0;
                 UsecType ifm_usec = position_feedback_config.ifm_usec;
                 position_feedback_config = in_config;
+                singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
                 position_feedback_config.ifm_usec = ifm_usec;
                 hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (position_feedback_config.pole_pairs*6)) * 60 ;
+                write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
 
                 notification = MOTCTRL_NTF_CONFIG_CHANGED;
                 // TODO: Use a constant for the number of interfaces
@@ -242,9 +257,9 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 switch(hall_stable_states)
                 {
                 case 0:
-                    qei_hall_port.p_qei_hall :> hall_state_1;
+                    qei_hall_port :> hall_state_1;
                     hall_state_1 &= 0x07;
-                    qei_hall_port.p_qei_hall :> hall_state_2;
+                    qei_hall_port :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_1 == hall_state_2)
                         hall_stable_states++;
@@ -252,7 +267,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
 
                 case 1:
-                    qei_hall_port.p_qei_hall :> hall_state_2;
+                    qei_hall_port :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_2 == hall_state_1)
                         hall_stable_states++;
@@ -262,7 +277,7 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
 
 
                 case 2:
-                    qei_hall_port.p_qei_hall :> hall_state_2;
+                    qei_hall_port :> hall_state_2;
                     hall_state_2 &= 0x07;
                     if(hall_state_2 == hall_state_1)
                         hall_state_new = hall_state_2;
@@ -271,10 +286,63 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                     break;
                 }
 
+                if (hall_state_old == 0)
+                    hall_state_old = hall_state_new;
 
                 if(hall_state_new != hall_state_old)
                 {
                     tx :> hall_new_change_moment;
+
+                    if (hall_state_new != hall_state_old)
+                    {
+                        sensor_error = SENSOR_NO_ERROR;
+
+                        switch (hall_state_old)
+                        {
+                        case 1:
+                            if (hall_state_new != 5 && hall_state_new != 3)
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
+                            break;
+                        case 2:
+                            if (hall_state_new != 3 && hall_state_new != 6)
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
+                            break;
+                        case 3:
+                            if (hall_state_new != 1 && hall_state_new != 2)
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
+                            break;
+                        case 4:
+                            if (hall_state_new != 6 && hall_state_new != 5)
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
+                            break;
+                        case 5:
+                            if (hall_state_new != 4 && hall_state_new != 1)
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
+                            break;
+                        case 6:
+                            if (hall_state_new != 2 && hall_state_new != 4)
+                                ++hall_error_counter;
+                            else
+                                hall_error_counter = 0;
+                            break;
+                        }
+                    }
+
+                    if (hall_error_counter == 1000)
+                        sensor_error = SENSOR_HALL_FAULT;
+
+                    if (sensor_error != SENSOR_NO_ERROR)
+                        last_sensor_error = sensor_error;
 
                     hall_state_old = hall_state_new;
 
@@ -372,8 +440,15 @@ void hall_service(QEIHallPort &qei_hall_port, port * (&?gpio_ports)[4], Position
                 multiturn(count, last_angle, angle_out, HALL_TICKS_PER_ELECTRICAL_ROTATION);
                 last_angle = angle_out;
 
+                singleturn = count % singleturn_resolution;
+                if (singleturn < 0) {
+                    singleturn += singleturn_resolution;
+                }
+                // set the singleturn position to a 16 bits format
+                singleturn = (singleturn * 16) / position_feedback_config.pole_pairs; // singleturn = (singleturn * 2**16) / (2**12 * pole_pairs)
+
                 tx :> time1;
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, speed_out, angle_out, hall_state_new, SENSOR_NO_ERROR, SENSOR_NO_ERROR, time1/position_feedback_config.ifm_usec);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn, speed_out, angle_out, hall_state_new, 0, sensor_error, last_sensor_error, time1/position_feedback_config.ifm_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);

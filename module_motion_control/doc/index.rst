@@ -115,6 +115,24 @@ How to use
                     motion_ctrl_config.velocity_ki =                           VELOCITY_Ki;
                     motion_ctrl_config.velocity_kd =                           VELOCITY_Kd;
                     motion_ctrl_config.velocity_integral_limit =              VELOCITY_INTEGRAL_LIMIT;
+                    
+                    motion_ctrl_config.enable_compensation_recording =        ENABLE_COMPENSATION_RECORDING;
+                    motion_ctrl_config.enable_open_phase_detection =          ENABLE_OPEN_PHASE_DETECTION;
+
+                    motion_ctrl_config.position_kp_l =                        GAIN_SCHEDULING_POSITION_Kp_0;
+                    motion_ctrl_config.position_ki_l =                        GAIN_SCHEDULING_POSITION_Ki_0;
+                    motion_ctrl_config.position_kd_l =                        GAIN_SCHEDULING_POSITION_Kd_0;
+                    motion_ctrl_config.position_kp_h =                        GAIN_SCHEDULING_POSITION_Kp_1;
+                    motion_ctrl_config.position_ki_h =                        GAIN_SCHEDULING_POSITION_Ki_1;
+                    motion_ctrl_config.position_kd_h =                        GAIN_SCHEDULING_POSITION_Kd_1;
+                    motion_ctrl_config.velocity_kp_l =                        GAIN_SCHEDULING_VELOCITY_Kp_0;
+                    motion_ctrl_config.velocity_ki_l =                        GAIN_SCHEDULING_VELOCITY_Ki_0;
+                    motion_ctrl_config.velocity_kd_l =                        GAIN_SCHEDULING_VELOCITY_Kd_0;
+                    motion_ctrl_config.velocity_kp_h =                        GAIN_SCHEDULING_VELOCITY_Kp_1;
+                    motion_ctrl_config.velocity_ki_h =                        GAIN_SCHEDULING_VELOCITY_Ki_1;
+                    motion_ctrl_config.velocity_kd_h =                        GAIN_SCHEDULING_VELOCITY_Kd_1;
+                    motion_ctrl_config.velocity_lo_l =                        GAIN_SCHEDULING_VELOCITY_THRESHOLD_0;
+                    motion_ctrl_config.velocity_hi_l =                        GAIN_SCHEDULING_VELOCITY_THRESHOLD_1;
         
                     motion_ctrl_config.brake_release_strategy =                BRAKE_RELEASE_STRATEGY;
                     motion_ctrl_config.brake_release_delay =                 BRAKE_RELEASE_DELAY;
@@ -132,133 +150,137 @@ How to use
                     motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
         
                     motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake); //5
-        }
+        		}
 
-        on tile[IFM_TILE]:
-        {
-            par
-            {
-                /* PWM Service */
-                {
-                    pwm_config(pwm_ports);
+        		on tile[IFM_TILE]:
+       			{	
+            		par
+            		{
+                		/* PWM Service */
+                		{
+                    		pwm_config(pwm_ports);
 
-                    if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
-                        predriver(fet_driver_ports);
+                    		if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
+                        		predriver(fet_driver_ports);
 
-                    //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                    pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                            i_update_brake, IFM_TILE_USEC);
+                    		//pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
+                    		pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
+                           		i_update_brake, IFM_TILE_USEC);
 
-                }
+                		}
 
-                /* ADC Service */
-                {
-                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
-                }
+                		/* ADC Service */
+                		{
+                    		adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
+                		}
 
-                /* Watchdog Service */
-                {
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
-                }
+                		/* Watchdog Service */
+                		{
+                    		watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
+                		}
 
-                /* Motor Control Service */
-                {
-                    // step 2
-                    MotorcontrolConfig motorcontrol_config;
+                		/* Motor Control Service */
+                		{
+                    		// step 2
+                    		MotorcontrolConfig motorcontrol_config;
 
-                    motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
-                    motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
-                    motorcontrol_config.torque_P_gain =  TORQUE_Kp;
-                    motorcontrol_config.torque_I_gain =  TORQUE_Ki;
-                    motorcontrol_config.torque_D_gain =  TORQUE_Kd;
-                    motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
-                    motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
-                    motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
-                    motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
-                    motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
-                    motorcontrol_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
-                    motorcontrol_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
-                    motorcontrol_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
-                    motorcontrol_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
-                    motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
-                    motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
-                    motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
-                    motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
-                    motorcontrol_config.current_ratio =  CURRENT_RATIO;
-                    motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
-                    motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
-                    motorcontrol_config.rated_current =  MOTOR_RATED_CURRENT;
-                    motorcontrol_config.rated_torque  =  MOTOR_RATED_TORQUE;
-                    motorcontrol_config.percent_offset_torque =  APPLIED_TUNING_TORQUE_PERCENT;
-                    motorcontrol_config.protection_limit_over_current =  PROTECTION_MAXIMUM_CURRENT;
-                    motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
-                    motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
-                    motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
+                    		motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
+                    		motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
+                   			motorcontrol_config.torque_P_gain =  TORQUE_Kp;
+                    		motorcontrol_config.torque_I_gain =  TORQUE_Ki;
+                    		motorcontrol_config.torque_D_gain =  TORQUE_Kd;
+                    		motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
+                    		motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
+                    		motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
+                    		motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
+                    		motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
+                    		motorcontrol_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
+                    		motorcontrol_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
+                    		motorcontrol_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
+                    		motorcontrol_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
+                    		motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
+                    		motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
+                    		motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
+                    		motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
+                    		motorcontrol_config.current_ratio =  CURRENT_RATIO;
+                    		motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
+                    		motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
+                    		motorcontrol_config.rated_current =  MOTOR_RATED_CURRENT;
+                    		motorcontrol_config.rated_torque  =  MOTOR_RATED_TORQUE;
+                    		motorcontrol_config.percent_offset_torque =  APPLIED_TUNING_TORQUE_PERCENT;
+                    		motorcontrol_config.protection_limit_over_current =  PROTECTION_MAXIMUM_CURRENT;
+                    		motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
+                    		motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
+                    		motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
+                            for (int i = 0; i < 1024; i++)
+                            {
+                                motorcontrol_config.torque_offset[i] = 0;
+                            }
 
-                    torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
-                }
+                    		torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                            		i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
+                		}
 
-                /* Shared memory Service */
-                [[distribute]] shared_memory_service(i_shared_memory, 3);
+                		/* Shared memory Service */
+                		[[distribute]] shared_memory_service(i_shared_memory, 3);
 
-                /* Position feedback service */
-                {
-                    PositionFeedbackConfig position_feedback_config;
-                    position_feedback_config.sensor_type = SENSOR_1_TYPE;
-                    position_feedback_config.resolution  = SENSOR_1_RESOLUTION;
-                    position_feedback_config.polarity    = SENSOR_1_POLARITY;
-                    position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
-                    position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IFM_TILE_USEC;
-                    position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                    position_feedback_config.offset      = HOME_OFFSET;
-                    position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
+                		/* Position feedback service */
+                		{
+                    		PositionFeedbackConfig position_feedback_config;
+                    		position_feedback_config.sensor_type = SENSOR_1_TYPE;
+                    		position_feedback_config.resolution  = SENSOR_1_RESOLUTION;
+                    		position_feedback_config.polarity    = SENSOR_1_POLARITY;
+                    		position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
+                    		position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
+                    		position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                    		position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                    		position_feedback_config.offset      = HOME_OFFSET;
+                    		position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
 
-                    position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
-                    position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
-                    position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
-                    position_feedback_config.biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
-                    position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
-                    position_feedback_config.biss_config.busy = BISS_BUSY;
-                    position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
-                    position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                    		position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
+                    		position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;
+                    		position_feedback_config.biss_config.crc_poly = BISS_CRC_POLY;
+                    		position_feedback_config.biss_config.clock_frequency = BISS_CLOCK_FREQUENCY;
+                    		position_feedback_config.biss_config.timeout = BISS_TIMEOUT;
+                    		position_feedback_config.biss_config.busy = BISS_BUSY;
+                    		position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
+                    		position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
 
-                    position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
+                    		position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
 
-                    position_feedback_config.rem_14_config.hysteresis              = REM_14_SENSOR_HYSTERESIS;
-                    position_feedback_config.rem_14_config.noise_settings          = REM_14_SENSOR_NOISE_SETTINGS;
-                    position_feedback_config.rem_14_config.dyn_angle_error_comp    = REM_14_DYN_ANGLE_ERROR_COMPENSATION;
-                    position_feedback_config.rem_14_config.abi_resolution_settings = REM_14_ABI_RESOLUTION_SETTINGS;
+                    		position_feedback_config.rem_14_config.hysteresis              = REM_14_SENSOR_HYSTERESIS;
+                    		position_feedback_config.rem_14_config.noise_settings          = REM_14_SENSOR_NOISE_SETTINGS;
+                    		position_feedback_config.rem_14_config.dyn_angle_error_comp    = REM_14_DYN_ANGLE_ERROR_COMPENSATION;
+                    		position_feedback_config.rem_14_config.abi_resolution_settings = REM_14_ABI_RESOLUTION_SETTINGS;
 
-                    position_feedback_config.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
-                    position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
-                    position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
+                    		position_feedback_config.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
+                    		position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
+                    		position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
+                    		position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
 
-                    position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+                    		position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
 
-                    //setting second sensor
-                    PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
-                    position_feedback_config_2.sensor_type = 0;
-                    if (SENSOR_2_FUNCTION != SENSOR_FUNCTION_DISABLED) //enable second sensor
-                    {
-                        position_feedback_config_2.sensor_type = SENSOR_2_TYPE;
-                        position_feedback_config_2.polarity    = SENSOR_2_POLARITY;
-                        position_feedback_config_2.resolution  = SENSOR_2_RESOLUTION;
-                        position_feedback_config_2.velocity_compute_period = SENSOR_2_VELOCITY_COMPUTE_PERIOD;
-                        position_feedback_config_2.sensor_function = SENSOR_2_FUNCTION;
-                    }
+                    		//setting second sensor
+                    		PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
+                    		position_feedback_config_2.sensor_type = 0;
+                    		if (SENSOR_2_FUNCTION != SENSOR_FUNCTION_DISABLED) //enable second sensor
+                    		{
+                        		position_feedback_config_2.sensor_type = SENSOR_2_TYPE;
+                        		position_feedback_config_2.polarity    = SENSOR_2_POLARITY;
+                        		position_feedback_config_2.resolution  = SENSOR_2_RESOLUTION;
+                        		position_feedback_config_2.velocity_compute_period = SENSOR_2_VELOCITY_COMPUTE_PERIOD;
+                        		position_feedback_config_2.sensor_function = SENSOR_2_FUNCTION;
+                    		}
 
-                    position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
-                            position_feedback_config, i_shared_memory[0], i_position_feedback_1,
-                            position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
-                }
-            }
-        }
-    }
-
-    return 0;
-}
+                    		position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,
+                            		position_feedback_config, i_shared_memory[0], i_position_feedback_1,
+                            		position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
+                        }
+            	    }
+        	    }
+    	    }
+    		return 0;
+	    }
 
 API
 ===
@@ -277,6 +299,8 @@ Global Types
 -------------
 
 .. doxygenstruct:: MotionControlStrategies
+
+.. _Motion Control Config :
 .. doxygenstruct:: MotionControlConfig
 .. doxygenstruct:: MotionPolarity
 .. doxygenstruct:: ControlConfig
@@ -292,4 +316,74 @@ Position Control Interface
 
 .. doxygeninterface:: MotionControlInterface
 
+.. _Cogging-Torque-Feature :
 
+Cogging Torque Feature
+======================
+
+Introduction
+------------
+
+This software also includes a cogging torque compensation feature, which enables you to remove the magnetic disturbances between the motor shaft and the stator. 
+Those disturbances are in the form of a periodic load applied to the rotor (the cogging torque). This load is positive when the magnets are reppelled by the stator, and negative when they are attracted to it.
+The disturbances are most present at low speed and can induce a jitter in the control of the motor.
+
+The compensation can be done in two steps : 
+
+-	First the controller must perform a calibration process, in which the torque necessary to remove is measured. This part needs a good velocity control of the motor at low speed (10 RPM) to work properly.
+	During this process, the motor will run for two rotations in each direction.
+- 	Then, if the compensation is enabled, the controller will add an offset to the torque command given to the torque control service. Since the cogging torque is periodic, the offset is equal to the one measured at the same angle of the rotor.
+
+How to use
+----------
+1-  The calibration process uses the velocity controller. The first step is to enable the velocity controller with the interface **enable_velocity_ctrl()**
+
+2-	Start the recording of the cogging torque of your motor by setting the variable  **enable_compensation_recording** to 1 in the structure `Motion Control Config`_.
+
+3-	At the end of the measurement process, the variable **enable_compensation_recording** is automatically set to 0. You can then enable/disable the compensation of the cogging torque with the interface enable_cogging_compensation()
+
+.. warning ::
+
+	Warning
+	-------
+	Before the calibration process, make sure that the velocity PID parameters are set for a stable control at 10 RPM
+	To tune the controller, feel free to use the :ref:`Tuning application <app_control_tuning>`. (Bad tuning means the motor turns visibly step by step, stopping from time to time)
+
+	Once the cogging torque is calibrated for a motor, the calibration table is saved into the falsh memory. It is possible to enable/disable the compensation without doing the calibration another time. 
+
+	Before doing the calibration, be sure that the compensation is disabled, otherwise the measures will be altered.
+
+Example
+-------
+    .. code-block:: c
+    
+
+        void cogging_torque_compensation(client interface MotionControlInterface i_motion_control)
+        {
+            DownstreamControlData downstream_control_data = {0};
+
+            MotionControlConfig motion_ctrl_config = i_motion_control.get_motion_control_config();
+
+            //*****************************//
+            // 1) First step : Calibration //
+            //*****************************//
+            i_motion_control.enable_velocity_ctrl();                            //the calibration process uses the velocity controller 
+
+            motion_ctrl_config = i_motion_control.get_motion_control_config(); 
+            motion_ctrl_config.enable_compensation_recording = 1;               //set the flag to 'enable'
+            i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+            while (motion_ctrl_config.enable_compensation_recording)            //check regularly if the flag is set to '0', which indicates the end of the process
+            {                                                                   //do not give other commands to the motor that would risk to influence the measurement
+                motion_ctrl_config = i_motion_control.get_motion_control_config();
+                delay_milliseconds(1);
+            }
+
+            //*******************************//
+            // 2) Second step : Compensation //
+            //*******************************//
+            i_motion_control.enable_cogging_compensation(1);                    //use the previous calibration to compensate the cogging torque
+            i_motion_control.enable_torque_ctrl();
+            downstream_control_data.torque_cmd = 0;
+
+        }

@@ -40,6 +40,7 @@
  */
 typedef struct {
     EncoderPortNumber port_number;  /**< To select which input port is used */
+    int hall_state_angle[6];        /**< estimated angle while being in sector [1-6] (the array is 7 for with other arrays in control_variables.h)*/
 } HallConfig;
 
 

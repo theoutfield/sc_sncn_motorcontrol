@@ -8,6 +8,43 @@
 #include <stdio.h>
 #include <ctype.h>
 
+int general_system_evaluation(client interface MotionControlInterface i_motion_control)
+{
+    float resistance;
+    int phase_error = 0, sensor_error = 0;
+
+    printf("Evaluation of phases is starting ...\n");
+    printf("Voltages are applied to phase terminals ...\n");
+    {phase_error, resistance} = i_motion_control.open_phase_detection();
+
+    if (phase_error == 1)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE A ...\n");
+        return phase_error;
+    }
+    else if (phase_error == 2)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE B ...\n");
+        return phase_error;
+    }
+    else if(phase_error == 3)
+    {
+        printf(">>  OPEN CIRCUIT FAULT PHASE C ...\n");
+        return phase_error;
+    }
+    else
+    {
+        printf(">> MOTOR PHASES PROPERLY CONNECTED ...\n\n");
+
+        printf("Evaluation of sensors is starting ...\n");
+        printf("Motor will rotate couple of turns in both directions ...\n");
+        delay_seconds(1);
+        sensor_error = i_motion_control.sensors_evaluation();
+        if (sensor_error == 0)
+            printf("SENSOR IS WORKING PROPERLY ...\n\n");
+        return sensor_error;
+    }
+}
 
 void control_tuning_console(client interface MotionControlInterface i_motion_control)
 {
@@ -39,6 +76,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         char mode_1 = 0;
         char mode_2 = 0;
         char mode_3 = 0;
+        char mode_4 = 0;
         char c;
         int value = 0;
         int sign = 1;
@@ -64,47 +102,68 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 {
                     mode_2 = c;
                 }
-                else
+                else if (mode_3 == 0)
                 {
                     mode_3 = c;
                 }
+                else
+                    mode_4 = c;
             }
         }
         value *= sign;
 
         switch(mode_1)
         {
+        case 'g':
+            motion_ctrl_config = i_motion_control.get_motion_control_config();
+            switch (mode_2)
+            {
+                case 's':
+                    switch(mode_3)
+                    {
+                        case 'l':
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_lo_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_hi_l = value;
+                                    break;
+                            }
+                            break;
+
+                            case 'e':
+                                general_system_evaluation(i_motion_control);
+                                break;
+                    }
+                    break;
+            }
+
+            i_motion_control.set_motion_control_config(motion_ctrl_config);
+            if (mode_4 != 0)
+            {
+                printf("Low velicty limit for gain scheduling controller: %d\n",  motion_ctrl_config.velocity_lo_l);
+                printf("High velicty limit for gain scheduling controller: %d\n",  motion_ctrl_config.velocity_hi_l);
+            }
+
+            break;
 
         //automatic tuning
         case 'a':
                 motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
-                case 'o'://find motor commutation offset automatically
-                         printf("Sending offset_detection command ...\n");
+                case 'c' :
+                        printf("Start Cogging torque detection\n");
+                        i_motion_control.enable_velocity_ctrl();
 
-                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        motion_ctrl_config.enable_compensation_recording = 1;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
 
-                         if(motorcontrol_config.commutation_angle_offset == -1)
-                         {
-                             printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
-                         }
-                         else
-                         {
-                             motorcontrol_config = i_motion_control.get_motorcontrol_config();
-                             printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
-
-                             printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
-
-                             if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
-                             {
-                                 printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
-                                 for (int i=0;i<6;i++) {
-                                     printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
-                                 }
-                             }
-                         }
-                         break;
+                        break;
 
                 case 'v'://calculate optimal pid parameters for velocity controller
 
@@ -131,7 +190,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         downstream_control_data.velocity_cmd  = 0;
 
                         i_motion_control.update_control_data(downstream_control_data);
-                        printf("set velocity %d\n", downstream_control_data.velocity_cmd);
 
                         delay_milliseconds(500);//wait until the actual speed goes to 0.
 
@@ -265,7 +323,43 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 break;
                         }
                         break;
-                 }
+
+                default://find motor commutation offset automatically
+
+                    if (general_system_evaluation(i_motion_control) == 0)
+                    {
+                        printf("Sending offset_detection command ...\n");
+
+                        motorcontrol_config = i_motion_control.set_offset_detection_enabled();
+
+                        if(motorcontrol_config.commutation_angle_offset == -1)
+                        {
+                            printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                        }
+                        else
+                        {
+                            motorcontrol_config = i_motion_control.get_motorcontrol_config();
+                            printf(">>  PROPER POSITION SENSOR POLARITY ...\n");
+
+                            printf("Detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
+
+                            if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                            {
+                                printf("SET THE FOLLOWING CONSTANTS IN CASE OF LOW-QUALITY HALL SENSOR \n");
+                                for (int i=0;i<6;i++) {
+                                    printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        printf("OFFSET DETECTION NOT POSSIBLE ...\n");
+                    }
+
+                    break;
+
+                 } //end switch(mode_2)
 
                 break;
 
@@ -438,13 +532,52 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         switch(mode_3)
                         {
                         case 'p':
-                                motion_ctrl_config.position_kp = value;
+                                switch(mode_4)
+                                {
+                                    case 'l':
+                                        motion_ctrl_config.position_kp_l = value;
+                                        break;
+
+                                    case 'h':
+                                        motion_ctrl_config.position_kp_h = value;
+                                        break;
+
+                                    default:
+                                        motion_ctrl_config.position_kp = value;
+                                        break;
+                                }
                                 break;
                         case 'i':
-                                motion_ctrl_config.position_ki = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.position_ki_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.position_ki_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.position_ki = value;
+                                    break;
+                            }
+                            break;
                         case 'd':
-                                motion_ctrl_config.position_kd = value;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.position_kd_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.position_kd_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.position_kd = value;
+                                    break;
+                            }
                                 break;
                         case 'l':
                                 motion_ctrl_config.position_integral_limit = value;
@@ -455,36 +588,98 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         default:
                                 break;
                         }
+
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
-                                motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
-                                motion_ctrl_config.moment_of_inertia, motion_ctrl_config.position_integral_limit);
+
+                        if (mode_4 == 0)
+                            printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
+                                    motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
+                                    motion_ctrl_config.moment_of_inertia, motion_ctrl_config.position_integral_limit);
+                        else
+                        {
+                            printf("Kp_l:%d Ki_l:%d Kd_l:%d i_lim:%d\n",
+                                    motion_ctrl_config.position_kp_l, motion_ctrl_config.position_ki_l, motion_ctrl_config.position_kd_l, motion_ctrl_config.position_integral_limit);
+                            printf("Kp_h:%d Ki_h:%d Kd_h:%d i_lim:%d\n",
+                                motion_ctrl_config.position_kp_h, motion_ctrl_config.position_ki_h, motion_ctrl_config.position_kd_h, motion_ctrl_config.position_integral_limit);
+                        }
+
                         break;
 
                 case 'v': //velocity
                         switch(mode_3)
                         {
                         case 'p':
-                                motion_ctrl_config.velocity_kp = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_kp_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_kp_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.velocity_kp = value;
+                                    break;
+                            }
+                            break;
                         case 'i':
-                                motion_ctrl_config.velocity_ki = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_ki_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_ki_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.velocity_ki = value;
+                                    break;
+                            }
+                            break;
                         case 'd':
-                                motion_ctrl_config.velocity_kd = value;
-                                break;
+                            switch(mode_4)
+                            {
+                                case 'l':
+                                    motion_ctrl_config.velocity_kd_l = value;
+                                    break;
+
+                                case 'h':
+                                    motion_ctrl_config.velocity_kd_h = value;
+                                    break;
+
+                                default:
+                                    motion_ctrl_config.velocity_kd = value;
+                                    break;
+                            }
+                            break;
+
                         case 'l':
                                 motion_ctrl_config.velocity_integral_limit = value;
                                 break;
                         default:
                                 break;
                         }
+
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",
+
+                        if(mode_4 == 0)
+                            printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",
                                 motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd,
                                 motion_ctrl_config.velocity_integral_limit);
+                        else
+                        {
+                            printf("Kp_l:%d Ki_l:%d Kd_l:%d i_lim:%d\n",
+                                    motion_ctrl_config.velocity_kp_l, motion_ctrl_config.velocity_ki_l, motion_ctrl_config.velocity_kd_l, motion_ctrl_config.velocity_integral_limit);
+                        printf("Kp_h:%d Ki_h:%d Kd_h:%d i_lim:%d\n",
+                                motion_ctrl_config.velocity_kp_h, motion_ctrl_config.velocity_ki_h, motion_ctrl_config.velocity_kd_h, motion_ctrl_config.velocity_integral_limit);
+                        }
+
                         break;
 
                 case 't': //torque
@@ -574,6 +769,20 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'e':
                 switch(mode_2)
                 {
+                case 'c':
+                        if (value == 1)
+                        {
+
+                            i_motion_control.enable_cogging_compensation(1);
+                            printf("cogging torque compensation enabled\n");
+                        }
+                        else
+                        {
+                            i_motion_control.enable_cogging_compensation(0);
+                            printf("cogging torque compensation disabled\n");
+                        }
+                        break;
+
                 case 'p':
                         if (value == 1)
                         {
@@ -589,6 +798,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         {
                             i_motion_control.enable_position_ctrl(LT_POSITION_CONTROLLER);
                             printf("limited torque pos ctrl enabled\n");
+                        }
+                        else if (value == 4)
+                        {
+                            i_motion_control.enable_position_ctrl(POS_PID_GAIN_SCHEDULING_CONTROLLER);
+                            printf("gain scheduling pos ctrl enabled\n");
                         }
                         else
                         {
@@ -676,6 +890,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
                         motion_ctrl_config.brake_release_strategy = value;
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
+                        printf("set brake release strategy to %d\n", motion_ctrl_config.brake_release_strategy);
                         break;
 
                 case 'v'://brake voltage configure
@@ -689,29 +904,30 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                i_motion_control.update_brake_configuration();
                                 printf("nominal voltage of dc-bus is %d Volts \n", motion_ctrl_config.dc_bus_voltage);
+                                brake_flag = 0;
                                 break;
 
                         case 'p':// pull voltage for releasing the brake at startup
                                 //set
                                 motion_ctrl_config.pull_brake_voltage=value;
+
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                i_motion_control.update_brake_configuration();
                                 printf("brake pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage);
+                                brake_flag = 0;
                                 break;
 
                         case 'h':// hold voltage for holding the brake after it is pulled
                                 //set
                                 motion_ctrl_config.hold_brake_voltage=value;
+
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                i_motion_control.set_motion_control_config(motion_ctrl_config);
-                                i_motion_control.update_brake_configuration();
-                                printf("brake hold voltage is %d milli-Volts\n", motion_ctrl_config.hold_brake_voltage);
+                                printf("brake hold voltage is %d milli-Volts \n", motion_ctrl_config.hold_brake_voltage);
+                                brake_flag = 0;
                                 break;
                         default:
                                 break;
@@ -719,13 +935,16 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
 
                 case 't'://set pull time
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
                         //set
                         motion_ctrl_config.pull_brake_time=value;
+
+                        if(motion_ctrl_config.pull_brake_time<0)    motion_ctrl_config.pull_brake_time=0;
+
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         // check
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        i_motion_control.update_brake_configuration();
-                        printf("brake pull time is %d milli-seconds \n", motion_ctrl_config.pull_brake_time);
+                        printf("brake pull time is %d [milli-seconds] \n", motion_ctrl_config.pull_brake_time);
                         brake_flag = 0;
                         break;
 
@@ -775,7 +994,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         case 'f':
             UpstreamControlData upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
 
-            if (upstream_control_data.error_status == NO_FAULT)
+            if (upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR && upstream_control_data.watchdog_error == WATCHDOG_NO_ERROR)
             {
                 printf("No fault\n");
             }
@@ -785,8 +1004,68 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 i_motion_control.disable();
                 brake_flag = 0;
 
-                if(upstream_control_data.error_status != NO_FAULT)
-                    printf(">>  FAULT ID %i DETECTED ...\n", upstream_control_data.error_status);
+                //Software protection errors
+                switch(upstream_control_data.error_status) {
+                case DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1:
+                    printf("Software protection: Over current\n");
+                    break;
+                case PHASE_FAILURE_L1:
+                    printf("Software protection: PHASE_FAILURE_L1\n");
+                    break;
+                case PHASE_FAILURE_L2:
+                    printf("Software protection: PHASE_FAILURE_L2\n");
+                    break;
+                case PHASE_FAILURE_L3:
+                    printf("Software protection: PHASE_FAILURE_L3\n");
+                    break;
+                case OVER_VOLTAGE_NO_1:
+                    printf("Software protection: Over voltage\n");
+                    break;
+                case UNDER_VOLTAGE_NO_1:
+                    printf("Software protection: Under voltage\n");
+                    break;
+                case EXCESS_TEMPERATURE_DRIVE:
+                    printf("Software protection: Over temperature\n");
+                    break;
+                case NO_FAULT:
+                    break;
+                default:
+                    printf("Software protection: %d\n", upstream_control_data.error_status);
+                    break;
+                }
+
+                //watchdog errors
+                switch(upstream_control_data.watchdog_error) {
+                case WATCHDOG_NO_ERROR:
+                    break;
+                case WATCHDOG_TICKS_ERROR:
+                    printf("Watchdog: Ticks error\n");
+                    break;
+                case WATCHDOG_OVER_UNDER_VOLTAGE_OVER_TEMP_ERROR:
+                    printf("Watchdog: Over/Under voltage or Over temperature\n");
+                    break;
+                case WATCHDOG_OVER_CURRENT_ERROR:
+                    printf("Watchdog: Over current\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_A_ERROR:
+                    printf("Watchdog: Dead time phase A\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_B_ERROR:
+                    printf("Watchdog: Dead time phase B\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_C_ERROR:
+                    printf("Watchdog: Dead time phase C\n");
+                    break;
+                case WATCHDOG_DEAD_TIME_PHASE_D_ERROR:
+                    printf("Watchdog: Dead time phase D\n");
+                    break;
+                default:
+                    printf("Watchdog: Unknown error %d\n", upstream_control_data.watchdog_error);
+                    break;
+                }
+
+                if (upstream_control_data.sensor_error != SENSOR_NO_ERROR)
+                    printf(">>  Sensor Error ID %i DETECTED ...\n", upstream_control_data.sensor_error);
 
                 //reset fault
                 printf("Reset fault...\n");
@@ -795,11 +1074,11 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 //check if reset worked
                 delay_ticks(500*1000*tile_usec);
                 upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
-                if(upstream_control_data.error_status == NO_FAULT)
+                if(upstream_control_data.error_status == NO_FAULT && upstream_control_data.sensor_error == SENSOR_NO_ERROR && upstream_control_data.watchdog_error == WATCHDOG_NO_ERROR)
                 {
                     printf(">>  FAULT REMOVED\n");
                 } else {
-                    printf(">>  FAULT ID %i NOT REMOVED!\n");
+                    printf(">>  FAULT ** NOT ** REMOVED!\n");
                 }
             }
             break;

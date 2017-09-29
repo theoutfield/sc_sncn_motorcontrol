@@ -141,7 +141,8 @@ How to use
                         position_feedback_config.qei_config.index_type  = QEI_SENSOR_INDEX_TYPE;
                         position_feedback_config.qei_config.signal_type = QEI_SENSOR_SIGNAL_TYPE;
                         position_feedback_config.qei_config.port_number = QEI_SENSOR_PORT_NUMBER;
-
+						position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
+							
                         position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
 
                         position_feedback_config.gpio_config[0] = GPIO_INPUT_PULLDOWN;
@@ -210,12 +211,12 @@ Types
 .. doxygenenum:: SensorFunction
 .. doxygenenum:: SensorError
 .. doxygenenum:: EncoderPortNumber
+.. doxygenenum:: PositionFeedbackPortsLocation
+.. doxygenstruct:: PositionFeedbackPortsCheck
 .. doxygenstruct:: PositionFeedbackConfig
 
-
-.. doxygenstruct:: QEIHallPort
-.. doxygenstruct:: HallEncSelectPort
 .. doxygenstruct:: SPIPorts
+.. doxygenstruct:: HallEncSelectPort
 
 Service
 --------

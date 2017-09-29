@@ -23,8 +23,8 @@
 // SENSOR 1 SETTINGS //
 ///////////////////////
 
-// SENSOR 1 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
+// SENSOR 1 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
+#define SENSOR_1_TYPE                     REM_16MT_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -47,7 +47,7 @@
 // SENSOR 2 SETTINGS //
 ///////////////////////
 
-// SENSOR 2 TYPE [HALL_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR]
+// SENSOR 2 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
 #define SENSOR_2_TYPE                     REM_16MT_SENSOR//HALL_SENSOR
 
 // FUNCTION OF SENSOR_2 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
@@ -70,7 +70,7 @@
 //////////////////////////////////////////////
 //////  PROTECTION CONFIGURATION
 //////////////////////////////////////////////
-#define PROTECTION_MAXIMUM_CURRENT        40000    //maximum tolerable value of phase current in milliamps (under abnormal conditions)
+#define PROTECTION_MAXIMUM_CURRENT        40000     //maximum tolerable value of phase current in milliamps (under abnormal conditions)
 #define PROTECTION_MINIMUM_VOLTAGE        10        //minimum tolerable value of dc-bus voltave (under abnormal conditions)
 #define PROTECTION_MAXIMUM_VOLTAGE        60        //maximum tolerable value of dc-bus voltage (under abnormal conditions)
 #define TEMP_BOARD_MAX                    80        //maximum tolerable value of board temperature (Degree Centigrade)
@@ -81,14 +81,14 @@
 //////////////////////////////////////////////
 // Warning!!! This parameter alters PWM switching frequency.
 // Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
-#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile.
+#define IFM_TILE_USEC       USEC_STD      // Number of ticks in a microsecond for IFM Tile.
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
 //////////////////////////////////////////////
 #define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 80
+#define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
 #define COMMUTATION_ANGLE_OFFSET       0
@@ -129,6 +129,10 @@
 #define VELOCITY_Ki                             0
 #define VELOCITY_Kd                             0
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
+#define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller
+
+#define ENABLE_COMPENSATION_RECORDING           0 //set the cogging torque recording to 0 on startup
+#define ENABLE_OPEN_PHASE_DETECTION             0 //set to 0 to disable/1 to enable
 
 //PID GAINS FOR POSITION CONTROL [will be divided by 1e6]
 #define POSITION_Kp                             0
@@ -140,8 +144,25 @@
 //     "1000"                 in case of using position controller in "LT_POSITION_CONTROLLER"               mode
 #define POSITION_INTEGRAL_LIMIT                 PEAK_SPEED
 
+// PARAMS FOR GAIN SCHEDULING CONTROLLER
+#define GAIN_SCHEDULING_POSITION_Kp_0           0
+#define GAIN_SCHEDULING_POSITION_Ki_0           0
+#define GAIN_SCHEDULING_POSITION_Kd_0           0
+#define GAIN_SCHEDULING_VELOCITY_Kp_0           0
+#define GAIN_SCHEDULING_VELOCITY_Ki_0           0
+#define GAIN_SCHEDULING_VELOCITY_Kd_0           0
+#define GAIN_SCHEDULING_POSITION_Kp_1           0
+#define GAIN_SCHEDULING_POSITION_Ki_1           0
+#define GAIN_SCHEDULING_POSITION_Kd_1           0
+#define GAIN_SCHEDULING_VELOCITY_Kp_1           0
+#define GAIN_SCHEDULING_VELOCITY_Ki_1           0
+#define GAIN_SCHEDULING_VELOCITY_Kd_1           0
+#define GAIN_SCHEDULING_VELOCITY_THRESHOLD_0    0
+#define GAIN_SCHEDULING_VELOCITY_THRESHOLD_1    0
+
+
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
-#define POLARITY           MOTION_POLARITY_NORMAL
+#define POLARITY                MOTION_POLARITY_NORMAL
 
 #define FILTER_CUT_OFF_FREQ     0;//cut-off frequency of filter in motion control service (default value 100 kHz)
 
@@ -166,7 +187,6 @@
 
 #define POSITION_CONTROL_STRATEGY               POS_PID_VELOCITY_CASCADED_CONTROLLER
 
-
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
@@ -174,11 +194,11 @@
 #define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 // Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define PULL_BRAKE_VOLTAGE     18000    // [milli-Volts]
+#define PULL_BRAKE_VOLTAGE         0    // [milli-Volts]
 // Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define HOLD_BRAKE_VOLTAGE     7000     // [milli-Volts]
-#define PULL_BRAKE_TIME        3000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define HOLD_BRAKE_VOLTAGE         0     // [milli-Volts]
+#define PULL_BRAKE_TIME         1000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
 /////////////////////////////////////////////////

@@ -37,9 +37,9 @@ void qei_test(client interface PositionFeedbackInterface i_position_feedback, cl
     }
 }
 
-QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
+port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
 
 int main(void)
 {
@@ -66,12 +66,14 @@ int main(void)
                 position_feedback_config.resolution  = QEI_SENSOR_RESOLUTION;
                 position_feedback_config.ifm_usec    = IFM_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
+                position_feedback_config.offset      = HOME_OFFSET;
                 position_feedback_config.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 position_feedback_config.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
                 position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
                 position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
+                position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
 
                 position_feedback_config.gpio_config[0] = GPIO_OFF;
                 position_feedback_config.gpio_config[1] = GPIO_OFF;

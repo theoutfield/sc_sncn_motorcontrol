@@ -194,10 +194,10 @@ void position_feedback_commands(client interface PositionFeedbackInterface i_pos
     }
 }
 
-QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
 SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
+port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
 port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
 port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
@@ -241,6 +241,7 @@ int main(void)
                 position_feedback_config_1.biss_config.busy = BISS_BUSY;
                 position_feedback_config_1.biss_config.clock_port_config = BISS_CLOCK_PORT;
                 position_feedback_config_1.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                position_feedback_config_1.biss_config.data_port_signal_type = BISS_DATA_PORT_SIGNAL_TYPE;
 
                 position_feedback_config_1.rem_16mt_config.filter = REM_16MT_FILTER;
 
@@ -252,8 +253,15 @@ int main(void)
                 position_feedback_config_1.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
                 position_feedback_config_1.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
                 position_feedback_config_1.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
+                position_feedback_config_1.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
 
                 position_feedback_config_1.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+                position_feedback_config_1.hall_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
+                position_feedback_config_1.hall_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
 
                 position_feedback_config_1.gpio_config[0] = GPIO_INPUT;
                 position_feedback_config_1.gpio_config[1] = GPIO_OUTPUT;
@@ -270,9 +278,9 @@ int main(void)
                 position_feedback_config_1.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
 
                 //set sensor 1 parameters
-                position_feedback_config_2.sensor_type = QEI_SENSOR;
-                position_feedback_config_2.resolution  = QEI_SENSOR_RESOLUTION;
-                position_feedback_config_2.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
+                position_feedback_config_2.sensor_type = BISS_SENSOR;
+                position_feedback_config_2.resolution  = BISS_SENSOR_RESOLUTION;
+                position_feedback_config_2.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config_2.sensor_function = SENSOR_FUNCTION_FEEDBACK_DISPLAY_ONLY;
 
                 position_feedback_service(qei_hall_port_1, qei_hall_port_2, hall_enc_select_port, spi_ports, gpio_port_0, gpio_port_1, gpio_port_2, gpio_port_3,

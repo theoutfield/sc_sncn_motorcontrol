@@ -1,5 +1,49 @@
 sc_sncn_motorcontrol Change Log
 ===============================
+3.1.3
+-----
+
+  * Have three options for switching frequency namely 15 kHz, 30 kHz and 100 kHz
+  * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq
+  * Add support for DC30 in watchdog service
+  * Implement gain scheduling controller with velocity as gain scheduling variable
+
+3.1.2
+-----
+
+  * Integrate GPIO service in ethercat drive enabled for SDK 3.0.4
+  * Fix Incremental encoder position update to the shared memory
+  * Integrate BiSS CRC error fix from SDK 3.0.3
+  * Add configuration parameter to enable/disable open phase detection
+    * The feature is disabled by default due to frequent false positives 
+  * Change simple PID controllers to PIDT1
+
+3.1.1
+-----
+
+  * Allow interrupt of cogging torque compensation reccording
+  * Improve position controller autotuner
+
+
+3.1.0
+-----
+  * Integrate automatic PID tuning for cascaded and limitted torque position controllers from SDK v3.0.3
+  * Add automatic velocity tuning
+  * Add cogging compensation
+  * Add low-pass filter into position control
+  * Add SSI position sensor support
+  * Add dual BiSS position sensor support (only DC1K-rev.D1 compatible)
+  * Add error detection for open phase
+  * Add automatic position sensor eveluation on offset tuning 
+  * Core C22 and C21-DX rev.A are no longer supported (memory limitation)
+
+
+  Known Issues:
+    * REM 16MT sensor does not work with Core C21-DX_G2 and DC1K rev.C3-C4 with long cables (more than 15 cm).
+
+    This is caused by differences in traces length between the GPIO ports used for SPI. A workaround is to flip the Clock (GPIO 1) and the MISO (GPIO 2) pins. For this you need to modify or make a new cable with the two wires flipped
+    and also flip the definitions of GPIO ports 1 and 2 in the IFM module's bsp file.
+
 
 3.0.4
 -----

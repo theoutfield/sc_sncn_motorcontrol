@@ -9,68 +9,103 @@
 #include <xs1.h>
 #include <xscope.h>
 
-extern char start_message[];
-
-
-SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * qei_hall_port_2, HallEncSelectPort * hall_enc_select_port, int hall_enc_select_config, port * biss_clock_port, BISSConfig & biss_config, unsigned int data[])
+SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
+        int biss_clock_low, int biss_clock_high,
+        timer t,
+        PositionFeedbackConfig &position_feedback_config, unsigned int data[])
 {
     unsigned int crc  =  0;
     SensorError status = SENSOR_NO_ERROR;
     unsigned int read_status = 0;
+    unsigned int bit = 0;
+    unsigned int time;
+    unsigned int timeout;
     unsigned int readbuf = 0;
     unsigned int bitindex = 0;
     unsigned int byteindex = 0;
-    unsigned int data_length = BISS_CDS_BIT + biss_config.multiturn_resolution +  biss_config.singleturn_resolution + biss_config.filling_bits + BISS_STATUS_BITS;
-    unsigned int read_limit = biss_config.busy; //maximum number of bits to read before the start bit
-    unsigned int crc_length = 32 - clz(biss_config.crc_poly); //clz: number of leading 0
-    unsigned int frame_length = data_length+crc_length+1;
+    unsigned int data_length = position_feedback_config.biss_config.multiturn_resolution +  position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits + BISS_STATUS_BITS;
+    unsigned int read_limit = position_feedback_config.biss_config.busy; //maximum number of bits to read before the start bit
+    unsigned int crc_length = 32 - clz(position_feedback_config.biss_config.crc_poly); //clz: number of leading 0
+    unsigned int frame_length = data_length+crc_length;
 
-    //set clock and data port config
-    unsigned int clock_config = 0;
-    if (biss_config.clock_port_config <= BISS_CLOCK_PORT_EXT_D3) { //clock is output on a gpio port
-        clock_config = 1;
+    //wait for the data line to go high
+    t :> time;
+    timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
+    while(bit != 1 && timeafter(timeout, time)) {
+        *biss_clock_port <: biss_clock_high;
+        *biss_data_port :> bit;
+        bit &= 1;
+        t :> time;
     }
-    unsigned int data_port_config = 0;
-    if (biss_config.data_port_number == ENCODER_PORT_2) {
-        data_port_config = 1;
+
+    //test if the line went up
+    if (bit != 1) {
+        return SENSOR_BISS_DATA_LINE_ERROR; //error data line
     }
+
+    //SSI sensor, no ack, start, status bits
+    if (position_feedback_config.sensor_type == SSI_SENSOR) {
+        read_status = 2; //force status to 2 because there is no ack and start bit
+        data_length -= BISS_STATUS_BITS; //SSI does not have status bits
+        read_limit = data_length + crc_length;
+        //put clock low and wait for the encoder to be ready
+        if (position_feedback_config.biss_config.busy) {
+            *biss_clock_port <: biss_clock_low;
+            delay_ticks(position_feedback_config.biss_config.busy*position_feedback_config.ifm_usec);
+        }
+    } else {
+        //BiSS sensor: wait for ack and start bits
+        while (read_limit && read_status != 2) {
+            *biss_clock_port <: biss_clock_low;
+            *biss_clock_port <: biss_clock_high;
+            *biss_data_port :> bit;
+            bit &= 1;
+
+            //check ack and start bits
+            if (read_status) { //ack received, start not received
+                if (bit) {//start bit received, set status to 2
+                    read_status++;
+                    read_limit = frame_length; //now we read exactly data_length+crc_length bits
+                    break;
+                }
+            } else if (bit == 0)  {//ack bit received, set status to 1
+                read_status++;
+            }
+            read_limit--;
+        }
+    }
+
+    //discard first bit
+    *biss_clock_port <: biss_clock_low;
+    *biss_clock_port <: biss_clock_high;
+    *biss_data_port :> void;
 
     //read the raw data
     while (read_limit) {
-        unsigned int bit;
-        if (clock_config) { //clock is output on a gpio port
-            *biss_clock_port <:0;
-            *biss_clock_port <:1;
-        } else { //clock is output on the hall_enc_select port leftmost 2 bits
-            hall_enc_select_port->p_hall_enc_select <: hall_enc_select_config;
-            hall_enc_select_port->p_hall_enc_select <: biss_config.clock_port_config | hall_enc_select_config;
-        }
-        if (data_port_config) {
-            qei_hall_port_2->p_qei_hall :> bit;
-        } else {
-            qei_hall_port_1->p_qei_hall :> bit;
-        }
-        bit = (bit >> BISS_DATA_PORT_BIT)&1;
+        *biss_clock_port <: biss_clock_low;
+        *biss_clock_port <: biss_clock_high;
+        *biss_data_port :> bit;
+        bit &= 1;
 
-        //check ack and start bits and save the data
-        if (read_status == 2) { //ack and start bit received, save data
-            if (bitindex == 32) { //byte full
-                data[byteindex] = readbuf; //save byte
-                byteindex++;                //change to next byte
-                readbuf = 0;
-                bitindex = 0;
-            }
-            readbuf = (readbuf << 1) | bit;
-            bitindex++;
-        } else if (read_status) { //ack received, start not received
-            if (bit) {//start bit received, set status to 2
-                read_status++;
-                read_limit = frame_length; //now we read exactly data_length+crc_length bits
-            }
-        } else if (bit == 0)  {//ack bit received, set status to 1
-            read_status++;
+        //save the data
+        if (bitindex == 32) { //byte full
+            data[byteindex] = readbuf; //save byte
+            byteindex++;                //change to next byte
+            readbuf = 0;
+            bitindex = 0;
         }
+        readbuf = (readbuf << 1) | bit;
+        bitindex++;
         read_limit--;
+    }
+
+    //wait for the data line to go low
+    t :> time;
+    timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
+    while(bit != 0 && timeafter(timeout, time)) {
+        *biss_data_port :> bit;
+        bit &= 1;
+        t :> time;
     }
 
     //extract the crc from the data
@@ -90,7 +125,7 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
         data[byteindex] = readbuf << (32-bitindex);//left align and save the last data byte
 
         //check crc
-        if (biss_config.crc_poly && crc != biss_crc(data, data_length, biss_config.crc_poly) ) {
+        if (position_feedback_config.biss_config.crc_poly && crc != biss_crc(data, data_length, position_feedback_config.biss_config.crc_poly) ) {
             status = SENSOR_CHECKSUM_ERROR;
         }
     } else if (read_status) {
@@ -102,15 +137,22 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
 }
 
 
-{ int, unsigned int, SensorError } biss_encoder(unsigned int data[], BISSConfig biss_config) {
-    unsigned int biss_data_length = biss_config.multiturn_resolution +  biss_config.singleturn_resolution + biss_config.filling_bits + BISS_STATUS_BITS; //length witout CDS bit
+{ int, unsigned int, SensorError } biss_encoder(unsigned int data[], PositionFeedbackConfig &position_feedback_config) {
+    unsigned int biss_data_length;
     unsigned int position = 0;
     SensorError status = SENSOR_NO_ERROR;
     unsigned int status_bits = 0;
-    unsigned int readbuf = data[0] << BISS_CDS_BIT; //discard CDS bit
-    unsigned int bitindex = BISS_CDS_BIT; //discard CDS bit
+    unsigned int readbuf = data[0];
+    unsigned int bitindex = 0;
     unsigned int byteindex = 0;
     int count = 0;
+
+    if (position_feedback_config.sensor_type == BISS_SENSOR) {
+        biss_data_length = position_feedback_config.biss_config.multiturn_resolution +  position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits + BISS_STATUS_BITS; //length witout CDS bit
+    } else {
+        biss_data_length = position_feedback_config.biss_config.multiturn_resolution + position_feedback_config.biss_config.singleturn_resolution;
+        status_bits = 0b11; // set status to no error
+    }
 
     //read data
     for (int i=0; i<biss_data_length; i++) {
@@ -119,11 +161,11 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
             byteindex++;
             readbuf = data[byteindex];
         }
-        if (i < biss_config.multiturn_resolution) {
+        if (i < position_feedback_config.biss_config.multiturn_resolution) {
             count = (count << 1) | ((readbuf & 0x80000000) >> 31);
-        } else if (i < biss_config.multiturn_resolution + biss_config.singleturn_resolution) {
+        } else if (i < position_feedback_config.biss_config.multiturn_resolution + position_feedback_config.biss_config.singleturn_resolution) {
             position = (position << 1) | ((readbuf & 0x80000000) >> 31);
-        } else if (i >= biss_config.multiturn_resolution + biss_config.singleturn_resolution + biss_config.filling_bits) {
+        } else if (i >= position_feedback_config.biss_config.multiturn_resolution + position_feedback_config.biss_config.singleturn_resolution + position_feedback_config.biss_config.filling_bits) {
             status_bits = (status_bits << 1) | ((readbuf & 0x80000000) >> 31);
         }
         readbuf = readbuf << 1;
@@ -142,9 +184,9 @@ SensorError read_biss_sensor_data(QEIHallPort * qei_hall_port_1, QEIHallPort * q
         status = SENSOR_BISS_ERROR_AND_WARNING_BIT_ERROR;
         break;
     }
-    count &= ~(~0U <<  biss_config.multiturn_resolution);
-    position &= ~(~0U <<  biss_config.singleturn_resolution);
-    count = (sext(count, biss_config.multiturn_resolution) * (1 << biss_config.singleturn_resolution)) + position;  //convert multiturn to signed absolute count
+    count &= ~(~0U <<  position_feedback_config.biss_config.multiturn_resolution);
+    position &= ~(~0U <<  position_feedback_config.biss_config.singleturn_resolution);
+    count = (sext(count, position_feedback_config.biss_config.multiturn_resolution) * (1 << position_feedback_config.biss_config.singleturn_resolution)) + position;  //convert multiturn to signed absolute count
 
     return { count, position, status };
 }

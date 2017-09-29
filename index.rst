@@ -60,7 +60,7 @@ Modules
 	Position Feedback Module <module_position_feedback/doc/index>
 	Hall Sensor Feedback Module <module_hall_sensor/doc/index>
 	Incremental Encoder Feedback Module <module_incremental_encoder/doc/index>
-	BiSS Encoder Feedback Module <module_biss_encoder/doc/index>
+	BiSS / SSI Encoder Feedback Module <module_biss_encoder/doc/index>
 	REM 14 Module <module_encoder_rem_14/doc/index>
 	REM 16MT Module <module_encoder_rem_16mt/doc/index>
 	Serial Encoder Module <module_serial_encoder/doc/index>
@@ -82,7 +82,7 @@ This is the complete list of modules and libraries currently included into the *
 * `Position Feedback Module <module_position_feedback/doc/index.html>`_: Service to read position data from various sensors.
 * `Hall Sensor Feedback Module <module_hall_sensor/doc/index.html>`_: Driver to read signals from a latched Hall-effect based feedback sensor.
 * `Incremental Encoder Feedback Module <module_incremental_encoder/doc/index.html>`_: Driver to read signals from an Incremental (AB/ABI) Encoder.
-* `BiSS Encoder Feedback Module <module_biss_encoder/doc/index.html>`_: Driver to read data from a BiSS-C inteface Encoder.
+* `BiSS / SSI Encoder Feedback Module <module_biss_encoder/doc/index.html>`_: Driver to read data from a BiSS-C or SSI inteface Encoder.
 * `REM 14 Encoder Module <module_encoder_rem_14/doc/index.html>`_: Driver to read data from a SYNAPTICON featured REM 14 Encoder.
 * `REM 16MT Encoder Module <module_encoder_rem_16mt/doc/index.html>`_: Driver to read data from a SYNAPTICON featured REM 16MT Encoder.
 * `Serial Encoder Module <module_serial_encoder/doc/index.html>`_: Combined service to read position feedback data from Serial Encoders (SPI or BiSS)
@@ -110,6 +110,7 @@ Examples
 	Hall Sensor Test <examples/app_test_hall_sensor/doc/index>
 	Incremental Encoder Test <examples/app_test_incremental_encoder/doc/index>
 	BiSS Absolute Encoder Test <examples/app_test_biss_encoder/doc/index>
+	SSI Encoder Test <examples/app_test_ssi_encoder/doc/index>
 	REM 14 Absolute Encoder Test <examples/app_test_rem_14_encoder/doc/index>
 	REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt_encoder/doc/index>
 	Position Feedback Service Test <examples/app_test_position_feedback/doc/index>
@@ -128,6 +129,7 @@ Examples
 	* `Hall Sensor Test <examples/app_test_hall_sensor/doc/index.html>`_: Shows data acquired from a latched Hall sensor served as a rotary encoder.	
 	* `Incremental Encoder Test <examples/app_test_incremental_encoder/doc/index.html>`_: Shows data acquired from an incremental encoder.
 	* `BiSS Absolute Encoder Test <examples/app_test_biss_encoder/doc/index.html>`_: Shows data acquired from a BiSS interface encoder.
+	* `SSI Encoder Test <examples/app_test_ssi_encoder/doc/index.html>`_: Shows data acquired from a SSI interface encoder.
 	* `REM 14 Absolute Encoder Test <examples/app_test_rem_14_encoder/doc/index.html>`_: Shows data acquired from REM 14 absolute magnetic rotary encoder.
 	* `REM 16MT Absolute Encoder Test <examples/app_test_rem_16mt_encoder/doc/index.html>`_: Shows data acquired from REM 16MT absolute magnetic rotary encoder.
 	* `Position Feedback Service Test <examples/app_test_position_feedback/doc/index.html>`_: Simple example of the Position Feedback Service usage to acquire position from multiple sensors.

@@ -18,9 +18,6 @@ int init_velocity_auto_tuner(VelCtrlAutoTuneParam &velocity_auto_tune, MotionCon
     velocity_auto_tune.z = 0.70;
     velocity_auto_tune.st= settling_time;
 
-    motion_ctrl_config.velocity_kp = KP_VELOCITY_TUNING;
-    motion_ctrl_config.velocity_ki = 0;
-    motion_ctrl_config.velocity_kd = 0;
 
     velocity_auto_tune.kp   = 0.00;
     velocity_auto_tune.ki   = 0.00;
@@ -91,7 +88,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
                 velocity_auto_tune.ki/= (0.001*g_speed);
 
                 velocity_auto_tune.kp *= 1000000.00;
-                velocity_auto_tune.ki *= 1000.00;
+                velocity_auto_tune.ki *= 100.00;
 
                 if(velocity_auto_tune.kp<0 || velocity_auto_tune.ki<0) //wrong calculation
                 {
@@ -283,6 +280,7 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 if(pos_ctrl_auto_tune.err_energy_ss_int>pos_ctrl_auto_tune.err_energy_ss_limit_hard/10)
                 {
                     pos_ctrl_auto_tune.kpp = (pos_ctrl_auto_tune.kpp*1050)/1000;    //increase kpp by 5% in each cycle of step-5
+
                     if(pos_ctrl_auto_tune.kpp<100) pos_ctrl_auto_tune.kpp =100;
                 }
                 else
