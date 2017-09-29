@@ -117,7 +117,6 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
 
     int angle_out=0, last_angle=0, speed_out=0, count = 0, singleturn = 0;
     int singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
-    int init_angle = 0;
 
     int hall_sector_and_state_temp;
 
