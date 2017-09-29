@@ -1558,10 +1558,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         out_motorcontrol_config = i_torque_control.get_config();
                         out_motorcontrol_config.commutation_angle_offset = -1;
                         i_torque_control.set_offset_detection_enabled();
+                        int pole_pairs=0;
                         while(out_motorcontrol_config.commutation_angle_offset == -1)
                         {
                             out_motorcontrol_config = i_torque_control.get_config();
-                            out_motorcontrol_config.commutation_angle_offset = i_torque_control.get_offset();
+                            {out_motorcontrol_config.commutation_angle_offset, pole_pairs} = i_torque_control.get_offset();
                             delay_milliseconds(50);//wait until offset is detected
                         }
 
@@ -1569,6 +1570,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         if(i_torque_control.get_sensor_polarity_state() != 1)
                         {
                             out_motorcontrol_config.commutation_angle_offset = -1;
+                        }
+                        else if(pole_pairs != out_motorcontrol_config.pole_pairs)
+                        {
+                            out_motorcontrol_config.commutation_angle_offset = -2;
+                            out_motorcontrol_config.pole_pairs = pole_pairs;
                         }
                         //write offset in config
                         i_torque_control.set_config(out_motorcontrol_config);
