@@ -5,6 +5,7 @@ sc_sncn_motorcontrol Change Log
 -----
 
   * Add GPIO support in ethercat drive
+  * Fix issue with Drive 100 (DC100) when motor gets stalled after some times of running
 
 
 3.0.3
