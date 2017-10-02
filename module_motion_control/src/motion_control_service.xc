@@ -669,14 +669,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 // torque control
                 if(torque_enable_flag == 1)
                 {
-                    //QEI index calibration
-                    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
-                    {
-                        if(!upstream_control_data.qei_index_found)
-                        {
-                            error_sens = find_encoder_index(i_torque_control);
-                        }
-                    }
                     if(motion_ctrl_config.enable_profiler==1)
                     {
                         torque_ref_in_k = torque_profiler(((double)(downstream_control_data.torque_cmd)), torque_ref_in_k_1n, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
@@ -690,14 +682,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
                 else if (velocity_enable_flag == 1)// velocity control
                 {
-                    //QEI index calibration
-                    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
-                    {
-                        if(!upstream_control_data.qei_index_found)
-                        {
-                            error_sens = find_encoder_index(i_torque_control);
-                        }
-                    }
                     if(motion_ctrl_config.enable_velocity_auto_tuner == 1)
                     {
                         if(velocity_auto_tune.enable == 0)
@@ -836,14 +820,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 }
                 else if (position_enable_flag == 1)// position control
                 {
-                    //QEI index calibration
-                    if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
-                    {
-                        if(!upstream_control_data.qei_index_found)
-                        {
-                            error_sens = find_encoder_index(i_torque_control);
-                        }
-                    }
                     //brake shutdown delay, don't update target position
                     if (brake_shutdown_counter > 0)
                     {
@@ -1371,6 +1347,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 pos_control_mode = in_pos_control_mode;
 
+                //QEI index calibration
+                if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                {
+                    if(!upstream_control_data.qei_index_found)
+                    {
+                        error_sens = find_encoder_index(i_torque_control);
+                    }
+                }
                 //set current position as target
                 downstream_control_data.position_cmd = upstream_control_data.position;
                 position_k        = ((double) upstream_control_data.position);
@@ -1399,6 +1383,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 velocity_enable_flag =1;
                 position_enable_flag =0;
 
+                //QEI index calibration
+                if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                {
+                    if(!upstream_control_data.qei_index_found)
+                    {
+                        error_sens = find_encoder_index(i_torque_control);
+                    }
+                }
                 downstream_control_data.velocity_cmd = 0;
                 downstream_control_data.offset_torque = 0;
 
@@ -1427,6 +1419,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 torque_enable_flag   =1;
                 velocity_enable_flag =0;
                 position_enable_flag =0;
+
+                //QEI index calibration
+                if (motorcontrol_config.commutation_sensor == QEI_SENSOR)
+                {
+                    if(!upstream_control_data.qei_index_found)
+                    {
+                        error_sens = find_encoder_index(i_torque_control);
+                    }
+                }
 
                 downstream_control_data.torque_cmd = 0;
                 downstream_control_data.offset_torque = 0;
