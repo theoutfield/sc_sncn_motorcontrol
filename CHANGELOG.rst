@@ -8,6 +8,7 @@ sc_sncn_motorcontrol Change Log
   * Add support for DC30 in watchdog service
   * Implement gain scheduling controller with velocity as gain scheduling variable
   * Integrate the Drive 100 (DC100) fix from SDK 3.0.4
+  * Add reverse sensor polarity command in app_control_tuning
 
 3.1.2
 -----
