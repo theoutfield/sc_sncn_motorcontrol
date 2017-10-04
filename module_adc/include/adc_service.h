@@ -10,6 +10,11 @@
 #include <motor_control_interfaces.h>
 
 /**
+ * @brief Define data valid delay for ADC 7949
+ */
+#define ADC7949_DATA_VALID_DELAY    3
+
+/**
  * @brief Define possible sampling modes in case of using AD7265 chip (SINGLE_ENDED/DIFFERENTIAL)
  */
 #define SINGLE_ENDED                0
