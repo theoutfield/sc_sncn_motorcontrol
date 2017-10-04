@@ -7,6 +7,7 @@ sc_sncn_motorcontrol Change Log
   * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq
   * Add support for DC30 in watchdog service
   * Implement gain scheduling controller with velocity as gain scheduling variable
+  * Add reverse sensor polarity command in app_control_tuning
 
 3.1.2
 -----
