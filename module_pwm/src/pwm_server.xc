@@ -316,8 +316,8 @@ void pwm_service_general(
 
         dummy_delay      =  500 & 0x0000FFFF   ;
 
-        limit_h_computational_margine = 40 & 0x0000FFFF   ;
-        limit_l_computational_margine = 40 & 0x0000FFFF   ;
+        limit_h_computational_margine = 60 & 0x0000FFFF   ;
+        limit_l_computational_margine = 80 & 0x0000FFFF   ;
 
         pwm_limit_h      = (1000 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = limit_l_computational_margine & 0x0000FFFF   ;
