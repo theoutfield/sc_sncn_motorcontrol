@@ -32,6 +32,23 @@ port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
 port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
 port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
 
+void occupy_core(int foo)
+{
+    int x=foo;
+    int y=2*foo;
+
+    while(1)
+    {
+        x = x + foo;
+
+        if(x>(y*1000000))
+            x=foo;
+
+        y=2*foo;
+    }
+}
+
+
 int main(void) {
 
     // Motor control interfaces
@@ -51,11 +68,43 @@ int main(void) {
         {
             par
             {
-                /* WARNING: only one blocking task is possible per tile. */
-                /* Waiting for a user input blocks other tasks on the same tile from execution. */
                 {
-                    control_tuning_console(i_motion_control[0]);
+                    occupy_core(10);
                 }
+
+                {
+                    occupy_core(11);
+                }
+
+                {
+                    occupy_core(12);
+                }
+
+                {
+                    occupy_core(13);
+                }
+
+                {
+                    occupy_core(14);
+                }
+
+                {
+                    occupy_core(15);
+                }
+
+                {
+                    occupy_core(16);
+                }
+
+                {
+                    occupy_core(17);
+                }
+
+                ///* WARNING: only one blocking task is possible per tile. */
+                ///* Waiting for a user input blocks other tasks on the same tile from execution. */
+                //{
+                //    control_tuning_console(i_motion_control[0]);
+                //}
             }
         }
 
@@ -63,6 +112,10 @@ int main(void) {
         {
             par
             {
+                {
+                    occupy_core(20);
+                }
+
                 /* Shared memory Service */
                 [[distribute]] shared_memory_service(i_shared_memory, 3);
 
