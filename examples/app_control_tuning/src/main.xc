@@ -54,7 +54,7 @@ int main(void) {
                 /* WARNING: only one blocking task is possible per tile. */
                 /* Waiting for a user input blocks other tasks on the same tile from execution. */
                 {
-                    control_tuning_console(i_motion_control[0]);
+                    control_tuning_console(i_motion_control[0], i_position_feedback_1[0], i_position_feedback_2[0]);
                 }
             }
         }
