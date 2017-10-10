@@ -105,9 +105,9 @@ typedef struct {
     int max_speed_profiler;             /**< Parameter for setting the maximum speed in profiler mode */
     int max_torque_rate_profiler;       /**< Parameter for setting the maximum torque in profiler mode */
 
-    int position_kp;                    /**< Parameter for position controller P-constant */
-    int position_ki;                    /**< Parameter for position controller I-constant */
-    int position_kd;                    /**< Parameter for position controller D-constant */
+    float position_kp;                    /**< Parameter for position controller P-constant */
+    float position_ki;                    /**< Parameter for position controller I-constant */
+    float position_kd;                    /**< Parameter for position controller D-constant */
     int position_integral_limit;        /**< Parameter for integral limit of position pid controller */
 
     int position_control_autotune;      /**< Parameter for enabling/disabling automatic tuning of position controller*/
@@ -116,9 +116,9 @@ typedef struct {
     int per_thousand_overshoot_autotune;      /**< Overshoot limit while tuning (it is set as per thousand of step amplitude)*/
     int rise_time_freedom_percent_autotune;   /**< This value helps the tuner to find out whether the ki is high enough or not. By default set this value to 300, and if the tuner is not able to find proper values (and the response is having oscillations), increase this value to 400 or 500.*/
 
-    int velocity_kp;                    /**< Parameter for velocity controller P-constant */
-    int velocity_ki;                    /**< Parameter for velocity controller I-constant */
-    int velocity_kd;                    /**< Parameter for velocity controller D-constant */
+    float velocity_kp;                    /**< Parameter for velocity controller P-constant */
+    float velocity_ki;                    /**< Parameter for velocity controller I-constant */
+    float velocity_kd;                    /**< Parameter for velocity controller D-constant */
     int velocity_integral_limit;        /**< Parameter for integral limit of velocity pid controller */
 
     int enable_velocity_auto_tuner;     /**< Parameter for enabling/disabling auto tuner for velocity controller */

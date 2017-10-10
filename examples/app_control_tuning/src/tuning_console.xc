@@ -79,21 +79,35 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         char mode_3 = 0;
         char mode_4 = 0;
         char c;
-        int value = 0;
+        float value = 0;
         int sign = 1;
+        float decimal_point  = 1;
         //reading user input.
         while((c = getchar ()) != '\n')
         {
+            if(c == '.')
+            {
+                decimal_point = 0.1;
+            }
+
             if(isdigit(c)>0)
             {
-                value *= 10;
-                value += c - '0';
+                if (decimal_point == 1)
+                {
+                    value *= 10;
+                    value += c - '0';
+                }
+                else if (decimal_point < 1)
+                {
+                    value += (c - '0') * decimal_point;
+                    decimal_point /= 10;
+                }
             }
             else if (c == '-')
             {
                 sign = -1;
             }
-            else if (c != ' ')
+            else if (c != ' ' && c != '.')
             {
                 if (mode_1 == 0)
                 {
@@ -595,14 +609,14 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
 
                         if (mode_4 == 0)
-                            printf("Kp:%d Ki:%d Kd:%d j%d i_lim:%d\n",
+                            printf("Kp:%.2f Ki:%.2f Kd:%.2f j%d i_lim:%d\n",
                                     motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd,
                                     motion_ctrl_config.moment_of_inertia, motion_ctrl_config.position_integral_limit);
                         else
                         {
-                            printf("Kp_l:%d Ki_l:%d Kd_l:%d i_lim:%d\n",
+                            printf("Kp_l:%.2f Ki_l:%.2f Kd_l:%.2f i_lim:%d\n",
                                     motion_ctrl_config.position_kp_l, motion_ctrl_config.position_ki_l, motion_ctrl_config.position_kd_l, motion_ctrl_config.position_integral_limit);
-                            printf("Kp_h:%d Ki_h:%d Kd_h:%d i_lim:%d\n",
+                            printf("Kp_h:%.2f Ki_h:%.2f Kd_h:%.2f i_lim:%d\n",
                                 motion_ctrl_config.position_kp_h, motion_ctrl_config.position_ki_h, motion_ctrl_config.position_kd_h, motion_ctrl_config.position_integral_limit);
                         }
 
@@ -671,14 +685,14 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
 
                         if(mode_4 == 0)
-                            printf("Kp:%d Ki:%d Kd:%d i_lim:%d\n",
+                            printf("Kp:%.2f Ki:%.2f Kd:%.2f i_lim:%d\n",
                                 motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd,
                                 motion_ctrl_config.velocity_integral_limit);
                         else
                         {
-                            printf("Kp_l:%d Ki_l:%d Kd_l:%d i_lim:%d\n",
+                            printf("Kp_l:%.2f Ki_l:%.2f Kd_l:%.2f i_lim:%d\n",
                                     motion_ctrl_config.velocity_kp_l, motion_ctrl_config.velocity_ki_l, motion_ctrl_config.velocity_kd_l, motion_ctrl_config.velocity_integral_limit);
-                        printf("Kp_h:%d Ki_h:%d Kd_h:%d i_lim:%d\n",
+                        printf("Kp_h:%.2f Ki_h:%.2f Kd_h:%.2f i_lim:%d\n",
                                 motion_ctrl_config.velocity_kp_h, motion_ctrl_config.velocity_ki_h, motion_ctrl_config.velocity_kd_h, motion_ctrl_config.velocity_integral_limit);
                         }
 
