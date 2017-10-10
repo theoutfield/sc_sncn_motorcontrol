@@ -36,7 +36,7 @@ void pid_init(PIDT1param &param)
 /**
  * @brief setting the parameters of the PIDT1 controller.
  * @param input, P parameter scaled by 1e6
- * @param input, I parameter scaled by 1e8
+ * @param input, I parameter scaled by 1e10
  * @param input, D parameter scaled by 1e6
  * @param input, Integral limit
  * @param input, sampling time in us (microseconds)
@@ -46,9 +46,9 @@ void pid_init(PIDT1param &param)
  */
 void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDT1param &param)
 {
-    param.Kp = Kp/1000000.00;
-    param.Ki = Ki/100000000.00;
-    param.Kd = Kd/1000000.00;
+    param.Kp = Kp;
+    param.Ki = Ki;
+    param.Kd = Kd;
     param.integral_limit = integral_limit;
 
     if(param.Ki == 0)
@@ -77,7 +77,7 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
  *
  * @return the output of PIDT1 controller
  */
-double pid_update(double desired_value, double actual_value, int T_s, PIDT1param &param)
+double pid_update(double desired_value, double actual_value, double T_s, PIDT1param &param)
 {
     double error=0.00, cmd=0.00, derivat_input = 0.00;
 
