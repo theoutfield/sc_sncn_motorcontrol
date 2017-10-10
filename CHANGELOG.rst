@@ -4,7 +4,7 @@ sc_sncn_motorcontrol Change Log
 -----
 
   * Have three options for switching frequency namely 15 kHz, 30 kHz and 100 kHz
-  * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq
+  * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq with enough flexibility to drive 2 BLDCs and 2 brakes at the same time
   * Add support for DC30 in watchdog service
   * Implement gain scheduling controller with velocity as gain scheduling variable
   * Integrate the Drive 100 (DC100) fix from SDK 3.0.4
