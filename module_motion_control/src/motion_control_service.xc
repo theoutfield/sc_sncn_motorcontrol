@@ -690,7 +690,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         }
 
                         velocity_controller_auto_tune(velocity_auto_tune, motion_ctrl_config, velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD);
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
                         if(velocity_auto_tune.enable == 0)
                         {
                             torque_ref_k=0;
@@ -706,12 +706,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     {
                         velocity_ref_in_k = velocity_profiler(velocity_ref_k, velocity_ref_in_k_1n, velocity_k, profiler_param, POSITION_CONTROL_LOOP_PERIOD);
                         velocity_ref_in_k_1n = velocity_ref_in_k;
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
                     }
                     else if(motion_ctrl_config.enable_profiler==0)
                     {
                         velocity_ref_in_k = velocity_ref_k;
-                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        torque_ref_k = pid_update(velocity_ref_in_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
                     }
                     //Recording function for the cogging torque
                     if (motion_ctrl_config.enable_compensation_recording)
@@ -850,7 +850,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                     if (pos_control_mode == POS_PID_CONTROLLER)
                     {
-                        torque_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                        torque_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
                     }
                     else if (pos_control_mode == POS_PID_GAIN_SCHEDULING_CONTROLLER)
                     {
@@ -862,11 +862,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
                         pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
 
-                        velocity_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                        velocity_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
                         if(velocity_ref_k > motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
                         if(velocity_ref_k < -motion_ctrl_config.max_motor_speed) velocity_ref_k = -motion_ctrl_config.max_motor_speed;
 
-                        torque_ref_k = pid_update(velocity_ref_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        torque_ref_k = pid_update(velocity_ref_k, velocity_k, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
                     }
                     else if (pos_control_mode == POS_PID_VELOCITY_CASCADED_CONTROLLER)
                     {
@@ -897,17 +897,17 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             position_ref_in_k_2n = position_ref_in_k_1n;
                             position_ref_in_k_1n = position_ref_in_k;
 
-                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
                             if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
                             if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
-                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
                         }
                         else
                         {
-                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                            velocity_ref_k =pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
                             if(velocity_ref_k> motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
                             if(velocity_ref_k<-motion_ctrl_config.max_motor_speed) velocity_ref_k =-motion_ctrl_config.max_motor_speed;
-                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                            torque_ref_k   =pid_update(velocity_ref_k   , velocity_k, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
                         }
                     }
                     else if (pos_control_mode == LT_POSITION_CONTROLLER)
