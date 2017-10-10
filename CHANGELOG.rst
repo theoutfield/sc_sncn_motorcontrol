@@ -6,6 +6,9 @@ sc_sncn_motorcontrol Change Log
   * Have three options for switching frequency namely 15 kHz, 30 kHz and 100 kHz
   * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq
   * Add support for DC30 in watchdog service
+  * Implement gain scheduling controller with velocity as gain scheduling variable
+  * Integrate the Drive 100 (DC100) fix from SDK 3.0.4
+  * Add reverse sensor polarity command in app_control_tuning
 
 3.1.2
 -----
@@ -48,6 +51,7 @@ sc_sncn_motorcontrol Change Log
 -----
 
   * Add GPIO support in ethercat drive
+  * Fix issue with Drive 100 (DC100) when motor gets stalled after some times of running
 
 
 3.0.3

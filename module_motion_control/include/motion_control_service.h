@@ -53,7 +53,8 @@ typedef enum {
     POS_PID_CONTROLLER                      = 1,
     POS_PID_VELOCITY_CASCADED_CONTROLLER    = 2,
     LT_POSITION_CONTROLLER                  = 3,
-    VELOCITY_PID_CONTROLLER                 = 4
+    POS_PID_GAIN_SCHEDULING_CONTROLLER      = 4,
+    VELOCITY_PID_CONTROLLER                 = 5
 } MotionControlStrategies;
 
 /**
@@ -153,6 +154,21 @@ typedef struct {
     int hold_brake_voltage;             /**< Parameter for setting the brake voltage after it is pulled */
 
     int filter;
+
+    int position_kp_l;
+    int position_ki_l;
+    int position_kd_l;
+    int position_kp_h;
+    int position_ki_h;
+    int position_kd_h;
+    int velocity_kp_l;
+    int velocity_ki_l;
+    int velocity_kd_l;
+    int velocity_kp_h;
+    int velocity_ki_h;
+    int velocity_kd_h;
+    int velocity_lo_l;
+    int velocity_hi_l;
 } MotionControlConfig;
 
 
