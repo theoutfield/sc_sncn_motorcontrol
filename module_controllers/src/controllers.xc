@@ -39,12 +39,12 @@ void pid_init(PIDT1param &param)
  * @param input, I parameter scaled by 1e10
  * @param input, D parameter scaled by 1e6
  * @param input, Integral limit
- * @param input, sampling time in us (microseconds)
+ * @param input, sampling time in seconds
  * @param structure including the parameters of the PIDT1 controller
  *
  * @return void
  */
-void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDT1param &param)
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, double T_s, PIDT1param &param)
 {
     param.Kp = Kp;
     param.Ki = Ki;
@@ -62,7 +62,7 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
     if (param.Kd == 0)
         param.derivative = 0; // reset the derivative in case kd is set to 0
     else
-        param.v = 13;    // it is recommended to be in range [4, 20]
+        param.v = 100;
 
     param.T_s = T_s;
     param.b = PSEUDO_DERIVATIVE;

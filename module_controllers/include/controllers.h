@@ -26,7 +26,7 @@ typedef struct {
     double derivative_1n;
     double actual_value_1n;
     double error_value_1n;
-    double T_s;                // sampling-Time in seconds
+    double T_s;                // sampling time in seconds
     int v;                  // first order element in D part with time constant T_v
                             // T_v = Td / v => v €[4, 20]
     derivative_feedback b;  // derivative feedback, error = b*ref-y
