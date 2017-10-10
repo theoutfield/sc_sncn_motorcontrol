@@ -504,11 +504,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     pid_init(velocity_control_pid_param);
     if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
-    if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+    if(motion_ctrl_config.velocity_kp>100)    motion_ctrl_config.velocity_kp=100;
     if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
-    if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+    if(motion_ctrl_config.velocity_ki>100)    motion_ctrl_config.velocity_ki=100;
     if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
-    if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
+    if(motion_ctrl_config.velocity_kd>100)    motion_ctrl_config.velocity_kd=100;
     pid_set_parameters(
             (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
             (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
@@ -516,42 +516,42 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     pid_init(position_control_pid_param);
     if(motion_ctrl_config.position_kp<0)            motion_ctrl_config.position_kp=0;
-    if(motion_ctrl_config.position_kp>100000000)    motion_ctrl_config.position_kp=100000000;
+    if(motion_ctrl_config.position_kp>100)    motion_ctrl_config.position_kp = 100;
     if(motion_ctrl_config.position_ki<0)            motion_ctrl_config.position_ki=0;
-    if(motion_ctrl_config.position_ki>100000000)    motion_ctrl_config.position_ki=100000000;
+    if(motion_ctrl_config.position_ki>100)    motion_ctrl_config.position_ki = 100;
     if(motion_ctrl_config.position_kd<0)            motion_ctrl_config.position_kd=0;
-    if(motion_ctrl_config.position_kd>100000000)    motion_ctrl_config.position_kd=100000000;
+    if(motion_ctrl_config.position_kd>100)    motion_ctrl_config.position_kd = 100;
     pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki,
             (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
-            POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+            POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
 
     // initialize GS controller params to zero
     gain_scheduling_init(gain_sch_param);
     // set GS controller params to default ones from configuration file
     if(motion_ctrl_config.position_kp_l<0)            motion_ctrl_config.position_kp_l=0;
-    if(motion_ctrl_config.position_kp_l>100000000)    motion_ctrl_config.position_kp_l=100000000;
+    if(motion_ctrl_config.position_kp_l>100)    motion_ctrl_config.position_kp_l=100;
     if(motion_ctrl_config.position_ki_l<0)            motion_ctrl_config.position_ki_l=0;
-    if(motion_ctrl_config.position_ki_l>100000000)    motion_ctrl_config.position_ki_l=100000000;
+    if(motion_ctrl_config.position_ki_l>100)    motion_ctrl_config.position_ki_l=100;
     if(motion_ctrl_config.position_kd_l<0)            motion_ctrl_config.position_kd_l=0;
-    if(motion_ctrl_config.position_kd_l>100000000)    motion_ctrl_config.position_kd_l=100000000;
+    if(motion_ctrl_config.position_kd_l>100)    motion_ctrl_config.position_kd_l=100;
     if(motion_ctrl_config.position_kp_h<0)            motion_ctrl_config.position_kp_h=0;
-    if(motion_ctrl_config.position_kp_h>100000000)    motion_ctrl_config.position_kp_h=100000000;
+    if(motion_ctrl_config.position_kp_h>100)    motion_ctrl_config.position_kp_h=100;
     if(motion_ctrl_config.position_ki_h<0)            motion_ctrl_config.position_ki_h=0;
-    if(motion_ctrl_config.position_ki_h>100000000)    motion_ctrl_config.position_ki_h=100000000;
+    if(motion_ctrl_config.position_ki_h>100)    motion_ctrl_config.position_ki_h=100;
     if(motion_ctrl_config.position_kd_h<0)            motion_ctrl_config.position_kd_h=0;
-    if(motion_ctrl_config.position_kd_h>100000000)    motion_ctrl_config.position_kd_h=100000000;
+    if(motion_ctrl_config.position_kd_h>100)    motion_ctrl_config.position_kd_h=100;
     if(motion_ctrl_config.velocity_kp_l<0)            motion_ctrl_config.velocity_kp_l=0;
-    if(motion_ctrl_config.velocity_kp_l>100000000)    motion_ctrl_config.velocity_kp_l=100000000;
+    if(motion_ctrl_config.velocity_kp_l>100)    motion_ctrl_config.velocity_kp_l=100;
     if(motion_ctrl_config.velocity_ki_l<0)            motion_ctrl_config.velocity_ki_l=0;
-    if(motion_ctrl_config.velocity_ki_l>100000000)    motion_ctrl_config.velocity_ki_l=100000000;
+    if(motion_ctrl_config.velocity_ki_l>100)    motion_ctrl_config.velocity_ki_l=100;
     if(motion_ctrl_config.velocity_kd_l<0)            motion_ctrl_config.velocity_kd_l=0;
-    if(motion_ctrl_config.velocity_kd_l>100000000)    motion_ctrl_config.velocity_kd_l=100000000;
+    if(motion_ctrl_config.velocity_kd_l>100)    motion_ctrl_config.velocity_kd_l=100;
     if(motion_ctrl_config.velocity_kp_h<0)            motion_ctrl_config.velocity_kp_h=0;
-    if(motion_ctrl_config.velocity_kp_h>100000000)    motion_ctrl_config.velocity_kp_h=100000000;
+    if(motion_ctrl_config.velocity_kp_h>100)    motion_ctrl_config.velocity_kp_h=100;
     if(motion_ctrl_config.velocity_ki_h<0)            motion_ctrl_config.velocity_ki_h=0;
-    if(motion_ctrl_config.velocity_ki_h>100000000)    motion_ctrl_config.velocity_ki_h=100000000;
+    if(motion_ctrl_config.velocity_ki_h>100)    motion_ctrl_config.velocity_ki_h=100;
     if(motion_ctrl_config.velocity_kd_h<0)            motion_ctrl_config.velocity_kd_h=0;
-    if(motion_ctrl_config.velocity_kd_h>100000000)    motion_ctrl_config.velocity_kd_h=100000000;
+    if(motion_ctrl_config.velocity_kd_h>100)    motion_ctrl_config.velocity_kd_h=100;
     if(motion_ctrl_config.velocity_lo_l<0)            motion_ctrl_config.velocity_lo_l=0;
     if(motion_ctrl_config.velocity_lo_l>motion_ctrl_config.max_motor_speed)  motion_ctrl_config.velocity_lo_l=motion_ctrl_config.max_motor_speed;
     if(motion_ctrl_config.velocity_hi_l<0)            motion_ctrl_config.velocity_hi_l=0;
@@ -684,7 +684,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             motion_ctrl_config.velocity_ki = 0;
                             motion_ctrl_config.velocity_kd = 0;
                             pid_init(velocity_control_pid_param);
-                            pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                            pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
 
                             velocity_auto_tune.enable = 1;
                         }
@@ -859,8 +859,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         gain_scheduling_update(velocity_k, gain_sch_param, motion_ctrl_config);
 
                         // set params of PID controllers
-                        pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                        pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                        pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
+                        pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
 
                         velocity_ref_k = pid_update(position_ref_in_k, position_k, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
                         if(velocity_ref_k > motion_ctrl_config.max_motor_speed) velocity_ref_k = motion_ctrl_config.max_motor_speed;
@@ -888,8 +888,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 pid_init(velocity_control_pid_param);
                                 pid_init(position_control_pid_param);
 
-                                pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
-                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                                pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
+                                pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
                             }
 
 
@@ -1375,15 +1375,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 pid_init(velocity_control_pid_param);
                 if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
-                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+                if(motion_ctrl_config.velocity_kp>100)    motion_ctrl_config.velocity_kp=100;
                 if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
-                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+                if(motion_ctrl_config.velocity_ki>100)    motion_ctrl_config.velocity_ki=100;
                 if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
-                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
+                if(motion_ctrl_config.velocity_kd>100)    motion_ctrl_config.velocity_kd=100;
                 pid_set_parameters(
                         (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
                         (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
-                        POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
 
                 enable_motorcontrol(motion_ctrl_config, i_torque_control, upstream_control_data.position, special_brake_release_counter, special_brake_release_initial_position, special_brake_release_torque, motion_control_error);
 
@@ -1445,52 +1445,52 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 motion_ctrl_config = in_config;
 
                 if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
-                if(motion_ctrl_config.velocity_kp>100000000)    motion_ctrl_config.velocity_kp=100000000;
+                if(motion_ctrl_config.velocity_kp>100)    motion_ctrl_config.velocity_kp=100;
                 if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
-                if(motion_ctrl_config.velocity_ki>100000000)    motion_ctrl_config.velocity_ki=100000000;
+                if(motion_ctrl_config.velocity_ki>100)    motion_ctrl_config.velocity_ki=100;
                 if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
-                if(motion_ctrl_config.velocity_kd>100000000)    motion_ctrl_config.velocity_kd=100000000;
+                if(motion_ctrl_config.velocity_kd>100)    motion_ctrl_config.velocity_kd=100;
                 pid_set_parameters(
                         (double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki,
                         (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit,
-                        POSITION_CONTROL_LOOP_PERIOD, velocity_control_pid_param);
+                        POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
 
 
                 if(motion_ctrl_config.position_kp<0)            motion_ctrl_config.position_kp=0;
-                if(motion_ctrl_config.position_kp>100000000)    motion_ctrl_config.position_kp=100000000;
+                if(motion_ctrl_config.position_kp>100)    motion_ctrl_config.position_kp=100;
                 if(motion_ctrl_config.position_ki<0)            motion_ctrl_config.position_ki=0;
-                if(motion_ctrl_config.position_ki>100000000)    motion_ctrl_config.position_ki=100000000;
+                if(motion_ctrl_config.position_ki>100)    motion_ctrl_config.position_ki=100;
                 if(motion_ctrl_config.position_kd<0)            motion_ctrl_config.position_kd=0;
-                if(motion_ctrl_config.position_kd>100000000)    motion_ctrl_config.position_kd=100000000;
+                if(motion_ctrl_config.position_kd>100)    motion_ctrl_config.position_kd=100;
                 pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki,
                         (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit,
-                        POSITION_CONTROL_LOOP_PERIOD, position_control_pid_param);
+                        POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
 
                 // set GS controller params
                 if(motion_ctrl_config.position_kp_l<0)            motion_ctrl_config.position_kp_l=0;
-                if(motion_ctrl_config.position_kp_l>100000000)    motion_ctrl_config.position_kp_l=100000000;
+                if(motion_ctrl_config.position_kp_l>100)    motion_ctrl_config.position_kp_l=100;
                 if(motion_ctrl_config.position_ki_l<0)            motion_ctrl_config.position_ki_l=0;
-                if(motion_ctrl_config.position_ki_l>100000000)    motion_ctrl_config.position_ki_l=100000000;
+                if(motion_ctrl_config.position_ki_l>100)    motion_ctrl_config.position_ki_l=100;
                 if(motion_ctrl_config.position_kd_l<0)            motion_ctrl_config.position_kd_l=0;
-                if(motion_ctrl_config.position_kd_l>100000000)    motion_ctrl_config.position_kd_l=100000000;
+                if(motion_ctrl_config.position_kd_l>100)    motion_ctrl_config.position_kd_l=100;
                 if(motion_ctrl_config.position_kp_h<0)            motion_ctrl_config.position_kp_h=0;
-                if(motion_ctrl_config.position_kp_h>100000000)    motion_ctrl_config.position_kp_h=100000000;
+                if(motion_ctrl_config.position_kp_h>100)    motion_ctrl_config.position_kp_h=100;
                 if(motion_ctrl_config.position_ki_h<0)            motion_ctrl_config.position_ki_h=0;
-                if(motion_ctrl_config.position_ki_h>100000000)    motion_ctrl_config.position_ki_h=100000000;
+                if(motion_ctrl_config.position_ki_h>100)    motion_ctrl_config.position_ki_h=100;
                 if(motion_ctrl_config.position_kd_h<0)            motion_ctrl_config.position_kd_h=0;
-                if(motion_ctrl_config.position_kd_h>100000000)    motion_ctrl_config.position_kd_h=100000000;
+                if(motion_ctrl_config.position_kd_h>100)    motion_ctrl_config.position_kd_h=100;
                 if(motion_ctrl_config.velocity_kp_l<0)            motion_ctrl_config.velocity_kp_l=0;
-                if(motion_ctrl_config.velocity_kp_l>100000000)    motion_ctrl_config.velocity_kp_l=100000000;
+                if(motion_ctrl_config.velocity_kp_l>100)    motion_ctrl_config.velocity_kp_l=100;
                 if(motion_ctrl_config.velocity_ki_l<0)            motion_ctrl_config.velocity_ki_l=0;
-                if(motion_ctrl_config.velocity_ki_l>100000000)    motion_ctrl_config.velocity_ki_l=100000000;
+                if(motion_ctrl_config.velocity_ki_l>100)    motion_ctrl_config.velocity_ki_l=100;
                 if(motion_ctrl_config.velocity_kd_l<0)            motion_ctrl_config.velocity_kd_l=0;
-                if(motion_ctrl_config.velocity_kd_l>100000000)    motion_ctrl_config.velocity_kd_l=100000000;
+                if(motion_ctrl_config.velocity_kd_l>100)    motion_ctrl_config.velocity_kd_l=100;
                 if(motion_ctrl_config.velocity_kp_h<0)            motion_ctrl_config.velocity_kp_h=0;
-                if(motion_ctrl_config.velocity_kp_h>100000000)    motion_ctrl_config.velocity_kp_h=100000000;
+                if(motion_ctrl_config.velocity_kp_h>100)    motion_ctrl_config.velocity_kp_h=100;
                 if(motion_ctrl_config.velocity_ki_h<0)            motion_ctrl_config.velocity_ki_h=0;
-                if(motion_ctrl_config.velocity_ki_h>100000000)    motion_ctrl_config.velocity_ki_h=100000000;
+                if(motion_ctrl_config.velocity_ki_h>100)    motion_ctrl_config.velocity_ki_h=100;
                 if(motion_ctrl_config.velocity_kd_h<0)            motion_ctrl_config.velocity_kd_h=0;
-                if(motion_ctrl_config.velocity_kd_h>100000000)    motion_ctrl_config.velocity_kd_h=100000000;
+                if(motion_ctrl_config.velocity_kd_h>100)    motion_ctrl_config.velocity_kd_h=100;
                 if(motion_ctrl_config.velocity_lo_l<0)            motion_ctrl_config.velocity_lo_l=0;
                 if(motion_ctrl_config.velocity_lo_l>motion_ctrl_config.max_motor_speed)
                     motion_ctrl_config.velocity_lo_l=motion_ctrl_config.max_motor_speed;
