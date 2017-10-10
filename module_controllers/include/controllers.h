@@ -53,7 +53,7 @@ void pid_init(PIDT1param &param);
  *
  * @return void
  */
-void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDT1param &param);
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, double T_s, PIDT1param &param);
 
 /**
  * @brief updating the PIDT1 controller.

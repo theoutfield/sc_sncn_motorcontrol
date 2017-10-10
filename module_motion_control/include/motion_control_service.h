@@ -145,18 +145,18 @@ typedef struct {
 
     int filter;
 
-    int position_kp_l;
-    int position_ki_l;
-    int position_kd_l;
-    int position_kp_h;
-    int position_ki_h;
-    int position_kd_h;
-    int velocity_kp_l;
-    int velocity_ki_l;
-    int velocity_kd_l;
-    int velocity_kp_h;
-    int velocity_ki_h;
-    int velocity_kd_h;
+    float position_kp_l;
+    float position_ki_l;
+    float position_kd_l;
+    float position_kp_h;
+    float position_ki_h;
+    float position_kd_h;
+    float velocity_kp_l;
+    float velocity_ki_l;
+    float velocity_kd_l;
+    float velocity_kp_h;
+    float velocity_ki_h;
+    float velocity_kd_h;
     int velocity_lo_l;
     int velocity_hi_l;
 } MotionControlConfig;
