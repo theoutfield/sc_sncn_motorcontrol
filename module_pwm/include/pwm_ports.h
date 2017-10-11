@@ -44,6 +44,10 @@ typedef struct{
     buffered out port:1 ?p_pwm_w;           /**< Nullable 1-bit port for phase W high-side PWM signal */
     buffered out port:1 ?p_pwm_inv_w;       /**< Nullable 1-bit port for phase W low-side PWM signal */
 
+    buffered out port:1 ?p_pwm_b1;           /**< Nullable 1-bit port for phase V high-side PWM signal */
+    buffered out port:1 ?p_pwm_inv_b1;       /**< Nullable 1-bit port for phase V low-side PWM signal */
+    buffered out port:1 ?p_pwm_b2;           /**< Nullable 1-bit port for phase W high-side PWM signal */
+    buffered out port:1 ?p_pwm_inv_b2;       /**< Nullable 1-bit port for phase W low-side PWM signal */
     clock clk;                     /**< Hardware clock used as time reference */
 
     in port ?dummy_port;           /**< Any unused port. Used internally for accurate timming */

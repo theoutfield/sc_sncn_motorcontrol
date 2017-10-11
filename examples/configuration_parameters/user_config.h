@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+#include <motor_config_Maxon_411678.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       0
+#define COMMUTATION_ANGLE_OFFSET       150
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -194,10 +194,10 @@
 #define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 // Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define PULL_BRAKE_VOLTAGE         0    // [milli-Volts]
+#define PULL_BRAKE_VOLTAGE     48000    // [milli-Volts]
 // Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define HOLD_BRAKE_VOLTAGE         0     // [milli-Volts]
+#define HOLD_BRAKE_VOLTAGE     10000     // [milli-Volts]
 #define PULL_BRAKE_TIME         1000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
