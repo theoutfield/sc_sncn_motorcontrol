@@ -40,11 +40,12 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
                     pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
+    unsigned short  pwm_value_b1= 0x0000, pwm_value_b2= 0x0000;//pwm value for electric brake 1 and electric brake 2
+    unsigned short  safe_torque_off=0x0000;//default value 0
 
     int counter=0;
 
     unsigned short pwm_value =0;
-    unsigned short safe_torque_off=0x0000;
 
     time    =0x00000000;
     t :> time;
@@ -88,7 +89,8 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 
             i_update_pwm.update_server_control_data(
                     /*unsigned short pwm_a*/pwm_value_a, /*unsigned short pwm_b*/pwm_value_b, /*unsigned short pwm_c*/pwm_value_c,
-                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w);
+                    /*unsigned short pwm_u*/pwm_value_u, /*unsigned short pwm_v*/pwm_value_v, /*unsigned short pwm_w*/pwm_value_w,
+                    /*unsigned short pwm_b1*/pwm_value_b1, /*unsigned short pwm_v*/pwm_value_b2, safe_torque_off);
 
             time     += updating_period;
             break;
