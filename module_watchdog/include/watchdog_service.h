@@ -14,6 +14,7 @@
  */
 typedef struct {
     out port ?p_shared_enable_tick_led; /**< 4-bit Port for Watchdog basic management. */
+    port ?p_diag_enable; /**< Nullable] Bidirectional port for Diagnostic and enable */
     out port ?p_tick; /**< [Nullable] Port for the periodic tick signal (if applicable in your SOMANET device). */
     port ?p_cpld_shared;
     port ?p_cpld_fault_monitor;
@@ -22,7 +23,7 @@ typedef struct {
 /**
  * @brief Enumeration of existing IFM modules.
  */
-enum {DC100_DC300, DC500, DC1K_DC5K, DC1KD1};
+enum {DC100_DC300, DC500, DC1K_DC5K, DC1KD1, DC30};
 
 /**
  * @brief Service to manage the watchdog chip within your IFM SOMANET device.

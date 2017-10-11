@@ -75,7 +75,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
     int notification = MOTCTRL_NTF_EMPTY;
 
     SensorError sensor_error = SENSOR_NO_ERROR, last_sensor_error = SENSOR_NO_ERROR;
-    int singleturn_counter = 0, singleturn_old = 0, losing_ticks_counter = 0, ticks_lost;
+    int singleturn_counter = 0, singleturn_old = 0, ticks_lost;
 
     // used to compute the singleturn
     int shift = position_feedback_config.resolution;
@@ -139,9 +139,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
 
                                 // generate an error
                                 if(ticks_lost > position_feedback_config.resolution/position_feedback_config.qei_config.ticks_lost_threshold)
-                                    ++losing_ticks_counter;
-                                else
-                                    losing_ticks_counter = 0;
+                                    sensor_error = SENSOR_QEI_INDEX_LOSING_TICKS;
                             }
 
 
@@ -261,9 +259,6 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
 
                 if (singleturn_counter == 1000)
                     sensor_error = SENSOR_INCREMENTAL_FAULT;
-
-                if (losing_ticks_counter == 1000)
-                    sensor_error = SENSOR_QEI_INDEX_LOSING_TICKS;
 
                 if (sensor_error != SENSOR_NO_ERROR)
                     last_sensor_error = sensor_error;

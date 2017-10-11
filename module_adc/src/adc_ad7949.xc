@@ -539,6 +539,7 @@ void adc_ad7949(
 
                     configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
 
+                    delay_ticks(ADC7949_DATA_VALID_DELAY);
                     adc_ports.data_a :> data_raw_a;
                     adc_data_a = convert(data_raw_a);
                     adc_ports.data_b :> data_raw_b;

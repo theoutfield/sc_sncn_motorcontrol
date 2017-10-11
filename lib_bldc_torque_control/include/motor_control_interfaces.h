@@ -27,6 +27,15 @@ interface TorqueControlInterface
     void set_brake_status(int brake_status);
 
     /**
+     * @brief configures the brake settings including its voltages and timing
+     *
+     * @param pull_brake_voltage  voltage applied to electric brake at startup of brake
+     * @param pull_brake_time     period of applying high voltage to electric brake at startup (in milliseconds)
+     * @param hold_brake_voltage  voltage applied to electric brake after the brake is pulled
+     */
+    void configure_brake(int pull_brake_voltage, int pull_brake_time, int hold_brake_voltage);
+
+    /**
      * @brief Enables the torque control
      *
      * @return void
@@ -409,6 +418,15 @@ interface UpdatePWMGeneral
     int status(void);
 
     /**
+     * @brief send the settings of pwm service to the client side (kHz)
+     *
+     * @return pwm frequency in kHz
+     * @return pwm minimum value
+     * @return pwm maximum value
+     */
+    {int, int, int} settings(void);
+
+    /**
      * @brief send the pwm values and pwm controling commands to pwm service
      *
      * @param   pwm_a pwm value for phase a
@@ -422,7 +440,7 @@ interface UpdatePWMGeneral
      *
      * @return  void
      */
-    void update_server_control_data(unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c, unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w, int pwm_on, int safe_torque_off_mode);
+    void update_server_control_data(unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c, unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w, unsigned short pwm_b1, unsigned short pwm_b2, unsigned short safe_torque_off);
 
     /**
      * @brief send safe_torque_off_mode command to pwm service

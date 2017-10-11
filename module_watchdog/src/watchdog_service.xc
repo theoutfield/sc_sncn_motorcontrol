@@ -31,12 +31,12 @@
     unsigned char p_ifm_wdtick = 0b0000;
     //CPLD
     unsigned cpld_out_state = 0x8;//set green LED off
-    WatchdogError cpld_fault_monitor = WATCHDOG_NO_ERROR;
+    WatchdogError fault_monitor = WATCHDOG_NO_ERROR;
     unsigned int cycles_counter = 0;
     unsigned int cycles_reset = 40; //20 periods
 
     int WD_En_sent_flag =0;
-    unsigned int wd_enabled = 0;
+    unsigned int wd_enabled = 1;
     unsigned int ts;
     timer t;
 
@@ -47,7 +47,7 @@
 
     //proper task startup
     t :> ts;
-    t when timerafter (ts + (1000*20*250)) :> void;//FixMe: how is it proper?
+    t when timerafter (ts + (1000*100*10)) :> void;
 
     //Do the IFM type identification only once
     if(!isnull(watchdog_ports.p_shared_enable_tick_led)){//DC100, DC300, or DC1K
@@ -65,6 +65,10 @@
             cycles_reset = 25; //12.5 periods
         }
     }
+    else if (!isnull(watchdog_ports.p_diag_enable)) { //DC30
+        IFM_module_type = DC30;
+        cycles_reset = 500; // 20 ms
+    }
 
     /* WD Initialization routine */
     switch(IFM_module_type){
@@ -74,7 +78,10 @@
             //set green LED on
             led_motor_on_wdtick_wden_buffer |= 0b1010;
             watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
-            wd_enabled = 1;
+            break;
+        case DC30:
+            cycles_counter = cycles_reset;
+            watchdog_ports.p_diag_enable <: 0;
             break;
         case DC500:
         case DC1KD1:
@@ -82,26 +89,25 @@
             cpld_out_state |= 0b0101;//enable CPLD, reset errors
             watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
             cycles_counter = cycles_reset;
-            wd_enabled = 1;
             break;
         case DC1K_DC5K://FixMe: optimize it further
             //motor on and WD on
             led_motor_on_wdtick_wden_buffer |= 0b0101;//[ LED | Motor_En | WD_Tick | WD_En ]
-            wd_enabled = 1;
+            break;
+        default:
+            wd_enabled = 0;
             break;
     }
 
     t :> ts;
     t when timerafter (ts + 100*usec) :> void;//100 us
 
-
     t :> ts;
-
     // Loop forever processing commands
     while (1) {
         select {
-        case i_watchdog[int i].read_fault_monitor() -> WatchdogError out_cpld_fault_monitor:
-                out_cpld_fault_monitor = cpld_fault_monitor;
+        case i_watchdog[int i].read_fault_monitor() -> WatchdogError out_fault_monitor:
+                out_fault_monitor = fault_monitor;
                 break;
 
         case i_watchdog[int i].protect(int fault_id):
@@ -110,6 +116,9 @@
                         //Disable WD and set red LED on
                         led_motor_on_wdtick_wden_buffer &= 0b1100;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        wd_enabled = 0;
+                        break;
+                    case DC30:
                         wd_enabled = 0;
                         break;
                     case DC500:
@@ -149,6 +158,10 @@
                                 WD_En_sent_flag++;
                             }
                             break;
+                        case DC30:
+                            p_ifm_wdtick ^= 1;//toggle wd tick
+                            watchdog_ports.p_tick <: p_ifm_wdtick;
+                            break;
                         case DC500:
                         case DC1KD1:
                             cpld_out_state ^= (1 << 1); //toggle wd tick
@@ -180,17 +193,33 @@
                 }
 
                 //read cpld fault monitor on DC1KD1
-                if (IFM_module_type == DC1KD1) {
+                switch(IFM_module_type) {
+                case DC1KD1:
                     unsigned int tmp = 0;
                     watchdog_ports.p_cpld_fault_monitor :> tmp;
                     tmp = tmp >> 4; //the first four bits are used for pwm
                     if (tmp == 0b1000) { //green led on = no error
-                        cpld_fault_monitor = WATCHDOG_NO_ERROR;
+                        fault_monitor = WATCHDOG_NO_ERROR;
                     } else if (tmp == 0 || (tmp&0b1000)) { //every led is off or green led is on with red led = unknown error
-                        cpld_fault_monitor = WATCHDOG_UNKNOWN_ERROR;
+                        fault_monitor = WATCHDOG_UNKNOWN_ERROR;
                     } else { //the rest of the error maps to the enum
-                        cpld_fault_monitor = tmp;
+                        fault_monitor = tmp;
                     }
+                    break;
+                case DC30:
+                    //read diag port when reset is finished
+                    if (cycles_counter == 0) {
+                        unsigned int watchdog_diag = 0;
+                        watchdog_ports.p_diag_enable :> watchdog_diag;
+                        if (watchdog_diag & 1) {
+                            fault_monitor = WATCHDOG_NO_ERROR;
+                        } else {
+                            fault_monitor = WATCHDOG_UNKNOWN_ERROR;
+                        }
+                    } else {
+                        cycles_counter--;
+                    }
+                    break;
                 }
 
                 //showing the fault type by LED flashing (once, twice, ..., five times)
@@ -214,6 +243,10 @@
                         //Turn green LED on and enable WD
                         led_motor_on_wdtick_wden_buffer |= 0b1011;
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
+                        break;
+                    case DC30:
+                        cycles_counter = cycles_reset;
+                        watchdog_ports.p_diag_enable <: 0;
                         break;
                     case DC500:
                     case DC1KD1:

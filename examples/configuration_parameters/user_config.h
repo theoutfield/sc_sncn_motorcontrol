@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config.h>
+#include <motor_config_Maxon_411678.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -81,7 +81,7 @@
 //////////////////////////////////////////////
 // Warning!!! This parameter alters PWM switching frequency.
 // Selecting USEC_STD will result in 12kHZ switching frequency, USEC_FAST (recommended) - in 15kHz
-#define IFM_TILE_USEC       USEC_FAST      // Number of ticks in a microsecond for IFM Tile.
+#define IFM_TILE_USEC       USEC_STD      // Number of ticks in a microsecond for IFM Tile.
 
 //////////////////////////////////////////////
 //////  MOTOR COMMUTATION CONFIGURATION
@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       0
+#define COMMUTATION_ANGLE_OFFSET       150
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -144,6 +144,23 @@
 //     "1000"                 in case of using position controller in "LT_POSITION_CONTROLLER"               mode
 #define POSITION_INTEGRAL_LIMIT                 PEAK_SPEED
 
+// PARAMS FOR GAIN SCHEDULING CONTROLLER
+#define GAIN_SCHEDULING_POSITION_Kp_0           0
+#define GAIN_SCHEDULING_POSITION_Ki_0           0
+#define GAIN_SCHEDULING_POSITION_Kd_0           0
+#define GAIN_SCHEDULING_VELOCITY_Kp_0           0
+#define GAIN_SCHEDULING_VELOCITY_Ki_0           0
+#define GAIN_SCHEDULING_VELOCITY_Kd_0           0
+#define GAIN_SCHEDULING_POSITION_Kp_1           0
+#define GAIN_SCHEDULING_POSITION_Ki_1           0
+#define GAIN_SCHEDULING_POSITION_Kd_1           0
+#define GAIN_SCHEDULING_VELOCITY_Kp_1           0
+#define GAIN_SCHEDULING_VELOCITY_Ki_1           0
+#define GAIN_SCHEDULING_VELOCITY_Kd_1           0
+#define GAIN_SCHEDULING_VELOCITY_THRESHOLD_0    0
+#define GAIN_SCHEDULING_VELOCITY_THRESHOLD_1    0
+
+
 // POLARITY OF THE MOVEMENT OF YOUR MOTOR [MOTION_POLARITY_NORMAL(0), MOTION_POLARITY_INVERTED(1)]
 #define POLARITY                MOTION_POLARITY_NORMAL
 
@@ -170,7 +187,6 @@
 
 #define POSITION_CONTROL_STRATEGY               POS_PID_VELOCITY_CASCADED_CONTROLLER
 
-
 //////////////////////////////////////////////
 //////  BRAKE CONFIGURATION
 //////////////////////////////////////////////
@@ -178,11 +194,11 @@
 #define BRAKE_RELEASE_DELAY        0    // delay in milliseconds between the brake blocking and the stop of the control
 // Voltage which will be applied to electric brake to release (pull) the brake at startup in [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define PULL_BRAKE_VOLTAGE     18000    // [milli-Volts]
+#define PULL_BRAKE_VOLTAGE     48000    // [milli-Volts]
 // Voltage which will be applied to electric brake to hold the brake after it is pulled [milli-Volt].
 // Note: The final voltage (on brake terminals) depends on brake loading characteristics. Generated voltage is precise in the case of pure resistive brake.
-#define HOLD_BRAKE_VOLTAGE     7000     // [milli-Volts]
-#define PULL_BRAKE_TIME        3000    //Time period in which it is tried to release (pull) the brake [milli seconds]
+#define HOLD_BRAKE_VOLTAGE     10000     // [milli-Volts]
+#define PULL_BRAKE_TIME         1000    //Time period in which it is tried to release (pull) the brake [milli seconds]
 
 
 /////////////////////////////////////////////////

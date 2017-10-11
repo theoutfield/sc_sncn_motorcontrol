@@ -17,27 +17,36 @@
 #define _PWM_SERVER_H_
 
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <xs1.h>
-#include <assert.h>
-#include <print.h>
 
 #include <pwm_ports.h>
 #include <motor_control_interfaces.h>
 
 /**
- * @brief Define maximum possible values for general PWM server (which is able to
- * generate PWM pulses for up to 6 outputs.
+ * @brief Define updating period for general purpose pwm server while the ref_clk_freq is 100 MHz.
  */
-#define GENERAL_PWM_MAX_VALUE   0x1612
+#define GPWM_UPDATING_PERIOD          6667
 
 /**
  * @brief Define maximum possible values for general PWM server (which is able to
  * generate PWM pulses for up to 6 outputs.
  */
-#define GENERAL_PWM_MIN_VALUE   0x0000
+#define GPWM_MAX_VALUE_15_kHz         6666
+#define GPWM_MAX_VALUE_30_kHz         3333
+#define GPWM_MAX_VALUE_100_kHz        1000
+
+/**
+ * @brief Define maximum possible values for general PWM server (which is able to
+ * generate PWM pulses for up to 6 outputs.
+ */
+#define GPWM_MIN_VALUE         0
+
+/**
+ * @brief PWM frequency in kHz.
+ */
+#define GPWM_FRQ_15               15 // PWM frequency in kHz
+#define GPWM_FRQ_30               30 // PWM frequency in kHz
+#define GPWM_FRQ_100              100// PWM frequency in kHz
 
 /**
  * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
@@ -80,16 +89,19 @@ void pwm_config_general(PwmPortsGeneral &ports);
 
 /**
  * @brief Service to generate center-alligned PWM signals for 6 inverter outputs (2 power switch for each leg).
- * It recieves 6 pwm values through i_update_pwm interface. The commutation frequency is 16 kHz, and the deadtime is 3 us.
+ * It recieves 6 pwm values through i_update_pwm interface. The commutation frequency is 15 kHz.
  *
- * @param ports                 Structure type for PWM ports
+ * @param ports                 Structure type for general PWM ports
  * @param i_update_pwm          Interface to communicate with client and update the PWM values
+ * @param freq_kHz              pwm frequency - kHz
+ * @param deadtime_ns           deadtime in [ns] (depends on board)
  *
  * @return void
  */
 void pwm_service_general(
         PwmPortsGeneral &ports,
-        server interface UpdatePWMGeneral i_update_pwm
+        server interface UpdatePWMGeneral i_update_pwm,
+        int freq_kHz, int deadtime_ns
 );
 
 /**
@@ -122,7 +134,5 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         server interface UpdateBrake i_update_brake,
         int ifm_tile_usec
 );
-
-
 
 #endif // _PWM_SERVER_H_

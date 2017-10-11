@@ -33,7 +33,7 @@ void torque_control_service( MotorcontrolConfig &motorcontrol_config,
                             client interface shared_memory_interface ?i_shared_memory,
                             interface WatchdogInterface client i_watchdog,
                             interface TorqueControlInterface server i_torque_control[2],
-                            client interface UpdatePWM i_update_pwm,
-                            int ifm_tile_usec);
+                            client interface UpdatePWMGeneral i_update_pwm,
+                            int ifm_tile_usec, out port? p_trq_ctrl);
 
 #endif /* ADVANCED_MOTOR_CONTROL_H_ */
