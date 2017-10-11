@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config_Maxon_411678.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -24,7 +24,7 @@
 ///////////////////////
 
 // SENSOR 1 TYPE [HALL_SENSOR, QEI_SENSOR, REM_14_SENSOR, REM_16MT_SENSOR, BISS_SENSOR, SSI_SENSOR]
-#define SENSOR_1_TYPE                     REM_16MT_SENSOR
+#define SENSOR_1_TYPE                     HALL_SENSOR
 
 // FUNCTION OF SENSOR_1 [ SENSOR_FUNCTION_DISABLED, SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL,
 //                        SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY,
@@ -34,10 +34,10 @@
 #define SENSOR_1_FUNCTION                 SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL
 
 // RESOLUTION (TICKS PER TURN) OF SENSOR_1
-#define SENSOR_1_RESOLUTION               REM_16MT_SENSOR_RESOLUTION
+#define SENSOR_1_RESOLUTION               HALL_SENSOR_RESOLUTION
 
 // VELOCITY COMPUTE PERIOD (ALSO POLLING RATE) OF SENSOR_1 (in microseconds)
-#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  REM_16MT_SENSOR_VELOCITY_COMPUTE_PERIOD
+#define SENSOR_1_VELOCITY_COMPUTE_PERIOD  HALL_SENSOR_VELOCITY_COMPUTE_PERIOD
 
 // POLARITY OF SENSOR_1 SENSOR [0 - normal, 1 - inverted]
 #define SENSOR_1_POLARITY                 SENSOR_POLARITY_NORMAL
@@ -88,19 +88,19 @@
 //////////////////////////////////////////////
 #define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 20
+#define APPLIED_TUNING_TORQUE_PERCENT 50
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       150
+#define COMMUTATION_ANGLE_OFFSET       3365
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
-#define HALL_STATE_1_ANGLE     0
-#define HALL_STATE_2_ANGLE     0
-#define HALL_STATE_3_ANGLE     0
-#define HALL_STATE_4_ANGLE     0
-#define HALL_STATE_5_ANGLE     0
-#define HALL_STATE_6_ANGLE     0
+#define HALL_STATE_1_ANGLE     1974
+#define HALL_STATE_2_ANGLE     651
+#define HALL_STATE_3_ANGLE     1341
+#define HALL_STATE_4_ANGLE     3347
+#define HALL_STATE_5_ANGLE     2698
+#define HALL_STATE_6_ANGLE     4052
 
 // GPIO PORTS CONFIGURATION
 #define GPIO_CONFIG_1          GPIO_OFF
