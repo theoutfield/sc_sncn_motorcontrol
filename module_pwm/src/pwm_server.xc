@@ -249,7 +249,7 @@ void pwm_service_general(
     unsigned short pwm_value_a=0x0000, pwm_value_b=0x0000, pwm_value_c=0x0000, pwm_value_u=0x0000, pwm_value_v=0x0000, pwm_value_w=0x0000;
     unsigned short pwm_value_b1=0x0000, pwm_value_b2=0x0000;
 
-    unsigned short pwm_on = 0x0000;
+    unsigned short pwm_on = 0x0000, safe_torque_off=0x0000;
 
     unsigned short a_high_rise=0x0000, a_low_rise=0x0000;
     unsigned short b_high_rise=0x0000, b_low_rise=0x0000;
@@ -334,8 +334,8 @@ void pwm_service_general(
 
         dummy_delay      = 1667 & 0x0000FFFF   ;
 
-        limit_h_computational_margine =200 & 0x0000FFFF   ;
-        limit_l_computational_margine =80 & 0x0000FFFF   ;
+        limit_h_computational_margine =300 & 0x0000FFFF   ;
+        limit_l_computational_margine =100 & 0x0000FFFF   ;
 
         pwm_limit_h      = (3333 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = limit_l_computational_margine & 0x0000FFFF   ;
@@ -358,7 +358,7 @@ void pwm_service_general(
         dummy_delay      =  500 & 0x0000FFFF   ;
 
         limit_h_computational_margine = 80 & 0x0000FFFF   ;
-        limit_l_computational_margine = 80 & 0x0000FFFF   ;
+        limit_l_computational_margine = 50 & 0x0000FFFF   ;
 
         pwm_limit_h      = (1000 - (2*inactive_period) - limit_h_computational_margine) & 0x0000FFFF   ;
         pwm_limit_l      = limit_l_computational_margine & 0x0000FFFF   ;
@@ -434,7 +434,8 @@ void pwm_service_general(
             case i_update_pwm.update_server_control_data(
                     unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c,
                     unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w,
-                    unsigned short pwm_b1,unsigned short pwm_b2):
+                    unsigned short pwm_b1,unsigned short pwm_b2,
+                    unsigned short safe_torque_off_in):
 
                             pwm_value_a = (pwm_a & 0x0000FFFF);
                             if(pwm_value_a<pwm_limit_l) pwm_value_a=pwm_limit_l;
@@ -505,6 +506,7 @@ void pwm_service_general(
                             b2_low_rise =  b2_high_rise+inactive_period;
 
                             pwm_on = 0x0001;
+                            safe_torque_off = safe_torque_off_in;
                             break;
 
             case i_update_pwm.status() -> {int status}:
@@ -541,7 +543,7 @@ void pwm_service_general(
                 break;
             }//select
 
-            if(pwm_on)
+            if(pwm_on && !safe_torque_off)
             {
                 if(phase_a_defined) ports.p_pwm_a           @ (unsigned short)((ref_time - a_high_rise)&(inp_wid)) <: 1;
                 if(phase_a_inv_defined) ports.p_pwm_inv_a       @ (unsigned short)((ref_time - a_low_rise) &(inp_wid)) <: 1;
@@ -615,7 +617,8 @@ void pwm_service_general(
             case i_update_pwm.update_server_control_data(
                     unsigned short pwm_a, unsigned short pwm_b, unsigned short pwm_c,
                     unsigned short pwm_u, unsigned short pwm_v, unsigned short pwm_w,
-                    unsigned short pwm_b1,unsigned short pwm_b2):
+                    unsigned short pwm_b1,unsigned short pwm_b2,
+                    unsigned short safe_torque_off_in):
 
                             pwm_value_a = (pwm_a & 0x0000FFFF);
                             if(pwm_value_a<pwm_limit_l) pwm_value_a=pwm_limit_l;
@@ -686,6 +689,7 @@ void pwm_service_general(
                             b2_low_rise =  b2_high_rise+inactive_period;
 
                             pulse_generation_flag = 1;
+                            safe_torque_off = safe_torque_off_in;
 
                             pattern = peek( ports.p_pwm_a ); // Find out value on 1-bit port. NB Only LS-bit is relevant
                             ref_time  = partout_timestamped( ports.p_pwm_a ,1 ,pattern ); // Re-load output port with same bit-value
@@ -729,7 +733,7 @@ void pwm_service_general(
                 break;
             }//select
 
-            if(pulse_generation_flag)
+            if(pulse_generation_flag && !safe_torque_off)
             {
                 for(i=0x00000000;i<pulse_counter;i++)
                 {
