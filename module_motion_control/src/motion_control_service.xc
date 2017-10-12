@@ -717,7 +717,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     if (motion_ctrl_config.enable_compensation_recording)
                     {
                         downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
-                        if (ct_parameters.delay_counter < (1000 * 1000 * POSITION_CONTROL_LOOP_PERIOD))
+                        if (ct_parameters.delay_counter > (500 * 1000 / POSITION_CONTROL_LOOP_PERIOD))
                         {
                             if (!ct_parameters.torque_recording_started)
                             {
