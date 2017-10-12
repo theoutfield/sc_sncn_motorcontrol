@@ -457,7 +457,7 @@ void adc_ad7949(
                 if(ad7949_config & BIT0)
                     bits[3] |= 0x00B30000;
 
-                for(int i=0;i<=3;i++)
+                for(int i=0;i<=4;i++)
                 {
                     stop_clock(adc_ports.clk);
                     clearbuf(adc_ports.data_a);
