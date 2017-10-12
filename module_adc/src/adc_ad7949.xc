@@ -313,8 +313,6 @@ void adc_ad7949(
 
     int data_updated=0;
 
-    int dc_value=2617;
-
     int v_dc_max=0;
     int v_dc_min=0;
     int current_limit = 0;
@@ -361,7 +359,7 @@ void adc_ad7949(
             phaseB_out = (current_sensor_config.sign_phase_b * (OUT_A[0] - i_calib_a))/20;
             phaseC_out = (current_sensor_config.sign_phase_c * (OUT_B[0] - i_calib_b))/20;
 
-            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-dc_value;
+            V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT];
 
             if((5000<protection_counter) && (fault_code==NO_FAULT))
             {
