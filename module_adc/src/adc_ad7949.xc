@@ -295,7 +295,7 @@ void adc_ad7949(
 
     unsigned int adc_data_a=0;
     unsigned int adc_data_b=0;
-    unsigned int hdw_delay = 2440 + (18*ifm_tile_usec);
+    unsigned int hdw_delay = 1400;
 
     unsigned int data_raw_a;
     unsigned int data_raw_b;
