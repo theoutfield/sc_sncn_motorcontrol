@@ -315,9 +315,10 @@ void adc_ad7949(
 
     int dc_value=2617;
 
-    int v_dc_max=100;
+    int v_dc_max=0;
     int v_dc_min=0;
-    int current_limit = 100;
+    int current_limit = 0;
+    int protection_initialized=0;
     int protection_counter=0;
 
     int fault_code=NO_FAULT;
@@ -346,6 +347,7 @@ void adc_ad7949(
                 current_limit = limit_oc;
                 v_dc_max      = limit_ov;
                 v_dc_min      = limit_uv;
+                protection_initialized = 1;
                 break;
 
         case iADC[int i].get_all_measurements() -> {
@@ -409,7 +411,7 @@ void adc_ad7949(
 
         if(data_updated==1)
         {
-            if(protection_counter<10000) protection_counter++;
+            if(protection_counter<50000 && protection_initialized) protection_counter++;
 
             t when timerafter (t_start + hdw_delay) :> void;
             for(j=AD_7949_EXT_A0_P_EXT_A1_P;AD_7949_IB_IC<=j;j--)
