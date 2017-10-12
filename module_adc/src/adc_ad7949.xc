@@ -309,7 +309,7 @@ void adc_ad7949(
             AD7949_CHANNEL_4,   // ADC Channel 4, unipolar, referenced to GND
             AD7949_CHANNEL_5};  // ADC Channel 5, unipolar, referenced to GND
 
-    int i_calib_a = 10002, i_calib_b = 10002;
+    int i_calib_a = 5000, i_calib_b = 5000;
 
     int data_updated=0;
 
