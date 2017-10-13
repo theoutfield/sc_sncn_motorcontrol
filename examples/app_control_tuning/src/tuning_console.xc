@@ -46,7 +46,8 @@ int general_system_evaluation(client interface MotionControlInterface i_motion_c
     }
 }
 
-void control_tuning_console(client interface MotionControlInterface i_motion_control)
+void control_tuning_console(client interface MotionControlInterface i_motion_control,
+        client interface PositionFeedbackInterface ?i_position_feedback_1, client interface PositionFeedbackInterface ?i_position_feedback_2)
 {
     DownstreamControlData downstream_control_data = {0};
 
@@ -334,7 +335,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                         if(motorcontrol_config.commutation_angle_offset == -1)
                         {
-                            printf(">>  WRONG POSITION SENSOR POLARITY ...\n");
+                            printf(">>  WRONG POSITION SENSOR POLARITY ...\n"
+                                   "You need to change the sensor polarity with the 's' command\n");
                         }
                         else
                         {
@@ -763,6 +765,44 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 printf("inverted movement polarity\n");
             }
             i_motion_control.set_motion_control_config(motion_ctrl_config);
+            break;
+
+        //change sensor polarity
+        case 's':
+            int polarity_reverse_done = 0;
+            if (!isnull(i_position_feedback_1)) {
+                PositionFeedbackConfig position_feedback_config_1 = i_position_feedback_1.get_config();
+                if (position_feedback_config_1.sensor_function == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL ||
+                    position_feedback_config_1.sensor_function == SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY ||
+                    position_feedback_config_1.sensor_function == SENSOR_FUNCTION_COMMUTATION_ONLY)
+                {
+                    if (position_feedback_config_1.polarity == SENSOR_POLARITY_INVERTED) {
+                        position_feedback_config_1.polarity = SENSOR_POLARITY_NORMAL;
+                        printf("normal sensor polarity\n");
+                    } else {
+                        position_feedback_config_1.polarity = SENSOR_POLARITY_INVERTED;
+                        printf("inverted sensor polarity\n");
+                    }
+                    polarity_reverse_done = 1;
+                    i_position_feedback_1.set_config(position_feedback_config_1);
+                }
+            }
+            if (polarity_reverse_done == 0 && !isnull(i_position_feedback_2)) {
+                PositionFeedbackConfig position_feedback_config_2 = i_position_feedback_2.get_config();
+                if (position_feedback_config_2.sensor_function == SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL ||
+                    position_feedback_config_2.sensor_function == SENSOR_FUNCTION_COMMUTATION_AND_FEEDBACK_DISPLAY_ONLY ||
+                    position_feedback_config_2.sensor_function == SENSOR_FUNCTION_COMMUTATION_ONLY)
+                {
+                    if (position_feedback_config_2.polarity == SENSOR_POLARITY_INVERTED) {
+                        position_feedback_config_2.polarity = SENSOR_POLARITY_NORMAL;
+                        printf("normal sensor polarity\n");
+                    } else {
+                        position_feedback_config_2.polarity = SENSOR_POLARITY_INVERTED;
+                        printf("inverted sensor polarity\n");
+                    }
+                    i_position_feedback_2.set_config(position_feedback_config_2);
+                }
+            }
             break;
 
         //enable

@@ -69,6 +69,7 @@ int main(void) {
             par
             {
                 {
+<<<<<<< HEAD
                     occupy_core(10);
                 }
 
@@ -82,6 +83,9 @@ int main(void) {
 
                 {
                     occupy_core(13);
+=======
+                    control_tuning_console(i_motion_control[0], i_position_feedback_1[0], i_position_feedback_2[0]);
+>>>>>>> develop
                 }
 
                 {
