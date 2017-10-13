@@ -1272,32 +1272,32 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         upstream_control_data.error_status = PHASE_FAILURE_L3;
                         break;
                 }
-
-#ifdef XSCOPE_POSITION_CTRL
-                xscope_int(VELOCITY, upstream_control_data.velocity);
-                xscope_int(POSITION, upstream_control_data.position);
-                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
-                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
-                xscope_int(TORQUE,   upstream_control_data.computed_torque);
-                xscope_int(POSITION_CMD, downstream_control_data.position_cmd);
-                xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
-                xscope_int(TORQUE_CMD, torque_ref_k);
-                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
-                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-#endif
-
-#ifdef XSCOPE_ANALOGUE_MEASUREMENT
-                xscope_int(V_DC, upstream_control_data.V_dc);
-                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
-                xscope_int(TEMPERATURE, (upstream_control_data.temperature/motorcontrol_config.temperature_ratio));
-                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
-                xscope_int(I_B, upstream_control_data.I_b);
-                xscope_int(I_C, upstream_control_data.I_c);
-                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
-                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
-                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
-                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
-#endif
+//
+//#ifdef XSCOPE_POSITION_CTRL
+//                xscope_int(VELOCITY, upstream_control_data.velocity);
+//                xscope_int(POSITION, upstream_control_data.position);
+//                xscope_int(VELOCITY_SECONDARY, upstream_control_data.secondary_velocity);
+//                xscope_int(POSITION_SECONDARY, upstream_control_data.secondary_position);
+//                xscope_int(TORQUE,   upstream_control_data.computed_torque);
+//                xscope_int(POSITION_CMD, downstream_control_data.position_cmd);
+//                xscope_int(VELOCITY_CMD, downstream_control_data.velocity_cmd);
+//                xscope_int(TORQUE_CMD, torque_ref_k);
+//                xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
+//                xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
+//#endif
+//
+//#ifdef XSCOPE_ANALOGUE_MEASUREMENT
+//                xscope_int(V_DC, upstream_control_data.V_dc);
+//                xscope_int(I_DC, upstream_control_data.analogue_input_b_2);
+//                xscope_int(TEMPERATURE, (upstream_control_data.temperature/motorcontrol_config.temperature_ratio));
+//                xscope_int(I_A, -(upstream_control_data.I_b+upstream_control_data.I_c));
+//                xscope_int(I_B, upstream_control_data.I_b);
+//                xscope_int(I_C, upstream_control_data.I_c);
+//                xscope_int(AI_A1, upstream_control_data.analogue_input_a_1);
+//                xscope_int(AI_A2, upstream_control_data.analogue_input_a_2);
+//                xscope_int(AI_B1, upstream_control_data.analogue_input_b_1);
+//                xscope_int(AI_B2, upstream_control_data.analogue_input_b_2);
+//#endif
 
                 if((time_used/app_tile_usec)>(POSITION_CONTROL_LOOP_PERIOD-5))
                 {
