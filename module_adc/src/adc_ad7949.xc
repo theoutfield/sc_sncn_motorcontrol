@@ -295,7 +295,7 @@ void adc_ad7949(
 
     unsigned int adc_data_a=0;
     unsigned int adc_data_b=0;
-    unsigned int hdw_delay = 2440 + (18*ifm_tile_usec);
+    unsigned int hdw_delay = 1400;
 
     unsigned int data_raw_a;
     unsigned int data_raw_b;
@@ -309,7 +309,7 @@ void adc_ad7949(
             AD7949_CHANNEL_4,   // ADC Channel 4, unipolar, referenced to GND
             AD7949_CHANNEL_5};  // ADC Channel 5, unipolar, referenced to GND
 
-    int i_calib_a = 10002, i_calib_b = 10002;
+    int i_calib_a = 5000, i_calib_b = 5000;
 
     int data_updated=0;
 
@@ -356,72 +356,8 @@ void adc_ad7949(
             int fault_code_out}:
 
             t :> t_start;
-            configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-
-#pragma unsafe arrays
-            int bits[4];
-
-            bits[0]=0x80808000;
-            if(adc_config_mot & BIT13)
-                bits[0] |= 0x0000B300;
-            if(adc_config_mot & BIT12)
-                bits[0] |= 0x00B30000;
-            if(adc_config_mot & BIT11)
-                bits[0] |= 0xB3000000;
-
-            bits[1]=0x80808080;
-            if(adc_config_mot & BIT10)
-                bits[1] |= 0x000000B3;
-            if(adc_config_mot & BIT09)
-                bits[1] |= 0x0000B300;
-            if(adc_config_mot & BIT08)
-                bits[1] |= 0x00B30000;
-            if(adc_config_mot & BIT07)
-                bits[1] |= 0xB3000000;
-
-            bits[2]=0x80808080;
-            if(adc_config_mot & BIT06)
-                bits[2] |= 0x000000B3;
-            if(adc_config_mot & BIT05)
-                bits[2] |= 0x0000B300;
-            if(adc_config_mot & BIT04)
-                bits[2] |= 0x00B30000;
-            if(adc_config_mot & BIT03)
-                bits[2] |= 0xB3000000;
-
-            bits[3]=0x00808080;
-            if(adc_config_mot & BIT02)
-                bits[3] |= 0x000000B3;
-            if(adc_config_mot & BIT01)
-                bits[3] |= 0x0000B300;
-            if(adc_config_mot & BIT0)
-                bits[3] |= 0x00B30000;
-
-            stop_clock(adc_ports.clk);
-            clearbuf(adc_ports.data_a);
-            clearbuf(adc_ports.data_b);
-            clearbuf(adc_ports.sclk_conv_mosib_mosia);
-            adc_ports.sclk_conv_mosib_mosia <: bits[0];
-            start_clock(adc_ports.clk);
-
-            adc_ports.sclk_conv_mosib_mosia <: bits[1];
-            adc_ports.sclk_conv_mosib_mosia <: bits[2];
-            adc_ports.sclk_conv_mosib_mosia <: bits[3];
-
-            sync(adc_ports.sclk_conv_mosib_mosia);
-            stop_clock(adc_ports.clk);
-
-            configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-
-            adc_ports.data_a :> data_raw_a;
-            adc_data_a = convert(data_raw_a);
-            adc_ports.data_b :> data_raw_b;
-            adc_data_b = convert(data_raw_b);
-
-            configure_out_port(adc_ports.sclk_conv_mosib_mosia, adc_ports.clk, 0b0100);
-
-            phaseB_out = (current_sensor_config.sign_phase_b * (((int) adc_data_a) - i_calib_a))/20;
-            phaseC_out = (current_sensor_config.sign_phase_c * (((int) adc_data_b) - i_calib_b))/20;
+            phaseB_out = (current_sensor_config.sign_phase_b * (OUT_A[0] - i_calib_a))/20;
+            phaseC_out = (current_sensor_config.sign_phase_c * (OUT_B[0] - i_calib_b))/20;
 
             V_dc_out=OUT_A[AD_7949_VMOT_DIV_I_MOT]-dc_value;
 
@@ -521,7 +457,7 @@ void adc_ad7949(
                 if(ad7949_config & BIT0)
                     bits[3] |= 0x00B30000;
 
-                for(int i=0;i<=3;i++)
+                for(int i=0;i<=4;i++)
                 {
                     stop_clock(adc_ports.clk);
                     clearbuf(adc_ports.data_a);
