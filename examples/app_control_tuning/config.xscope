@@ -53,6 +53,7 @@
     <Probe name="TIME_TOTAL_SELECT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="TIME_IDLE_ADC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="APPLIED_V1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="APPLIED_V2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
    
     
 </xSCOPEconfig>
