@@ -69,14 +69,14 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
             speed_integral *= ((saving_reduction_factor*period)/1000000.00);
             speed_integral /= g_speed;
 
-            velocity_auto_tune.j = ((speed_integral*motion_ctrl_config.velocity_kp)/1000000000);                  //k_m = 0.001 * kp
+            velocity_auto_tune.j = ((speed_integral*motion_ctrl_config.velocity_kp)/1000);                  //k_m = 0.001 * kp
             velocity_auto_tune.j/= (steady_state/g_speed);
             velocity_auto_tune.j/= (steady_state/g_speed);
             velocity_auto_tune.j*= (velocity_auto_tune.velocity_ref);
 
-            velocity_auto_tune.f = ((velocity_auto_tune.velocity_ref*motion_ctrl_config.velocity_kp)/1000000000);//k_m = 0.001 * kp
+            velocity_auto_tune.f = ((velocity_auto_tune.velocity_ref*motion_ctrl_config.velocity_kp)/1000);//k_m = 0.001 * kp
             velocity_auto_tune.f/= (steady_state/g_speed);
-            velocity_auto_tune.f-= ((g_speed*motion_ctrl_config.velocity_kp)/1000000000);
+            velocity_auto_tune.f-= ((g_speed*motion_ctrl_config.velocity_kp)/1000);
 
             if(velocity_auto_tune.f>0 && velocity_auto_tune.j>0)
             {
@@ -87,8 +87,7 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
                 velocity_auto_tune.ki = (wn_auto_tune*wn_auto_tune*velocity_auto_tune.j);
                 velocity_auto_tune.ki/= (0.001*g_speed);
 
-                velocity_auto_tune.kp *= 1000000.00;
-                velocity_auto_tune.ki *= 100.00;
+                velocity_auto_tune.ki /= 10.00;
 
                 if(velocity_auto_tune.kp<0 || velocity_auto_tune.ki<0) //wrong calculation
                 {
@@ -113,9 +112,9 @@ int velocity_controller_auto_tune(VelCtrlAutoTuneParam &velocity_auto_tune, Moti
         velocity_auto_tune.counter=0;
 
         motion_ctrl_config.enable_velocity_auto_tuner = 0;
-        motion_ctrl_config.velocity_kp = ((int)(velocity_auto_tune.kp));
-        motion_ctrl_config.velocity_ki = ((int)(velocity_auto_tune.ki));
-        motion_ctrl_config.velocity_kd = ((int)(velocity_auto_tune.kd));
+        motion_ctrl_config.velocity_kp = velocity_auto_tune.kp;
+        motion_ctrl_config.velocity_ki = velocity_auto_tune.ki;
+        motion_ctrl_config.velocity_kd = velocity_auto_tune.kd;
 
         for(int i=0; i<=MEASUREMENT_ARRAY_LENGTH; i++) velocity_auto_tune.actual_velocity[i] = 0;
     }
@@ -226,10 +225,13 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
                 }
                 else
                 {
-                    if(pos_ctrl_auto_tune.active_step_counter==0)
-                        pos_ctrl_auto_tune.kvp += 50000;            //at first step, increase kvp by 50000 (corresponding to 0.05 after scaling in pid controller)
-                    else                                            //and in the next steps increase it by 10000.
-                        pos_ctrl_auto_tune.kvp += 10000;
+//                    if(pos_ctrl_auto_tune.active_step_counter==0)
+//                        pos_ctrl_auto_tune.kvp += 50000;            //at first step, increase kvp by 50000 (corresponding to 0.05 after scaling in pid controller)
+//                    else                                            //and in the next steps increase it by 10000.
+                    if(pos_ctrl_auto_tune.kvp==0) pos_ctrl_auto_tune.kvp=100000;
+                    else
+
+                    pos_ctrl_auto_tune.kvp += (pos_ctrl_auto_tune.kvp/10);
 
                     pos_ctrl_auto_tune.kpp = pos_ctrl_auto_tune.kvp/10;
 
@@ -698,14 +700,14 @@ int pos_ctrl_autotune(PosCtrlAutoTuneParam &pos_ctrl_auto_tune, MotionControlCon
 
     if(pos_ctrl_auto_tune.counter==0)
     {
-        motion_ctrl_config.velocity_kp = pos_ctrl_auto_tune.kvp;
-        motion_ctrl_config.velocity_ki = pos_ctrl_auto_tune.kvi;
-        motion_ctrl_config.velocity_kd = pos_ctrl_auto_tune.kvd;
+        motion_ctrl_config.velocity_kp = pos_ctrl_auto_tune.kvp / 1e6;
+        motion_ctrl_config.velocity_ki = pos_ctrl_auto_tune.kvi / 1e6;
+        motion_ctrl_config.velocity_kd = pos_ctrl_auto_tune.kvd / 1e6;
         motion_ctrl_config.velocity_integral_limit = pos_ctrl_auto_tune.kvl;
 
-        motion_ctrl_config.position_kp = pos_ctrl_auto_tune.kpp;
-        motion_ctrl_config.position_ki = pos_ctrl_auto_tune.kpi;
-        motion_ctrl_config.position_kd = pos_ctrl_auto_tune.kpd;
+        motion_ctrl_config.position_kp = pos_ctrl_auto_tune.kpp / 1e6;
+        motion_ctrl_config.position_ki = pos_ctrl_auto_tune.kpi / 1e6;
+        motion_ctrl_config.position_kd = pos_ctrl_auto_tune.kpd / 1e6;
         motion_ctrl_config.position_integral_limit = pos_ctrl_auto_tune.kpl;
 
         motion_ctrl_config.moment_of_inertia       = pos_ctrl_auto_tune.j;

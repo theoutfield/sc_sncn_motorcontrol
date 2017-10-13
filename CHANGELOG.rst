@@ -7,6 +7,7 @@ sc_sncn_motorcontrol Change Log
   * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq with enough flexibility to drive 2 BLDCs and 2 brakes at the same time
   * Add support for DC30 in watchdog service
   * Implement gain scheduling controller with velocity as gain scheduling variable
+  * Measuring units of PID gains have now physical background and their size changed to values related to physical world   
   * Integrate the Drive 100 (DC100) fix from SDK 3.0.4
   * Add reverse sensor polarity command in app_control_tuning
 
