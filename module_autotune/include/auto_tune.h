@@ -101,15 +101,15 @@ typedef struct {
     int counter;
     int counter_max;
 
-    int kvp;
-    int kvi;
-    int kvd;
+    float kvp;
+    float kvi;
+    float kvd;
     int kvl;
 
-    int kpp;
-    int kpi;
-    int kpi_min;
-    int kpd;
+    float kpp;
+    float kpi;
+    float kpi_min;
+    float kpd;
     int kpl;
     int j;
 
