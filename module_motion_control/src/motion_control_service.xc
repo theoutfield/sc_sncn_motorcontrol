@@ -699,7 +699,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             position_enable_flag =0;
                             i_torque_control.set_torque_control_disabled();
 
-                            printf("kp:%i ki:%i kd:%i \n",  ((int)(velocity_auto_tune.kp)), ((int)(velocity_auto_tune.ki)), ((int)(velocity_auto_tune.kd)));
+                            printf("kp:%f ki:%f kd:%f \n",  velocity_auto_tune.kp, velocity_auto_tune.ki, velocity_auto_tune.kd);
                         }
                     }
                     else if(motion_ctrl_config.enable_profiler==1)
@@ -880,7 +880,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             if(motion_ctrl_config.position_control_autotune == 0)
                             {
                                 printf("TUNING ENDED: \n");
-                                printf("kp:%i ki:%i kd:%i kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                printf("kp:%f ki:%f kd:%f kl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
                             }
 
                             if(pos_ctrl_auto_tune.counter==0)
@@ -890,10 +890,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                 pid_set_parameters((double)motion_ctrl_config.velocity_kp, (double)motion_ctrl_config.velocity_ki, (double)motion_ctrl_config.velocity_kd, (double)motion_ctrl_config.velocity_integral_limit, POSITION_CONTROL_LOOP_PERIOD_SEC, velocity_control_pid_param);
                                 pid_set_parameters((double)motion_ctrl_config.position_kp, (double)motion_ctrl_config.position_ki, (double)motion_ctrl_config.position_kd, (double)motion_ctrl_config.position_integral_limit, POSITION_CONTROL_LOOP_PERIOD_SEC, position_control_pid_param);
+
+                                printf("kpp:%f kpi:%f kpd:%f kpl:%d \n",  motion_ctrl_config.position_kp, motion_ctrl_config.position_ki, motion_ctrl_config.position_kd, motion_ctrl_config.position_integral_limit);
+                                printf("kvp:%f kvi:%f kvd:%f kpl:%d \n",  motion_ctrl_config.velocity_kp, motion_ctrl_config.velocity_ki, motion_ctrl_config.velocity_kd, motion_ctrl_config.velocity_integral_limit);
+
                             }
 
 
-                            position_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
+                            velocity_ref_in_k    = pos_profiler(pos_ctrl_auto_tune.position_ref, position_ref_in_k_1n, position_ref_in_k_2n, position_k, profiler_param);
                             position_ref_in_k_2n = position_ref_in_k_1n;
                             position_ref_in_k_1n = position_ref_in_k;
 
