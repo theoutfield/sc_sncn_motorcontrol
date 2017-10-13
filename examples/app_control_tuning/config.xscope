@@ -42,16 +42,17 @@
 
     <Probe name="ACTUAL_VELOCITY_ARRAY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
-    <Probe name="PWM_A" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_U" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="DELTA_DUTY" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PATTERN" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="TIME_IDLE_COMPUTATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="TIME_IDLE_FINAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="TIME_TOTAL_SELECT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="TIME_IDLE_ADC" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="PWM_A" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_U" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="DELTA_DUTY" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PATTERN" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="TIME_IDLE_COMPUTATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="TIME_IDLE_FINAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="TIME_TOTAL_SELECT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="TIME_IDLE_ADC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="APPLIED_V1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
    
     
 </xSCOPEconfig>
