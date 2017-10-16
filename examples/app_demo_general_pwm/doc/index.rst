@@ -8,7 +8,7 @@ General PWM Application Demo
     :backlinks: none
     :depth: 3
 
-The purpose of this app (app_demo_general_pwm) is showing the use of pwm_service_general in :ref:`PWM Module <module_pwm>` in an IFM board. For this purpose, a simple funciton (named send_pwm_values) is defined. This function changes the pwm values in each execution loop, and sends them to general pwm service through an interface. 
+The purpose of this app (app_demo_general_pwm) is showing the use of pwm_service_general in :ref:`PWM Module <module_pwm>` in our different drives. For this purpose, a simple funciton (named send_pwm_values) is defined. This function changes the pwm values in each execution loop, and sends them to general pwm service through an interface. 
 
 * **Minimum Number of Cores**: 3
 * **Minimum Number of Tiles**: 1
