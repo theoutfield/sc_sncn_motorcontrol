@@ -87,7 +87,7 @@ How to use
                 /* Watchdog Service */
                 {
                     delay_milliseconds(200);
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC); // 7
+                    watchdog_service(wd_ports, i_watchdog, IF2_TILE_USEC); // 7
                 }
             }
 

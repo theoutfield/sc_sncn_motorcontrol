@@ -73,7 +73,7 @@ How to use
                     // 4. Fill up the BiSS configuration structure.                 
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = BISS_SENSOR; // or SSI_SENSOR for SSI
-                    position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                     position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                     position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
                     position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;

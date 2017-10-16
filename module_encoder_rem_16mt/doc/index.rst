@@ -71,7 +71,7 @@ How to use
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.polarity    = NORMAL_POLARITY;
                     position_feedback_config.pole_pairs  = POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                     position_feedback_config.offset      = 0;
 
                     position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
