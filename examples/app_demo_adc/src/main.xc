@@ -14,7 +14,7 @@
 #include <adc_ad7949.h>
 #include <motor_control_interfaces.h>
 
-ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
+ADCPorts adc_ports = SOMANET_DRIVE_ADC_PORTS;
 
 int main(void)
 {

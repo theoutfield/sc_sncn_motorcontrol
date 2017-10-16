@@ -98,9 +98,9 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
     }
 }
 
-PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
-WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+PwmPortsGeneral pwm_ports = SOMANET_DRIVE_PWM_PORTS_GENERAL;
+WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_DRIVE_FET_DRIVER_PORTS;
 
 int main(void) {
 

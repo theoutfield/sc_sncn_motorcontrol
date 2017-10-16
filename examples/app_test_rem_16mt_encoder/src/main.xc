@@ -21,17 +21,17 @@
 #include <advanced_motor_control.h>
 
 /*********** Sensor Test ***********/
-SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
-port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
-port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
-port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
+SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
+port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
+port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
+port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
+port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;
 
 /*********** Motor Test ***********/
-PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
-WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
-ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
+PwmPortsGeneral pwm_ports = SOMANET_DRIVE_PWM_PORTS_GENERAL;
+WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_DRIVE_FET_DRIVER_PORTS;
+ADCPorts adc_ports = SOMANET_DRIVE_ADC_PORTS;
 
 void rem_16mt_commands_test(client interface PositionFeedbackInterface i_position_feedback, interface TorqueControlInterface client i_torque_control) {
     char status;
