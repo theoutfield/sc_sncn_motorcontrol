@@ -44,6 +44,8 @@ typedef enum
     PORTS_ERR = 4
 } sensor_fault;
 
+ErrBuf_t ErrBuf;
+
 /*
  * checking the position, velocity and angle reading from the sensor, when user triggers 'gse' command in tuning console or prior to commutation offset detection
  */
@@ -370,6 +372,138 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
+/*
+ * Push new error item to a circular buffer
+ */
+int ErrBufPush(ErrBuf_t *c, ErrItem_t ErrItem,  interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
+{
+    // next is where head will point to after this write.
+    int next = c->head + 1;
+    if (next >= ERROR_BUF_SIZE)
+        next = 0;
+
+    if (next == c->tail) // check if circular buffer is full
+        return -1;       // and return with an error.
+
+    c->buffer[c->head] = ErrItem; // Load data and then move
+    c->head = next;            // head to next data offset.
+
+    //new error notification to all clients
+    for (int i = 0; i < N_MOTION_CONTROL_INTERFACES; i++)
+        i_motion_control[i].new_error();
+
+    return 0;  // return success to indicate successful push.
+}
+
+
+/*
+ * Pop last error item from circular buffer
+ */
+int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
+{
+    // if the head isn't ahead of the tail, we don't have any characters
+    if (c->head == c->tail) // check if circular buffer is empty
+        return -1;          // and return with an error
+
+    // next is where tail will point to after this read.
+    int next = c->tail + 1;
+    if(next >= ERROR_BUF_SIZE)
+        next = 0;
+
+    *ErrItem = c->buffer[c->tail]; // Read data and then move
+    c->tail = next;             // tail to next data offset.
+    return 0;  // return success to indicate successful push.
+}
+
+/*
+ * Checking of error values in UpstreamControlData for new errors.
+ */
+void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
+{
+    ErrItem_t ErrItem;
+    static int last_angle_sensor_error, last_sensor_error,  last_sec_sensor_error, last_error_status, last_motion_control_error, last_watchdog_error;
+    static unsigned int err_index;
+
+    if ((ucd.angle_sensor_error != 0) && (ucd.angle_sensor_error != last_angle_sensor_error))
+    {
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.angle_sensor_error;
+         ErrItem.err_type = ERR_ANGLE_SENSOR;
+
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_angle_sensor_error = ucd.angle_sensor_error;
+    }
+    else
+        if (ucd.angle_sensor_error == 0) last_angle_sensor_error = 0;
+
+    if ((ucd.sensor_error != 0) && (ucd.sensor_error != last_sensor_error))
+    {
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.sensor_error;
+         ErrItem.err_type = ERR_SENSOR;
+
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_sensor_error = ucd.sensor_error;
+    }
+    else
+        if (ucd.sensor_error == 0) last_sensor_error = 0;
+
+    if ((ucd.secondary_sensor_error != 0) && (ucd.secondary_sensor_error != last_sec_sensor_error))
+    {
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.secondary_sensor_timestamp;
+         ErrItem.err_code = ucd.secondary_sensor_error;
+         ErrItem.err_type = ERR_SEC_SENSOR;
+
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_sec_sensor_error = ucd.secondary_sensor_error;
+    }
+    else
+        if (ucd.secondary_sensor_error == 0) last_sec_sensor_error = 0;
+
+    if ((ucd.error_status != 0) && (ucd.error_status != last_error_status))
+    {
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.error_status;
+         ErrItem.err_type = ERR_STATUS;
+
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_error_status = ucd.error_status;
+    }
+    else
+        if (ucd.error_status == 0) last_error_status = 0;
+
+    if ((ucd.motion_control_error != 0) && (ucd.motion_control_error != last_motion_control_error))
+    {
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.motion_control_error;
+         ErrItem.err_type = ERR_MOTION;
+
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_motion_control_error = ucd.motion_control_error;
+    }
+    else
+        if (ucd.motion_control_error == 0) last_motion_control_error = 0;
+
+    if ((ucd.watchdog_error != 0) && (ucd.watchdog_error != last_watchdog_error))
+    {
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.watchdog_error;
+         ErrItem.err_type = ERR_WATCHDOG;
+
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_watchdog_error = ucd.watchdog_error;
+    }
+    else
+        if (ucd.watchdog_error == 0) last_watchdog_error = 0;
+}
+
+
 /**
  * @brief Service to perform torque, velocity or position control.
  *        You will need a Motor Control Stack running parallel to this Service,
@@ -387,7 +521,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *  */
 void motion_control_service(MotionControlConfig &motion_ctrl_config,
         interface TorqueControlInterface client i_torque_control,
-        interface MotionControlInterface server i_motion_control[3],client interface UpdateBrake i_update_brake)
+        interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES], client interface UpdateBrake i_update_brake)
 {
     timer t;
     unsigned int ts;
@@ -1708,7 +1842,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec);
                         sensor_status_out = error_sens;
                         break;
+
+                case i_motion_control[int i].get_last_error(ErrItem_t &ErrItem) -> int status :
+                        ErrItem_t TempErrItem;
+                        status = ErrBufPop(&ErrBuf, &TempErrItem);
+                        ErrItem = TempErrItem;
+                        if (status == 0)
+                        {
+                            //renew notification if we have unreaded items in buffer notification to all clients
+                            i_motion_control[i].new_error();
+                        }
+                break;
         }
+
+        error_detect(i_torque_control.update_upstream_control_data(0), downstream_control_data, i_motion_control);
 
         }
     }

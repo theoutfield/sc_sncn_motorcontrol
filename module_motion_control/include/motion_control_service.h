@@ -40,6 +40,13 @@
  */
 #define BRAKE_UPDATE_CONFIG_WAIT        2000
 
+/**
+ * @brief Size of circular buffer for error items accumulating.
+ */
+#define ERROR_BUF_SIZE                  300
+
+#define N_MOTION_CONTROL_INTERFACES     3
+
 
 
 /**
@@ -73,6 +80,17 @@ typedef enum {
     MOTION_POLARITY_NORMAL      = 0,
     MOTION_POLARITY_INVERTED    = 1
 } MotionPolarity;
+
+
+typedef enum {
+    ERR_STATUS = 1,
+    ERR_MOTION,
+    ERR_SENSOR,
+    ERR_SEC_SENSOR,
+    ERR_ANGLE_SENSOR,
+    ERR_WATCHDOG
+
+} ErrType;
 
 /**
  * @brief Structure definition for a Control Loop Service configuration.
@@ -155,6 +173,26 @@ typedef struct {
     int velocity_lo_l;
     int velocity_hi_l;
 } MotionControlConfig;
+
+/**
+ * @brief Structure definition for one error item
+ */
+typedef struct {
+    unsigned int index;
+    unsigned int timestamp;
+    unsigned int err_code;
+    unsigned char err_type;
+} ErrItem_t;
+
+/**
+ * @brief Structure definition for a circular buffer for error items accumulating
+ */
+typedef struct {
+    ErrItem_t buffer[ERROR_BUF_SIZE];
+    int head;
+    int tail;
+} ErrBuf_t;
+
 
 /**
  * @brief Interface type to communicate with the Motion Control Service.
@@ -293,6 +331,18 @@ interface MotionControlInterface
      * @param   flag    value : 0 (disable) or 1 (enable)
      */
     void enable_cogging_compensation(int flag);
+
+    /**
+     * @brief    Pop last error item from error buffer
+     *
+     * @param    Error item
+     */
+    [[clears_notification]] int get_last_error(ErrItem_t &ErrItem);
+
+    /**
+     * @brief    Notification of new error
+     */
+    [[notification]] slave void new_error(void);
 };
 
 
