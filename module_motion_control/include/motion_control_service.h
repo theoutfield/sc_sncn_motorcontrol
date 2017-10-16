@@ -340,7 +340,7 @@ interface MotionControlInterface
     [[clears_notification]] int get_last_error(ErrItem_t &ErrItem);
 
     /**
-     * @brief    Pop last error item from error buffer
+     * @brief    Notification of new error
      */
     [[notification]] slave void new_error(void);
 };
