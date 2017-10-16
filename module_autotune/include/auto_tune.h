@@ -11,8 +11,8 @@
  *        Note: The dc-bus voltage should be high enough for the selected velocity.
  */
 #define TUNING_VELOCITY 1000        //[rpm]
-#define KP_VELOCITY_TUNING  100000  //kp initial value while running the automatic tuning of velocity controller
-#define SETTLING_TIME   0.3         //preffered settling time for velocity controller [seconds]
+#define KP_VELOCITY_TUNING  0.5     //kp initial value while running the automatic tuning of velocity controller
+#define SETTLING_TIME   0.2         //preffered settling time for velocity controller [seconds]
 #define MEASUREMENT_ARRAY_LENGTH    1000    //length of measurement array which is used while sampling velocity in velocity autotuner
 
 // parameters of position controller autotuner
@@ -101,15 +101,15 @@ typedef struct {
     int counter;
     int counter_max;
 
-    int kvp;
-    int kvi;
-    int kvd;
+    float kvp;
+    float kvi;
+    float kvd;
     int kvl;
 
-    int kpp;
-    int kpi;
-    int kpi_min;
-    int kpd;
+    float kpp;
+    float kpi;
+    float kpi_min;
+    float kpd;
     int kpl;
     int j;
 

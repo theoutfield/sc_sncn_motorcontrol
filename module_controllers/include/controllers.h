@@ -26,7 +26,7 @@ typedef struct {
     double derivative_1n;
     double actual_value_1n;
     double error_value_1n;
-    int T_s;                // sampling-Time in microseconds
+    double T_s;                // sampling time in seconds
     int v;                  // first order element in D part with time constant T_v
                             // T_v = Td / v => v €[4, 20]
     derivative_feedback b;  // derivative feedback, error = b*ref-y
@@ -53,7 +53,7 @@ void pid_init(PIDT1param &param);
  *
  * @return void
  */
-void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, int T_s, PIDT1param &param);
+void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, double T_s, PIDT1param &param);
 
 /**
  * @brief updating the PIDT1 controller.
@@ -65,7 +65,7 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
  *
  * @return the output of pid controller
  */
-double pid_update(double desired_value, double actual_value, int T_s, PIDT1param &param);
+double pid_update(double desired_value, double actual_value, double T_s, PIDT1param &param);
 
 /**
  * @brief resetting the parameters of the PIDT1 controller.
