@@ -33,8 +33,7 @@
     <Probe name="I_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="TEMPERATURE" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="I_A" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="I_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="I_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_C" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="AI_A1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="AI_A2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="AI_B1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
@@ -52,8 +51,18 @@
     <Probe name="TIME_IDLE_FINAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="TIME_TOTAL_SELECT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="TIME_IDLE_ADC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="APPLIED_V1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="APPLIED_V2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-   
+    <Probe name="APPLIED_V1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="REF_V_1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="APPLIED_V2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
+    
+    <Probe name="I_REF_1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_B" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="ERR_1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    
+    <Probe name="P_PART" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="INTEGRAL" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_PART" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="V_OUT" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+
 </xSCOPEconfig>

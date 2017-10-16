@@ -120,8 +120,8 @@
 #define MOTOR_ID 0
 
 // PID GAINS FOR TORQUE CONTROL [will be divided by 10000]
-#define TORQUE_Kp         40
-#define TORQUE_Ki         40
+#define TORQUE_Kp         400
+#define TORQUE_Ki         100000
 #define TORQUE_Kd          0
 
 //PID GAINS FOR VELOCITY CONTROL [will be divided by 1e6]
