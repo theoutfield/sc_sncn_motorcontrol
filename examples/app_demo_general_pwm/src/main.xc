@@ -162,7 +162,7 @@ int main(void) {
 
                 /* Watchdog Service */
                 {
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
+                    watchdog_service(wd_ports, i_watchdog, IF2_TILE_USEC);
                 }
 
                 {

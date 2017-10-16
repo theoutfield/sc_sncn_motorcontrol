@@ -28,7 +28,7 @@ int main(void)
             adc_client_demo(i_adc[1], AD_7949);
         }
 
-        on tile[IFM_TILE]:
+        on tile[IF2_TILE]:
         {
             if(!isnull(adc_ports.ad7949_ports.clk))         adc_ad7949_service_demo(adc_ports.ad7949_ports, i_adc);
             else if(!isnull(adc_ports.ad7265_ports.xclk))   adc_ad7265_service_demo(adc_ports.ad7265_ports, i_adc);

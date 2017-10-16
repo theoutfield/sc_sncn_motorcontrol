@@ -99,9 +99,9 @@ int main() {
 
     par {
         /************************************************************
-         * IFM_TILE
+         * IF2_TILE
          ************************************************************/
-        on tile[IFM_TILE]: par {
+        on tile[IF2_TILE]: par {
             /* Test BiSS Encoder Client */
             biss_test(i_position_feedback[0], null);
 
@@ -116,7 +116,7 @@ int main() {
                 position_feedback_config.polarity    = SENSOR_POLARITY_NORMAL;
                 position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = HOME_OFFSET;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;
