@@ -40,7 +40,10 @@
  */
 #define BRAKE_UPDATE_CONFIG_WAIT        2000
 
-#define ERROR_BUF_SIZE                  30
+/**
+ * @brief Size of circular buffer for error items accumulating.
+ */
+#define ERROR_BUF_SIZE                  300
 
 #define N_MOTION_CONTROL_INTERFACES     3
 
@@ -171,13 +174,19 @@ typedef struct {
     int velocity_hi_l;
 } MotionControlConfig;
 
-
+/**
+ * @brief Structure definition for one error item
+ */
 typedef struct {
+    unsigned int index;
     unsigned int timestamp;
     unsigned int err_code;
     unsigned char err_type;
 } ErrItem_t;
 
+/**
+ * @brief Structure definition for a circular buffer for error items accumulating
+ */
 typedef struct {
     ErrItem_t buffer[ERROR_BUF_SIZE];
     int head;
@@ -330,6 +339,9 @@ interface MotionControlInterface
      */
     [[clears_notification]] int get_last_error(ErrItem_t &ErrItem);
 
+    /**
+     * @brief    Pop last error item from error buffer
+     */
     [[notification]] slave void new_error(void);
 };
 

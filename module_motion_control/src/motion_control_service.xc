@@ -372,6 +372,9 @@ int special_brake_release(int &counter, int start_position, int actual_position,
 }
 
 
+/*
+ * Push new error item to a circular buffer
+ */
 int ErrBufPush(ErrBuf_t *c, ErrItem_t ErrItem,  interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
 {
     // next is where head will point to after this write.
@@ -393,7 +396,9 @@ int ErrBufPush(ErrBuf_t *c, ErrItem_t ErrItem,  interface MotionControlInterface
 }
 
 
-
+/*
+ * Pop last error item from circular buffer
+ */
 int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
 {
     // if the head isn't ahead of the tail, we don't have any characters
@@ -410,14 +415,18 @@ int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
     return 0;  // return success to indicate successful push.
 }
 
-
+/*
+ * Checking of error values in UpstreamControlData for new errors.
+ */
 void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
 {
     ErrItem_t ErrItem;
     static int last_angle_sensor_error, last_sensor_error,  last_sec_sensor_error, last_error_status, last_motion_control_error, last_watchdog_error;
+    static unsigned int err_index;
 
     if ((ucd.angle_sensor_error != 0) && (ucd.angle_sensor_error != last_angle_sensor_error))
     {
+         ErrItem.index = err_index++;
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.angle_sensor_error;
          ErrItem.err_type = ERR_ANGLE_SENSOR;
@@ -430,6 +439,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.sensor_error != 0) && (ucd.sensor_error != last_sensor_error))
     {
+         ErrItem.index = err_index++;
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.sensor_error;
          ErrItem.err_type = ERR_SENSOR;
@@ -442,6 +452,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.secondary_sensor_error != 0) && (ucd.secondary_sensor_error != last_sec_sensor_error))
     {
+         ErrItem.index = err_index++;
          ErrItem.timestamp = ucd.secondary_sensor_timestamp;
          ErrItem.err_code = ucd.secondary_sensor_error;
          ErrItem.err_type = ERR_SEC_SENSOR;
@@ -454,30 +465,33 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
     if ((ucd.error_status != 0) && (ucd.error_status != last_error_status))
     {
-          ErrItem.timestamp = ucd.sensor_timestamp;
-          ErrItem.err_code = ucd.error_status;
-          ErrItem.err_type = ERR_STATUS;
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.error_status;
+         ErrItem.err_type = ERR_STATUS;
 
-          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
-          last_error_status = ucd.error_status;
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_error_status = ucd.error_status;
     }
     else
         if (ucd.error_status == 0) last_error_status = 0;
 
     if ((ucd.motion_control_error != 0) && (ucd.motion_control_error != last_motion_control_error))
     {
-          ErrItem.timestamp = ucd.sensor_timestamp;
-          ErrItem.err_code = ucd.motion_control_error;
-          ErrItem.err_type = ERR_MOTION;
+         ErrItem.index = err_index++;
+         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.err_code = ucd.motion_control_error;
+         ErrItem.err_type = ERR_MOTION;
 
-          ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
-          last_motion_control_error = ucd.motion_control_error;
+         ErrBufPush(&ErrBuf, ErrItem, i_motion_control);
+         last_motion_control_error = ucd.motion_control_error;
     }
     else
         if (ucd.motion_control_error == 0) last_motion_control_error = 0;
 
     if ((ucd.watchdog_error != 0) && (ucd.watchdog_error != last_watchdog_error))
     {
+         ErrItem.index = err_index++;
          ErrItem.timestamp = ucd.sensor_timestamp;
          ErrItem.err_code = ucd.watchdog_error;
          ErrItem.err_type = ERR_WATCHDOG;
