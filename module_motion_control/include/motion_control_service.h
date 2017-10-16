@@ -186,7 +186,7 @@ typedef struct {
     unsigned int index;
     unsigned int timestamp;
     unsigned int err_code;
-    unsigned char err_type;
+    ErrType err_type;
 } ErrItem_t;
 
 /**
