@@ -1,6 +1,6 @@
-/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "DRIVE_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <DRIVE_BOARD_REQUIRED>
 
 /**
  * @file main.xc
@@ -55,14 +55,14 @@ void ssi_test(client interface PositionFeedbackInterface i_position_feedback, cl
     }
 }
 
-SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
-port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
-port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
-port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
-port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
-port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
-port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
+SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_ENCODER_PORTS_INPUT_MODE_SELECTION;
+port ? qei_hall_port_1 = SOMANET_DRIVE_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_DRIVE_ENCODER_2_PORT;
+port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
+port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
+port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
+port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;
 
 int main() {
     interface shared_memory_interface i_shared_memory[2];
@@ -70,9 +70,9 @@ int main() {
 
     par {
         /************************************************************
-         * IFM_TILE
+         * IF2_TILE
          ************************************************************/
-        on tile[IFM_TILE]: par {
+        on tile[IF2_TILE]: par {
             /* Test BiSS Encoder Client */
             ssi_test(i_position_feedback[0], null);
 
@@ -87,7 +87,7 @@ int main() {
                 position_feedback_config.polarity    = SENSOR_POLARITY_NORMAL;
                 position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
                 position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = HOME_OFFSET;
                 position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;

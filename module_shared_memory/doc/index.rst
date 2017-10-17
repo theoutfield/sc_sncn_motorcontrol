@@ -55,7 +55,7 @@ How to use
         {
             par
             {
-                on tile[IFM_TILE]: par
+                on tile[IF2_TILE]: par
                 {
                     par {
                     {

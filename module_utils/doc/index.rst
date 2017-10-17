@@ -70,7 +70,7 @@ Time Definitions
   t :> ts; 
   t when timerafter(ts + MSEC_STD) :> ts;
 
-4. However, if you need to set 1 ms time in your code, but your code is running on tile with a **250MHz Reference Freq.** (e.g. IFM tile):
+4. However, if you need to set 1 ms time in your code, but your code is running on tile with a **250MHz Reference Freq.** (e.g. IF2 tile):
 
 .. code-block:: c
         

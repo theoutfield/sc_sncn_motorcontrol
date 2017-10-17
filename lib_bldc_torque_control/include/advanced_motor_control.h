@@ -23,7 +23,7 @@
  * @param i_watchdog            Interface to communicate with watchdog_service
  * @param i_torque_control[2]     Array of interfaces to communicate with up to two clients for motor_control_service.
  * @param i_update_pwm          Interface to communicate with PWM module
- * @param if2_tile_usec         Reference clock frequency of IF2 tile (in MHz)
+ * @param ifm_tile_usec         Reference clock frequency of IF2 tile (in MHz)
  *
  * @return void
  */

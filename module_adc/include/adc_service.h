@@ -158,7 +158,7 @@ typedef struct
  * @param adc_ports             Ports structure defining where to access the ADC chip signals.
  * @param i_adc[2]              Array of communication interfaces to handle up to 2 different clients.
  * @param i_watchdog            Interface to communicate with watchdog service
- * @param ifm_tile_usec         Reference clock frequency of IFM tile (in MHz)
+ * @param ifm_tile_usec         Reference clock frequency of IF2 tile (in MHz)
  * @param operational_mode      Integer type to select between SINGLE_ENDED/FULLY_DIFFERENTIAL modes
  *
  * @return void

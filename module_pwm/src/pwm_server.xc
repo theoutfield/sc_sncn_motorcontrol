@@ -23,9 +23,9 @@
 #include <pwm_convert_width.h>
 
 /**
- * @brief Initialize the predriver circuit in your SOMANET Drive (if applicable)
+ * @brief Initialize the predriver circuit in your SOMANET Drive device (if applicable)
  *
- * @param fet_driver_ports  Structure of ports to manage the FET-driver in your SOMANET Drive (if applicable).
+ * @param fet_driver_ports  Structure of ports to manage the FET-driver in your SOMANET Drive device (if applicable).
  *
  * @return void
  */
@@ -883,7 +883,7 @@ void pwm_config(PwmPorts &ports)
  * @param duty_start_brake      PWM value which is used to start the electric brake
  * @param duty_maintain_brake   PWM value which is used to maintain the electric brake
  * @param time_start_brake      Required time to start the brake (in milliseconds)
- * @param if2_tile_usec         Reference clock frequency of IF2 tile (in MHz)
+ * @param ifm_tile_usec         Reference clock frequency of IF2 tile (in MHz)
  *
  * @return void
  */

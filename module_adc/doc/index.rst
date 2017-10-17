@@ -42,11 +42,11 @@ How to use
 
     .. note:: In case of using **adc_service** service of module_adc only add **adc_service.h** header to your app.
 
-3. Define the required adc ports in the board-support-package of your IFM module. By default, these ports are defined as SOMANET_IFM_ADC_PORTS in board-support-package of your SOMANET device.
+3. Define the required adc ports in the board-support-package of your Drive module. By default, these ports are defined as SOMANET_DRIVE_ADC_PORTS in board-support-package of your SOMANET device.
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication (in this case, adc server and adc client).
 
-5. At your IFM tile, instantiate the Service. 
+5. At your IF2 tile, instantiate the Service. 
 
 6. At whichever other core, now you can perform calls to the ADC Service through the interfaces connected to it.
 
@@ -58,7 +58,7 @@ How to use
 
         #include <adc_service.h> // 2
 
-        ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS; // 3
+        ADCPorts adc_ports = SOMANET_DRIVE_ADC_PORTS; // 3
 
         int main(void)
         {
@@ -73,7 +73,7 @@ How to use
             			                                       // CHANNEL_IDs are defined in the adc_service.h file, and can be used depending on adc type of your module.
                 }
 
-                on tile[IFM_TILE]: // 5
+                on tile[IF2_TILE]: // 5
                 {
                     if(!isnull(adc_ports.ad7949_ports.clk))         adc_ad7949_service_demo(adc_ports.ad7949_ports, i_adc);
                     else if(!isnull(adc_ports.ad7265_ports.xclk))   adc_ad7265_service_demo(adc_ports.ad7265_ports, i_adc);
