@@ -96,15 +96,11 @@ int main(void) {
                     occupy_core(16);
                 }
 
+                /* WARNING: only one blocking task is possible per tile. */
+                /* Waiting for a user input blocks other tasks on the same tile from execution. */
                 {
-                    occupy_core(17);
+                    control_tuning_console(i_motion_control[0], i_position_feedback_1[0], i_position_feedback_2[0]);
                 }
-
-                ///* WARNING: only one blocking task is possible per tile. */
-                ///* Waiting for a user input blocks other tasks on the same tile from execution. */
-                //{
-                //    control_tuning_console(i_motion_control[0]);
-                //}
             }
         }
 
@@ -211,13 +207,9 @@ int main(void) {
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
                     motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
 
-                    motorcontrol_config.torque_P_gain1 =  TORQUE_Kp;
-                    motorcontrol_config.torque_I_gain1 =  TORQUE_Ki;
-                    motorcontrol_config.torque_D_gain1 =  TORQUE_Kd;
-
-                    motorcontrol_config.torque_P_gain2 =  TORQUE_Kp;
-                    motorcontrol_config.torque_I_gain2 =  TORQUE_Ki;
-                    motorcontrol_config.torque_D_gain2 =  TORQUE_Kd;
+                    motorcontrol_config.torque_P_gain =  TORQUE_Kp;
+                    motorcontrol_config.torque_I_gain =  TORQUE_Ki;
+                    motorcontrol_config.torque_D_gain =  TORQUE_Kd;
 
                     motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                     motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
