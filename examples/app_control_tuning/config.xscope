@@ -52,23 +52,23 @@
     <Probe name="TIME_TOTAL_SELECT" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="TIME_IDLE_ADC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     
-    <Probe name="TORQUE_SET1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="I_SET1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="I_ACT1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="ERR_1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="P_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="INTEGRAL1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="I_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="V_OUT1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="TORQUE_SET1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_SET1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_ACT1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="ERR_1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="P_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="INTEGRAL1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="V_OUT1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     
-    <Probe name="TORQUE_SET2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="I_SET2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="I_ACT2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="ERR_2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="P_PART2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="INTEGRAL2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="I_PART2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="V_OUT2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="TORQUE_SET2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="I_SET2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="I_ACT2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="ERR_2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="P_PART2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="INTEGRAL2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="I_PART2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="V_OUT2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
         
     <Probe name="TIME_IDLE_COMPUTATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
 
