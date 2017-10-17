@@ -21,7 +21,7 @@ The service takes the following parameters as input:
 - An interface to communicate with PWM service
 - Reference clock frequency of IF2 tile (in MHz)
 
-The service will wait until lower level services (such as watchdog, PWM and ADC) start to work. After that, it initializes the torque control parameters, and provides the user with torque control service. It also provides the interface for feedback services (such as ADC and position sensor services) and higher controlling loops (such as position/velocity controllers and also Ethercat communication). Figure 1 shows the structure of data flow among torque control service and other services. Torque control service should always run over an IFM Tile.
+The service will wait until lower level services (such as watchdog, PWM and ADC) start to work. After that, it initializes the torque control parameters, and provides the user with torque control service. It also provides the interface for feedback services (such as ADC and position sensor services) and higher controlling loops (such as position/velocity controllers and also Ethercat communication). Figure 1 shows the structure of data flow among torque control service and other services. Torque control service should always run over an IF2 Tile.
 
 .. image:: images/photo.jpg
    :width: 90%
@@ -82,7 +82,7 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
 
     .. code-block:: c
     
-        // 1. include proper board support package files for your IFM and CORE
+        // 1. include proper board support package files for your Drive and CORE
         #include <CORE_BOARD_REQUIRED>
         #include <DRIVE_BOARD_REQUIRED>
 

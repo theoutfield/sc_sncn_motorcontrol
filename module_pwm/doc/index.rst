@@ -10,7 +10,7 @@ PWM Module
 
 This module provides a Service (pwm_service_general) to generate center-aligned Pulse-Width modulation(PWM) signals for both high-side and low-side FETs of your Drive module. PWM module can be used to cycle on-and-off a digital signal in order to control a load which requires electrical power. As shown in figure 1, the period and hence the frequency of a pwm signal is always fixed (the default value is 12 kHz). Only the on-time of PWM pulses can be changed. The on-time (for each inverter output can be adjusted by sending the corresponding pwm_value to pwm_service_general through an interface. By this technique, it is possible to modulate a given reference voltage.
 
-The PWM Service should always run over an **IFM Tile** so it can access the ports of your SOMANET IFM device.
+The PWM Service should always run over an **IF2 Tile** so it can access the ports of your SOMANET Drive.
 
 If PWM signals are used to drive an Drive module, the watchdog service should also be running to activate the IFM ports.
 
@@ -54,8 +54,8 @@ How to use
 
     .. code-block:: c
 
-        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
-        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
+        #include <Core_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
+        #include <Drive_DC100-rev-b.bsp>  //Board Support file for SOMANET Drive DC100 device
                                         //(select your board support files according to your device)
 
         #include <pwm_server.h> // 2
