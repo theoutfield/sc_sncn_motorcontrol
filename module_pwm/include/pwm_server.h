@@ -49,7 +49,7 @@
 #define GPWM_FRQ_100              100// PWM frequency in kHz
 
 /**
- * @brief Structure type to define the ports to manage the FET-driver in your IFM SOMANET device (if applicable).
+ * @brief Structure type to define the ports to manage the FET-driver in your Drive SOMANET device (if applicable).
  */
 typedef struct {
     port ?p_coast;                  /**< [Nullable] Port for management signals. */
@@ -70,9 +70,9 @@ typedef struct PWM_SERV_TAG
 
 
 /**
- * @brief Initialize the predriver circuit in your IFM SOMANET device (if applicable)
+ * @brief Initialize the predriver circuit in your SOMANET Drive (if applicable)
  *
- * @param fet_driver_ports  Structure of ports to manage the FET-driver in your IFM SOMANET device (if applicable).
+ * @param fet_driver_ports  Structure of ports to manage the FET-driver in your SOMANET Drive (if applicable).
  *
  * @return void
  */
@@ -123,7 +123,7 @@ void pwm_config(PwmPorts &ports);
  * @param duty_start_brake      PWM value which is used to start the electric brake
  * @param duty_maintain_brake   PWM value which is used to maintain the electric brake
  * @param time_start_brake      Required time to start the brake (in milliseconds)
- * @param ifm_tile_usec         Reference clock frequency of IFM tile (in MHz)
+ * @param if2_tile_usec         Reference clock frequency of IF2 tile (in MHz)
  *
  * @return void
  */

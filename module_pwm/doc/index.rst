@@ -12,7 +12,7 @@ This module provides a Service (pwm_service_general) to generate center-aligned 
 PWM frequency can be 15 kHz, 30 kHz or even 100 kHz. Among them, 15 kHz of switching frequency is recommended for normal applications as it results in higher voltage efficiency).
 As shown in figure 1, only the on-time of PWM pulses can be changed. The on-time (for each inverter output can be adjusted by sending the corresponding pwm_value to pwm_service_general through an interface. By this technique, it is possible to modulate a given reference voltage.
 
-The PWM Service should always run over an **IFM Tile** so it can access the ports of your SOMANET DRIVE device.
+The PWM Service should always run over an **IF2 Tile** so it can access the ports of your SOMANET Drive.
 
 If PWM signals are used to drive an inverter, the watchdog service should also be running to activate the Drive ports.
 
@@ -50,21 +50,21 @@ How to use
 
 6. Inside your main function, instantiate the interfaces array for the Service-Clients communication (both watchdog service and pwm service).
 
-7. At your IFM tile, instantiate the Services (both PWM service and watchdog service)
+7. At your IF2 tile, instantiate the Services (both PWM service and watchdog service)
 
 8. At whichever other core, now you can perform calls to the PWM Service through the interfaces connected to it.
 
     .. code-block:: c
 
-        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
-        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
+        #include <Core_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
+        #include <Drive_DC100-rev-b.bsp>  //Board Support file for SOMANET Drive DC100 device
                                         //(select your board support files according to your device)
 
         #include <pwm_server.h> // 2
         #include <watchdog_service.h> // 3
 
-        PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL; // 4
-        WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS; // 5
+        PwmPortsGeneral pwm_ports = SOMANET_DRIVE_PWM_PORTS_GENERAL; // 4
+        WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS; // 5
 
         int main(void)
         {
@@ -89,7 +89,7 @@ How to use
                 /* Watchdog Service */
                 {
                     delay_milliseconds(200);
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC); // 7
+                    watchdog_service(wd_ports, i_watchdog, IF2_TILE_USEC); // 7
                 }
             }
 

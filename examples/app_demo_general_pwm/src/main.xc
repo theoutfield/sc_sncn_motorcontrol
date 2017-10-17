@@ -1,4 +1,4 @@
-/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "DRIVE_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -107,7 +107,7 @@ int main(void) {
             }
         }
 
-        on tile[1]://IFM TILE
+        on tile[1]://IF2 TILE
         {
             par
             {
