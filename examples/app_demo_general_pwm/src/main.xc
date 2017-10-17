@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "DRIVE_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <DRIVE_BOARD_REQUIRED>
 
 /**
  * @file main.xc
@@ -88,9 +88,9 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
     }
 }
 
-PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
-WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
+PwmPortsGeneral pwm_ports = SOMANET_DRIVE_PWM_PORTS_GENERAL;
+WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_DRIVE_FET_DRIVER_PORTS;
 
 int main(void) {
 
@@ -129,7 +129,7 @@ int main(void) {
 
                 /* Watchdog Service */
                 {
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
+                    watchdog_service(wd_ports, i_watchdog, IF2_TILE_USEC);
                 }
 
             }
