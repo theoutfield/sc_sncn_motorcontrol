@@ -121,6 +121,11 @@ typedef struct {
     int velocity_kd;                    /**< Parameter for velocity controller D-constant */
     int velocity_integral_limit;        /**< Parameter for integral limit of velocity pid controller */
 
+    int torque_P_gain;                 /**< proportional constant in torque controller*/
+    int torque_I_gain;                 /**< integral constant in torque controller*/
+    int torque_D_gain;                 /**< derivative constant in torque controller*/
+    int torque_integral_limit;         /**< derivative constant in torque controller*/
+
     int enable_velocity_auto_tuner;     /**< Parameter for enabling/disabling auto tuner for velocity controller */
     int enable_compensation_recording;  /**< Parameter for enabling/disabling the cogging torque compensator recording*/
     int enable_open_phase_detection;    /**< Parameter for enabling/disabling the open phase detection functionality*/

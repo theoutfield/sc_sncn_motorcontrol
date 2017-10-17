@@ -1518,9 +1518,38 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
 
+                //update pid constants of torque controller (at the moment only active for dc motor control)
+                //in the case of ac motor control (bldc applications) these constants should be directly set
+                //through user_config.h file or through ethercat initializations
+                MotorcontrolConfig out_motorcontrol_config;
+                out_motorcontrol_config = i_torque_control.get_config();
+
+                if(motion_ctrl_config.torque_P_gain>=0)
+                    out_motorcontrol_config.torque_P_gain = motion_ctrl_config.torque_P_gain;
+                else
+                    printf("Warning: negative pid constnats are not accepted by torque controller \n");
+
+                if(motion_ctrl_config.torque_I_gain>=0)
+                    out_motorcontrol_config.torque_I_gain = motion_ctrl_config.torque_I_gain;
+                else
+                    printf("Warning: negative pid constnats are not accepted by torque controller \n");
+
+                if(motion_ctrl_config.torque_D_gain>=0)
+                    out_motorcontrol_config.torque_D_gain = motion_ctrl_config.torque_D_gain;
+                else
+                    printf("Warning: negative pid constnats are not accepted by torque controller \n");
+
+                i_torque_control.set_config(out_motorcontrol_config);
+
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
+
+                MotorcontrolConfig out_motorcontrol_config = i_torque_control.get_config();
+                motion_ctrl_config.torque_P_gain = out_motorcontrol_config.torque_P_gain;
+                motion_ctrl_config.torque_I_gain = out_motorcontrol_config.torque_I_gain;
+                motion_ctrl_config.torque_D_gain = out_motorcontrol_config.torque_D_gain;
+
                 out_config = motion_ctrl_config;
                 break;
 
