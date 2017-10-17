@@ -210,16 +210,23 @@ int main(void) {
 
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
                     motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
-                    motorcontrol_config.torque_P_gain =  TORQUE_Kp;
-                    motorcontrol_config.torque_I_gain =  TORQUE_Ki;
-                    motorcontrol_config.torque_D_gain =  TORQUE_Kd;
+
+                    motorcontrol_config.torque_P_gain1 =  TORQUE_Kp;
+                    motorcontrol_config.torque_I_gain1 =  TORQUE_Ki;
+                    motorcontrol_config.torque_D_gain1 =  TORQUE_Kd;
+
+                    motorcontrol_config.torque_P_gain2 =  TORQUE_Kp;
+                    motorcontrol_config.torque_I_gain2 =  TORQUE_Ki;
+                    motorcontrol_config.torque_D_gain2 =  TORQUE_Kd;
+
                     motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                     motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
                     motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
-                    motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
+                    motorcontrol_config.torque_constant1 =  MOTOR_TORQUE_CONSTANT;
+                    motorcontrol_config.torque_constant1 =  MOTOR_TORQUE_CONSTANT;
                     motorcontrol_config.current_ratio =  CURRENT_RATIO;
                     motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
                     motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
