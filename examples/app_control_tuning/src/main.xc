@@ -226,7 +226,7 @@ int main(void) {
                     motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
                     motorcontrol_config.torque_constant1 =  MOTOR_TORQUE_CONSTANT;
-                    motorcontrol_config.torque_constant1 =  MOTOR_TORQUE_CONSTANT;
+                    motorcontrol_config.torque_constant2 =  MOTOR_TORQUE_CONSTANT;
                     motorcontrol_config.current_ratio =  CURRENT_RATIO;
                     motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
                     motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
