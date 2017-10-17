@@ -434,7 +434,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     //cogging compensation
     CoggingTorqueParam ct_parameters;
-    int buffer_cogg[2*COGGING_TORQUE_ARRAY_SIZE] = { 0 };
 
     init_cogging_torque_parameters(ct_parameters, 10);
 
@@ -760,45 +759,37 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 }
                             }
                             else {
-//                                printf("Measurement done\n");
+                                printf("Measurement done\n");
                                 for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
                                 {
                                     ct_parameters.torque_recording[i] /= ct_parameters.counter_average[i];
+                                    ct_parameters.counter_average[i] = 0;
                                 }
 
 
                                 motorcontrol_config = i_torque_control.get_config();
                                 if (ct_parameters.back_and_forth == 1)
                                 {
-//                                    printf("\nFirst turn done\n");
+                                    printf("\nFirst turn done\n");
                                     for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
                                     {
                                         motorcontrol_config.torque_offset[i] = ct_parameters.torque_recording[i];
-                                        buffer_cogg[i] = ct_parameters.counter_average[i];
-                                        ct_parameters.counter_average[i] = 0;
                                         ct_parameters.torque_recording[i]= 0;
                                     }
                                     ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
                                 }
                                 else if(ct_parameters.back_and_forth == 2)
                                 {
-//                                    printf("\nSecond turn done\n");
+                                    printf("\nSecond turn done\n");
                                     for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
                                     {
                                         motorcontrol_config.torque_offset[i] += ct_parameters.torque_recording[i];
                                         motorcontrol_config.torque_offset[i] /= 2;
-                                        buffer_cogg[i+COGGING_TORQUE_ARRAY_SIZE] = ct_parameters.counter_average[i];
-                                        ct_parameters.counter_average[i] = 0;
                                         ct_parameters.torque_recording[i]= 0;
                                     }
                                     ct_parameters.rotation_sign = 0;
                                     motion_ctrl_config.enable_compensation_recording = 0;
                                     velocity_ref_k = 0;
-
-                                    for (int i = 0; i < 2* COGGING_TORQUE_ARRAY_SIZE; i++)
-                                    {
-                                        printf("%d\n", buffer_cogg[i]);
-                                    }
                                 }
                                 ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
                                 i_torque_control.set_config(motorcontrol_config);
