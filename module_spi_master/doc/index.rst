@@ -40,7 +40,7 @@ How to use
 
      It needs a ``SPIPorts`` structure containing two clock blocks and 4 1-bit ports for SPI.
 
-4. At your IFM tile, You can use the functions to read or write SPI data.
+4. At your IF2 tile, You can use the functions to read or write SPI data.
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
@@ -51,13 +51,13 @@ How to use
         #include <spi_master.h>
         
         // 3.Instantiate the ports for the SPI.
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+        SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
 
         int main(void)
         {
             par
             {
-                on tile[IFM_TILE]:
+                on tile[IF2_TILE]:
                 {                    
                     // 4. Use the functions to read and write SPI data.
                     // initialize the master

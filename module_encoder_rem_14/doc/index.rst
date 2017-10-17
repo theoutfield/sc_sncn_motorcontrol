@@ -48,7 +48,7 @@ How to use
      You need to fill up all the generic sensor parameters especially ``ifm_usec`.
      And fill up the REM 14 specific parameters.
 
-5. At your IFM tile, You can use the functions to read REM 14 data.
+5. At your IF2 tile, You can use the functions to read REM 14 data.
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
@@ -59,13 +59,13 @@ How to use
         #include <rem_14_service.h>
         
         // 3.Instantiate the ports for the REM 14.
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
+        SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
 
         int main(void)
         {
             par
             {
-                on tile[IFM_TILE]:
+                on tile[IF2_TILE]:
                 {
                     // 4. Fill up the REM 14 configuration structure.
                     PositionFeedbackConfig position_feedback_config;

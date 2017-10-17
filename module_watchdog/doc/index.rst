@@ -14,7 +14,7 @@ Up to 2 clients could control the Service through an interface.
 When running the Watchdog Service, the **Reference Frequency** of the tile where the Service is
 allocated will be automatically changed to **250MHz**.
 
-The Watchdog Service should always run over an **IFM tile** so it can access the ports to
+The Watchdog Service should always run over an **IF2 tile** so it can access the ports to
 your SOMANET IFM device.
 
 .. cssclass:: github
@@ -41,7 +41,7 @@ How to use
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instantiate the Service.
+5. At your IF2 tile, instantiate the Service.
 
 6. At whichever other core, now you can perform calls to the Watchdog Service through the interfaces connected to it.
 
@@ -53,7 +53,7 @@ How to use
 
         #include <watchdog_service.h> // 2
 
-        WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS; // 3
+        WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS; // 3
 
         int main(void) {
 
@@ -63,7 +63,7 @@ How to use
             {
                 on tile[APP_TILE]: i_watchdog[0].start(); // 6
 
-                on tile[IFM_TILE]: watchdog_service(wd_ports, i_watchdog); // 5
+                on tile[IF2_TILE]: watchdog_service(wd_ports, i_watchdog); // 5
             }
 
             return 0;

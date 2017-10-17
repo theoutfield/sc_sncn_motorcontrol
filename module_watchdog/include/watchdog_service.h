@@ -26,7 +26,7 @@ typedef struct {
 enum {DC100_DC300, DC500, DC1K_DC5K, DC1KD1, DC30};
 
 /**
- * @brief Service to manage the watchdog chip within your IFM SOMANET device.
+ * @brief Service to manage the watchdog chip within your SOMANET Drive device.
  *
  * @param watchdog_ports Ports structure defining watchdog chip HW access.
  * @param i_watchdog Array of communication interfaces to handle up to 2 different clients.
@@ -35,7 +35,7 @@ enum {DC100_DC300, DC500, DC1K_DC5K, DC1KD1, DC30};
 void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec);
 
 /**
- * @brief Function to blink red LED on your IFM SOMANET devices to signal different types of faults.
+ * @brief Function to blink red LED on your SOMANET Drive devices to signal different types of faults.
  *
  * @param fault Fault ID, i.e., number of times to blink followed by a pause.
  * @param period Red LED on/off period

@@ -39,7 +39,7 @@ How to use
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. Outside your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
+5. Outside your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
 
 6. Now you can perform calls to the Motion Control Service through the interfaces connected to it. You can do this at whichever other core. 
 
@@ -55,18 +55,18 @@ How to use
         #include <motorcontrol_service.h>
         #include <motion_control_service.h> // step 3
     
-        PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
-        WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-        FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
-        ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-        port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
-        port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
-        port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
-        port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;    
+        PwmPorts pwm_ports = SOMANET_DRIVE_PWM_PORTS;
+        WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS;
+        FetDriverPorts fet_driver_ports = SOMANET_DRIVE_FET_DRIVER_PORTS;
+        ADCPorts adc_ports = SOMANET_DRIVE_ADC_PORTS;
+        QEIHallPort qei_hall_port_1 = SOMANET_DRIVE_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_DRIVE_QEI_PORTS;
+        HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_QEI_PORT_INPUT_MODE_SELECTION;
+        SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
+        port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
+        port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
+        port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
+        port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;    
 
         int main(void)
         {
@@ -152,7 +152,7 @@ How to use
                     motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake); //5
         		}
 
-        		on tile[IFM_TILE]:
+        		on tile[IF2_TILE]:
        			{	
             		par
             		{

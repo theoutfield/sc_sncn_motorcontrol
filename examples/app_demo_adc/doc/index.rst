@@ -9,8 +9,8 @@ ADC DEMO
     :depth: 3
 
 In many applications, it is required to measure analogue signals. These measured signals can later be used for controlling/demonstration purposes.
-The purpose of this app (app_demo_adc) is to show how an ADC block can be used on a SOMANET IFM module. It includes one of simplest forms of using an adc block in
-SOMANET IFM module. 
+The purpose of this app (app_demo_adc) is to show how an ADC block can be used on a SOMANET Drive module. It includes one of simplest forms of using an adc block in
+SOMANET Drive module. 
 
 
 * **Minimum Number of Cores**: 2
@@ -30,7 +30,7 @@ Quick How-to
 
 .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
-6. :ref:`Set the type of your ADC block (AD_7949 or AD_7265) as the second input of adc_client_demo function in the main.xc file (ADC block type is defined as SOMANET_IFM_ADC value in bsp file of your IFM device in module-board-support).
+6. :ref:`Set the type of your ADC block (AD_7949 or AD_7265) as the second input of adc_client_demo function in the main.xc file (ADC block type is defined as SOMANET_DRIVE_ADC value in bsp file of your IFM device in module-board-support).
  
 .. code-block:: c
   
@@ -44,7 +44,7 @@ Quick How-to
                         adc_client_demo(i_adc[1], AD_7949/*or AD_7265*/);
                    }
 
-                   on tile[IFM_TILE]:
+                   on tile[IF2_TILE]:
                    {
                         if(!isnull(adc_ports.ad7949_ports.clk))         adc_ad7949_service_demo(adc_ports.ad7949_ports, i_adc);
                         else if(!isnull(adc_ports.ad7265_ports.xclk))   adc_ad7265_service_demo(adc_ports.ad7265_ports, i_adc);

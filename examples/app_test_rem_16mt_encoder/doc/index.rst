@@ -62,7 +62,7 @@ Quick How-to
 
     .. code-block:: c
 
-            on tile[IFM_TILE]:
+            on tile[IF2_TILE]:
             /* Position feedback service */
             {
                 PositionFeedbackConfig position_feedback_config;

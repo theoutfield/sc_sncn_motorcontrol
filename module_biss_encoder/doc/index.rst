@@ -50,7 +50,7 @@ How to use
 
 4. Fill up the BiSS configuration structure. BiSS and SSI use the same parameters. The protocol type is selected with the ``position_feedback_config.sensor_type`` parameters. Usually SSI encoders don't support CRC or multiturn, they can be disabled by setting them to `0`.
 
-5. At your IFM tile, You can use the functions to read BiSS data and process it into position data.
+5. At your IF2 tile, You can use the functions to read BiSS data and process it into position data.
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
@@ -61,14 +61,14 @@ How to use
         #include <biss_service.h>
         
         // 3.Instantiate the ports for the BiSS.
-        port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
-        port ? gpio_port_3 = SOMANET_IFM_GPIO_D3; // 1-bit port
+        port ? qei_hall_port_2 = SOMANET_DRIVE_ENCODER_2_PORT;
+        port ? gpio_port_3 = SOMANET_DRIVE_GPIO_D3; // 1-bit port
 
         int main(void)
         {
             par
             {
-                on tile[IFM_TILE]:
+                on tile[IF2_TILE]:
                 {
                     // 4. Fill up the BiSS configuration structure.                 
                     PositionFeedbackConfig position_feedback_config;

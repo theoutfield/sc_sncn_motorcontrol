@@ -8,11 +8,11 @@ PWM Module
     :backlinks: none
     :depth: 3
 
-This module provides a Service (pwm_service_general) to generate center-aligned Pulse-Width modulation(PWM) signals for both high-side and low-side FETs of your IFM module. PWM module can be used to cycle on-and-off a digital signal in order to control a load which requires electrical power. As shown in figure 1, the period and hence the frequency of a pwm signal is always fixed (the default value is 12 kHz). Only the on-time of PWM pulses can be changed. The on-time (for each inverter output can be adjusted by sending the corresponding pwm_value to pwm_service_general through an interface. By this technique, it is possible to modulate a given reference voltage.
+This module provides a Service (pwm_service_general) to generate center-aligned Pulse-Width modulation(PWM) signals for both high-side and low-side FETs of your Drive module. PWM module can be used to cycle on-and-off a digital signal in order to control a load which requires electrical power. As shown in figure 1, the period and hence the frequency of a pwm signal is always fixed (the default value is 12 kHz). Only the on-time of PWM pulses can be changed. The on-time (for each inverter output can be adjusted by sending the corresponding pwm_value to pwm_service_general through an interface. By this technique, it is possible to modulate a given reference voltage.
 
 The PWM Service should always run over an **IFM Tile** so it can access the ports of your SOMANET IFM device.
 
-If PWM signals are used to drive an IFM module, the watchdog service should also be running to activate the IFM ports.
+If PWM signals are used to drive an Drive module, the watchdog service should also be running to activate the IFM ports.
 
 .. cssclass:: github
 
@@ -42,13 +42,13 @@ How to use
 
 3. Include the WATCHDOG Service header **watchdog_service.h** in your app.
 
-4. Define the required pwm ports in the board-support-package of your IFM module. By default, these ports are defined for phase A, B and C of the IFM module.
+4. Define the required pwm ports in the board-support-package of your Drive module. By default, these ports are defined for phase A, B and C of the Drive module.
 
-5. Define the required watchdog ports in the board-support-package of your IFM module. By default, these ports are defined in the board-support-package of each IFM module. 
+5. Define the required watchdog ports in the board-support-package of your Drive module. By default, these ports are defined in the board-support-package of each Drive module. 
 
 6. Inside your main function, instantiate the interfaces array for the Service-Clients communication (both watchdog service and pwm service).
 
-7. At your IFM tile, instantiate the Services (both PWM service and watchdog service)
+7. At your IF2 tile, instantiate the Services (both PWM service and watchdog service)
 
 8. At whichever other core, now you can perform calls to the PWM Service through the interfaces connected to it.
 
@@ -61,8 +61,8 @@ How to use
         #include <pwm_server.h> // 2
         #include <watchdog_service.h> // 3
 
-        PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL; // 4
-        WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS; // 5
+        PwmPortsGeneral pwm_ports = SOMANET_DRIVE_PWM_PORTS_GENERAL; // 4
+        WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS; // 5
 
         int main(void)
         {

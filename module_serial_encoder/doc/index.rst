@@ -12,7 +12,7 @@ This module provides a Service that will read and process the data coming from a
 
 This service can run independently but is meant to be used by the :ref:`Position Feedback Module <module_position_feedback>` that is why it uses the same communication interface.
 
-The Service should always run over an **IFM tile** so it can access the ports to
+The Service should always run over an **IF2 tile** so it can access the ports to
 your SOMANET IFM device.
 
 .. cssclass:: github
@@ -51,7 +51,7 @@ How to use
 
 5. Optionally, instantiate the shared memory interface.
 
-6. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+6. At your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
      The service uses the same configuration structure as the :ref:`Position Feedback Module <module_position_feedback>`.
      You need to fill up all the generic sensor parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
@@ -69,14 +69,14 @@ How to use
         #include <serial_encoder_service.h>
        
         // 3. Instantiate the ports needed for the sensor.
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-        port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
-        port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
-        port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
-        port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
+        QEIHallPort qei_hall_port_1 = SOMANET_DRIVE_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_DRIVE_QEI_PORTS;
+        HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_QEI_PORT_INPUT_MODE_SELECTION;
+        SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
+        port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
+        port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
+        port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
+        port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;
 
 
         int main(void)
@@ -90,7 +90,7 @@ How to use
             par
             {
 
-                on tile[IFM_TILE]: par {
+                on tile[IF2_TILE]: par {
                     // 5. Start the shared memory service
                     shared_memory_service(i_shared_memory, 3);
 
