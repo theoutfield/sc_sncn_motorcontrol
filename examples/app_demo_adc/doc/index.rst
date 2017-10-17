@@ -10,7 +10,7 @@ ADC DEMO
 
 In many applications, it is required to measure analogue signals. These measured signals can later be used for controlling/demonstration purposes.
 The purpose of this app (app_demo_adc) is to show how an ADC block can be used on a SOMANET IFM module. It includes one of simplest forms of using an adc block in
-SOMANET IFM module. 
+SOMANET drives. 
 
 
 * **Minimum Number of Cores**: 2

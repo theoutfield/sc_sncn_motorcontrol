@@ -1,4 +1,4 @@
-/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "DRIVE_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_BOARD_REQUIRED>
 #include <IFM_BOARD_REQUIRED>
 
@@ -16,20 +16,6 @@
 
 #include <xscope.h>
 #include <timer.h>
-
-void ocupy_core(int foo)//just a while(1) loop to ocupy the core, and increase computational load of cpu
-{
-    int x=0;
-    int y=0;
-
-    while(1)
-    {
-        x++;
-        y++;
-        if(x>100) x=foo;
-        if(y>100) y=2*foo;
-    }
-}
 
 //Sends pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
 void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
@@ -55,6 +41,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
         {
         case t when timerafter(time) :> void:
 
+            //----------------- the following block is responsible to change pwm value (it can be replaced user's code to calculate pwm values)
             counter++;
             if(counter==50)
             {
@@ -79,7 +66,10 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
             xscope_int(PWM_VALUE_U, pwm_value_u);
             xscope_int(PWM_VALUE_V, pwm_value_v);
             xscope_int(PWM_VALUE_W, pwm_value_w);
+            //----------------- end of user's code for caltulating pwm values
 
+
+            // prepare pwm values for being sent to pwm server
             pwm_value_a &= 0x0000FFFF;
             pwm_value_b &= 0x0000FFFF;
             pwm_value_c &= 0x0000FFFF;
@@ -113,34 +103,11 @@ int main(void) {
         {
             par
             {
-                {
-                    ocupy_core(10);
-                }
-                {
-                    ocupy_core(11);
-                }
-                {
-                    ocupy_core(12);
-                }
-                {
-                    ocupy_core(13);
-                }
-                {
-                    ocupy_core(14);
-                }
-                {
-                    ocupy_core(15);
-                }
-                {
-                    ocupy_core(16);
-                }
-                {
-                    ocupy_core(17);
-                }
+                //place your application code here
             }
         }
 
-        on tile[1]://IFM TILE
+        on tile[1]://IF2 TILE
         {
             par
             {
@@ -163,19 +130,6 @@ int main(void) {
                 /* Watchdog Service */
                 {
                     watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
-                }
-
-                {
-                    ocupy_core(22);
-                }
-                {
-                    ocupy_core(23);
-                }
-                {
-                    ocupy_core(24);
-                }
-                {
-                    ocupy_core(25);
                 }
 
             }
