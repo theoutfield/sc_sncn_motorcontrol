@@ -143,7 +143,7 @@ void adc_ad7265_service_demo(
                 int limit_oc, int limit_ov, int limit_uv, int limit_ot):
                 break;
 
-        case iADC[int i].get_all_measurements() -> {
+        case iADC[int i].get_all_measurements(int motor_type) -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
@@ -229,7 +229,7 @@ void adc_ad7265(
 
                 break;
 
-        case iADC[int i].get_all_measurements() -> {
+        case iADC[int i].get_all_measurements(int motor_type) -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
@@ -262,7 +262,7 @@ void adc_ad7265(
             out_b = (int)tmp_val;
 
 
-            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048)-36;
+            phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
             phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
             if(current_sensor_config.sign_phase_a != 0)//if phase a is measured instead of phase C
                 phaseC_out = current_sensor_config.sign_phase_a * (phaseB_out+phaseC_out)+50;

@@ -224,7 +224,7 @@ void adc_ad7949_service_demo(
                 int limit_oc, int limit_ov, int limit_uv, int limit_ot):
                 break;
 
-        case iADC[int i].get_all_measurements() -> {
+        case iADC[int i].get_all_measurements(int motor_type) -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
@@ -348,7 +348,7 @@ void adc_ad7949(
                 protection_initialized = 1;
                 break;
 
-        case iADC[int i].get_all_measurements() -> {
+        case iADC[int i].get_all_measurements(int motor_type) -> {
             int phaseB_out, int phaseC_out,
             int V_dc_out, int I_dc_out, int Temperature_out,
             int analogue_input_a_1, int analogue_input_a_2,
