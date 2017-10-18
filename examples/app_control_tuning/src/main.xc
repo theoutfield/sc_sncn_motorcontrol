@@ -205,7 +205,8 @@ int main(void) {
                     MotorcontrolConfig motorcontrol_config;
 
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
-                    motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
+                    motorcontrol_config.phases_inverted1 = MOTOR_PHASES_CONFIGURATION;
+                    motorcontrol_config.phases_inverted2 = MOTOR_PHASES_CONFIGURATION;
 
                     motorcontrol_config.torque_P_gain =  TORQUE_Kp;
                     motorcontrol_config.torque_I_gain =  TORQUE_Ki;
