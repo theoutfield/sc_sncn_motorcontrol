@@ -55,14 +55,14 @@
     <Probe name="TORQUE_SET1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="I_SET1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="I_ACT1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="ERR_1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="P_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="INTEGRAL1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="I_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="V_OUT1" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="ERR_1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="P_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="INTEGRAL1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_PART1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="V_OUT1" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     
     <Probe name="TORQUE_SET2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-    <Probe name="I_SET2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="I_SET2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="I_ACT2" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="ERR_2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="P_PART2" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
@@ -72,9 +72,7 @@
     
     <Probe name="PWM_M1_H" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
     <Probe name="PWM_M1_L" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_M2_H" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="PWM_M2_L" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+    <Probe name="PWM_M2_H" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="PWM_M2_L" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
         
-    <Probe name="TIME_IDLE_COMPUTATION" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-
 </xSCOPEconfig>
