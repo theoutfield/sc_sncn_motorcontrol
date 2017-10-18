@@ -118,11 +118,14 @@ void start_service(port * qei_hall_port_1, port * qei_hall_port_2, port * biss_c
     }
 }
 
-void set_hall_enc_select_config(int &hall_enc_select_config, EncoderPortNumber port_number, EncoderPortSignalType signal_type)
+void set_hall_enc_select_config(int &hall_enc_select_config, EncoderPortNumber port_number, EncoderPortSignalType signal_type, unsigned int hall_enc_select_port_inv_mask)
 {
     int mask = 0b0001; //port 1
     if (port_number == ENCODER_PORT_2) {
         mask = 0b0010; //port 2
+    }
+    if (hall_enc_select_port_inv_mask) { // on rev d1 ports are flipped
+        mask ^= 0b0011;
     }
     if (signal_type == ENCODER_PORT_TTL_SIGNAL) {
         hall_enc_select_config &= ~mask ; //TTL mode
@@ -142,7 +145,7 @@ void check_ports(port * qei_hall_port_1, port * qei_hall_port_2, port * hall_enc
         {
             position_feedback_config.sensor_type = 0;
         }
-        set_hall_enc_select_config(hall_enc_select_config, position_feedback_config.hall_config.port_number, ENCODER_PORT_TTL_SIGNAL);
+        set_hall_enc_select_config(hall_enc_select_config, position_feedback_config.hall_config.port_number, ENCODER_PORT_TTL_SIGNAL, hall_enc_select_port_inv_mask);
     }
     else if (position_feedback_config.sensor_type == QEI_SENSOR)
     {
@@ -152,7 +155,7 @@ void check_ports(port * qei_hall_port_1, port * qei_hall_port_2, port * hall_enc
             position_feedback_config.sensor_type = 0;
         }
         //set qei_hall_port to TTL or RS422 (differential) mode
-        set_hall_enc_select_config(hall_enc_select_config, position_feedback_config.qei_config.port_number, position_feedback_config.qei_config.signal_type);
+        set_hall_enc_select_config(hall_enc_select_config, position_feedback_config.qei_config.port_number, position_feedback_config.qei_config.signal_type, hall_enc_select_port_inv_mask);
     }
     else if ((position_feedback_config.sensor_type == REM_16MT_SENSOR || position_feedback_config.sensor_type == REM_14_SENSOR)) {
         if (ports_check.spi_ports != POSITION_FEEDBACK_PORTS_1 ||
@@ -197,7 +200,7 @@ void check_ports(port * qei_hall_port_1, port * qei_hall_port_2, port * hall_enc
                     position_feedback_config.gpio_config[position_feedback_config.biss_config.data_port_number-ENCODER_PORT_EXT_D0] = GPIO_OFF; //disable GPIO on this port
                 }
             }
-            set_hall_enc_select_config(hall_enc_select_config, position_feedback_config.biss_config.data_port_number, position_feedback_config.biss_config.data_port_signal_type);
+            set_hall_enc_select_config(hall_enc_select_config, position_feedback_config.biss_config.data_port_number, position_feedback_config.biss_config.data_port_signal_type, hall_enc_select_port_inv_mask);
             //check and configure clock port
             if (position_feedback_config.biss_config.clock_port_config >= BISS_CLOCK_PORT_EXT_D4) { //hall_enc_select_port clock port
                 if (ports_check.hall_enc_select_port != 1) {

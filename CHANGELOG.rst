@@ -16,6 +16,7 @@ sc_sncn_motorcontrol Change Log
   * Measuring units of PID gains have now physical background and their size changed to values related to physical world   
   * Integrate the Drive 100 (DC100) fix from SDK 3.0.4
   * Add reverse sensor polarity command in app_control_tuning
+  * Fix Hall for Drive 1000 rev d1
 
 3.1.2
 -----
