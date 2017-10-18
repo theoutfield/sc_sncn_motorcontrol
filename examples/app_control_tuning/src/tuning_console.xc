@@ -974,23 +974,25 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                         case 'p':// pull voltage for releasing the brake at startup
                                 //set
-                                motion_ctrl_config.pull_brake_voltage=value;
+                            motion_ctrl_config.pull_brake_voltage1=value;
+                            motion_ctrl_config.pull_brake_voltage2=value;
 
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                printf("brake pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage);
+                                printf("brake1 & brake2 pull voltage is %d milli-Volts \n", motion_ctrl_config.pull_brake_voltage1);
                                 brake_flag = 0;
                                 break;
 
                         case 'h':// hold voltage for holding the brake after it is pulled
                                 //set
-                                motion_ctrl_config.hold_brake_voltage=value;
+                            motion_ctrl_config.hold_brake_voltage1=value;
+                            motion_ctrl_config.hold_brake_voltage2=value;
 
                                 i_motion_control.set_motion_control_config(motion_ctrl_config);
                                 // check
                                 motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                printf("brake hold voltage is %d milli-Volts \n", motion_ctrl_config.hold_brake_voltage);
+                                printf("brake1 & brake2 hold voltage is %d milli-Volts \n", motion_ctrl_config.hold_brake_voltage1);
                                 brake_flag = 0;
                                 break;
                         default:
@@ -1001,14 +1003,16 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 case 't'://set pull time
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
                         //set
-                        motion_ctrl_config.pull_brake_time=value;
+                        motion_ctrl_config.pull_brake_time1=value;
+                        motion_ctrl_config.pull_brake_time2=value;
 
-                        if(motion_ctrl_config.pull_brake_time<0)    motion_ctrl_config.pull_brake_time=0;
+                        if(motion_ctrl_config.pull_brake_time1<0)    motion_ctrl_config.pull_brake_time1=0;
+                        if(motion_ctrl_config.pull_brake_time2<0)    motion_ctrl_config.pull_brake_time2=0;
 
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         // check
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        printf("brake pull time is %d [milli-seconds] \n", motion_ctrl_config.pull_brake_time);
+                        printf("brake1 & brake2 pull time is %d [milli-seconds] \n", motion_ctrl_config.pull_brake_time1);
                         brake_flag = 0;
                         break;
 

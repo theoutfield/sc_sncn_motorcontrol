@@ -297,9 +297,13 @@ int main(void) {
                     }
 
                     motion_ctrl_config.dc_bus_voltage=                        DC_BUS_VOLTAGE;
-                    motion_ctrl_config.pull_brake_voltage=                    PULL_BRAKE_VOLTAGE;
-                    motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
-                    motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
+                    motion_ctrl_config.pull_brake_voltage1=                    PULL_BRAKE_VOLTAGE;
+                    motion_ctrl_config.pull_brake_time1 =                      PULL_BRAKE_TIME;
+                    motion_ctrl_config.hold_brake_voltage1 =                   HOLD_BRAKE_VOLTAGE;
+
+                    motion_ctrl_config.pull_brake_voltage2=                    PULL_BRAKE_VOLTAGE;
+                    motion_ctrl_config.pull_brake_time2 =                      PULL_BRAKE_TIME;
+                    motion_ctrl_config.hold_brake_voltage2 =                   HOLD_BRAKE_VOLTAGE;
 
                     motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
                 }

@@ -139,9 +139,13 @@ typedef struct {
     int brake_release_delay;            /**< Parameter for setting the delay between removing voltage from the brake and disabling the control  */
 
     int dc_bus_voltage;                 /**< Parameter for setting the nominal (rated) value of dc-link */
-    int pull_brake_voltage;             /**< Parameter for setting the voltage for pulling the brake out! */
-    int pull_brake_time;                /**< Parameter for setting the time of brake pulling */
-    int hold_brake_voltage;             /**< Parameter for setting the brake voltage after it is pulled */
+    int pull_brake_voltage1;             /**< Parameter for setting the voltage for pulling the brake1 out! */
+    int pull_brake_time1;                /**< Parameter for setting the time of brake1 pulling */
+    int hold_brake_voltage1;             /**< Parameter for setting the brake1 voltage after it is pulled */
+
+    int pull_brake_voltage2;             /**< Parameter for setting the voltage for pulling the brake2 out! */
+    int pull_brake_time2;                /**< Parameter for setting the time of brake2 pulling */
+    int hold_brake_voltage2;             /**< Parameter for setting the brake2 voltage after it is pulled */
 
     int filter;
 
