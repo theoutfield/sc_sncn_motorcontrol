@@ -9,7 +9,7 @@
 #include <xclib.h>
 #include <refclk.h>
 #include <adc_ad7949.h>
-
+#include <xscope.h>
 /**
  * @brief Define bit masks to distinguish if a single bit is 0/1 in a 14 bit binary variable.
  */
@@ -311,6 +311,8 @@ void adc_ad7949(
 
     int i_calib_a = 10002, i_calib_b = 10002;
 
+    int adc_out_max_limit = ADC_OUT_MAX_LIMIT;
+
     int data_updated=0;
 
     int dc_value=2617;
@@ -450,6 +452,14 @@ void adc_ad7949(
                     i_watchdog.protect(WD_OVER_VOLTAGE);
                     fault_code=OVER_VOLTAGE_NO_1;
                 }
+
+                if (adc_data_a > adc_out_max_limit || adc_data_b > adc_out_max_limit)
+                {
+                    i_watchdog.protect(WD_OVER_ADC_LIMIT);
+                    fault_code=DEVICE_INTERNAL_CONTINOUS_OVER_CURRENT_NO_1;
+
+                }
+
             }
             I_dc_out=OUT_B[AD_7949_VMOT_DIV_I_MOT];
             analogue_input_a_1 = OUT_A[AD_7949_EXT_A0_N_EXT_A1_N];
