@@ -385,6 +385,7 @@ int special_brake_release(int &counter, int start_position, int actual_position,
  *
  * @return void
  *  */
+
 void motion_control_service(MotionControlConfig &motion_ctrl_config,
         interface TorqueControlInterface client i_torque_control,
         interface MotionControlInterface server i_motion_control[3],client interface UpdateBrake i_update_brake)
@@ -405,6 +406,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int torque_measurement;
     int torque_buffer [8] = {0};
     int index = 0;
+
+    int index_torque = 0;
 
     // structure definition
     UpstreamControlData upstream_control_data;
@@ -436,6 +439,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     CoggingTorqueParam ct_parameters;
 
     init_cogging_torque_parameters(ct_parameters, 10);
+    int buffer_cogg[COGGING_TORQUE_ARRAY_SIZE] = { 0 };
+    int buffer_trq[COGGING_TORQUE_ARRAY_SIZE] = { 0 };
 
     VelCtrlAutoTuneParam velocity_auto_tune;
 
@@ -745,17 +750,18 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             {
                                 if (upstream_control_data.singleturn % ct_parameters.position_step)
                                 {
-                                    int index = upstream_control_data.singleturn / ct_parameters.position_step;
-                                    if (ct_parameters.counter_average[index] < 50)
-                                    {
-                                        ct_parameters.torque_recording[index] += torque_measurement;
-                                        ct_parameters.counter_average[index] ++;
-                                    }
+                                    if(ct_parameters.remaining_cells == 1024)
+                                        printf("start = %d\n", upstream_control_data.singleturn);
 
-                                    if (ct_parameters.counter_average[index] == 1)
+                                    int index = upstream_control_data.singleturn / ct_parameters.position_step;
+                                    ct_parameters.torque_recording[index] += torque_measurement;
+                                    buffer_trq[index] = +ct_parameters.torque_recording[index];
+                                    if (ct_parameters.counter_average[index] == 0)
                                     {
                                         ct_parameters.remaining_cells--;
                                     }
+                                    ct_parameters.counter_average[index] ++;
+                                    buffer_cogg[index] ++;
                                 }
                             }
                             else {
@@ -777,6 +783,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         ct_parameters.torque_recording[i]= 0;
                                     }
                                     ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
+                                    printf("switch = %d\n", upstream_control_data.singleturn);
+
                                 }
                                 else if(ct_parameters.back_and_forth == 2)
                                 {
@@ -787,16 +795,32 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         motorcontrol_config.torque_offset[i] /= 2;
                                         ct_parameters.torque_recording[i]= 0;
                                     }
+
+//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+//                                    {
+//                                        printf("%d\n", buffer_trq[i]);
+//                                    }
+
+                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+                                    {
+                                        printf("%d\n", motorcontrol_config.torque_offset[i]);
+                                    }
+
+//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+//                                    {
+//                                        printf("%d\n", buffer_cogg[i]);
+//                                    }
+
+
                                     ct_parameters.rotation_sign = 0;
                                     motion_ctrl_config.enable_compensation_recording = 0;
                                     velocity_ref_k = 0;
                                 }
                                 ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
-                                i_torque_control.set_config(motorcontrol_config);
+                                i_torque_control.set_cogging_table(motorcontrol_config);
                                 ct_parameters.torque_recording_started = 0;
                                 ct_parameters.delay_counter = 0;
                                 i_torque_control.set_torque_control_enabled();
-                                i_torque_control.set_brake_status(DISABLE_BRAKE);
 
                                 if(ct_parameters.back_and_forth == 2)
                                 {
@@ -805,6 +829,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     velocity_enable_flag =0;
                                     position_enable_flag =0;
                                     i_torque_control.set_torque_control_disabled();
+                                    i_torque_control.set_brake_status(DISABLE_BRAKE);
+
+                                    printf("%d\n", index_torque);
                                 }
                             }
                         }
@@ -1292,6 +1319,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
                 xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
+                xscope_int(FILT_TORQUE, torque_measurement);
+                xscope_int(BINS, index);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
