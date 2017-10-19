@@ -9,7 +9,6 @@
 #include <xclib.h>
 #include <refclk.h>
 #include <adc_ad7949.h>
-#include <xscope.h>
 /**
  * @brief Define bit masks to distinguish if a single bit is 0/1 in a 14 bit binary variable.
  */
