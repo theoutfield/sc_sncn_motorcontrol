@@ -174,16 +174,17 @@ void check_ports(port * qei_hall_port_1, port * qei_hall_port_2, port * hall_enc
                     position_feedback_config.sensor_type = 0;
                 } else {
                     configure_in_port(*qei_hall_port_1, spi_ports->spi_interface.blk1);
+                    //if the clock port is GPIO 3, enable the redirect GPIO 3 -> qei_hall_port_1
+                    //by setting P4F2 to high (3rd bit of hall_enc_select_config)
+                    if (position_feedback_config.biss_config.clock_port_config == BISS_CLOCK_PORT_EXT_D3) {
+                        hall_enc_select_config |= 0b0100;
+                    }
                 }
             } else if (position_feedback_config.biss_config.data_port_number == ENCODER_PORT_2) {
                 if (ports_check.qei_hall_port_2 != POSITION_FEEDBACK_PORTS_1) {
                     position_feedback_config.sensor_type = 0;
                 } else {
                     configure_in_port(*qei_hall_port_2, spi_ports->spi_interface.blk1);
-                    //if the clock port is GPIO 3, enable the redirect GPIO 3 -> qei_hall_port_2
-                    if (position_feedback_config.biss_config.clock_port_config == BISS_CLOCK_PORT_EXT_D3) {
-                        hall_enc_select_config |= 0b0100;
-                    }
                 }
             } else if (position_feedback_config.biss_config.data_port_number >= ENCODER_PORT_EXT_D0 && position_feedback_config.biss_config.data_port_number <= ENCODER_PORT_EXT_D3) {
                 //gpio data port
