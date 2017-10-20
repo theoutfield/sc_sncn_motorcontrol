@@ -10,7 +10,7 @@
 #include <xclib.h>
 #include <adc_service.h>
 
-
+#define ADC_OUT_MAX_LIMIT   16000   /* ADC can operate till 4V */
 /**
  * @brief Demo service to show how AD7949 can be used.
  *
