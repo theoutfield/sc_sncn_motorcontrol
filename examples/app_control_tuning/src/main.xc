@@ -122,7 +122,7 @@ int main(void) {
                     if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                         predriver(fet_driver_ports);
 
-                    pwm_service_general(pwm_ports, i_update_pwm, GPWM_FRQ_30, DEADTIME_NS);
+                    pwm_service_general(pwm_ports, i_update_pwm, GPWM_FRQ_15, DEADTIME_NS);
                 }
 
                 /* Watchdog Service */
