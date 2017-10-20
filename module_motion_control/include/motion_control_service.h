@@ -240,7 +240,7 @@ interface MotionControlInterface
      *
      * @param brake_status -> release if 1, block if 0
      */
-    void set_brake_status(int brake_status);
+    void set_brake_status(int brake_status1, int brake_status2);
 
     /**
      * @brief updates the new brake configuration in pwm service

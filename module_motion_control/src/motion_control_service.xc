@@ -630,7 +630,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int special_brake_release_torque = 0;
     int brake_shutdown_counter = 0;
     i_torque_control.set_safe_torque_off_enabled();
-    i_torque_control.set_brake_status(DISABLE_BRAKE);
+    i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
 
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
@@ -792,7 +792,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 ct_parameters.torque_recording_started = 0;
                                 ct_parameters.delay_counter = 0;
                                 i_torque_control.set_torque_control_enabled();
-                                i_torque_control.set_brake_status(DISABLE_BRAKE);
+                                i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
 
                                 if(ct_parameters.back_and_forth == 2)
                                 {
@@ -961,7 +961,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 // check error code
                 if (motion_control_error != MOTION_CONTROL_NO_ERROR) {
-                    i_torque_control.set_brake_status(DISABLE_BRAKE);
+                    i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                     torque_enable_flag   =0;
                     velocity_enable_flag =0;
                     position_enable_flag =0;
@@ -975,7 +975,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     torque_enable_flag = 0;
                     position_enable_flag = 0;
                     velocity_enable_flag = 0;
-                    i_torque_control.set_brake_status(DISABLE_BRAKE);
+                    i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                     i_torque_control.set_torque_control_disabled();
                     printstr("*** Position Limit Reached ***\n");
                     //store original limits, with threshold if possible
@@ -1106,7 +1106,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     if (detect[A] == 3)
                                     {
                                         error_phase = A;
-                                        i_torque_control.set_brake_status(0);
+                                        i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                                         if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                                         {
                                             brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1128,7 +1128,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     if (detect[B] == 3)
                                     {
                                         error_phase = B;
-                                        i_torque_control.set_brake_status(0);
+                                        i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                                         if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                                         {
                                             brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1150,7 +1150,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     if (detect[C] == 3)
                                     {
                                         error_phase = C;
-                                        i_torque_control.set_brake_status(0);
+                                        i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                                         if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                                         {
                                             brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1175,7 +1175,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         if (detect_low[A] == 2)
                                         {
                                             error_phase = A;
-                                            i_torque_control.set_brake_status(0);
+                                            i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                                             if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                                             {
                                                 brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1198,7 +1198,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         if (detect_low[B] == 2)
                                         {
                                             error_phase = B;
-                                            i_torque_control.set_brake_status(0);
+                                            i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                                             if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                                             {
                                                 brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1221,7 +1221,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         if (detect_low[C] == 2)
                                         {
                                             error_phase = C;
-                                            i_torque_control.set_brake_status(0);
+                                            i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                                             if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                                             {
                                                 brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1311,7 +1311,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
         case i_motion_control[int i].disable():
 
-                i_torque_control.set_brake_status(DISABLE_BRAKE);
+                i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                 if (motion_ctrl_config.brake_release_delay != 0 && position_enable_flag == 1)
                 {
                     brake_shutdown_counter = motion_ctrl_config.brake_release_delay;
@@ -1441,7 +1441,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     torque_ref_k = 0;
 
                     i_torque_control.set_safe_torque_off_enabled();
-                    i_torque_control.set_brake_status(DISABLE_BRAKE);
+                    i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
 
                     update_brake_configuration(in_config, i_torque_control);
                 }
@@ -1662,8 +1662,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         i_torque_control.set_config(in_motorcontrol_config);
                         break;
 
-                case i_motion_control[int i].set_brake_status(int in_brake_status):
-                        i_torque_control.set_brake_status(in_brake_status);
+                case i_motion_control[int i].set_brake_status(int in_brake_status1, int in_brake_status2):
+                        i_torque_control.set_brake_status(in_brake_status1, in_brake_status2);
                         break;
 
                 case i_motion_control[int i].update_brake_configuration():
@@ -1673,7 +1673,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         torque_ref_k = 0;
 
                         i_torque_control.set_safe_torque_off_enabled();
-                        i_torque_control.set_brake_status(DISABLE_BRAKE);
+                        i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
 
                         update_brake_configuration(motion_ctrl_config, i_torque_control);
 
@@ -1712,7 +1712,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
 
                 case i_motion_control[int i].set_safe_torque_off_enabled():
-                        i_torque_control.set_brake_status(DISABLE_BRAKE);
+                        i_torque_control.set_brake_status(DISABLE_BRAKE, DISABLE_BRAKE);
                         torque_enable_flag   = 0;
                         velocity_enable_flag = 0;
                         position_enable_flag = 0;
@@ -1832,7 +1832,7 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
     }
 
     if (motion_ctrl_config.brake_release_strategy > 0) {
-        i_torque_control.set_brake_status(ENABLE_BRAKE);
+        i_torque_control.set_brake_status(ENABLE_BRAKE, ENABLE_BRAKE);
     }
 
     //enable motorcontrol and release brake

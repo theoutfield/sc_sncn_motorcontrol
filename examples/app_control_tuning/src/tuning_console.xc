@@ -1027,7 +1027,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                             brake_flag = 1;
                             printf("Brake released\n");
                         }
-                        i_motion_control.set_brake_status(brake_flag);
+                        i_motion_control.set_brake_status(brake_flag, brake_flag);
                         break;
                 }
                 break;
