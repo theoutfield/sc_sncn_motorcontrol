@@ -439,8 +439,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     CoggingTorqueParam ct_parameters;
 
     init_cogging_torque_parameters(ct_parameters, 10);
-    int buffer_cogg[COGGING_TORQUE_ARRAY_SIZE] = { 0 };
-    int buffer_trq[COGGING_TORQUE_ARRAY_SIZE] = { 0 };
 
     VelCtrlAutoTuneParam velocity_auto_tune;
 
@@ -783,7 +781,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         ct_parameters.torque_recording[i]= 0;
                                     }
                                     ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
-                                    printf("switch = %d\n", upstream_control_data.singleturn);
 
                                 }
                                 else if(ct_parameters.back_and_forth == 2)
@@ -795,22 +792,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         motorcontrol_config.torque_offset[i] /= 2;
                                         ct_parameters.torque_recording[i]= 0;
                                     }
-
-//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
-//                                    {
-//                                        printf("%d\n", buffer_trq[i]);
-//                                    }
-
-                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
-                                    {
-                                        printf("%d\n", motorcontrol_config.torque_offset[i]);
-                                    }
-
-//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
-//                                    {
-//                                        printf("%d\n", buffer_cogg[i]);
-//                                    }
-
 
                                     ct_parameters.rotation_sign = 0;
                                     motion_ctrl_config.enable_compensation_recording = 0;
@@ -1319,8 +1300,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 xscope_int(TORQUE_CMD, torque_ref_k);
                 xscope_int(FAULT_CODE, upstream_control_data.error_status*1000);
                 xscope_int(SENSOR_ERROR_X100, upstream_control_data.sensor_error*100);
-                xscope_int(FILT_TORQUE, torque_measurement);
-                xscope_int(BINS, index);
 #endif
 
 #ifdef XSCOPE_ANALOGUE_MEASUREMENT
