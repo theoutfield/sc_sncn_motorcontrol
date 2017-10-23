@@ -1,6 +1,6 @@
-/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IFM_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "DRIVE_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
 #include <CORE_BOARD_REQUIRED>
-#include <IFM_BOARD_REQUIRED>
+#include <DRIVE_BOARD_REQUIRED>
 
 /**
  * @file main.xc
@@ -17,18 +17,18 @@
 #include <advanced_motor_control.h>
 #include <position_feedback_service.h>
 
-PwmPortsGeneral pwm_ports = SOMANET_IFM_PWM_PORTS_GENERAL;
-WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
-ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-HallEncSelectPort hall_enc_select_port = SOMANET_IFM_ENCODER_PORTS_INPUT_MODE_SELECTION;
-port ? qei_hall_port_1 = SOMANET_IFM_ENCODER_1_PORT;
-port ? qei_hall_port_2 = SOMANET_IFM_ENCODER_2_PORT;
-port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
-port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
-port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
-port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
+PwmPortsGeneral pwm_ports = SOMANET_DRIVE_PWM_PORTS_GENERAL;
+WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS;
+FetDriverPorts fet_driver_ports = SOMANET_DRIVE_FET_DRIVER_PORTS;
+ADCPorts adc_ports = SOMANET_DRIVE_ADC_PORTS;
+SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
+HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_ENCODER_PORTS_INPUT_MODE_SELECTION;
+port ? qei_hall_port_1 = SOMANET_DRIVE_ENCODER_1_PORT;
+port ? qei_hall_port_2 = SOMANET_DRIVE_ENCODER_2_PORT;
+port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
+port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
+port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
+port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;
 
 #define POSITION_LIMIT 5000000 //+/- 4095
 
@@ -51,7 +51,7 @@ int main(void) {
         /* Waiting for a user input blocks other tasks on the same tile from execution. */
         on tile[APP_TILE]: demo_torque_control(i_torque_control[0], i_update_brake);
 
-        on tile[IFM_TILE]:
+        on tile[IF2_TILE]:
         {
             par
             {
@@ -68,12 +68,12 @@ int main(void) {
 
                 /* ADC Service */
                 {
-                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
+                    adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IF2_TILE_USEC, SINGLE_ENDED);
                 }
 
                 /* Watchdog Service */
                 {
-                    watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
+                    watchdog_service(wd_ports, i_watchdog, IF2_TILE_USEC);
                 }
 
                 /* Motor Control Service */
@@ -109,7 +109,7 @@ int main(void) {
                     }
 
                     torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC, /*gpio_port_0*/null);
+                            i_watchdog[0], i_torque_control, i_update_pwm, IF2_TILE_USEC, /*gpio_port_0*/null);
                 }
 
                 /* Shared memory Service */
@@ -123,7 +123,7 @@ int main(void) {
                     position_feedback_config.polarity    = SENSOR_1_POLARITY;
                     position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
                     position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                     position_feedback_config.offset      = HOME_OFFSET;
                     position_feedback_config.sensor_function = SENSOR_1_FUNCTION;

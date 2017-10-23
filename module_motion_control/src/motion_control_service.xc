@@ -1859,7 +1859,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
         }
 
-        error_detect(i_torque_control.update_upstream_control_data(0), downstream_control_data, i_motion_control);
+        error_detect(i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output), downstream_control_data, i_motion_control);
 
         }
     }

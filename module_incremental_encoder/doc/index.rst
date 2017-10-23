@@ -13,7 +13,7 @@ Incremental Encoder Feedback Sensor.
 
 This service can run independently but is meant to be used by the :ref:`Position Feedback Module <module_position_feedback>` that is why it uses the same communication interface.
 
-The Service should always run over an **IFM tile** so it can access the ports to
+The Service should always run over an **IF2 tile** so it can access the ports to
 your SOMANET IFM device.
 
 .. cssclass:: github
@@ -52,7 +52,7 @@ How to use
 
 5. Optionally, instantiate the shared memory interface.
 
-6. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+6. At your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
      The QEI sensor has some specific parameters. ``index_type`` to select if the encoder has a index pulse.
      ``signal_type`` to select the input port configuration between RS422 (differential) and TTL.
@@ -71,9 +71,9 @@ How to use
         #include <qei_service.h>
        
         // 3. Instantiate the ports needed for the sensor.
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
+        QEIHallPort qei_hall_port_1 = SOMANET_DRIVE_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_DRIVE_QEI_PORTS;
+        HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_QEI_PORT_INPUT_MODE_SELECTION;
 
 
         int main(void)
@@ -87,7 +87,7 @@ How to use
             par
             {
 
-                on tile[IFM_TILE]: par {
+                on tile[IF2_TILE]: par {
                     // 5. Start the shared memory service
                     shared_memory_service(i_shared_memory, 3);
 
@@ -99,7 +99,7 @@ How to use
                         position_feedback_config.sensor_type = QEI_SENSOR;
                         position_feedback_config.polarity    = NORMAL_POLARITY;
                         position_feedback_config.resolution  = QEI_SENSOR_RESOLUTION;
-                        position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                        position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                         position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                         position_feedback_config.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
                         position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;

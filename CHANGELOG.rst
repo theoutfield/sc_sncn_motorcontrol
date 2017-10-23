@@ -1,8 +1,10 @@
 sc_sncn_motorcontrol Change Log
 ===============================
-3.1.3
+
+3.2.0
 -----
 
+  * Renamed board support packages and targets to reflect new product naming conventions
   * Have three options for switching frequency namely 15 kHz, 30 kHz and 100 kHz
   * Implement new pwm structure with 15 kHz, and use 100 MHz ref_clk_frq with enough flexibility to drive 2 BLDCs and 2 brakes at the same time
   * Add support for DC30 in watchdog service
@@ -10,6 +12,7 @@ sc_sncn_motorcontrol Change Log
   * Measuring units of PID gains have now physical background and their size changed to values related to physical world   
   * Integrate the Drive 100 (DC100) fix from SDK 3.0.4
   * Add reverse sensor polarity command in app_control_tuning
+  * Fix Hall sensor position feedback port config for Drive1000 rev d1
 
 3.1.2
 -----

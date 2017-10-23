@@ -39,7 +39,7 @@ How to use
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. Outside your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
+5. Outside your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
 
 6. Now you can perform calls to the Motion Control Service through the interfaces connected to it. You can do this at whichever other core. 
 
@@ -55,18 +55,18 @@ How to use
         #include <motorcontrol_service.h>
         #include <motion_control_service.h> // step 3
     
-        PwmPorts pwm_ports = SOMANET_IFM_PWM_PORTS;
-        WatchdogPorts wd_ports = SOMANET_IFM_WATCHDOG_PORTS;
-        FetDriverPorts fet_driver_ports = SOMANET_IFM_FET_DRIVER_PORTS;
-        ADCPorts adc_ports = SOMANET_IFM_ADC_PORTS;
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-        port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
-        port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
-        port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
-        port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;    
+        PwmPorts pwm_ports = SOMANET_DRIVE_PWM_PORTS;
+        WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS;
+        FetDriverPorts fet_driver_ports = SOMANET_DRIVE_FET_DRIVER_PORTS;
+        ADCPorts adc_ports = SOMANET_DRIVE_ADC_PORTS;
+        QEIHallPort qei_hall_port_1 = SOMANET_DRIVE_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_DRIVE_QEI_PORTS;
+        HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_QEI_PORT_INPUT_MODE_SELECTION;
+        SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
+        port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
+        port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
+        port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
+        port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;    
 
         int main(void)
         {
@@ -152,7 +152,7 @@ How to use
                     motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake); //5
         		}
 
-        		on tile[IFM_TILE]:
+        		on tile[IF2_TILE]:
        			{	
             		par
             		{
@@ -165,18 +165,18 @@ How to use
 
                     		//pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
                     		pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                           		i_update_brake, IFM_TILE_USEC);
+                           		i_update_brake, IF2_TILE_USEC);
 
                 		}
 
                 		/* ADC Service */
                 		{
-                    		adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IFM_TILE_USEC, SINGLE_ENDED);
+                    		adc_service(adc_ports, i_adc /*ADCInterface*/, i_watchdog[1], IF2_TILE_USEC, SINGLE_ENDED);
                 		}
 
                 		/* Watchdog Service */
                 		{
-                    		watchdog_service(wd_ports, i_watchdog, IFM_TILE_USEC);
+                    		watchdog_service(wd_ports, i_watchdog, IF2_TILE_USEC);
                 		}
 
                 		/* Motor Control Service */
@@ -218,7 +218,7 @@ How to use
                             }
 
                     		torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                            		i_watchdog[0], i_torque_control, i_update_pwm, IFM_TILE_USEC);
+                            		i_watchdog[0], i_torque_control, i_update_pwm, IF2_TILE_USEC);
                 		}
 
                 		/* Shared memory Service */
@@ -232,7 +232,7 @@ How to use
                     		position_feedback_config.polarity    = SENSOR_1_POLARITY;
                     		position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
                     		position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                    		position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                    		position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                     		position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                     		position_feedback_config.offset      = HOME_OFFSET;
                     		position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
