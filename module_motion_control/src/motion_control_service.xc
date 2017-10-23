@@ -541,8 +541,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     int torque_buffer [8] = {0};
     int index = 0;
 
-    int index_torque = 0;
-
     // structure definition
     UpstreamControlData upstream_control_data;
     DownstreamControlData downstream_control_data = {0};
@@ -943,8 +941,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                     position_enable_flag =0;
                                     i_torque_control.set_torque_control_disabled();
                                     i_torque_control.set_brake_status(DISABLE_BRAKE);
-
-                                    printf("%d\n", index_torque);
                                 }
                             }
                         }
