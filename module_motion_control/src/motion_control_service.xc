@@ -887,13 +887,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                                     int index = upstream_control_data.singleturn / ct_parameters.position_step;
                                     ct_parameters.torque_recording[index] += torque_measurement;
-                                    buffer_trq[index] = +ct_parameters.torque_recording[index];
                                     if (ct_parameters.counter_average[index] == 0)
                                     {
                                         ct_parameters.remaining_cells--;
                                     }
                                     ct_parameters.counter_average[index] ++;
-                                    buffer_cogg[index] ++;
                                 }
                             }
                             else {
