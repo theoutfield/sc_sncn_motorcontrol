@@ -44,7 +44,7 @@ How to use
 
 4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. At your IFM tile, instantiate the Service. 
+5. At your IF2 tile, instantiate the Service. 
 
 6. At whichever other core, now you can perform calls to the GPIO Service through the interfaces connected to it.
 
@@ -56,10 +56,10 @@ How to use
 
         #include <gpio_service.h> // 2
 
-        port gpio_ports[4] = {  SOMANET_IFM_GPIO_D0,
-                                SOMANET_IFM_GPIO_D1,
-                                SOMANET_IFM_GPIO_D2,
-                                SOMANET_IFM_GPIO_D3 }; // 3
+        port gpio_ports[4] = {  SOMANET_DRIVE_GPIO_D0,
+                                SOMANET_DRIVE_GPIO_D1,
+                                SOMANET_DRIVE_GPIO_D2,
+                                SOMANET_DRIVE_GPIO_D3 }; // 3
         int main(void)
         {
 
@@ -73,7 +73,7 @@ How to use
                         int foo = i_gpio[0].read_gpio(0);                        
                 }
 
-                on tile[IFM_TILE]: gpio_service(gpio_ports, i_gpio); // 5
+                on tile[IF2_TILE]: gpio_service(gpio_ports, i_gpio); // 5
             }
 
             return 0;

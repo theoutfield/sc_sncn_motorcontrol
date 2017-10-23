@@ -67,7 +67,7 @@ How to use
 
 5. Optionally, instantiate the shared memory interface.
 
-6. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+6. At your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
     The service configuration contains generic sensor parameters and also structures for sensor specific parameters.
     You need to fill up all the parameters for the sensor you want to use.
@@ -86,14 +86,14 @@ How to use
         #include <position_feedback_service.h>
        
         // 3. Instantiate the ports needed for the sensors.
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_IFM_QEI_PORT_INPUT_MODE_SELECTION;
-        SPIPorts spi_ports = SOMANET_IFM_SPI_PORTS;
-        port ?gpio_port_0 = SOMANET_IFM_GPIO_D0;
-        port ?gpio_port_1 = SOMANET_IFM_GPIO_D1;
-        port ?gpio_port_2 = SOMANET_IFM_GPIO_D2;
-        port ?gpio_port_3 = SOMANET_IFM_GPIO_D3;
+        QEIHallPort qei_hall_port_1 = SOMANET_DRIVE_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_DRIVE_QEI_PORTS;
+        HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_QEI_PORT_INPUT_MODE_SELECTION;
+        SPIPorts spi_ports = SOMANET_DRIVE_SPI_PORTS;
+        port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
+        port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
+        port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
+        port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;
 
         int main(void)
         {
@@ -107,7 +107,7 @@ How to use
             par
             {
 
-                on tile[IFM_TILE]: par {
+                on tile[IF2_TILE]: par {
                     // 5. Start the shared memory service
                     shared_memory_service(i_shared_memory, 3);
 
@@ -118,7 +118,7 @@ How to use
                         PositionFeedbackConfig position_feedback_config;
                         position_feedback_config.polarity    = NORMAL_POLARITY;
                         position_feedback_config.pole_pairs  = POLE_PAIRS;
-                        position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                        position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                         position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                         position_feedback_config.offset      = 0;
 

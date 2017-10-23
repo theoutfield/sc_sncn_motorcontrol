@@ -51,7 +51,7 @@ How to use
 
 5. Optionally, instantiate the shared memory interface.
 
-6. At your IFM tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
+6. At your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
      The Hall sensor has only one specific parameter ``hall_config.port_number`` the port number used.
      You still need to fill up all the generic sensor parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
@@ -68,8 +68,8 @@ How to use
         #include <hall_service.h>
        
         // 3. Instantiate the ports needed for the sensor.
-        QEIHallPort qei_hall_port_1 = SOMANET_IFM_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_IFM_QEI_PORTS;
+        QEIHallPort qei_hall_port_1 = SOMANET_DRIVE_HALL_PORTS;
+        QEIHallPort qei_hall_port_2 = SOMANET_DRIVE_QEI_PORTS;
 
         int main(void)
         {
@@ -82,7 +82,7 @@ How to use
             par
             {
 
-                on tile[IFM_TILE]: par {
+                on tile[IF2_TILE]: par {
                     // 5. Start the shared memory service
                     shared_memory_service(i_shared_memory, 3);
 
@@ -93,7 +93,7 @@ How to use
                         PositionFeedbackConfig position_feedback_config;
                         position_feedback_config.polarity    = NORMAL_POLARITY;
                         position_feedback_config.pole_pairs  = POLE_PAIRS;
-                        position_feedback_config.ifm_usec    = IFM_TILE_USEC;
+                        position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                         position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                         position_feedback_config.offset      = 0;
                         position_feedback_config.sensor_type = HALL_SENSOR;

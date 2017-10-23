@@ -170,7 +170,7 @@ typedef struct {
     int torque_D_gain;                     /**< derivative constant in torque controller*/
     int current_ratio;                     /**<ratio between current recieved in control core, and real phase current*/
     int voltage_ratio;                     /**<ratio between adc measured value and real dc-bus voltage*/
-    int temperature_ratio;                 /**<ratio between adc measured value and IFM board temperature*/
+    int temperature_ratio;                 /**<ratio between adc measured value and Drive board temperature*/
 
     int percent_offset_torque;              // (maximum) generated torque while finding offset value as a percentage of rated torque
 

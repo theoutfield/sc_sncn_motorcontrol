@@ -29,9 +29,9 @@ interface TorqueControlInterface
     /**
      * @brief configures the brake settings including its voltages and timing
      *
-     * @param pull_brake_voltage  voltage applied to electric brake at startup of brake
+     * @param pull_brake_voltage  voltage applied to electric brake at startup of brake (mV)
      * @param pull_brake_time     period of applying high voltage to electric brake at startup (in milliseconds)
-     * @param hold_brake_voltage  voltage applied to electric brake after the brake is pulled
+     * @param hold_brake_voltage  voltage applied to electric brake after the brake is pulled (mV)
      */
     void configure_brake(int pull_brake_voltage, int pull_brake_time, int hold_brake_voltage);
 
@@ -429,14 +429,15 @@ interface UpdatePWMGeneral
     /**
      * @brief send the pwm values and pwm controling commands to pwm service
      *
-     * @param   pwm_a pwm value for phase a
-     * @param   pwm_b pwm value for phase b
-     * @param   pwm_c pwm value for phase c
-     * @param   pwm_u pwm value for phase u
-     * @param   pwm_v pwm value for phase v
-     * @param   pwm_w pwm value for phase w
-     * @param   pwm_on determines whether pwm service generates the pulses or not
-     * @param   safe_torque_off_mode if set to 1 then pwm will not work in normal mode
+     * @param   pwm_a  pwm value for phase a
+     * @param   pwm_b  pwm value for phase b
+     * @param   pwm_c  pwm value for phase c
+     * @param   pwm_u  pwm value for phase u
+     * @param   pwm_v  pwm value for phase v
+     * @param   pwm_w  pwm value for phase w
+     * @param   pwm_b1 pwm value for activation/deactivation of electric brake 1
+     * @param   pwm_b2 pwm value for activation/deactivation of electric brake 2
+     * @param   safe_torque_off_mode if set to 1 then all FETs will be opened
      *
      * @return  void
      */
