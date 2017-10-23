@@ -106,6 +106,15 @@ interface TorqueControlInterface
     void set_config(MotorcontrolConfig in_config);
 
     /**
+     * @brief   Sets MotorcontrolConfig parameters, the most important cogging table
+     *
+     * @param   in_config MotorcontroConfig structure which will be passed to motor_control_service
+     *
+     * @return  void
+     */
+    void set_cogging_table(MotorcontrolConfig in_config);
+
+    /**
      * @brief Gets MotorcontrolConfig parameters which are used by motor_control_service.
      *
      * @return MotorcontroConfig structure which will be passed to motor_control_service
