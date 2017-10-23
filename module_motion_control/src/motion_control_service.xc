@@ -1167,7 +1167,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             }
                             else if (abs(upstream_control_data.velocity) > 5)// if velocity is low
                             {
-                                if (abs(upstream_control_data.computed_torque) > 10)
+                                if (abs(upstream_control_data.computed_torque1) > 10)
                                 {
                                     if (rms[A] < curr_threshold && rms[B] > 4 * rms[A] && rms[C] > 4 * rms[A])
                                     {
@@ -1599,7 +1599,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     //feeedback
                     upstream_control_data_out.position          = -upstream_control_data_out.position;
                     upstream_control_data_out.velocity          = -upstream_control_data_out.velocity;
-                    upstream_control_data_out.computed_torque   = -upstream_control_data_out.computed_torque;
+                    upstream_control_data_out.computed_torque1  = -upstream_control_data_out.computed_torque1;
                     //commands
                     downstream_control_data.position_cmd = -downstream_control_data.position_cmd;
                     downstream_control_data.velocity_cmd = -downstream_control_data.velocity_cmd;
