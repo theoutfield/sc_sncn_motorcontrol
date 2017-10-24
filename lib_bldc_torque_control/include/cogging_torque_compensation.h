@@ -18,7 +18,7 @@
 typedef struct
 {
     int remaining_cells;
-    short torque_recording[COGGING_TORQUE_ARRAY_SIZE];
+    int torque_recording[COGGING_TORQUE_ARRAY_SIZE];
     short counter_average [COGGING_TORQUE_ARRAY_SIZE];
     int torque_recording_started;
     int back_and_forth;
