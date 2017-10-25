@@ -1,6 +1,6 @@
 /* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "DRIVE_BOARD_REQUIRED" WITH AN APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
-#include <CORE_BOARD_REQUIRED>
-#include <DRIVE_BOARD_REQUIRED>
+#include <CoreC2X.bsp>
+#include <Drive1000-rev-d1.bsp>
 
 /**
  * @file main.xc
