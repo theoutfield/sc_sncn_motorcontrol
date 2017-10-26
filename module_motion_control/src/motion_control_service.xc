@@ -881,12 +881,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 if (upstream_control_data.singleturn % ct_parameters.position_step)
                                 {
                                     if(ct_parameters.remaining_cells == 1024)
-                                        printf("start = %d\n", upstream_control_data.singleturn);
+                                        ct_parameters.singleturn_start[0] = upstream_control_data.singleturn;
 
                                     int index = upstream_control_data.singleturn / ct_parameters.position_step;
 
                                     if ((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign > (ct_parameters.number_turns - 1) * motion_ctrl_config.resolution)
                                     {
+                                        ct_parameters.singleturn_start[1] = upstream_control_data.singleturn;
+
                                         // 2nd revolution
                                         ct_parameters.torque_recording[index+COGGING_TORQUE_ARRAY_SIZE] += torque_measurement;
                                         ct_parameters.counter_average[index+COGGING_TORQUE_ARRAY_SIZE] ++;
@@ -906,6 +908,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             }
                             else {
                                 printf("Measurement done\n");
+                                printf("%d %d\n", ct_parameters.singleturn_start[0], ct_parameters.singleturn_start[1]);
+
                                 for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
                                 {
                                     ct_parameters.torque_recording[i] /= ct_parameters.counter_average[i];
@@ -924,7 +928,14 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 ct_parameters.torque_mean[1] /= COGGING_TORQUE_ARRAY_SIZE;
 
 //                                printf("%d %d\n", (int)ct_parameters.torque_mean[0], (int)ct_parameters.torque_mean[1]);
-//
+
+                                // substract mean value from every bin for each revolution separate
+                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+                                {
+                                    ct_parameters.torque_recording[i] -= ct_parameters.torque_mean[0];
+                                    ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE] -= ct_parameters.torque_mean[1];
+                                }
+
 //                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
 //                                {
 //                                    printf("%d\n", ct_parameters.torque_recording[i]);
@@ -935,22 +946,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 //                                    printf("%d\n", ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]);
 //                                }
 
-                                // substract mean value from every bin for each revolution separate
-                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-                                {
-                                    ct_parameters.torque_recording[i] -= ct_parameters.torque_mean[0];
-                                    ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE] -= ct_parameters.torque_mean[1];
-                                }
 
-                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-                                {
-                                    printf("%d\n", ct_parameters.torque_recording[i]);
-                                }
-
-                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-                                {
-                                    printf("%d\n", ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]);
-                                }
 
                                 motorcontrol_config = i_torque_control.get_config();
                                 if (ct_parameters.back_and_forth == 1)
