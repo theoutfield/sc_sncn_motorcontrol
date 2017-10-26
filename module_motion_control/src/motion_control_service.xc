@@ -994,10 +994,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]= 0;
                                     }
 
-                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-                                    {
-                                        printf("%d\n", motorcontrol_config.torque_offset[i]);
-                                    }
+//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+//                                    {
+//                                        printf("%d\n", motorcontrol_config.torque_offset[i]);
+//                                    }
 
                                     ct_parameters.rotation_sign = 0;
                                     motion_ctrl_config.enable_compensation_recording = 0;
