@@ -182,7 +182,7 @@ int main(void)
 {
     /*********** Sensor Test ***********/
     interface PositionFeedbackInterface i_position_feedback[3];
-    interface shared_memory_interface i_shared_memory[3];
+    interface shared_memory_interface i_shared_memory[2];
     /*********** Motor Test ***********/
     interface WatchdogInterface i_watchdog[2];
     interface UpdatePWMGeneral i_update_pwm;
@@ -249,7 +249,7 @@ int main(void)
                     motorcontrol_config.torque_offset[i] = 0;
                 }
 
-                torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[1],
                         i_watchdog[0], i_torque_control, i_update_pwm, IF2_TILE_USEC, /*gpio_port_0*/null);
             }
 
