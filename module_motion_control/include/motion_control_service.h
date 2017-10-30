@@ -128,6 +128,9 @@ typedef struct {
     int max_speed_profiler;             /**< Parameter for setting the maximum speed in profiler mode */
     int max_torque_rate_profiler;       /**< Parameter for setting the maximum torque in profiler mode */
 
+    int torque_kp;                    /**< Parameter for torque controller P-constant */
+    int torque_ki;                    /**< Parameter for torque controller I-constant */
+    int torque_kd;                    /**< Parameter for torque controller D-constant */
     float position_kp;                    /**< Parameter for position controller P-constant */
     float position_ki;                    /**< Parameter for position controller I-constant */
     float position_kd;                    /**< Parameter for position controller D-constant */

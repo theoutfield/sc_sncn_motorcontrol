@@ -702,13 +702,25 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 case 't': //torque
                         switch(mode_3)
                         {
+                        case 'p':
+                            motion_ctrl_config.torque_kp = (int)value;
+                                break;
+
+                        case 'i':
+                            motion_ctrl_config.torque_ki = (int)value;
+                                break;
+
+                        case 'd':
+                            motion_ctrl_config.torque_kd = (int)value;
+                                break;
+
                         case 'f':
                             motion_ctrl_config.filter = (int)value;
                                 break;
                         default:
                             i_motion_control.set_motion_control_config(motion_ctrl_config);
-                            motion_ctrl_config = i_motion_control.get_motion_control_config();
-                            printf("filter cut-off freq:%d\n", motion_ctrl_config.filter);
+                            printf("Ktp :%d Kti:%d Ktd:%d \n",
+                                    motion_ctrl_config.torque_kp, motion_ctrl_config.torque_ki, motion_ctrl_config.torque_kd);
                                 break;
                         }
 

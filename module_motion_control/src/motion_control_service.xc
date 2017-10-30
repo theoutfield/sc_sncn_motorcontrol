@@ -626,6 +626,10 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     // initialization
     MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
     motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
+    motion_ctrl_config.torque_kp =motorcontrol_config.torque_P_gain;
+    motion_ctrl_config.torque_ki =motorcontrol_config.torque_I_gain;
+    motion_ctrl_config.torque_kd =motorcontrol_config.torque_D_gain;
+    motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
     int current_ratio = motorcontrol_config.current_ratio;
 
     //init brake config
@@ -1656,6 +1660,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
 
+                motorcontrol_config = i_torque_control.get_config();
+                if (motion_ctrl_config.torque_kp != motorcontrol_config.torque_P_gain ||
+                    motion_ctrl_config.torque_ki != motorcontrol_config.torque_I_gain ||
+                    motion_ctrl_config.torque_kd != motorcontrol_config.torque_D_gain)
+                {
+                    motorcontrol_config.torque_P_gain = motion_ctrl_config.torque_kp;
+                    motorcontrol_config.torque_I_gain = motion_ctrl_config.torque_ki;
+                    motorcontrol_config.torque_D_gain = motion_ctrl_config.torque_kd;
+                    i_torque_control.set_config(motorcontrol_config);
+                }
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
