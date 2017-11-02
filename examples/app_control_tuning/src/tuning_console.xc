@@ -370,7 +370,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                     else
                     {
                         printf("Error: offset detection is not possible.\n");
-                        printf("       please check position sensor connections\n");
+                        printf("       please check position sensor/motor connections\n");
                         printf("       and repeat the evaluation process.\n");
                     }
 
