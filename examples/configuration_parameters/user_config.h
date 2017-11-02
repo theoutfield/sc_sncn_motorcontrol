@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config_Maxon_411678.h>
+#include <motor_config_AMK_DD7_28_10_T00.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -88,10 +88,10 @@
 //////////////////////////////////////////////
 #define DC_BUS_VOLTAGE                48 //Warning! This parameter is used as well as a base for brake voltage configuration
 // (maximum) generated torque while finding offset value as a percentage of rated torque
-#define APPLIED_TUNING_TORQUE_PERCENT 20
+#define APPLIED_TUNING_TORQUE_PERCENT  5
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       160
+#define COMMUTATION_ANGLE_OFFSET       3000
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -120,13 +120,13 @@
 #define MOTOR_ID 0
 
 // PID GAINS FOR TORQUE CONTROL [will be divided by 10000]
-#define TORQUE_Kp         0
-#define TORQUE_Ki         0
-#define TORQUE_Kd         0
+#define TORQUE_Kp         2500
+#define TORQUE_Ki         50000
+#define TORQUE_Kd         3000
 
 //PID GAINS FOR VELOCITY CONTROL
-#define VELOCITY_Kp                             0.00
-#define VELOCITY_Ki                             0.00
+#define VELOCITY_Kp                             1.00
+#define VELOCITY_Ki                             0.20
 #define VELOCITY_Kd                             0.00
 #define VELOCITY_INTEGRAL_LIMIT                 MOTOR_MAXIMUM_TORQUE
 #define ENABLE_VELOCITY_AUTO_TUNER              0   //0/1 -> diactivate/deactivate auto-tuning for velocity controller

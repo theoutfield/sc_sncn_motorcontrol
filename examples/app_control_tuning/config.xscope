@@ -18,16 +18,16 @@
 
 	<!-- Velocity Position Control -->
 
-	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="Position Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+	<Probe name="Position" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Velocity" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Velocity Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Position Secondary" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="Velocity Secondary" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
-	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Fault Code" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
-    <Probe name="Sensor Error x100" type="CONTINUOUS" datatype="INT" units="Value" enabled="true"/>
+	<Probe name="Torque" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Torque Cmd" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Fault Code" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
+    <Probe name="Sensor Error x100" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
 
     <Probe name="V_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>
     <Probe name="I_DC" type="CONTINUOUS" datatype="INT" units="Value" enabled="false"/>

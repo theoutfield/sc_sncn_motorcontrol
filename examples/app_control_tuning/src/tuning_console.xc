@@ -69,6 +69,56 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
     delay_ticks(100*1000*tile_usec);
     printf(">>   SOMANET PID TUNING SERVICE STARTING...\n");
 
+
+    if(0)
+    {
+        delay_milliseconds(3000);
+        i_motion_control.enable_torque_ctrl();
+        printf("torque ctrl enabled\n");
+
+        int torque_ref=0;
+
+        while(1)
+        {
+            delay_milliseconds(5000);
+            torque_ref+=20;
+            if(torque_ref>4000) torque_ref=4000;
+
+            motion_ctrl_config = i_motion_control.get_motion_control_config();
+            motion_ctrl_config.enable_profiler = 0;
+            i_motion_control.set_motion_control_config(motion_ctrl_config);
+            downstream_control_data.offset_torque = 0;
+            downstream_control_data.torque_cmd = torque_ref;
+            i_motion_control.update_control_data(downstream_control_data);
+            printf("set torque %d milli-Nm\n", downstream_control_data.torque_cmd);
+
+        }
+
+    }
+    else if(1)
+    {
+
+        delay_milliseconds(5000);
+        i_motion_control.enable_velocity_ctrl();
+        printf("velocity ctrl enabled\n");
+
+        int velocity_ref=0;
+        int velocity_max=2550;
+        while(velocity_ref<velocity_max)
+        {
+            delay_milliseconds(15000);
+            velocity_ref+=200;
+            if(velocity_ref>velocity_max) velocity_ref=velocity_max;
+
+
+            downstream_control_data.offset_torque = 0;
+            downstream_control_data.velocity_cmd = velocity_ref;
+            printf("set velocity %d rpm\n", downstream_control_data.velocity_cmd);
+
+            i_motion_control.update_control_data(downstream_control_data);
+        }
+    }
+
     fflush(stdout);
     //read and adjust the offset.
     while (1)
@@ -340,8 +390,8 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                 default://find motor commutation offset automatically
 
-                    if (general_system_evaluation(i_motion_control) == 0)
-                    {
+//                    if (general_system_evaluation(i_motion_control) == 0)
+//                    {
                         printf("checking the configurations of position sensor ...\n");
 
                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
@@ -366,13 +416,13 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        printf("Error: offset detection is not possible.\n");
-                        printf("       please check position sensor/motor connections\n");
-                        printf("       and repeat the evaluation process.\n");
-                    }
+//                    }
+//                    else
+//                    {
+//                        printf("Error: offset detection is not possible.\n");
+//                        printf("       please check position sensor/motor connections\n");
+//                        printf("       and repeat the evaluation process.\n");
+//                    }
 
                     break;
 
