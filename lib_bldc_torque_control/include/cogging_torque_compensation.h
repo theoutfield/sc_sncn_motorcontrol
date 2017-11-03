@@ -18,11 +18,13 @@
 typedef struct
 {
     int remaining_cells;
-    int torque_recording[COGGING_TORQUE_ARRAY_SIZE];
-    short counter_average [COGGING_TORQUE_ARRAY_SIZE];
+    int torque_recording[2*COGGING_TORQUE_ARRAY_SIZE];
+    short counter_average[2*COGGING_TORQUE_ARRAY_SIZE];
+    float torque_mean[2];
     int torque_recording_started;
     int back_and_forth;
     int count_start;
+    short index_start[2];
     int number_turns;
     int position_step;
     int rotation_sign;
