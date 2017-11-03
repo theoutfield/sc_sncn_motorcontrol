@@ -35,7 +35,7 @@ int general_system_evaluation(client interface MotionControlInterface i_motion_c
     {
         printf("good (proper) connection between motor and drive ...\n");
 
-        printf("evaluating position sensor...\n");
+        printf("checking position sensor functionality ...\n");
         printf("(motor will rotate a couple of turns in both directions)...\n");
         delay_seconds(1);
         sensor_error = i_motion_control.sensors_evaluation();
@@ -342,7 +342,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                     if (general_system_evaluation(i_motion_control) == 0)
                     {
-                        printf("detecting commutation offset value ...\n");
+                        printf("checking the configurations of position sensor ...\n");
 
                         motorcontrol_config = i_motion_control.set_offset_detection_enabled();
 
@@ -369,7 +369,9 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                     }
                     else
                     {
-                        printf("OFFSET DETECTION NOT POSSIBLE ...\n");
+                        printf("Error: offset detection is not possible.\n");
+                        printf("       please check position sensor/motor connections\n");
+                        printf("       and repeat the evaluation process.\n");
                     }
 
                     break;
@@ -700,13 +702,25 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 case 't': //torque
                         switch(mode_3)
                         {
+                        case 'p':
+                            motion_ctrl_config.torque_kp = (int)value;
+                                break;
+
+                        case 'i':
+                            motion_ctrl_config.torque_ki = (int)value;
+                                break;
+
+                        case 'd':
+                            motion_ctrl_config.torque_kd = (int)value;
+                                break;
+
                         case 'f':
                             motion_ctrl_config.filter = (int)value;
                                 break;
                         default:
                             i_motion_control.set_motion_control_config(motion_ctrl_config);
-                            motion_ctrl_config = i_motion_control.get_motion_control_config();
-                            printf("filter cut-off freq:%d\n", motion_ctrl_config.filter);
+                            printf("Ktp :%d Kti:%d Ktd:%d \n",
+                                    motion_ctrl_config.torque_kp, motion_ctrl_config.torque_ki, motion_ctrl_config.torque_kd);
                                 break;
                         }
 
