@@ -11,7 +11,7 @@
 /////////////////////////////////////////////
 //////  YOUR MOTOR CONFIGURATION
 /////////////////////////////////////////////
-#include <motor_config_Maxon_411678.h>
+#include <motor_config.h>
 
 /////////////////////////////////////////////
 //////  MOTOR SENSORS CONFIGURATION
@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       160
+#define COMMUTATION_ANGLE_OFFSET       0
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -120,9 +120,9 @@
 #define MOTOR_ID 0
 
 // PID GAINS FOR TORQUE CONTROL [will be divided by 10000]
-#define TORQUE_Kp         0
-#define TORQUE_Ki         0
-#define TORQUE_Kd         0
+#define TORQUE_Kp         2500  //default value  2500
+#define TORQUE_Ki         40000 //default value 40000
+#define TORQUE_Kd         0     //default value     0
 
 //PID GAINS FOR VELOCITY CONTROL
 #define VELOCITY_Kp                             0.00
