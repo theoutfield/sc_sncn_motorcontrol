@@ -938,17 +938,17 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 printf("%d %d\n", (int)ct_parameters.torque_mean[0], (int)ct_parameters.torque_mean[1]);
 
                                 // substract mean value from every bin for each revolution separate
-//                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-//                                {
-//                                    ct_parameters.torque_recording[i] -= ct_parameters.torque_mean[0];
-//                                    ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE] -= ct_parameters.torque_mean[1];
-//                                }
-
                                 for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
                                 {
-                                    printf("%d\n", ct_parameters.torque_recording[i]);
+                                    ct_parameters.torque_recording[i] -= ct_parameters.torque_mean[0];
+                                    ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE] -= ct_parameters.torque_mean[1];
                                 }
-
+//
+//                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+//                                {
+//                                    printf("%d\n", ct_parameters.torque_recording[i]);
+//                                }
+//
 //                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
 //                                {
 //                                    printf("%d\n", ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]);
@@ -957,20 +957,20 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 motorcontrol_config = i_torque_control.get_config();
                                 if (ct_parameters.back_and_forth == 1)
                                 {
-                                    printf("\nFirst turn done\n");
+//                                    printf("\nFirst turn done\n");
 
-                                    // flipping of cogging tables around zero mean value
-                                    for (int i = ct_parameters.index_start[0]; i < ct_parameters.index_start[0] + COGGING_TORQUE_ARRAY_SIZE ; i++)
-                                    {
-                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
-                                        ct_parameters.torque_recording[bin] = ct_parameters.torque_recording[bin] - (1 - i/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
-                                    }
-
-                                    for (int i = ct_parameters.index_start[1]; i < ct_parameters.index_start[1] + COGGING_TORQUE_ARRAY_SIZE ; i++)
-                                    {
-                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
-                                        ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] = ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] - (1 - i/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
-                                    }
+//                                    // flipping of cogging tables around zero mean value
+//                                    for (int i = ct_parameters.index_start[0]; i < ct_parameters.index_start[0] + COGGING_TORQUE_ARRAY_SIZE ; i++)
+//                                    {
+//                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
+//                                        ct_parameters.torque_recording[bin] = ct_parameters.torque_recording[bin] - (1 - i/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
+//                                    }
+//
+//                                    for (int i = ct_parameters.index_start[1]; i < ct_parameters.index_start[1] + COGGING_TORQUE_ARRAY_SIZE ; i++)
+//                                    {
+//                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
+//                                        ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] = ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] - (1 - i/COGGING_TORQUE_ARRAY_SIZE/2)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
+//                                    }
 
 //                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
 //                                    {
@@ -994,7 +994,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 }
                                 else if(ct_parameters.back_and_forth == 2)
                                 {
-                                    printf("\nSecond turn done\n");
+//                                    printf("\nSecond turn done\n");
 
                                     // flipping of cogging tables around zero mean value
 //                                    for (int i = ct_parameters.index_start[0]; i < ct_parameters.index_start[0] + COGGING_TORQUE_ARRAY_SIZE ; i++)
@@ -1692,8 +1692,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 if(motion_ctrl_config.velocity_kp<0)            motion_ctrl_config.velocity_kp=0;
                 if(motion_ctrl_config.velocity_kp>100)    motion_ctrl_config.velocity_kp=100;
-//                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
-//                if(motion_ctrl_config.velocity_ki>100)    motion_ctrl_config.velocity_ki=100;
+                if(motion_ctrl_config.velocity_ki<0)            motion_ctrl_config.velocity_ki=0;
+                if(motion_ctrl_config.velocity_ki>100)    motion_ctrl_config.velocity_ki=100;
                 if(motion_ctrl_config.velocity_kd<0)            motion_ctrl_config.velocity_kd=0;
                 if(motion_ctrl_config.velocity_kd>100)    motion_ctrl_config.velocity_kd=100;
                 pid_set_parameters(
