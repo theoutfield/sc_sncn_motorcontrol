@@ -27,12 +27,6 @@ int auto_offset(interface TorqueControlInterface client i_torque_control)
     return offset;
 }
 
-
-/**
- * @brief receive user inputs from xtimecomposer. By default, it gets 3 characters, and one value from the console.
- *
- * @return ConsoleInputs structure including the user inputs.
- */
 ConsoleInputs get_user_command()
 {
     ConsoleInputs console_inputs;
@@ -86,14 +80,6 @@ ConsoleInputs get_user_command()
     return console_inputs;
 }
 
-/**
- * @brief Demonstrate usage of:
- *      - position controller (with a simple profiler)
- *      - velocity controller (with a simple profiler)
- *      - torque controller   (bypassing higher level controllers, with a simple profiler)
- *
- * @return ConsoleInputs structure including the user inputs.
- */
 void demo_motion_control(client interface MotionControlInterface i_motion_control)
 {
     delay_milliseconds(1000);
