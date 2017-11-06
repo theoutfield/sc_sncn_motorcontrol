@@ -4,7 +4,7 @@
 
 /**
  * @file main.xc
- * @brief Demo application illustrates usage of module_pwm
+ * @brief Demo application illustrates a general example of tuning/controlling a somonet Drive.
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
@@ -59,7 +59,7 @@ int main(void) {
             }
         }
 
-        on tile[1]://IFM TILE
+        on tile[1]://IF2 TILE
         {
             par
             {
@@ -232,7 +232,6 @@ int main(void) {
                     motion_ctrl_config.velocity_kd_h =                        GAIN_SCHEDULING_VELOCITY_Kd_1;
                     motion_ctrl_config.velocity_lo_l =                        GAIN_SCHEDULING_VELOCITY_THRESHOLD_0;
                     motion_ctrl_config.velocity_hi_l =                        GAIN_SCHEDULING_VELOCITY_THRESHOLD_1;
-
 
                     motion_ctrl_config.brake_release_strategy =               BRAKE_RELEASE_STRATEGY;
                     motion_ctrl_config.brake_release_delay =                  BRAKE_RELEASE_DELAY;
