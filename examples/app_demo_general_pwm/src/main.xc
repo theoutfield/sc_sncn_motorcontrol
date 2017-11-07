@@ -17,7 +17,8 @@
 #include <xscope.h>
 #include <timer.h>
 
-//Sends pwm values for 6 nullable inverter outputs to general pwm service. The updating rate is 10 kHz
+//Sends pwm values to control 6 nullable inverter outputs for motor-control purposes. Moreover, it sends pwm values to 2 nullable inverter output to control electric brakes.
+//The updating rate is 15 kHz
 void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
 {
     timer t;
@@ -27,7 +28,7 @@ void send_pwm_values(client interface UpdatePWMGeneral i_update_pwm)
     unsigned short  pwm_value_a = 0x0000, pwm_value_b = 0x0000, pwm_value_c = 0x0000,
                     pwm_value_u = 0x0000, pwm_value_v = 0x0000, pwm_value_w = 0x0000;
     unsigned short  pwm_value_b1= 0x0000, pwm_value_b2= 0x0000;//pwm value for electric brake 1 and electric brake 2
-    unsigned short  safe_torque_off=0x0000;//default value 0
+    unsigned short  safe_torque_off=0x0000;//default value 0. If 1, then the Drive will enter into standard "safe_torque_off" mode.
 
     int counter=0;
 

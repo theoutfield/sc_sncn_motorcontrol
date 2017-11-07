@@ -38,37 +38,37 @@ void update_brake(
 
     if(dc_bus_voltage <= 0)
     {
-        printstr("ERROR: NEGATIVE VDC VALUE DEFINED IN SETTINGS");
+        printstr("ERROR: negative Vdc value defined in settings");
         return;
     }
 
     if(pull_brake_voltage > (dc_bus_voltage*1000))
     {
-        printstr("ERROR: PULL BRAKE VOLTAGE HIGHER THAN VDC");
+        printstr("ERROR: pull brake voltage is higher than Vdc");
         return;
     }
 
     if(pull_brake_voltage < 0)
     {
-        printstr("ERROR: NEGATIVE PULL BRAKE VOLTAGE");
+        printstr("ERROR: negative pull brake voltage is entered");
         return;
     }
 
     if(hold_brake_voltage > (dc_bus_voltage*1000))
     {
-        printstr("ERROR: HOLD BRAKE VOLTAGE HIGHER THAN VDC");
+        printstr("ERROR: hold brake voltage is higher than Vdc");
         return;
     }
 
     if(hold_brake_voltage < 0)
     {
-        printstr("ERROR: NEGATIVE HOLD BRAKE VOLTAGE");
+        printstr("ERROR: hold brake voltage is negative");
         return;
     }
 
     if(period_start_brake < 0)
     {
-        printstr("ERROR: NEGATIVE PERIOD START BRAKE SETTINGS!");
+        printstr("ERROR: period start brake is negative");
         return;
     }
 

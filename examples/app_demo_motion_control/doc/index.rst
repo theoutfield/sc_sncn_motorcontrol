@@ -47,17 +47,17 @@ Quick How-to
 
 It is assumed that before starting this application, profiler parameters and PID parameters for velocity and position control are tuned and set in the software. To do this, please check app_demo_tuning in `synapticon sc_sncn_motorcontrol repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples>`_
 
-1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
+1. :ref:`Assemble your SOMANET device.
 
-2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor terminals, power supply cable, and XTAG. Power up!
+2. Wire up your Drive. Check how at your specific :ref:`hardware documentation <hardware>`. Connect your position sensor, motor terminals, power supply cable, and XTAG. Power up!
 
     **important**
-    For safety please use a current limited power supply and check current consumption.
+    For safety please use a current limited power supply and check current consumption at startup.
 
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
 
 4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-5. Open the **main.xc** within  the **app_demo_motion_control**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
+5. Open the **main.xc** within  the **app_demo_general_pwm**. Include the :ref:`board-support file according to your device <DRIVE_BOARD_REQUIRED>`, and Include the :ref:`Core-support file according to your Core module <CORE_BOARD_REQUIRED>`. Moreover, set the :ref:`appropriate core target in your Makefile.
 
     **important** Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
