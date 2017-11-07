@@ -4,7 +4,7 @@
 
 /**
  * @file main.xc
- * @brief Demo application illustrates a general example of tuning/controlling a somonet Drive.
+ * @brief Demo application illustrates a general example of tuning/controlling a somanet Drive.
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
