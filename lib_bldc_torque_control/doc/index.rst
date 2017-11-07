@@ -13,13 +13,14 @@ A :ref:`Cogging-Torque-Feature <Cogging-Torque-Feature>` also enables to remove 
 
 The service takes the following parameters as input:
 
-- A structure containing Motorcontrol Service configuration
-- An interface to communicate with the ADC server, and receive the ADC measurements
-- An interface to communicate with shared_memory_service and receive the position-related information
-- An interface to communicate with watchdog_service
-- An array of interfaces to communicate with up to two clients for torque_control_service.
-- An interface to communicate with PWM service
-- Reference clock frequency of IF2 tile (in MHz)
+- **motorcontrol_config**: Structure for Motorcontrol Service configuration
+- **i_adc**: Interface to communicate with the ADC server, and receive the ADC measurements
+- **i_shared_memory**: Interface to communicate with shared_memory_service and receive the position-related information
+- **i_watchdog**: Interface to communicate with watchdog_service
+- **i_torque_control[2]**: Array of interfaces to communicate with up to two clients for motor_control_service.
+- **i_update_pwm**: Interface to communicate with PWM module
+- **if2_tile_usec**: Reference clock frequency of IF2 tile (in MHz)
+- **p_trq_ctrl**: Nullable output port
 
 The service will wait until lower level services (such as watchdog, PWM and ADC) start to work. After that, it initializes the torque control parameters, and provides the user with torque control service. It also provides the interface for feedback services (such as ADC and position sensor services) and higher controlling loops (such as position/velocity controllers and also Ethercat communication). Figure 1 shows the structure of data flow among torque control service and other services. Torque control service should always run over an IF2 Tile.
 
@@ -96,7 +97,7 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
         #include <watchdog_service.h>
         
         // 4. define the required instances for watchdog, pwm, adc and position sensor ports
-        PwmPorts pwm_ports = SOMANET_DRIVE_PWM_PORTS;
+        PwmPortsGeneral pwm_ports = SOMANET_DRIVE_PWM_PORTS_GENERAL;
         WatchdogPorts wd_ports = SOMANET_DRIVE_WATCHDOG_PORTS;
         FetDriverPorts fet_driver_ports = SOMANET_DRIVE_FET_DRIVER_PORTS;
         ADCPorts adc_ports = SOMANET_DRIVE_ADC_PORTS;
@@ -113,7 +114,7 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
         
             // 5. define the required interfaces for communication between torque control service and other services (including pwm service, watchdog service, adc service, shared memory service, and position feedback service
             interface WatchdogInterface i_watchdog[2];
-            interface UpdatePWM i_update_pwm;
+            interface UpdatePWMGeneral i_update_pwm;
             interface UpdateBrake i_update_brake;
             interface ADCInterface i_adc[2];
             interface MotorControlInterface i_motorcontrol[2];
@@ -129,15 +130,12 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                     {
                         /* PWM Service */
                         {
-                            pwm_config(pwm_ports);
+                            pwm_config_general(pwm_ports);
         
                             if (!isnull(fet_driver_ports.p_esf_rst_pwml_pwmh) && !isnull(fet_driver_ports.p_coast))
                                 predriver(fet_driver_ports);
         
-                            //pwm_check(pwm_ports);//checks if pulses can be generated on pwm ports or not
-                            pwm_service_task(MOTOR_ID, pwm_ports, i_update_pwm,
-                                    i_update_brake, IF2_TILE_USEC);
-        
+                            pwm_service_general(pwm_ports, i_update_pwm, GPWM_FRQ_15, DEADTIME_NS);
                         }
         
                         /* ADC Service */
@@ -164,7 +162,7 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                             position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
                             position_feedback_config.ifm_usec    = IF2_TILE_USEC;
                             position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
-                            position_feedback_config.offset      = 0;
+                            position_feedback_config.offset      = HOME_OFFSET;
                             position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
         
                             position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
@@ -175,6 +173,7 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                             position_feedback_config.biss_config.busy = BISS_BUSY;
                             position_feedback_config.biss_config.clock_port_config = BISS_CLOCK_PORT;
                             position_feedback_config.biss_config.data_port_number = BISS_DATA_PORT_NUMBER;
+                            position_feedback_config.biss_config.data_port_signal_type = BISS_DATA_PORT_SIGNAL_TYPE;
         
                             position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
         
@@ -186,8 +185,20 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                             position_feedback_config.qei_config.number_of_channels = QEI_SENSOR_NUMBER_OF_CHANNELS;
                             position_feedback_config.qei_config.signal_type        = QEI_SENSOR_SIGNAL_TYPE;
                             position_feedback_config.qei_config.port_number        = QEI_SENSOR_PORT_NUMBER;
+                            position_feedback_config.qei_config.ticks_lost_threshold = QEI_SENSOR_TICKS_LOST;
         
                             position_feedback_config.hall_config.port_number = HALL_SENSOR_PORT_NUMBER;
+                            position_feedback_config.hall_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
+                            position_feedback_config.hall_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
+                            position_feedback_config.hall_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
+                            position_feedback_config.hall_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
+                            position_feedback_config.hall_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
+                            position_feedback_config.hall_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
+        
+                            position_feedback_config.gpio_config[0] = GPIO_CONFIG_1;
+                            position_feedback_config.gpio_config[1] = GPIO_CONFIG_2;
+                            position_feedback_config.gpio_config[2] = GPIO_CONFIG_3;
+                            position_feedback_config.gpio_config[3] = GPIO_CONFIG_4;
         
                             //setting second sensor
                             PositionFeedbackConfig position_feedback_config_2 = position_feedback_config;
@@ -205,6 +216,7 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                                     position_feedback_config, i_shared_memory[0], i_position_feedback_1,
                                     position_feedback_config_2, i_shared_memory[1], i_position_feedback_2);
                         }
+                    }
 
                          // 7. Again on IF2 tile initialize and run the torque control service 
                         /* Motor Control Service */
@@ -212,25 +224,20 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                             MotorcontrolConfig motorcontrol_config;
         
                             motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
-                            motorcontrol_config.phases_inverted = MOTOR_PHASES_NORMAL;
-                            motorcontrol_config.torque_P_gain =  TORQUE_P_VALUE;
-                            motorcontrol_config.torque_I_gain =  TORQUE_I_VALUE;
-                            motorcontrol_config.torque_D_gain =  TORQUE_D_VALUE;
+                            motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
+                            motorcontrol_config.torque_P_gain =  TORQUE_Kp;
+                            motorcontrol_config.torque_I_gain =  TORQUE_Ki;
+                            motorcontrol_config.torque_D_gain =  TORQUE_Kd;
                             motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                             motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                             motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
-                            motorcontrol_config.hall_state_angle[0]=HALL_STATE_1_ANGLE;
-                            motorcontrol_config.hall_state_angle[1]=HALL_STATE_2_ANGLE;
-                            motorcontrol_config.hall_state_angle[2]=HALL_STATE_3_ANGLE;
-                            motorcontrol_config.hall_state_angle[3]=HALL_STATE_4_ANGLE;
-                            motorcontrol_config.hall_state_angle[4]=HALL_STATE_5_ANGLE;
-                            motorcontrol_config.hall_state_angle[5]=HALL_STATE_6_ANGLE;
                             motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
                             motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
                             motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
                             motorcontrol_config.torque_constant =  MOTOR_TORQUE_CONSTANT;
                             motorcontrol_config.current_ratio =  CURRENT_RATIO;
                             motorcontrol_config.voltage_ratio =  VOLTAGE_RATIO;
+                            motorcontrol_config.temperature_ratio =  TEMPERATURE_RATIO;
                             motorcontrol_config.rated_current =  MOTOR_RATED_CURRENT;
                             motorcontrol_config.rated_torque  =  MOTOR_RATED_TORQUE;
                             motorcontrol_config.percent_offset_torque =  APPLIED_TUNING_TORQUE_PERCENT;
@@ -238,13 +245,14 @@ We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app inc
                             motorcontrol_config.protection_limit_over_voltage =  PROTECTION_MAXIMUM_VOLTAGE;
                             motorcontrol_config.protection_limit_under_voltage = PROTECTION_MINIMUM_VOLTAGE;
         
-         				 	for (int i = 0; i < 1024; i++)
+                            motorcontrol_config.protection_limit_over_temperature = TEMP_BOARD_MAX;
+                            for (int i = 0; i < 1024; i++)
                             {
                                 motorcontrol_config.torque_offset[i] = 0;
                             }
 
-                            motor_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
-                                    i_watchdog[0], i_motorcontrol, i_update_pwm, IF2_TILE_USEC);
+                            torque_control_service(motorcontrol_config, i_adc[0], i_shared_memory[2],
+                                    i_watchdog[0], i_torque_control, i_update_pwm, IF2_TILE_USEC, /*gpio_port_0*/null);
                         }
 
                     }
@@ -281,3 +289,4 @@ Interface
 .. doxygeninterface:: TorqueControlInterface
 
 
+ 

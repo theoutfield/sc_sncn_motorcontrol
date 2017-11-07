@@ -5,7 +5,6 @@
  *      Author: Synapticon
  */
 
-
 #ifndef MOTOR_CONTROL_INTERFACES_H_
 #define MOTOR_CONTROL_INTERFACES_H_
 
@@ -30,7 +29,7 @@ interface TorqueControlInterface
      * @brief configures the brake settings including its voltages and timing
      *
      * @param pull_brake_voltage  voltage applied to electric brake at startup of brake (mV)
-     * @param pull_brake_time     period of applying high voltage to electric brake at startup (in milliseconds)
+     * @param pull_brake_time     period of applying high voltage to electric brake at startup (in milli seconds)
      * @param hold_brake_voltage  voltage applied to electric brake after the brake is pulled (mV)
      */
     void configure_brake(int pull_brake_voltage, int pull_brake_time, int hold_brake_voltage);
