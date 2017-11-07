@@ -58,6 +58,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
 
     int position = 0;
     int count = 0;
+    int count_align = 0;
     unsigned int angle = 0;
     unsigned int index_found =0;
 
@@ -124,12 +125,12 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
                         if ((position_feedback_config.qei_config.number_of_channels == QEI_WITH_INDEX) && (new_pins & 0b0100)) {
                             position = 0;
                             if (index_found == 0) {
-                                count = 0; //reset count the first time we find the index
+                                count_align = count; //save offset between index and count to check alignement
                                 index_found = 1;
                             }
 
                             //realign the count with the position in case we missed ticks
-                            int align = (count % position_feedback_config.resolution);
+                            int align = ((count-count_align) % position_feedback_config.resolution);
                             if (align != 0)
                             {
                                 if (align > 0)
@@ -181,6 +182,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
                 break;
 
             case i_position_feedback[int i].set_position(int in_count):
+                 count_align = (count_align + (in_count - count)) % position_feedback_config.resolution; //update count_align
                  count = in_count;
                  break;
 
