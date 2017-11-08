@@ -184,7 +184,7 @@ typedef struct {
 } MotionControlConfig;
 
 /**
- * @brief Structure definition for one error item
+ * @brief Structure definition for timestamp
  */
 typedef struct {
     uint8_t mSec;
