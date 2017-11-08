@@ -1844,6 +1844,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 //error
                 upstream_control_data_out.motion_control_error = motion_control_error;
 
+                i_torque_control.set_field(downstream_control_data.field_cmd);
                 break;
 
                 case i_motion_control[int i].set_j(int j):

@@ -477,9 +477,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
         //set torque commmand
         case 't':
-                downstream_control_data.offset_torque = 0;
-                downstream_control_data.torque_cmd = (int)value;
-                motion_ctrl_config = i_motion_control.get_motion_control_config();
+            motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
                 //step command (forward and backward)
@@ -520,13 +518,19 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         i_motion_control.update_control_data(downstream_control_data);
                         break;
+
+                case 'f':
+                        downstream_control_data.field_cmd = (int)value;
+                        i_motion_control.update_control_data(downstream_control_data);
+                        printf("set field %d\n", downstream_control_data.field_cmd);
+                        break;
+
                 //direct command
                 default:
-                        motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        motion_ctrl_config.enable_profiler = 0;
-                        i_motion_control.set_motion_control_config(motion_ctrl_config);
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.torque_cmd = (int)value;
+                        motion_ctrl_config.enable_profiler = 0;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
                         i_motion_control.update_control_data(downstream_control_data);
                         printf("set torque %d\n", downstream_control_data.torque_cmd);
                         break;
