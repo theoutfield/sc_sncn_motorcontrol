@@ -571,6 +571,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     CoggingTorqueParam ct_parameters;
 
     init_cogging_torque_parameters(ct_parameters, 10);
+    int flag = 0;
 
     VelCtrlAutoTuneParam velocity_auto_tune;
 
@@ -856,64 +857,85 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     if (motion_ctrl_config.enable_compensation_recording)
                     {
                         downstream_control_data.velocity_cmd = ct_parameters.velocity_reference;
-                        if (ct_parameters.delay_counter > (3000 * 1000 / POSITION_CONTROL_LOOP_PERIOD))
+                        if (ct_parameters.delay_counter > (10000 * 1000 / POSITION_CONTROL_LOOP_PERIOD))
                         {
                             if (!ct_parameters.torque_recording_started)
                             {
-                                ct_parameters.torque_recording_started = 1;
-                                ct_parameters.count_start = upstream_control_data.position;
-
-                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+                                if ((upstream_control_data.singleturn / ct_parameters.position_step) == 0)
                                 {
-                                    ct_parameters.torque_recording[i]= 0;
-                                    ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]= 0;
-                                }
-
-                                if (ct_parameters.velocity_reference < 0)
-                                {
-                                    if (ct_parameters.rotation_sign != -1)
+                                    if ((ct_parameters.back_and_forth == 0 && upstream_control_data.singleturn < ct_parameters.start_threshold)
+                                            || (ct_parameters.back_and_forth == 1 && upstream_control_data.singleturn > (ct_parameters.position_step - ct_parameters.start_threshold)))
                                     {
-                                        ct_parameters.back_and_forth++;
+                                        ct_parameters.torque_recording_started = 1;
+                                        ct_parameters.count_start = upstream_control_data.position;
+                                        flag = 1;
+
+                                        for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+                                        {
+                                            ct_parameters.torque_recording[i]= 0;
+                                            ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]= 0;
+                                        }
+
+                                        if (ct_parameters.velocity_reference < 0)
+                                        {
+                                            if (ct_parameters.rotation_sign != -1)
+                                            {
+                                                ct_parameters.back_and_forth++;
+                                            }
+                                            ct_parameters.rotation_sign = -1;
+                                        }
+                                        else
+                                        {
+                                            if (ct_parameters.rotation_sign != 1)
+                                            {
+                                                ct_parameters.back_and_forth++;
+                                            }
+                                            ct_parameters.rotation_sign = 1;
+                                        }
                                     }
-                                    ct_parameters.rotation_sign = -1;
-                                }
-                                else
-                                {
-                                    if (ct_parameters.rotation_sign != 1)
-                                    {
-                                        ct_parameters.back_and_forth++;
-                                    }
-                                    ct_parameters.rotation_sign = 1;
+
                                 }
                             }
-                            if (((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign < ct_parameters.number_turns * motion_ctrl_config.resolution) || ct_parameters.remaining_cells != 0)
+
+                            if ((((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign < ct_parameters.number_turns * motion_ctrl_config.resolution) || ct_parameters.remaining_cells != 0))
                             {
-                                if(ct_parameters.remaining_cells == 1024)
-                                    ct_parameters.index_start[0] = upstream_control_data.singleturn / ct_parameters.position_step;
-
-                                int index = upstream_control_data.singleturn / ct_parameters.position_step;
-
-                                if ((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign > (ct_parameters.number_turns - 1) * motion_ctrl_config.resolution)
+                                if (flag)
                                 {
-                                    ct_parameters.index_start[1] = upstream_control_data.singleturn / ct_parameters.position_step;
+                                    int index = upstream_control_data.singleturn / ct_parameters.position_step;
 
-                                    // 2nd revolution
-                                    ct_parameters.torque_recording[index+COGGING_TORQUE_ARRAY_SIZE] += torque_measurement;
-                                    ct_parameters.counter_average[index+COGGING_TORQUE_ARRAY_SIZE] ++;
-                                }
-                                else
-                                {
-                                    // 1st revolution
-                                    ct_parameters.torque_recording[index] += torque_measurement;
-                                    ct_parameters.counter_average[index] ++;
-                                }
+                                    if ((upstream_control_data.position - ct_parameters.count_start) * ct_parameters.rotation_sign >= (ct_parameters.number_turns - 1) * motion_ctrl_config.resolution)
+                                    {
+                                        if (ct_parameters.index_start[1] == -1)
+                                            ct_parameters.index_start[1] = index;
 
-                                if (ct_parameters.counter_average[index] == 1)
-                                {
-                                    ct_parameters.remaining_cells--;
+                                        // 2nd revolution
+                                        ct_parameters.torque_recording[index+COGGING_TORQUE_ARRAY_SIZE] += torque_measurement;
+                                        ct_parameters.counter_average[index+COGGING_TORQUE_ARRAY_SIZE] ++;
+                                    }
+                                    else
+                                    {
+                                        if(ct_parameters.index_start[0] == -1)
+                                            ct_parameters.index_start[0] = index;
+
+                                        // 1st revolution
+
+                                        ct_parameters.torque_recording[index] += torque_measurement;
+                                        ct_parameters.counter_average[index] ++;
+
+                                        if(index == ct_parameters.index_start[0] || index  == ct_parameters.index_start[0]+1 || index  == ct_parameters.index_start[0]+2 || index  == ct_parameters.index_start[0]+3 || index  == ct_parameters.index_start[0]+4 || index  == ct_parameters.index_start[0]+5)
+                                        {
+                                            printf("%d %d\n", index, torque_measurement);
+                                        }
+                                    }
+
+                                    if (ct_parameters.counter_average[index] == 1)
+                                    {
+                                        ct_parameters.remaining_cells--;
+                                    }
                                 }
                             }
-                            else {
+                            else
+                            {
                                 printf("Measurement done\n");
 
                                 printf("%d %d\n", ct_parameters.index_start[0], ct_parameters.index_start[1]);
@@ -940,15 +962,15 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 // substract mean value from every bin for each revolution separate
                                 for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
                                 {
-                                    ct_parameters.torque_recording[i] -= ct_parameters.torque_mean[0];
-                                    ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE] -= ct_parameters.torque_mean[1];
+                                    ct_parameters.torque_recording[i] -= (int)ct_parameters.torque_mean[0];
+                                    ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE] -= (int)ct_parameters.torque_mean[1];
                                 }
-//
-//                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-//                                {
-//                                    printf("%d\n", ct_parameters.torque_recording[i]);
-//                                }
-//
+
+                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+                                {
+                                    printf("%d\n", ct_parameters.torque_recording[i]);
+                                }
+
 //                                for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
 //                                {
 //                                    printf("%d\n", ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]);
@@ -959,29 +981,30 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 {
 //                                    printf("\nFirst turn done\n");
 
-//                                    // flipping of cogging tables around zero mean value
-//                                    for (int i = ct_parameters.index_start[0]; i < ct_parameters.index_start[0] + COGGING_TORQUE_ARRAY_SIZE ; i++)
-//                                    {
-//                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
-//                                        ct_parameters.torque_recording[bin] = ct_parameters.torque_recording[bin] - (1 - i/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
-//                                    }
+                                    // flipping of cogging tables around zero mean value
+                                    for (int i = ct_parameters.index_start[0]; i < ct_parameters.index_start[0] + COGGING_TORQUE_ARRAY_SIZE; i++)
+                                    {
+                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
+//                                        printf("%d\n", ct_parameters.torque_recording[bin]);
+                                        ct_parameters.torque_recording[bin] = (int)(ct_parameters.torque_recording[bin] - (0.5 - (float)(i-ct_parameters.index_start[0]+1)/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]));
+//                                        printf("%d %d %d %d %d %d %d\n", bin, i, i-ct_parameters.index_start[0]+1, (int)ct_parameters.torque_mean[0], (int)ct_parameters.torque_mean[1], ct_parameters.torque_recording[bin], ct_parameters.torque_recording[bin]);
+                                    }
 //
 //                                    for (int i = ct_parameters.index_start[1]; i < ct_parameters.index_start[1] + COGGING_TORQUE_ARRAY_SIZE ; i++)
 //                                    {
 //                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
-//                                        ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] = ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] - (1 - i/COGGING_TORQUE_ARRAY_SIZE/2)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
+//                                        ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] = (int)(ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] - (0.5 - (float)(i-ct_parameters.index_start[1]+1)/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]));
 //                                    }
 
-//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
-//                                    {
-//                                        printf("%d\n", ct_parameters.torque_recording[i]);
-//                                    }
+                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
+                                    {
+                                        printf("%d\n", ct_parameters.torque_recording[i]);
+                                    }
 
 //                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
 //                                    {
 //                                        printf("%d\n", ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]);
 //                                    }
-
 
                                     for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
                                     {
@@ -989,24 +1012,42 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                         ct_parameters.torque_recording[i]= 0;
                                         ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]= 0;
                                     }
-                                    ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
 
+                                    ct_parameters.velocity_reference = -ct_parameters.velocity_reference;
                                 }
                                 else if(ct_parameters.back_and_forth == 2)
                                 {
 //                                    printf("\nSecond turn done\n");
 
                                     // flipping of cogging tables around zero mean value
-//                                    for (int i = ct_parameters.index_start[0]; i < ct_parameters.index_start[0] + COGGING_TORQUE_ARRAY_SIZE ; i++)
-//                                    {
-//                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
-//                                        ct_parameters.torque_recording[bin] = ct_parameters.torque_recording[bin] + (1 - i/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
-//                                    }
-//
+                                    for (int i = ct_parameters.index_start[0]; i > ct_parameters.index_start[0] - COGGING_TORQUE_ARRAY_SIZE; i--)
+                                    {
+                                        int bin;
+
+                                        if (i < 0)
+                                        {
+                                            bin = i + COGGING_TORQUE_ARRAY_SIZE;
+                                        }
+                                        else
+                                            bin = i % COGGING_TORQUE_ARRAY_SIZE;
+
+                                        ct_parameters.torque_recording[bin] = (int)(ct_parameters.torque_recording[bin] - (0.5 - (float)(ct_parameters.index_start[0]-i+1)/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]));
+                                    }
+
 //                                    for (int i = ct_parameters.index_start[1]; i < ct_parameters.index_start[1] + COGGING_TORQUE_ARRAY_SIZE ; i++)
 //                                    {
 //                                        int bin = i % COGGING_TORQUE_ARRAY_SIZE;
-//                                        ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] = ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] + (1 - i/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]);
+//                                        ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] = (int)(ct_parameters.torque_recording[bin+COGGING_TORQUE_ARRAY_SIZE] + (0.5 - (float)(i-ct_parameters.index_start[1]+1)/COGGING_TORQUE_ARRAY_SIZE)*(ct_parameters.torque_mean[0]-ct_parameters.torque_mean[1]));
+//                                    }
+
+                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+                                    {
+                                        printf("%d\n", ct_parameters.torque_recording[i]);
+                                    }
+
+//                                    for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE ; i++)
+//                                    {
+//                                        printf("%d\n", ct_parameters.torque_recording[i+COGGING_TORQUE_ARRAY_SIZE]);
 //                                    }
 
                                     for (int i = 0; i < COGGING_TORQUE_ARRAY_SIZE; i++)
@@ -1031,8 +1072,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 i_torque_control.set_cogging_table(motorcontrol_config);
                                 ct_parameters.torque_mean[0] = 0;
                                 ct_parameters.torque_mean[1] = 0;
+                                ct_parameters.index_start[0] = -1;
+                                ct_parameters.index_start[1] = -1;
                                 ct_parameters.torque_recording_started = 0;
                                 ct_parameters.delay_counter = 0;
+                                flag = 0;
                                 i_torque_control.set_torque_control_enabled();
 
                                 if(ct_parameters.back_and_forth == 2)
