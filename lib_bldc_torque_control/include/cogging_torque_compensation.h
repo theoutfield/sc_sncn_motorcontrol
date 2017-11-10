@@ -25,6 +25,8 @@ typedef struct
     int back_and_forth;
     int count_start;
     short index_start[2];
+    short start_threshold;
+    short first_bin_flag;
     int number_turns;
     int position_step;
     int rotation_sign;
