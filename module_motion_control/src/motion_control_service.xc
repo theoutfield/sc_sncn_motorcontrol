@@ -417,9 +417,9 @@ int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
     return 0;  // return success to indicate successful push.
 }
 
-ErrTimestamp_t ErrGetTimpestamp(client interface i2c_master_if i2c)
+Timestamp_t ErrGetTimpestamp(client interface i2c_master_if i2c)
 {
-    ErrTimestamp_t timestamp;
+    Timestamp_t timestamp;
     i2c_regop_res_t result;
 
     timestamp.mSec = rtc_get_Milli_Seconds(i2c, result);

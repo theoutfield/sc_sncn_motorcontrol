@@ -193,15 +193,15 @@ typedef struct {
     uint8_t hour;
     uint8_t day;
     uint8_t month;
-    unsigned short year;
-} ErrTimestamp_t;
+    uint16_t year;
+} Timestamp_t;
 
 /**
  * @brief Structure definition for one error item
  */
 typedef struct {
     unsigned int index;
-    ErrTimestamp_t timestamp;
+    Timestamp_t timestamp;
     unsigned int err_code;
     ErrType err_type;
 } ErrItem_t;
