@@ -423,12 +423,33 @@ Timestamp_t ErrGetTimpestamp(client interface i2c_master_if i2c)
     i2c_regop_res_t result;
 
     timestamp.mSec = rtc_get_Milli_Seconds(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.mSec = 0;
+
     timestamp.sec = rtc_get_Seconds(i2c,result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.sec = 0;
+
     timestamp.min = rtc_get_Minutes(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.min = 0;
+
     timestamp.hour = rtc_get_Hours(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.hour = 0;
+
     timestamp.day = rtc_get_Date(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.day = 0;
+
     timestamp.month = rtc_get_Month(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.month = 0;
+
     timestamp.year = rtc_get_Year(i2c, result) + (rtc_get_Century(i2c, result) + 19) * 100;
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.year = 0;
+
     return timestamp;
 }
 
