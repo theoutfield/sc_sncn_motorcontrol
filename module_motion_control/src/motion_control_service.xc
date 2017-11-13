@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <cogging_torque_compensation.h>
 
+#include <rtc.h>
+
 #define HALL_MASK_A 0x4
 #define HALL_MASK_B 0x2
 #define HALL_MASK_C 0x1
@@ -415,10 +417,46 @@ int ErrBufPop(ErrBuf_t *c, ErrItem_t * ErrItem)
     return 0;  // return success to indicate successful push.
 }
 
+Timestamp_t ErrGetTimpestamp(client interface i2c_master_if i2c)
+{
+    Timestamp_t timestamp;
+    i2c_regop_res_t result;
+
+    timestamp.mSec = rtc_get_Milli_Seconds(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.mSec = 0;
+
+    timestamp.sec = rtc_get_Seconds(i2c,result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.sec = 0;
+
+    timestamp.min = rtc_get_Minutes(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.min = 0;
+
+    timestamp.hour = rtc_get_Hours(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.hour = 0;
+
+    timestamp.day = rtc_get_Date(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.day = 0;
+
+    timestamp.month = rtc_get_Month(i2c, result);
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.month = 0;
+
+    timestamp.year = rtc_get_Year(i2c, result) + (rtc_get_Century(i2c, result) + 19) * 100;
+    if (result != I2C_REGOP_SUCCESS)
+        timestamp.year = 0;
+
+    return timestamp;
+}
+
 /*
  * Checking of error values in UpstreamControlData for new errors.
  */
-void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES])
+void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES], client interface i2c_master_if i2c)
 {
     ErrItem_t ErrItem;
     static int last_angle_sensor_error, last_sensor_error,  last_sec_sensor_error, last_error_status, last_motion_control_error, last_watchdog_error;
@@ -427,7 +465,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     if ((ucd.angle_sensor_error != 0) && (ucd.angle_sensor_error != last_angle_sensor_error))
     {
          ErrItem.index = err_index++;
-         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.timestamp = ErrGetTimpestamp(i2c);
          ErrItem.err_code = ucd.angle_sensor_error;
          ErrItem.err_type = ERR_ANGLE_SENSOR;
 
@@ -440,7 +478,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     if ((ucd.sensor_error != 0) && (ucd.sensor_error != last_sensor_error))
     {
          ErrItem.index = err_index++;
-         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.timestamp = ErrGetTimpestamp(i2c);
          ErrItem.err_code = ucd.sensor_error;
          ErrItem.err_type = ERR_SENSOR;
 
@@ -453,7 +491,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     if ((ucd.secondary_sensor_error != 0) && (ucd.secondary_sensor_error != last_sec_sensor_error))
     {
          ErrItem.index = err_index++;
-         ErrItem.timestamp = ucd.secondary_sensor_timestamp;
+         ErrItem.timestamp = ErrGetTimpestamp(i2c);
          ErrItem.err_code = ucd.secondary_sensor_error;
          ErrItem.err_type = ERR_SEC_SENSOR;
 
@@ -466,7 +504,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     if ((ucd.error_status != 0) && (ucd.error_status != last_error_status))
     {
          ErrItem.index = err_index++;
-         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.timestamp = ErrGetTimpestamp(i2c);
          ErrItem.err_code = ucd.error_status;
          ErrItem.err_type = ERR_STATUS;
 
@@ -479,7 +517,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     if ((ucd.motion_control_error != 0) && (ucd.motion_control_error != last_motion_control_error))
     {
          ErrItem.index = err_index++;
-         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.timestamp = ErrGetTimpestamp(i2c);
          ErrItem.err_code = ucd.motion_control_error;
          ErrItem.err_type = ERR_MOTION;
 
@@ -492,7 +530,7 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
     if ((ucd.watchdog_error != 0) && (ucd.watchdog_error != last_watchdog_error))
     {
          ErrItem.index = err_index++;
-         ErrItem.timestamp = ucd.sensor_timestamp;
+         ErrItem.timestamp = ErrGetTimpestamp(i2c);
          ErrItem.err_code = ucd.watchdog_error;
          ErrItem.err_type = ERR_WATCHDOG;
 
@@ -522,7 +560,9 @@ void error_detect(UpstreamControlData ucd, DownstreamControlData dcd, interface 
 
 void motion_control_service(MotionControlConfig &motion_ctrl_config,
         interface TorqueControlInterface client i_torque_control,
-        interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES], client interface UpdateBrake i_update_brake)
+        interface MotionControlInterface server i_motion_control[N_MOTION_CONTROL_INTERFACES],
+        client interface UpdateBrake i_update_brake,
+        client interface i2c_master_if i2c)
 {
     timer t;
     unsigned int ts;
@@ -1989,7 +2029,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 break;
         }
 
-        error_detect(i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output), downstream_control_data, i_motion_control);
+        error_detect(i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output), downstream_control_data, i_motion_control, i2c);
 
         }
     }
