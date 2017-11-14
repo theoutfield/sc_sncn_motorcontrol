@@ -50,9 +50,9 @@ How to use
 
     .. code-block:: c
 
-        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
-        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device 
-                                        //(select your board support files according to your device)
+        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+                                            //(select your board support files according to your device)
 
         #include <gpio_service.h> // 2
 
