@@ -45,7 +45,7 @@ How to use
 
     .. code-block:: c
 
-       #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
+       #include <CoreC2X.bsp>   	    //Board Support file for SOMANET Core C22 device 
        #include <Drive1000-rev-c4.bsp>  //Board Support file for SOMANET IFM DC100 device 
                                         //(select your board support files according to your device)
 
