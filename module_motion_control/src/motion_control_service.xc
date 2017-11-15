@@ -811,6 +811,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     i_torque_control.set_safe_torque_off_enabled();
     i_torque_control.set_brake_status(DISABLE_BRAKE);
 
+    //Disable RTC square wave output to save battery
+    rtc_set_SQWE(i2c, 0);
+
     printstr(">>   SOMANET POSITION CONTROL SERVICE STARTING...\n");
 
     t :> ts;
