@@ -8,7 +8,7 @@ General PWM Application Demo
     :backlinks: none
     :depth: 3
 
-The purpose of this app (app_demo_general_pwm) is showing the use of pwm_service_general in :ref:`PWM Module <module_pwm>` in our different drives. For this purpose, a simple funciton (named send_pwm_values) is defined. This function changes the pwm values in each execution loop, and sends them to general pwm service through an interface. 
+The purpose of this app (app_demo_general_pwm) is showing the use of pwm_service_general in :ref:`PWM Module <module_pwm>` in different SOMANET Drives. For this purpose, a simple function (named send_pwm_values) is defined. This function changes the pwm values in each execution loop, and sends them to general pwm service through its corresponding interface. 
 
 * **Minimum Number of Cores**: 3
 * **Minimum Number of Tiles**: 1
@@ -23,7 +23,7 @@ Quick How-to
 2. Wire up your device. Check how at your specific :ref:`hardware documentation <hardware>`. Connect power supply cable and XTAG. Power up!
 3. :ref:`Set up your XMOS development tools <getting_started_xmos_dev_tools>`. 
 4. Download and :ref:`import in your workspace <getting_started_importing_library>` the SOMANET Motor Control Library and its dependencies.
-5. Open the **main.xc** within  the **app_demo_general_pwm**. Include the :ref:`board-support file according to your device <somanet_board_support_module>`. Also set the :ref:`appropriate target in your Makefile <somanet_board_support_module>`.
+5. Open the **main.xc** within  the **app_demo_general_pwm**. Include the :ref:`board-support file according to your device <DRIVE_BOARD_REQUIRED>`, and Include the :ref:`Core-support file according to your Core module <CORE_BOARD_REQUIRED>`. Moreover, set the :ref:`appropriate core target in your Makefile.
 
 .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 

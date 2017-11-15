@@ -1,6 +1,11 @@
 sc_sncn_motorcontrol Change Log
 ===============================
 
+3.2.1
+-----
+  * Remove reset of Incremental encoder multiturn position when passing the index pulse to prevent a jump when doing position/velocity control.
+  * Cogging compensation algorithm compensates for a gravity effect 
+
 3.2.0
 -----
 
