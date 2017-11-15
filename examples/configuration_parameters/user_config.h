@@ -91,7 +91,7 @@
 #define APPLIED_TUNING_TORQUE_PERCENT 20
 
 //// COMMUTATION ANGLE OFFSET [0:4095]
-#define COMMUTATION_ANGLE_OFFSET       1395
+#define COMMUTATION_ANGLE_OFFSET       1400
 
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
@@ -120,9 +120,9 @@
 #define MOTOR_ID 0
 
 // PID GAINS FOR TORQUE CONTROL [will be divided by 10000]
-#define TORQUE_Kp         2500
-#define TORQUE_Ki         40000
-#define TORQUE_Kd         0
+#define TORQUE_Kp         5000
+#define TORQUE_Ki         140000
+#define TORQUE_Kd         3000
 
 //PID GAINS FOR VELOCITY CONTROL
 #define VELOCITY_Kp                             0.00
@@ -135,8 +135,8 @@
 #define ENABLE_OPEN_PHASE_DETECTION             0 //set to 0 to disable/1 to enable
 
 //PID GAINS FOR POSITION CONTROL
-#define POSITION_Kp                             1.0
-#define POSITION_Ki                             0.01
+#define POSITION_Kp                             0.0
+#define POSITION_Ki                             0.0
 #define POSITION_Kd                             0.00
 // set "POSITION_INTEGRAL_LIMIT" equal to:
 //     "MOTOR_MAXIMUM_TORQUE" in case of using position controller in "POS_PID_CONTROLLER"                   mode
