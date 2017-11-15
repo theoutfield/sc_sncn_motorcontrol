@@ -23,6 +23,8 @@
 #include <stdio.h>
 #include <cogging_torque_compensation.h>
 
+//#define ANALOG_SENSOR
+
 #define HALL_MASK_A 0x4
 #define HALL_MASK_B 0x2
 #define HALL_MASK_C 0x1
@@ -711,6 +713,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
+#ifdef ANALOG_SENSOR
+    upstream_control_data.position  = (upstream_control_data.analogue_input_a_1);
+#endif
     position_k  = ((double) upstream_control_data.position);
     position_k_1= position_k;
 
@@ -788,7 +793,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 time_free = time_start - time_end;
 
                 upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
-
+#ifdef ANALOG_SENSOR
+    upstream_control_data.position  = (upstream_control_data.analogue_input_a_1);
+#endif
 
                 if (motion_ctrl_config.enable_compensation_recording)
                 {
@@ -933,9 +940,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                                 }
                                 ct_parameters.remaining_cells = COGGING_TORQUE_ARRAY_SIZE;
                                 i_torque_control.set_cogging_table(motorcontrol_config);
+                                i_torque_control.set_config(motorcontrol_config);
                                 ct_parameters.torque_recording_started = 0;
                                 ct_parameters.delay_counter = 0;
                                 i_torque_control.set_torque_control_enabled();
+                                i_torque_control.set_brake_status(DISABLE_BRAKE);
 
                                 if(ct_parameters.back_and_forth == 2)
                                 {
@@ -990,6 +999,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         position_ref_in_k = (double) downstream_control_data.position_cmd;
                     }
                     position_k_1= position_k;
+#ifdef ANALOG_SENSOR
+    upstream_control_data.position  = (upstream_control_data.analogue_input_a_1);
+#endif
                     position_k  = ((double) upstream_control_data.position);
 
                     if (pos_control_mode == POS_PID_CONTROLLER)
@@ -1665,7 +1677,6 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 motion_control_error = MOTION_CONTROL_NO_ERROR;
 
                 second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
-
                 motorcontrol_config = i_torque_control.get_config();
                 if (motion_ctrl_config.torque_kp != motorcontrol_config.torque_P_gain ||
                     motion_ctrl_config.torque_ki != motorcontrol_config.torque_I_gain ||
@@ -1676,6 +1687,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     motorcontrol_config.torque_D_gain = motion_ctrl_config.torque_kd;
                     i_torque_control.set_config(motorcontrol_config);
                 }
+
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
@@ -1685,7 +1697,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
         case i_motion_control[int i].update_control_data(DownstreamControlData downstream_control_data_in) -> UpstreamControlData upstream_control_data_out:
                 downstream_control_data = downstream_control_data_in;
                 upstream_control_data_out = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
-
+#ifdef ANALOG_SENSOR
+                upstream_control_data_out.position  = (upstream_control_data.analogue_input_a_1);
+#endif
                 switch (error_phase)
                 {
                 case A:

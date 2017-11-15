@@ -49,6 +49,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
         client interface PositionFeedbackInterface ?i_position_feedback_1, client interface PositionFeedbackInterface ?i_position_feedback_2)
 {
     DownstreamControlData downstream_control_data = {0};
+    UpstreamControlData upstream_control_data = {0};
 
     MotionControlConfig motion_ctrl_config = i_motion_control.get_motion_control_config();
     MotorcontrolConfig motorcontrol_config = i_motion_control.get_motorcontrol_config();
@@ -340,7 +341,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                 default://find motor commutation offset automatically
 
-                    if (general_system_evaluation(i_motion_control) == 0)
+                    //if (general_system_evaluation(i_motion_control) == 0)
                     {
                         printf("checking the configurations of position sensor ...\n");
 
@@ -367,12 +368,12 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                             }
                         }
                     }
-                    else
-                    {
-                        printf("Error: offset detection is not possible.\n");
-                        printf("       please check position sensor/motor connections\n");
-                        printf("       and repeat the evaluation process.\n");
-                    }
+//                    else
+//                    {
+//                        printf("Error: offset detection is not possible.\n");
+//                        printf("       please check position sensor/motor connections\n");
+//                        printf("       and repeat the evaluation process.\n");
+//                    }
 
                     break;
 
@@ -386,6 +387,9 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 downstream_control_data.offset_torque = 0;
                 downstream_control_data.position_cmd = (int)value;
                 motion_ctrl_config = i_motion_control.get_motion_control_config();
+                upstream_control_data = i_motion_control.update_control_data(downstream_control_data);
+                int act_position = upstream_control_data.position;
+
                 switch(mode_2)
                 {
                 //direct command with profile
@@ -398,6 +402,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
                 //step command (forward and backward)
                 case 's':
+
                         switch(mode_3)
                         {
                         //with profile
@@ -408,18 +413,19 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         //without profile
                         default:
                                 motion_ctrl_config.enable_profiler = 0;
-                                printf("position cmd: %d to %d\n", (int)value, (int)-value);
+                                printf("position cmd: %d to %d\n", ((int)value + act_position), ((int)-value + act_position));
                                 break;
                         }
+
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         downstream_control_data.offset_torque = 0;
-                        downstream_control_data.position_cmd = (int)value;
+                        downstream_control_data.position_cmd = (int)value + act_position;
                         i_motion_control.update_control_data(downstream_control_data);
                         delay_ticks(1500*1000*tile_usec);
-                        downstream_control_data.position_cmd = -(int)value;
+                        downstream_control_data.position_cmd = -(int)value + act_position;
                         i_motion_control.update_control_data(downstream_control_data);
                         delay_ticks(1500*1000*tile_usec);
-                        downstream_control_data.position_cmd = 0;
+                        downstream_control_data.position_cmd = act_position;
                         i_motion_control.update_control_data(downstream_control_data);
                         break;
                 //direct command
