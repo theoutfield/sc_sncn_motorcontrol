@@ -42,6 +42,6 @@
 #define QEI_SENSOR_TICKS_LOST           100         // how many ticks is allowed to be lost = resolution / sensor ticks lost
 
 //Hall config
-#define HALL_SENSOR_PORT_NUMBER      ENCODER_PORT_1     // [ENCODER_PORT_1, ENCODER_PORT_2]
+#define HALL_SENSOR_PORT_NUMBER      ENCODER_PORT_2     // [ENCODER_PORT_1, ENCODER_PORT_2]
 #define HALL_SENSOR_VELOCITY_COMPUTE_PERIOD       1000
 #define HALL_SENSOR_RESOLUTION                    4096*MOTOR_POLE_PAIRS
