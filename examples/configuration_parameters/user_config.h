@@ -135,7 +135,7 @@
 #define ENABLE_OPEN_PHASE_DETECTION             0 //set to 0 to disable/1 to enable
 
 //PID GAINS FOR POSITION CONTROL
-#define POSITION_Kp                             0.0
+#define POSITION_Kp                             0.5
 #define POSITION_Ki                             0.0
 #define POSITION_Kd                             0.00
 // set "POSITION_INTEGRAL_LIMIT" equal to:
@@ -176,11 +176,11 @@
 #define HOME_OFFSET                             0
 
 //Limits
-//#define MIN_POSITION_RANGE_LIMIT                1220
-//#define MAX_POSITION_RANGE_LIMIT                1900
+#define MIN_POSITION_RANGE_LIMIT                1220
+#define MAX_POSITION_RANGE_LIMIT                1900
 
-#define MIN_POSITION_RANGE_LIMIT                -0x7fffffff
-#define MAX_POSITION_RANGE_LIMIT                0x7fffffff
+//#define MIN_POSITION_RANGE_LIMIT                -0x7fffffff
+//#define MAX_POSITION_RANGE_LIMIT                0x7fffffff
 
 //Integrated Profiler
 #define ENABLE_PROFILER                         0
