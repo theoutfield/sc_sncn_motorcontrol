@@ -263,17 +263,11 @@ void pwm_service_general(
 
     unsigned int ref_time      = 0x00000000;
 
-    unsigned int period_start  = 0x00000000;
-    unsigned int period_middle = 0x00000000;
-    unsigned int period_end    = 0x00000000;
-    unsigned int dummy_value   = 0x00000000;
-
     unsigned inp_wid = 0x0000FFFF;
     unsigned pattern = 0x00000000;
 
     unsigned short ref_time_delay   =0x0000;
     unsigned short port_clock_shift =0x0000;
-    unsigned short period           =0x0000;
     unsigned short inactive_period  =0x0000;
     unsigned short pwm_limit_h      =0x0000;
     unsigned short pwm_limit_l      =0x0000;
