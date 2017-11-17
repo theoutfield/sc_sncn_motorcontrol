@@ -204,6 +204,9 @@
 /////////////////////////////////////////////////
 //////  AUXILARY CONFIGURATION PARAMETERS
 /////////////////////////////////////////////////
+#define FIELD_WEAKENING_STATUS          0   // 1 => "field weakening is enabled", 0 => "field weakening is disabled"
+#define FIELD_WEAKENING_STARTING_RANGE  0   // velocity in which field weakening strategy will be started (in rpm)
+#define FIELD_WEAKENING_ENDING_RANGE    0   // velocity in which field weakening strategy will be ended   (in rpm)
 
 #define MOMENT_OF_INERTIA                       0    //set this variable only if it is known in [gram square centimiter]
                                                      //otherwise set as 0
