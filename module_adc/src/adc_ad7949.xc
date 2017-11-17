@@ -290,7 +290,6 @@ void adc_ad7949(
      *  bits[2:1] 00        bit[0] 1
      *
      */
-    const unsigned int adc_config_mot=   0b11110001001001;
     unsigned int ad7949_config       =   0b11110001001001;
 
     unsigned int adc_data_a=0;
