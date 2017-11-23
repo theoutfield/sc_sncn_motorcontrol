@@ -45,7 +45,7 @@ How to use
 4. Fill up the REM 14 configuration structure.
 
      The functions use the same configuration structure as the :ref:`Position Feedback Module <module_position_feedback>`.
-     You need to fill up all the generic sensor parameters especially ``ifm_usec`.
+     You need to fill up all the generic sensor parameters especially ``tile_usec`.
      And fill up the REM 14 specific parameters.
 
 5. At your IF2 tile, You can use the functions to read REM 14 data.
@@ -71,7 +71,7 @@ How to use
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.polarity    = NORMAL_POLARITY;
                     position_feedback_config.pole_pairs  = POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                    position_feedback_config.tile_usec   = IF2_TILE_USEC;
                     position_feedback_config.offset      = 0;
 
                     position_feedback_config.rem_14_config.hysteresis     = REM_14_SENSOR_HYSTERESIS ;
@@ -84,7 +84,7 @@ How to use
                     initRotarySensor(spi_ports, position_feedback_config);
                     
                     // read REM 14 data
-                    position = readRotarySensorAngleWithCompensation(spi_ports, position_feedback_config.ifm_usec);
+                    position = readRotarySensorAngleWithCompensation(spi_ports, position_feedback_config.tile_usec);
                 }
             }
 

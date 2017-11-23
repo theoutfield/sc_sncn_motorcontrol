@@ -54,7 +54,7 @@ How to use
 6. At your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
      The Hall sensor has only one specific parameter ``hall_config.port_number`` the port number used.
-     You still need to fill up all the generic sensor parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+     You still need to fill up all the generic sensor parameters especially ``tile_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
 
 7. At whichever other core, now you can perform calls to the Position Feedback Service through the interfaces connected to it. Or if it is enabled you can read the position using the shared memory.
 
@@ -93,7 +93,7 @@ How to use
                         PositionFeedbackConfig position_feedback_config;
                         position_feedback_config.polarity    = NORMAL_POLARITY;
                         position_feedback_config.pole_pairs  = POLE_PAIRS;
-                        position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                        position_feedback_config.tile_usec   = IF2_TILE_USEC;
                         position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                         position_feedback_config.offset      = 0;
                         position_feedback_config.sensor_type = HALL_SENSOR;

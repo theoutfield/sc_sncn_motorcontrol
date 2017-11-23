@@ -34,7 +34,7 @@ SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
  * @brief REM 16MT sensor position data
  *
  * @param spi_ports the SPI ports structure
- * @param ifm_usec number of ticks in a microseconds
+ * @param tile_usec         number of ticks in a microseconds
  *
  * @return status
  * @return absolute multiturn count
@@ -42,7 +42,7 @@ SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
  * @return singleturn position raw
  * @return timestamp
  */
-{ SensorError, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec);
+{ SensorError, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType tile_usec);
 
 
 /**
@@ -52,8 +52,8 @@ SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config);
  * @param opcode the opcode of the command
  * @param data the data to write
  * @param data_bits the number of data bits to write
- * @param ifm_usec number of ticks in a microseconds
+ * @param tile_usec         number of ticks in a microseconds
  */
-void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, UsecType ifm_usec);
+void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, UsecType tile_usec);
 
 #endif

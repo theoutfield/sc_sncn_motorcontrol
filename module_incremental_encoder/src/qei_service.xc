@@ -90,7 +90,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
     timer t_velocity;
     unsigned int ts_velocity;
 
-    UsecType ifm_usec = position_feedback_config.ifm_usec;
+    UsecType tile_usec = position_feedback_config.tile_usec;
 
     t_velocity :> ts_velocity;
 
@@ -162,7 +162,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
                         angle = ((position * position_feedback_config.pole_pairs* (1<<12))/ position_feedback_config.resolution) & ((1<<12)-1);
                         unsigned int timestamp;
                         t_velocity :> timestamp;
-                        write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, position * (1 << (16 - shift_counter)) / shift, velocity, angle, 0, index_found, sensor_error, last_sensor_error, timestamp/ifm_usec);
+                        write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, position * (1 << (16 - shift_counter)) / shift, velocity, angle, 0, index_found, sensor_error, last_sensor_error, timestamp/tile_usec);
                     }
                 }
                 break;
@@ -195,7 +195,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
                 last_sensor_error = SENSOR_NO_ERROR;
                 singleturn_counter = 0;
                 position_feedback_config = in_config;
-                position_feedback_config.ifm_usec = ifm_usec;
+                position_feedback_config.tile_usec = tile_usec;
                 shift = position_feedback_config.resolution;
                 shift_counter = 0;
                 while (!shift%2 && shift_counter < 16)
@@ -234,7 +234,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
                 gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
                 break;
 
-            case t_velocity when timerafter(ts_velocity + (position_feedback_config.velocity_compute_period*ifm_usec)) :> ts_velocity:
+            case t_velocity when timerafter(ts_velocity + (position_feedback_config.velocity_compute_period*tile_usec)) :> ts_velocity:
                 int difference_velocity = count - vel_previous_position;
                 if (difference_velocity < qei_crossover_velocity && difference_velocity > -qei_crossover_velocity)
                 {
@@ -265,7 +265,7 @@ void qei_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedbackC
                 if (sensor_error != SENSOR_NO_ERROR)
                     last_sensor_error = sensor_error;
 
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, sensor_error, last_sensor_error, ts_velocity/ifm_usec);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn,  velocity, angle, 0, index_found, sensor_error, last_sensor_error, ts_velocity/tile_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);

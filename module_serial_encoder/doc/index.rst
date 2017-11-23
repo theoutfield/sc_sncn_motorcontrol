@@ -54,7 +54,7 @@ How to use
 6. At your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
      The service uses the same configuration structure as the :ref:`Position Feedback Module <module_position_feedback>`.
-     You need to fill up all the generic sensor parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+     You need to fill up all the generic sensor parameters especially ``tile_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
      And you need to fill up sensor specific parameters depending on the sensor you want to use (BiSS, REM 14, REM 16MT).
 
 7. At whichever other core, now you can perform calls to the Encoder Service through the interfaces connected to it.
@@ -103,7 +103,7 @@ How to use
                         position_feedback_config.polarity    = NORMAL_POLARITY;
                         position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
                         position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                        position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                        position_feedback_config.tile_usec   = IF2_TILE_USEC;
                         position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                         position_feedback_config.offset      = 0;
                         position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;

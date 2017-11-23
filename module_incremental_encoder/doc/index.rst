@@ -57,7 +57,7 @@ How to use
      The QEI sensor has some specific parameters. ``index_type`` to select if the encoder has a index pulse.
      ``signal_type`` to select the input port configuration between RS422 (differential) and TTL.
      ``port_number`` to select the input port number.
-     You still need to fill up all the generic sensor parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+     You still need to fill up all the generic sensor parameters especially ``tile_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
 
 7. At whichever other core, now you can perform calls to the Encoder Service through the interfaces connected to it.
 
@@ -99,7 +99,7 @@ How to use
                         position_feedback_config.sensor_type = QEI_SENSOR;
                         position_feedback_config.polarity    = NORMAL_POLARITY;
                         position_feedback_config.resolution  = QEI_SENSOR_RESOLUTION;
-                        position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                        position_feedback_config.tile_usec   = IF2_TILE_USEC;
                         position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                         position_feedback_config.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;
                         position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;

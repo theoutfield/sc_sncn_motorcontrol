@@ -877,7 +877,7 @@ void pwm_config(PwmPorts &ports)
  * @param duty_start_brake      PWM value which is used to start the electric brake
  * @param duty_maintain_brake   PWM value which is used to maintain the electric brake
  * @param time_start_brake      Required time to start the brake (in milliseconds)
- * @param ifm_tile_usec         Reference clock frequency of IF2 tile (in MHz)
+ * @param tile_usec             Reference clock frequency of IF2 tile (in MHz)
  *
  * @return void
  */
@@ -886,7 +886,7 @@ void pwm_service_task(
         PwmPorts &ports,
         server interface UpdatePWM i_update_pwm,
         server interface UpdateBrake i_update_brake,
-        int ifm_tile_usec
+        int tile_usec
 )
 {
     int duty_start_brake    = 3000;
@@ -912,7 +912,7 @@ void pwm_service_task(
     timer t;
     unsigned ts;
 
-    if(ifm_tile_usec==250)
+    if(tile_usec==250)
     {
         half_sync_inc = 8192;
         pwm_max_value=16384;
@@ -921,13 +921,13 @@ void pwm_service_task(
         //Set freq to 250MHz (always needed for proper timing)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
-    else if(ifm_tile_usec==100)
+    else if(tile_usec==100)
     {
         half_sync_inc = 4096;
         pwm_max_value=8192;
         pwm_deadtime=600;
     }
-    else if (ifm_tile_usec!=100 && ifm_tile_usec!=250)
+    else if (tile_usec!=100 && tile_usec!=250)
     {
         while(1);//error state!!!
     }

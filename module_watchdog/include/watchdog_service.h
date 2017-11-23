@@ -32,7 +32,7 @@ enum {DC100_DC300, DC500, DC1K_DC5K, DC1KD1, DC30};
  * @param i_watchdog Array of communication interfaces to handle up to 2 different clients.
  */
 [[combinable]]
-void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec);
+void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int tile_usec);
 
 /**
  * @brief Function to blink red LED on your SOMANET Drive devices to signal different types of faults.

@@ -45,7 +45,7 @@ How to use
 4. Fill up the REM 16MT configuration structure.
 
      The functions use the same configuration structure as the :ref:`Position Feedback Module <module_position_feedback>`.
-     You need to fill up all the generic sensor parameters especially ``ifm_usec`.
+     You need to fill up all the generic sensor parameters especially ``tile_usec`.
      And fill up the REM 16MT specific parameters.
 
 5. At your IF2 tile, You can use the functions to read REM 16MT data.
@@ -71,7 +71,7 @@ How to use
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.polarity    = NORMAL_POLARITY;
                     position_feedback_config.pole_pairs  = POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                    position_feedback_config.tile_usec   = IF2_TILE_USEC;
                     position_feedback_config.offset      = 0;
 
                     position_feedback_config.rem_16mt_config.filter = REM_16MT_FILTER;
@@ -82,13 +82,13 @@ How to use
                     
                     // read REM 16MT data
                     int status, count, singleturn_filtered, singleturn_raw, timestamp;
-                    { status, count, singleturn_filtered, singleturn_raw, timestamp } = rem_16mt_init(spi_ports, position_feedback_config.ifm_usec);
+                    { status, count, singleturn_filtered, singleturn_raw, timestamp } = rem_16mt_init(spi_ports, position_feedback_config.tile_usec);
                     
                     //reset REM 16MT position to zero
-                    rem_16mt_write(spi_ports, REM_16MT_CONF_NULL, 0, 0, position_feedback_config.ifm_usec)
+                    rem_16mt_write(spi_ports, REM_16MT_CONF_NULL, 0, 0, position_feedback_config.tile_usec)
                     
                     //write REM 16MT filter setting
-                    rem_16mt_write(spi_ports, REM_16MT_CONF_FILTER, 0x02, 8, position_feedback_config.ifm_usec)
+                    rem_16mt_write(spi_ports, REM_16MT_CONF_FILTER, 0x02, 8, position_feedback_config.tile_usec)
                     
                     
                 }

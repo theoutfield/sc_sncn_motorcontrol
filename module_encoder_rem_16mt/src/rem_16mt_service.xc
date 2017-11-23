@@ -37,7 +37,7 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     return computed_checksum & 0xff;
 }
 
-{ SensorError, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType ifm_usec) {
+{ SensorError, int, unsigned int, unsigned int, unsigned int } rem_16mt_read(SPIPorts &spi_ports, UsecType tile_usec) {
     unsigned int timestamp;
     SensorError status;
     int count;
@@ -49,13 +49,13 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
     timer t;
     unsigned last_read;
     t :> last_read;
-    last_read = last_read - 40*ifm_usec - 1;
+    last_read = last_read - 40*tile_usec - 1;
 
     do {
-        t when timerafter(last_read + 40*ifm_usec) :> void;
+        t when timerafter(last_read + 40*tile_usec) :> void;
         configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1); //set mosi to 1
         slave_select(*spi_ports.slave_select);
-        delay_ticks(10*ifm_usec); //wait for the data buffer to fill
+        delay_ticks(10*tile_usec); //wait for the data buffer to fill
         count = spi_master_in_short(spi_ports.spi_interface);
         singleturn_filtered = spi_master_in_short(spi_ports.spi_interface);
         singleturn_raw = spi_master_in_short(spi_ports.spi_interface);
@@ -79,11 +79,11 @@ int checksum_compute(unsigned count, unsigned singleturn_filtered, unsigned sing
 }
 
 
-void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, UsecType ifm_usec)
+void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, UsecType tile_usec)
 {
     configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_select(*spi_ports.slave_select);
-    delay_ticks(100*ifm_usec);
+    delay_ticks(100*tile_usec);
     spi_master_out_byte(spi_ports.spi_interface, opcode);
     if (data_bits == 8) {
         spi_master_out_byte(spi_ports.spi_interface, data);
@@ -94,26 +94,26 @@ void rem_16mt_write(SPIPorts &spi_ports, int opcode, int data, int data_bits, Us
     }
     configure_out_port(*spi_ports.spi_interface.mosi, spi_ports.spi_interface.blk2, 1);
     slave_deselect(*spi_ports.slave_select);
-    delay_ticks(200020*ifm_usec);
+    delay_ticks(200020*tile_usec);
 }
 
 SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
 {
     SensorError status;
 
-    delay_ticks(100*config.ifm_usec);
+    delay_ticks(100*config.tile_usec);
     //reset
-    rem_16mt_write(spi_ports, REM_16MT_CTRL_RESET, 0, 0, config.ifm_usec);
+    rem_16mt_write(spi_ports, REM_16MT_CTRL_RESET, 0, 0, config.tile_usec);
     //read status
-    { status, void, void, void, void } = rem_16mt_read(spi_ports, config.ifm_usec);
-    delay_ticks(100*config.ifm_usec);
+    { status, void, void, void, void } = rem_16mt_read(spi_ports, config.tile_usec);
+    delay_ticks(100*config.tile_usec);
     if (status != SENSOR_NO_ERROR)
         return status;
     //direction
     if (config.polarity == SENSOR_POLARITY_INVERTED)
-        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 1, 8, config.ifm_usec);
+        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 1, 8, config.tile_usec);
     else
-        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 0, 8, config.ifm_usec);
+        rem_16mt_write(spi_ports, REM_16MT_CONF_DIR, 0, 8, config.tile_usec);
     //filter
     if (config.rem_16mt_config.filter == 1) {
         config.rem_16mt_config.filter = 0x02;
@@ -122,9 +122,9 @@ SensorError rem_16mt_init(SPIPorts &spi_ports, PositionFeedbackConfig &config)
     } else if (config.rem_16mt_config.filter > 9) {
         config.rem_16mt_config.filter = 0x09;
     }
-    rem_16mt_write(spi_ports, REM_16MT_CONF_FILTER, config.rem_16mt_config.filter, 8, config.ifm_usec);
+    rem_16mt_write(spi_ports, REM_16MT_CONF_FILTER, config.rem_16mt_config.filter, 8, config.tile_usec);
     //read status
-    { status, void, void, void, void } = rem_16mt_read(spi_ports, config.ifm_usec);
-    delay_ticks(100*config.ifm_usec);
+    { status, void, void, void, void } = rem_16mt_read(spi_ports, config.tile_usec);
+    delay_ticks(100*config.tile_usec);
     return status;
 }

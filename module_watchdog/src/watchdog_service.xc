@@ -8,10 +8,10 @@
 #include <watchdog_service.h>
 
 [[combinable]]
- void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec)
+ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int tile_usec)
 {
     unsigned int usec;
-    if(ifm_tile_usec==250)
+    if(tile_usec==250)
     {
         //Set freq to 250MHz (always needed for proper timing)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz

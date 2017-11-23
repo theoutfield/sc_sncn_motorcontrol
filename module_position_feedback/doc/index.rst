@@ -71,7 +71,7 @@ How to use
 
     The service configuration contains generic sensor parameters and also structures for sensor specific parameters.
     You need to fill up all the parameters for the sensor you want to use.
-    You also need to fill up all the generic parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+    You also need to fill up all the generic parameters especially ``tile_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
     As the service supports two sensors there is two configurations structures. The sensor type is selected with the ``sensor_type`` parameter.
 
 7. At whichever other core, now you can perform calls to the Position Feedback Service through the interfaces connected to it. Or if it is enabled you can read the position using the shared memory.
@@ -119,7 +119,7 @@ How to use
                     position_feedback_config.polarity    = SENSOR_1_POLARITY;
                     position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
                     position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                    position_feedback_config.tile_usec   = IF2_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                     position_feedback_config.offset      = HOME_OFFSET;
                     position_feedback_config.sensor_function = SENSOR_1_FUNCTION;
