@@ -52,7 +52,7 @@ int main(void)
     par
     {
         /***************************************************
-         * IFM TILE
+         * IF2 TILE
          ***************************************************/
         on tile[IF2_TILE]: par {
             /* Test Hall sensor Client */

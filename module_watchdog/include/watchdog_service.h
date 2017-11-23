@@ -21,7 +21,7 @@ typedef struct {
 } WatchdogPorts;
 
 /**
- * @brief Enumeration of existing IFM modules.
+ * @brief Enumeration of existing Drive modules.
  */
 enum {DC100_DC300, DC500, DC1K_DC5K, DC1KD1, DC30};
 
@@ -40,10 +40,10 @@ void watchdog_service( WatchdogPorts &watchdog_ports, interface WatchdogInterfac
  * @param fault Fault ID, i.e., number of times to blink followed by a pause.
  * @param period Red LED on/off period
  * @param watchdog_ports Ports structure defining watchdog chip HW access.
- * @param IFM_module_type Type of the IFM board used to properly handle the ports.
+ * @param drive_module_type Type of the Drive board used to properly handle the ports.
  * @param output Value to be written to the shared LED port
  * @param output_cpld Value to be written to the shared LED port for cpld boards
  * @param times Internal blinking counter
  * @param delay_counter External counter incrementing every WD clock cycle
  */
-void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned &output_cpld, unsigned int &times, unsigned int &delay_counter);
+void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int drive_module_type, unsigned char &output, unsigned &output_cpld, unsigned int &times, unsigned int &delay_counter);

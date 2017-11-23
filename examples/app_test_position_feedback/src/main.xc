@@ -215,7 +215,7 @@ int main(void)
         on tile[APP_TILE]: position_feedback_commands(i_position_feedback_1[1], i_position_feedback_2[1]);
 
         /***************************************************
-         * IFM TILE
+         * IF2 TILE
          ***************************************************/
         on tile[IF2_TILE]: par {
             position_feedback_display(i_position_feedback_1[0], i_position_feedback_2[0], i_shared_memory[2]);
