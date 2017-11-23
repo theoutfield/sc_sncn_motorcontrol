@@ -14,8 +14,8 @@ BiSS is an open source digital interface for sensors and actuators. BiSS is hard
 
 Those functions are used in :ref:`Serial Encoder Module <module_serial_encoder>` itself used by :ref:`Position Feedback Module <module_position_feedback>` to create a service for reading a BiSS or SSI encoders.
 
-The BiSS functions should always run over an **IFM Tile** so it can access the ports to
-your SOMANET IFM device.
+The BiSS functions should always run over an **IF2 Tile** so it can access the ports to
+your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -54,7 +54,7 @@ How to use
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
-        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
+        #include <Drive1000-rev-c4.bsp> //Board Support file for SOMANET Drive module
                                         //(select your board support files according to your device)
 
         // 2. Include the BiSS Service header **biss_service.h** in your app.

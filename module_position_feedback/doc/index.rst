@@ -31,8 +31,8 @@ The mode is set using the ``sensor_function`` parameter of the config structure.
 
 It is possible to switch the sensor service type at runtime. You need fist to update the config structure to set the ``sensor_type`` that you want. Then you call the ``exit()`` interface which will restart the Position Feedback Service with the new sensor service.
 
-This Service should always run over an **IFM Tile** so it can access the ports to
-your SOMANET IFM device.
+This Service should always run over an **IF2 Tile** so it can access the ports to
+your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -79,7 +79,7 @@ How to use
     .. code-block:: c
 
         #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
-        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET Drive module 
                                             //(select your board support files according to your device)
                                         
         // 2. Include the Position Feedback Service header

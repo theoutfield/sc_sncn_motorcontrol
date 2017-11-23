@@ -14,7 +14,7 @@ Incremental Encoder Feedback Sensor.
 This service can run independently but is meant to be used by the :ref:`Position Feedback Module <module_position_feedback>` that is why it uses the same communication interface.
 
 The Service should always run over an **IF2 tile** so it can access the ports to
-your SOMANET IFM device.
+your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -64,7 +64,7 @@ How to use
     .. code-block:: c
 
         #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
-        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET Drive module 
                                             //(select your board support files according to your device)
                                         
         // 2. Include the Hall Service header

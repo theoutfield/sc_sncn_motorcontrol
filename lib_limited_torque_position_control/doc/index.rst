@@ -50,7 +50,7 @@ How to use
     .. code-block:: c
 
         #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device 
-        #include <IFM_DC1K-rev-c3.bsp>  //Board Support file for SOMANET IFM DC100 device 
+        #include <Drive1000-rev-c4.bsp> //Board Support file for SOMANET Drive module 
                                         //(select your board support files according to your device)
 
         #include <pwm_service.h>
