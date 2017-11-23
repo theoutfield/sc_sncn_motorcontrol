@@ -53,7 +53,7 @@ How to use
 5. At your IF2 tile, You can use the functions to read BiSS data and process it into position data.
     .. code-block:: c
 
-        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
+        #include <CoreC2X.bsp>          //Board Support file for SOMANET Core C2X device
         #include <Drive1000-rev-c4.bsp> //Board Support file for SOMANET Drive module
                                         //(select your board support files according to your device)
 
