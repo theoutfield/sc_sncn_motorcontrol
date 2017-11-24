@@ -75,19 +75,19 @@ void update_brake(
 
     MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
 
-    if(motorcontrol_config.ifm_tile_usec==250)
+    if(motorcontrol_config.tile_usec==250)
     {
         duty_min = 1500;
         duty_max = 13000;
         duty_divider = 16384;
     }
-    else if(motorcontrol_config.ifm_tile_usec==100)
+    else if(motorcontrol_config.tile_usec==100)
     {
         duty_min = 600;
         duty_max = 7000;
         duty_divider = 8192;
     }
-    else if (motorcontrol_config.ifm_tile_usec!=100 && motorcontrol_config.ifm_tile_usec!=250)
+    else if (motorcontrol_config.tile_usec!=100 && motorcontrol_config.tile_usec!=250)
     {
         error = 1;
     }
@@ -100,7 +100,7 @@ void update_brake(
     if(duty_maintain_brake < duty_min) duty_maintain_brake = duty_min;
     if(duty_maintain_brake > duty_max) duty_maintain_brake = duty_max;
 
-    period_start_brake  = (pull_brake_time * 1000)/(motorcontrol_config.ifm_tile_usec);
+    period_start_brake  = (pull_brake_time * 1000)/(motorcontrol_config.tile_usec);
 
     i_update_brake.update_brake_control_data(duty_start_brake, duty_maintain_brake, period_start_brake);
 }
