@@ -666,11 +666,16 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
     // initialization
     MotorcontrolConfig motorcontrol_config = i_torque_control.get_config();
-    motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
-    motion_ctrl_config.torque_kp =motorcontrol_config.torque_P_gain;
-    motion_ctrl_config.torque_ki =motorcontrol_config.torque_I_gain;
-    motion_ctrl_config.torque_kd =motorcontrol_config.torque_D_gain;
-    motion_ctrl_config.max_torque =motorcontrol_config.max_torque;
+    motion_ctrl_config.max_torque = motorcontrol_config.max_torque;
+    motion_ctrl_config.torque_kp  = motorcontrol_config.torque_P_gain;
+    motion_ctrl_config.torque_ki  = motorcontrol_config.torque_I_gain;
+    motion_ctrl_config.torque_kd  = motorcontrol_config.torque_D_gain;
+    motion_ctrl_config.max_torque = motorcontrol_config.max_torque;
+    motion_ctrl_config.field_weakening_status          = motorcontrol_config.field_weakening_status;
+    motion_ctrl_config.field_weakening_starting_range  = motorcontrol_config.field_weakening_starting_range;
+    motion_ctrl_config.field_weakening_ending_range    = motorcontrol_config.field_weakening_ending_range;
+    motion_ctrl_config.field_weakening_percentage      = motorcontrol_config.field_weakening_percentage;
+
     int current_ratio = motorcontrol_config.current_ratio;
 
     //init brake config
@@ -1819,16 +1824,29 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
 
+                //check if settings of torque control service are matching the settings of motion control service
                 motorcontrol_config = i_torque_control.get_config();
                 if (motion_ctrl_config.torque_kp != motorcontrol_config.torque_P_gain ||
                     motion_ctrl_config.torque_ki != motorcontrol_config.torque_I_gain ||
-                    motion_ctrl_config.torque_kd != motorcontrol_config.torque_D_gain)
+                    motion_ctrl_config.torque_kd != motorcontrol_config.torque_D_gain ||
+
+                    motion_ctrl_config.field_weakening_status         != motorcontrol_config.field_weakening_status        ||
+                    motion_ctrl_config.field_weakening_starting_range != motorcontrol_config.field_weakening_starting_range||
+                    motion_ctrl_config.field_weakening_ending_range   != motorcontrol_config.field_weakening_ending_range  ||
+                    motion_ctrl_config.field_weakening_percentage     != motorcontrol_config.field_weakening_percentage)
                 {
                     motorcontrol_config.torque_P_gain = motion_ctrl_config.torque_kp;
                     motorcontrol_config.torque_I_gain = motion_ctrl_config.torque_ki;
                     motorcontrol_config.torque_D_gain = motion_ctrl_config.torque_kd;
+
+                    motorcontrol_config.field_weakening_status          = motion_ctrl_config.field_weakening_status;
+                    motorcontrol_config.field_weakening_starting_range  = motion_ctrl_config.field_weakening_starting_range;
+                    motorcontrol_config.field_weakening_ending_range    = motion_ctrl_config.field_weakening_ending_range;
+                    motorcontrol_config.field_weakening_percentage      = motion_ctrl_config.field_weakening_percentage;
+
                     i_torque_control.set_config(motorcontrol_config);
                 }
+
                 break;
 
         case i_motion_control[int i].get_motion_control_config() ->  MotionControlConfig out_config:
@@ -1899,6 +1917,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 //error
                 upstream_control_data_out.motion_control_error = motion_control_error;
 
+                i_torque_control.set_field(downstream_control_data.field_cmd);
                 break;
 
                 case i_motion_control[int i].set_j(int j):
