@@ -520,6 +520,25 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
 
                 case 'f':
+                        switch(mode_3)
+                        {
+                        case 'v'://velocity settings for field weakening strategy
+
+                                switch(mode_4)
+                                {
+                                case 's'://starting velocity range for field weakening (in rpm)
+
+                                    motion_ctrl_config.field_weakening_starting_range=value;
+                                    i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                    // check if motion_ctrl_config structure is set properly in motion_control_service:
+                                    motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                    printf("field weakening starting range: %d \n", motion_ctrl_config.field_weakening_starting_range);
+                                    break;
+                                }
+                            break;
+                        }
+
                         // enable/disable field weakening depending on user command (tf1 -> enable, tf0 -> disable)
                         if      (((int)value) == 0)     motion_ctrl_config.field_weakening_status=0;
                         else if (((int)value) == 1)     motion_ctrl_config.field_weakening_status=1;

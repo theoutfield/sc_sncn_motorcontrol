@@ -1776,9 +1776,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     i_torque_control.set_config(motorcontrol_config);
                 }
 
-                if (motion_ctrl_config.field_weakening_status != motorcontrol_config.field_weakening_status)
+                if (    motion_ctrl_config.field_weakening_status != motorcontrol_config.field_weakening_status                 ||
+                        motion_ctrl_config.field_weakening_starting_range != motorcontrol_config.field_weakening_starting_range)
                 {
                     motorcontrol_config.field_weakening_status=motion_ctrl_config.field_weakening_status;
+                    motorcontrol_config.field_weakening_starting_range=motion_ctrl_config.field_weakening_starting_range;
                     i_torque_control.set_config(motorcontrol_config);
                 }
                 break;
