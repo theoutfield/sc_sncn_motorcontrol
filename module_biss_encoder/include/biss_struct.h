@@ -37,7 +37,7 @@ typedef struct {
     int singleturn_resolution;  /**< Number of bits of singleturn resolution */
     int filling_bits;           /**< Number of filling bits between the singleturn data status data*/
     int crc_poly;               /**< CRC polynom in reverse representation:  x^0 + x^1 + x^6 is 0b110000 */
-    int clock_frequency;        /**< BiSS output clock frequency in kHz, supported frequencies depend on IFM Tile frequency */
+    int clock_frequency;        /**< BiSS output clock frequency in kHz, supported frequencies depend on IF2 Tile frequency */
     int timeout;                /**< Timeout after a BiSS read in microseconds */
     int busy;                   /**< For BiSS maximum number of bits to read before the start bit (= maximum duration of ACK bit). For SSI processing time before reading in microseconds */
     BISSClockPortConfig   clock_port_config;        /**< Configure of the biss clock port (GPIO or hall_enc_select_port) */

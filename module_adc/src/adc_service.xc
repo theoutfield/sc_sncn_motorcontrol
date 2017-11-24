@@ -10,7 +10,7 @@
  * @param adc_ports             Ports structure defining where to access the ADC chip signals.
  * @param i_adc[2]              Array of communication interfaces to handle up to 2 different clients.
  * @param i_watchdog            Interface to communicate with watchdog service
- * @param ifm_tile_usec         Reference clock frequency of IF2 tile (in MHz)
+ * @param tile_usec             Reference clock frequency of IF2 tile (in MHz)
  * @param operational_mode      Integer type to select between SINGLE_ENDED/FULLY_DIFFERENTIAL modes
  *
  * @return void
@@ -18,10 +18,10 @@
 void adc_service(
         ADCPorts &adc_ports,
         interface ADCInterface server i_adc[2],
-        interface WatchdogInterface client ?i_watchdog, int ifm_tile_usec, int operational_mode)
+        interface WatchdogInterface client ?i_watchdog, int tile_usec, int operational_mode)
 {
     if(!isnull(adc_ports.ad7949_ports.clk))
-        adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog, operational_mode, ifm_tile_usec);
+        adc_ad7949(i_adc, adc_ports.ad7949_ports, adc_ports.current_sensor_config, i_watchdog, operational_mode, tile_usec);
     else if(!isnull(adc_ports.ad7265_ports.xclk))
-        adc_ad7265(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog, operational_mode, ifm_tile_usec);
+        adc_ad7265(i_adc, adc_ports.ad7265_ports, adc_ports.current_sensor_config, i_watchdog, operational_mode, tile_usec);
 }// adc_service

@@ -30,7 +30,7 @@ SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
 
     //wait for the data line to go high
     t :> time;
-    timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
+    timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.tile_usec;
     while(bit != 1 && timeafter(timeout, time)) {
         *biss_clock_port <: biss_clock_high;
         *biss_data_port :> bit;
@@ -51,7 +51,7 @@ SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
         //put clock low and wait for the encoder to be ready
         if (position_feedback_config.biss_config.busy) {
             *biss_clock_port <: biss_clock_low;
-            delay_ticks(position_feedback_config.biss_config.busy*position_feedback_config.ifm_usec);
+            delay_ticks(position_feedback_config.biss_config.busy*position_feedback_config.tile_usec);
         }
     } else {
         //BiSS sensor: wait for ack and start bits
@@ -101,7 +101,7 @@ SensorError read_biss_sensor_data(port * biss_clock_port, port * biss_data_port,
 
     //wait for the data line to go low
     t :> time;
-    timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.ifm_usec;
+    timeout = time + position_feedback_config.biss_config.timeout*position_feedback_config.tile_usec;
     while(bit != 0 && timeafter(timeout, time)) {
         *biss_data_port :> bit;
         bit &= 1;

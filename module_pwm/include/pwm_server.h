@@ -123,7 +123,7 @@ void pwm_config(PwmPorts &ports);
  * @param duty_start_brake      PWM value which is used to start the electric brake
  * @param duty_maintain_brake   PWM value which is used to maintain the electric brake
  * @param time_start_brake      Required time to start the brake (in milliseconds)
- * @param ifm_tile_usec         Reference clock frequency of IF2 tile (in MHz)
+ * @param tile_usec             Reference clock frequency of IF2 tile (in MHz)
  *
  * @return void
  */
@@ -132,7 +132,7 @@ void pwm_service_task( // Implementation of the Centre-aligned, High-Low pair, P
         PwmPorts &ports,
         server interface UpdatePWM i_update_pwm,
         server interface UpdateBrake i_update_brake,
-        int ifm_tile_usec
+        int tile_usec
 );
 
 #endif // _PWM_SERVER_H_

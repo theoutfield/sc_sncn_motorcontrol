@@ -12,7 +12,7 @@ This module provides a Service (pwm_service_general) to generate center-aligned 
 
 The PWM Service should always run over an **IF2 Tile** so it can access the ports of your SOMANET Drive.
 
-If PWM signals are used to drive an Drive module, the watchdog service should also be running to activate the IFM ports.
+If PWM signals are used to drive an Drive module, the watchdog service should also be running to activate the Drive module ports.
 
 .. cssclass:: github
 
@@ -54,8 +54,8 @@ How to use
 
     .. code-block:: c
 
-         #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
-        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+        #include <CoreC2X.bsp>              //Board Support file for SOMANET Core C2X device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET Drive module 
                                             //(select your board support files according to your device)
 
         #include <pwm_server.h> // 2

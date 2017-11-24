@@ -12,8 +12,8 @@ This module provides functions to read  data coming from a REM 14 Encoder.
 
 Those functions are used in :ref:`Serial Encoder Module <module_serial_encoder>` itself used by :ref:`Position Feedback Module <module_position_feedback>` to create a service for reading a REM 14 encoder.
 
-The functions should always run over an **IFM Tile** so it can access the ports to
-your SOMANET IFM device.
+The functions should always run over an **IF2 Tile** so it can access the ports to
+your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -45,14 +45,14 @@ How to use
 4. Fill up the REM 14 configuration structure.
 
      The functions use the same configuration structure as the :ref:`Position Feedback Module <module_position_feedback>`.
-     You need to fill up all the generic sensor parameters especially ``ifm_usec`.
+     You need to fill up all the generic sensor parameters especially ``tile_usec`.
      And fill up the REM 14 specific parameters.
 
 5. At your IF2 tile, You can use the functions to read REM 14 data.
     .. code-block:: c
 
-        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
-        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C2X device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET Drive module 
                                             //(select your board support files according to your device)
 
         // 2. Include the REM 14 Service header **rem_14_service.h** in your app.
@@ -71,7 +71,7 @@ How to use
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.polarity    = NORMAL_POLARITY;
                     position_feedback_config.pole_pairs  = POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                    position_feedback_config.tile_usec   = IF2_TILE_USEC;
                     position_feedback_config.offset      = 0;
 
                     position_feedback_config.rem_14_config.hysteresis     = REM_14_SENSOR_HYSTERESIS ;
@@ -84,7 +84,7 @@ How to use
                     initRotarySensor(spi_ports, position_feedback_config);
                     
                     // read REM 14 data
-                    position = readRotarySensorAngleWithCompensation(spi_ports, position_feedback_config.ifm_usec);
+                    position = readRotarySensorAngleWithCompensation(spi_ports, position_feedback_config.tile_usec);
                 }
             }
 

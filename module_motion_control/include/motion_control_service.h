@@ -392,7 +392,7 @@ void init_motion_control(interface MotionControlInterface client i_motion_contro
  *        and compute the corresponding duty cycles which are then sent to the pwm service.
  *
  * @param motion_ctrl_config config structure of the motion control
- * @param i_torque_control client interface to get the ifm tile frequency from the motorcontrol service.
+ * @param i_torque_control client interface to get the IF2 tile frequency from the motorcontrol service.
  * @param i_update_brake client enterface to the pwm service to send the brake configuration
  *
  */

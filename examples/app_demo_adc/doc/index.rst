@@ -30,7 +30,7 @@ Quick How-to
 
 .. important:: Make sure the SOMANET Motor Control Library supports your SOMANET device. For that, check the :ref:`Hardware compatibility <motor_control_hw_compatibility>` section of the library.
 
-6. :ref:`Set the type of your ADC block (AD_7949 or AD_7265) as the second input of adc_client_demo function in the main.xc file (ADC block type is defined as SOMANET_DRIVE_ADC value in bsp file of your IFM device in module-board-support).
+6. :ref:`Set the type of your ADC block (AD_7949 or AD_7265) as the second input of adc_client_demo function in the main.xc file (ADC block type is defined as SOMANET_DRIVE_ADC value in bsp file of your Drive module in module-board-support).
  
 .. code-block:: c
   
