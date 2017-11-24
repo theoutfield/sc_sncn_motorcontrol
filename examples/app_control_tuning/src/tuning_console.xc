@@ -522,6 +522,17 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 case 'f':
                         switch(mode_3)
                         {
+
+                        case 'p'://percentage of field weakening (between 0 and 100) in pu.
+
+                            motion_ctrl_config.field_weakening_percentage=value;
+                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                            // check if motion_ctrl_config structure is set properly in motion_control_service:
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            printf("field weakening percentage: %d \n", motion_ctrl_config.field_weakening_percentage);
+                            break;
+
                         case 'v'://velocity settings for field weakening strategy
 
                                 switch(mode_4)
