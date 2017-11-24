@@ -520,10 +520,17 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         break;
 
                 case 'f':
-                        downstream_control_data.field_cmd = (int)value;
-                        i_motion_control.update_control_data(downstream_control_data);
-                        printf("set field %d\n", downstream_control_data.field_cmd);
-                        break;
+                        // enable/disable field weakening depending on user command (tf1 -> enable, tf0 -> disable)
+                        if      (((int)value) == 0)     motion_ctrl_config.field_weakening_status=0;
+                        else if (((int)value) == 1)     motion_ctrl_config.field_weakening_status=1;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                        // check if motion_ctrl_config structure is set properly in motion_control_service:
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        if      (motion_ctrl_config.field_weakening_status==0) printf("field weakening disabled. \n");
+                        else if (motion_ctrl_config.field_weakening_status==1) printf("field weakening enabled.  \n");
+
+                    break;
 
                 //direct command
                 default:

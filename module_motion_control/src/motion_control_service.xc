@@ -1764,6 +1764,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 second_order_LP_filter_init(motion_ctrl_config.filter, POSITION_CONTROL_LOOP_PERIOD, torque_filter_param);
 
+                //check if settings of torque control service are matching the settings of motion control service
                 motorcontrol_config = i_torque_control.get_config();
                 if (motion_ctrl_config.torque_kp != motorcontrol_config.torque_P_gain ||
                     motion_ctrl_config.torque_ki != motorcontrol_config.torque_I_gain ||
@@ -1772,6 +1773,12 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     motorcontrol_config.torque_P_gain = motion_ctrl_config.torque_kp;
                     motorcontrol_config.torque_I_gain = motion_ctrl_config.torque_ki;
                     motorcontrol_config.torque_D_gain = motion_ctrl_config.torque_kd;
+                    i_torque_control.set_config(motorcontrol_config);
+                }
+
+                if (motion_ctrl_config.field_weakening_status != motorcontrol_config.field_weakening_status)
+                {
+                    motorcontrol_config.field_weakening_status=motion_ctrl_config.field_weakening_status;
                     i_torque_control.set_config(motorcontrol_config);
                 }
                 break;

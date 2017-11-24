@@ -131,6 +131,11 @@ typedef struct {
     int torque_kp;                    /**< Parameter for torque controller P-constant */
     int torque_ki;                    /**< Parameter for torque controller I-constant */
     int torque_kd;                    /**< Parameter for torque controller D-constant */
+    // field weakening members:
+    int field_weakening_status;            /**< field_weakening 1-> enabled, 0-> disabled */
+    int field_weakening_percentage;        /**< field_weakening percentage. This parameter changes between 0 and 100, and represents the reduction percentage of rotor magnetic field */
+    int field_weakening_starting_range;    /**< speed in which field weakening will start (in rpm) */
+    int field_weakening_ending_range;      /**< speed in which field weakening will end (in rpm) */
     float position_kp;                    /**< Parameter for position controller P-constant */
     float position_ki;                    /**< Parameter for position controller I-constant */
     float position_kd;                    /**< Parameter for position controller D-constant */
