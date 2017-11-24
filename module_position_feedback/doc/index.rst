@@ -31,8 +31,8 @@ The mode is set using the ``sensor_function`` parameter of the config structure.
 
 It is possible to switch the sensor service type at runtime. You need fist to update the config structure to set the ``sensor_type`` that you want. Then you call the ``exit()`` interface which will restart the Position Feedback Service with the new sensor service.
 
-This Service should always run over an **IFM Tile** so it can access the ports to
-your SOMANET IFM device.
+This Service should always run over an **IF2 Tile** so it can access the ports to
+your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -71,15 +71,15 @@ How to use
 
     The service configuration contains generic sensor parameters and also structures for sensor specific parameters.
     You need to fill up all the parameters for the sensor you want to use.
-    You also need to fill up all the generic parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+    You also need to fill up all the generic parameters especially ``tile_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
     As the service supports two sensors there is two configurations structures. The sensor type is selected with the ``sensor_type`` parameter.
 
 7. At whichever other core, now you can perform calls to the Position Feedback Service through the interfaces connected to it. Or if it is enabled you can read the position using the shared memory.
 
     .. code-block:: c
 
-        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
-        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C2X device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET Drive module 
                                             //(select your board support files according to your device)
                                         
         // 2. Include the Position Feedback Service header
@@ -119,7 +119,7 @@ How to use
                     position_feedback_config.polarity    = SENSOR_1_POLARITY;
                     position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
                     position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                    position_feedback_config.tile_usec   = IF2_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                     position_feedback_config.offset      = HOME_OFFSET;
                     position_feedback_config.sensor_function = SENSOR_1_FUNCTION;

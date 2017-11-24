@@ -175,7 +175,7 @@ void adc_ad7265(
         interface ADCInterface server iADC[2],
         AD7265Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
-        interface WatchdogInterface client ?i_watchdog, int operational_mode, int ifm_tile_usec)
+        interface WatchdogInterface client ?i_watchdog, int operational_mode, int tile_usec)
 {
     timer t;
     unsigned int time;

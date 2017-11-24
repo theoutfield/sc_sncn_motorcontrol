@@ -13,7 +13,7 @@ This module provides a Service that will read and process the data coming from a
 This service can run independently but is meant to be used by the :ref:`Position Feedback Module <module_position_feedback>` that is why it uses the same communication interface.
 
 The Service should always run over an **IF2 tile** so it can access the ports to
-your SOMANET IFM device.
+your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -54,15 +54,15 @@ How to use
 6. At your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration.
 
      The service uses the same configuration structure as the :ref:`Position Feedback Module <module_position_feedback>`.
-     You need to fill up all the generic sensor parameters especially ``ifm_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
+     You need to fill up all the generic sensor parameters especially ``tile_usec``, ``resolution``, ``velocity_compute_period`` and ``sensor_function``.
      And you need to fill up sensor specific parameters depending on the sensor you want to use (BiSS, REM 14, REM 16MT).
 
 7. At whichever other core, now you can perform calls to the Encoder Service through the interfaces connected to it.
 
     .. code-block:: c
 
-         #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
-        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+        #include <CoreC2X.bsp>              //Board Support file for SOMANET Core C2X device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET Drive module 
                                             //(select your board support files according to your device)
                                         
         // 2. Include the Hall Service header
@@ -103,7 +103,7 @@ How to use
                         position_feedback_config.polarity    = NORMAL_POLARITY;
                         position_feedback_config.velocity_compute_period = BISS_SENSOR_VELOCITY_COMPUTE_PERIOD;
                         position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                        position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                        position_feedback_config.tile_usec   = IF2_TILE_USEC;
                         position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                         position_feedback_config.offset      = 0;
                         position_feedback_config.sensor_function = SENSOR_FUNCTION_COMMUTATION_AND_MOTION_CONTROL;

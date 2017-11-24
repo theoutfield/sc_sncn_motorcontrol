@@ -49,7 +49,7 @@ int main(void)
     par
     {
         /***************************************************
-         * IFM TILE
+         * IF2 TILE
          ***************************************************/
         on tile[IF2_TILE]: par {
             /* Test QEI Sensor Client */
@@ -64,7 +64,7 @@ int main(void)
                 position_feedback_config.sensor_type = QEI_SENSOR;
                 position_feedback_config.polarity    = SENSOR_POLARITY_NORMAL;
                 position_feedback_config.resolution  = QEI_SENSOR_RESOLUTION;
-                position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                position_feedback_config.tile_usec   = IF2_TILE_USEC;
                 position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config.offset      = HOME_OFFSET;
                 position_feedback_config.velocity_compute_period = QEI_SENSOR_VELOCITY_COMPUTE_PERIOD;

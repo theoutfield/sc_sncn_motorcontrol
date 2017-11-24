@@ -14,8 +14,8 @@ BiSS is an open source digital interface for sensors and actuators. BiSS is hard
 
 Those functions are used in :ref:`Serial Encoder Module <module_serial_encoder>` itself used by :ref:`Position Feedback Module <module_position_feedback>` to create a service for reading a BiSS or SSI encoders.
 
-The BiSS functions should always run over an **IFM Tile** so it can access the ports to
-your SOMANET IFM device.
+The BiSS functions should always run over an **IF2 Tile** so it can access the ports to
+your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -53,8 +53,8 @@ How to use
 5. At your IF2 tile, You can use the functions to read BiSS data and process it into position data.
     .. code-block:: c
 
-        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
-        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
+        #include <CoreC2X.bsp>          //Board Support file for SOMANET Core C2X device
+        #include <Drive1000-rev-c4.bsp> //Board Support file for SOMANET Drive module
                                         //(select your board support files according to your device)
 
         // 2. Include the BiSS Service header **biss_service.h** in your app.
@@ -73,7 +73,7 @@ How to use
                     // 4. Fill up the BiSS configuration structure.                 
                     PositionFeedbackConfig position_feedback_config;
                     position_feedback_config.sensor_type = BISS_SENSOR; // or SSI_SENSOR for SSI
-                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                    position_feedback_config.tile_usec   = IF2_TILE_USEC;
                     position_feedback_config.biss_config.multiturn_resolution = BISS_MULTITURN_RESOLUTION;
                     position_feedback_config.biss_config.singleturn_resolution = BISS_SINGLETURN_RESOLUTION;
                     position_feedback_config.biss_config.filling_bits = BISS_FILLING_BITS;

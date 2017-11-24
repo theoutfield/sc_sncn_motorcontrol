@@ -158,7 +158,7 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
     hv.hall_filter_buffer[2] = 0;
 
     // clock frequency of defined timers in hall section
-    hv.hall_f_clock = (position_feedback_config.ifm_usec*1000000); //1 second in ticks
+    hv.hall_f_clock = (position_feedback_config.tile_usec*1000000); //1 second in ticks
     // motor pole pairs
     hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (position_feedback_config.pole_pairs*6)) * 60 ;
 
@@ -210,10 +210,10 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 sensor_error = SENSOR_NO_ERROR;
                 last_sensor_error = SENSOR_NO_ERROR;
-                UsecType ifm_usec = position_feedback_config.ifm_usec;
+                UsecType tile_usec = position_feedback_config.tile_usec;
                 position_feedback_config = in_config;
                 singleturn_resolution = (1 << 12) * position_feedback_config.pole_pairs;
-                position_feedback_config.ifm_usec = ifm_usec;
+                position_feedback_config.tile_usec = tile_usec;
                 hv.hall_transition_period_at_1rpm = (hv.hall_f_clock / (position_feedback_config.pole_pairs*6)) * 60 ;
                 write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
 
@@ -241,7 +241,7 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
                 gpio_write(gpio_ports, position_feedback_config, gpio_number, in_value);
                 break;
 
-        case tx when timerafter(time1+(position_feedback_config.ifm_usec*10)) :> void: //10 usec
+        case tx when timerafter(time1+(position_feedback_config.tile_usec*10)) :> void: //10 usec
 
                 if(++hall_last_state_period  > HALL_TRANSITION_PERIOD_MAX)  hall_last_state_period=HALL_TRANSITION_PERIOD_MAX;
                 if(++hall_transition_timeout > HALL_PERIOD_MAX)             hall_transition_timeout=HALL_PERIOD_MAX;
@@ -430,7 +430,7 @@ void hall_service(port qei_hall_port, port * (&?gpio_ports)[4], PositionFeedback
                 singleturn = (singleturn * 16) / position_feedback_config.pole_pairs; // singleturn = (singleturn * 2**16) / (2**12 * pole_pairs)
 
                 tx :> time1;
-                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn, speed_out, angle_out, hall_state_new, 0, sensor_error, last_sensor_error, time1/position_feedback_config.ifm_usec);
+                write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, count + position_feedback_config.offset, singleturn, speed_out, angle_out, hall_state_new, 0, sensor_error, last_sensor_error, time1/position_feedback_config.tile_usec);
 
                 //gpio
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
