@@ -86,8 +86,9 @@ typedef enum {
  * @brief Type for motors.
  */
 typedef enum {
-    BDC_MOTOR  = 10, /**< Brushed DC Motor. */
-    BLDC_MOTOR = 11  /**< Brush-less DC Motor. */
+    BDC_MOTOR  = 10,        /**< Brushed DC Motor. */
+    BLDC_MOTOR = 11,        /**< Default setting for BLDC drives.*/
+    SPM_BLDC_MOTOR = 12     /**< Surface Mounted Brushless DC Motor. Only use this setting if it is mentioned in the datasheet of your motor */
 } MotorType;
 
 /**
@@ -163,6 +164,10 @@ typedef struct {
     int max_current;                       /**< maximum stator current*/
     int rated_current;                     /**< rated motor phase current*/
     int rated_torque;                      /**< rated motor torque*/
+    int field_weakening_status;            /**< field_weakening 1-> enabled, 0-> disabled */
+    int field_weakening_percentage;        /**< field_weakening percentage. This parameter changes between 0 and 100, and represents the reduction percentage of rotor magnetic field */
+    int field_weakening_starting_range;    /**< speed in which field weakening will start (in rpm) */
+    int field_weakening_ending_range;      /**< speed in which field weakening will end (in rpm) */
     int commutation_angle_offset;          /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
     int torque_constant;                   /**< motor torque constant*/
     int torque_P_gain;                     /**< proportional constant in torque controller*/
@@ -266,6 +271,7 @@ typedef struct
     int position_cmd;
     int velocity_cmd;
     int torque_cmd;
+    int field_cmd;
     int offset_torque;
     unsigned int gpio_output;
 }DownstreamControlData;
