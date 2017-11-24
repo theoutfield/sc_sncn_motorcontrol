@@ -8,6 +8,7 @@
 
 #include <motor_control_interfaces.h>
 #include <advanced_motor_control.h>
+#include <i2c.h>
 
 /**
  * @brief Denominator for PID contants. The values set by the user for such constants will be divided by this value (10000 by default).
@@ -188,11 +189,24 @@ typedef struct {
 } MotionControlConfig;
 
 /**
+ * @brief Structure definition for timestamp
+ */
+typedef struct {
+    uint8_t mSec;
+    uint8_t sec;
+    uint8_t min;
+    uint8_t hour;
+    uint8_t day;
+    uint8_t month;
+    uint16_t year;
+} Timestamp_t;
+
+/**
  * @brief Structure definition for one error item
  */
 typedef struct {
     unsigned int index;
-    unsigned int timestamp;
+    Timestamp_t timestamp;
     unsigned int err_code;
     ErrType err_type;
 } ErrItem_t;
@@ -422,4 +436,5 @@ void enable_motorcontrol(MotionControlConfig &motion_ctrl_config, client interfa
 void motion_control_service(MotionControlConfig &pos_velocity_control_config,
                     interface TorqueControlInterface client i_torque_control,
                     interface MotionControlInterface server i_motion_control[3],
-                    client interface UpdateBrake i_update_brake);
+                    client interface UpdateBrake i_update_brake,
+                    client interface i2c_master_if i2c);

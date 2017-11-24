@@ -301,6 +301,7 @@ void adc_ad7265(
             }
 
             V_dc_out           = OUT_A[adc_ports.ad7265_channel_index.voltage_dc];
+            I_dc_out           = OUT_A[adc_ports.ad7265_channel_index.current_dc];
             Temperature_out    = OUT_A[adc_ports.ad7265_channel_index.temperature];
             if(operational_mode==0)
             {

@@ -63,17 +63,17 @@ How to use
 
     .. code-block:: c
 
-        #include <CORE_C22-rev-a.bsp>   //Board Support file for SOMANET Core C22 device
-        #include <IFM_DC100-rev-b.bsp>  //Board Support file for SOMANET IFM DC100 device
-                                        //(select your board support files according to your device)
+        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+                                            //(select your board support files according to your device)
                                         
         // 2. Include the Hall Service header
         #include <qei_service.h>
        
         // 3. Instantiate the ports needed for the sensor.
-        QEIHallPort qei_hall_port_1 = SOMANET_DRIVE_HALL_PORTS;
-        QEIHallPort qei_hall_port_2 = SOMANET_DRIVE_QEI_PORTS;
-        HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_QEI_PORT_INPUT_MODE_SELECTION;
+        HallEncSelectPort hall_enc_select_port = SOMANET_DRIVE_ENCODER_PORTS_INPUT_MODE_SELECTION;
+		port ? qei_hall_port_1 = SOMANET_DRIVE_ENCODER_1_PORT;
+		port ? qei_hall_port_2 = SOMANET_DRIVE_ENCODER_2_PORT;
 
 
         int main(void)

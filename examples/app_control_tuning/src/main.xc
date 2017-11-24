@@ -8,6 +8,7 @@
  * @author Synapticon GmbH <support@synapticon.com>
  */
 
+#include <i2c.h>
 #include <pwm_server.h>
 #include <adc_service.h>
 #include <user_config.h>
@@ -31,6 +32,8 @@ port ?gpio_port_0 = SOMANET_DRIVE_GPIO_D0;
 port ?gpio_port_1 = SOMANET_DRIVE_GPIO_D1;
 port ?gpio_port_2 = SOMANET_DRIVE_GPIO_D2;
 port ?gpio_port_3 = SOMANET_DRIVE_GPIO_D3;
+port i2c_sda = RTC_PORT_I2C_SDA;
+port i2c_scl = RTC_PORT_I2C_SCL;
 
 int main(void) {
 
@@ -44,6 +47,7 @@ int main(void) {
     interface PositionFeedbackInterface i_position_feedback_1[3];
     interface PositionFeedbackInterface i_position_feedback_2[3];
     interface shared_memory_interface i_shared_memory[3];
+    interface i2c_master_if i2c[1];
 
     par
     {
@@ -55,6 +59,10 @@ int main(void) {
                 /* Waiting for a user input blocks other tasks on the same tile from execution. */
                 {
                     control_tuning_console(i_motion_control[0], i_position_feedback_1[0], i_position_feedback_2[0]);
+                }
+
+                {
+                    i2c_master(i2c, 1, i2c_scl, i2c_sda, 10);
                 }
             }
         }
@@ -253,7 +261,7 @@ int main(void) {
                     motion_ctrl_config.pull_brake_time =                      PULL_BRAKE_TIME;
                     motion_ctrl_config.hold_brake_voltage =                   HOLD_BRAKE_VOLTAGE;
 
-                    motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake);
+                    motion_control_service(motion_ctrl_config, i_torque_control[0], i_motion_control, i_update_brake, i2c[0]);
                 }
 
             }
