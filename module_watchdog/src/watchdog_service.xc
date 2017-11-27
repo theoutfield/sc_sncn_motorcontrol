@@ -295,9 +295,11 @@ void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int drive_m
                 watchdog_ports.p_shared_enable_tick_led <: output;
                 break;
             }
-        } else if (times >= ((fault*2) + 20)) { //resume blinking after 20 periods
+            times++;
+        } else if (times >= (20-(fault*2))) {   //resume blinking after 20 periods
             times = 0;
+        } else {
+            times++;
         }
-        times++;
     }
 }
