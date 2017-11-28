@@ -122,22 +122,19 @@
                         wd_enabled = 0;
                         break;
                     case DC500:
-                        cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
-                        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-                        wd_enabled = 0;
-                        break;
                     case DC1KD1:
-                        wd_enabled = 0;
-                        cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
+                        cpld_out_state &= 0b0111;//turn orange LED off
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
+                        wd_enabled = 0;
                         break;
                     case DC1K_DC5K://[ LED | Motor_En | WD_Tick | WD_En ]
-                        led_motor_on_wdtick_wden_buffer &= 0b1000;
+                        led_motor_on_wdtick_wden_buffer &= 0b0111; //turn LED off
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                         wd_enabled = 0;
                         break;
                 }
-
+                times = 0;
+                LED_counter = 0;
                 fault=fault_id;
                 break;
 
@@ -236,7 +233,6 @@
                 LED_counter = 0;
                 fault=NO_FAULT;
                 fault_counter=0;
-                times = 0;
 
                 switch(drive_module_type){
                     case DC100_DC300://ToDo: this needs to be tested!
@@ -278,7 +274,8 @@
 
 void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int drive_module_type, unsigned char &output, unsigned &output_cpld, unsigned int &times, unsigned int &delay_counter) {
     if ((delay_counter % period) == 0) {
-        if (times < (fault*2)) {                //blinking (fault*2) times
+        times++;
+        if (times <= (fault*2)) {               //blinking (fault*2) times
             switch(drive_module_type){
             case DC100_DC300://ToDo: to be tested
                 output |= 0b1100;
@@ -295,11 +292,8 @@ void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int drive_m
                 watchdog_ports.p_shared_enable_tick_led <: output;
                 break;
             }
-            times++;
-        } else if (times >= (20-(fault*2))) {   //resume blinking after 20 periods
+        } else if (times > (20-(fault*2))) {    //resume blinking after 20 periods
             times = 0;
-        } else {
-            times++;
         }
     }
 }
