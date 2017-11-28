@@ -1956,7 +1956,11 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         torque_enable_flag = 0;
                         position_enable_flag = 0;
                         velocity_enable_flag = 0;
+                        //i_torque_control.set_config() updates "motorcontorl_config" in torque_control_service.
+                        //but the new values in "motorcontrol_config" will be implemented almost 200 ms after
+                        //i_torque_control.set_torque_control_disabled() is called.
                         i_torque_control.set_config(in_motorcontrol_config);
+                        i_torque_control.set_torque_control_disabled();
                         break;
 
                 case i_motion_control[int i].set_brake_status(int in_brake_status):
