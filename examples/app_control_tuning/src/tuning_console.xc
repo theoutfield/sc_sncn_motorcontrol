@@ -1090,10 +1090,13 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 {
                 //set offset
                 case 's':
+                    i_motion_control.disable();
+                    brake_flag = 0;
+                    printf("torque ctrl disabled (before setting commutation offset).\n");
+                    delay_ticks(500*1000*tile_usec);
                     motorcontrol_config.commutation_angle_offset = (int)value;
                     i_motion_control.set_motorcontrol_config(motorcontrol_config);
                     printf("set offset to %d\n", motorcontrol_config.commutation_angle_offset);
-                    brake_flag = 0;
                     break;
                 //set percent offset torque
                 case 'p':
