@@ -1,5 +1,5 @@
 /**
- * @file motor_config_RobotDrive_ILM_50x08.h
+ * @file motor_config_RobotDrive_ILM_25x08.h
  * @brief Motor Control config file (define your motor specifications here)
  * @author Synapticon GmbH <support@synapticon.com>
  */
@@ -18,7 +18,7 @@
 
 // OTHER PARAMETERS (do not change if not having access to the following parameter values)
 #define RATED_POWER             60     // rated power [W]
-#define PEAK_SPEED              9000    // maximum motor speed [rpm]
+#define PEAK_SPEED              12000    // maximum motor speed [rpm]
 #define MOTOR_PHASE_RESISTANCE  748000  // motor phase resistance [micro-ohm]
 #define MOTOR_PHASE_INDUCTANCE  285     // motor phase inductance [micro-Henry]
 
