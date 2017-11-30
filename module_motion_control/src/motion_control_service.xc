@@ -828,6 +828,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                 time_free = time_start - time_end;
 
                 upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
+                upstream_control_data.gpio[2] = motion_ctrl_config.position_kp;
+                upstream_control_data.gpio[3] = motion_ctrl_config.velocity_kp;
 
 
                 if (motion_ctrl_config.enable_compensation_recording)
