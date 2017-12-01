@@ -93,6 +93,10 @@
 //// COMMUTATION ANGLE OFFSET [0:4095]
 #define COMMUTATION_ANGLE_OFFSET       0
 
+// (optional) difference between measured and real electrical angle at 1000 rpm in software.
+// Please notice that [0-360] degree range is mapped to [0-4095] range inside the software. Default value is 0
+#define OFFSET_COMPENSATION_CONSTANT       0
+
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
 #define HALL_STATE_1_ANGLE     0
@@ -207,7 +211,7 @@
 #define FIELD_WEAKENING_STATUS          0   // 1 => "field weakening is enabled", 0 => "field weakening is disabled"
 #define FIELD_WEAKENING_STARTING_RANGE  0   // velocity in which field weakening strategy will be started (in rpm)
 #define FIELD_WEAKENING_ENDING_RANGE    0   // velocity in which field weakening strategy will be ended   (in rpm)
-#define FIELD_WEAKENING_PERCENTAGE      10  // This parameter determines how much the rotor magentic field will be reduced. range: 0-100
+#define FIELD_WEAKENING_PERCENTAGE      0   // This parameter determines how much the rotor magentic field will be reduced. range: 0-100
                                             // Warning: depending on motor type, values more than 30
                                             //          can lead to instability of torque controllers.
 
