@@ -675,6 +675,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     motion_ctrl_config.field_weakening_starting_range  = motorcontrol_config.field_weakening_starting_range;
     motion_ctrl_config.field_weakening_ending_range    = motorcontrol_config.field_weakening_ending_range;
     motion_ctrl_config.field_weakening_percentage      = motorcontrol_config.field_weakening_percentage;
+    motion_ctrl_config.offset_compensation_constant    = motorcontrol_config.offset_compensation_constant;
 
     int current_ratio = motorcontrol_config.current_ratio;
 
