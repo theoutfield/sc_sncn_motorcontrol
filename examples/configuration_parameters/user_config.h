@@ -93,6 +93,10 @@
 //// COMMUTATION ANGLE OFFSET [0:4095]
 #define COMMUTATION_ANGLE_OFFSET       0
 
+// (optional) difference between measured and real electrical angle at 1000 rpm in software.
+// Please notice that [0-360] degree range is mapped to [0-4095] range inside the software. Default value is 0
+#define OFFSET_COMPENSATION_CONSTANT     0
+
 // (OPTIONAL) MOTOR ANGLE IN EACH HALL STATE. IN CASE HALL SENSOR IS USED FIND THE
 // FOLLOWING VALUES BY RUNNING OFFSET DETECTION FUNCTION, OR SET THEM ALL TO 0
 #define HALL_STATE_1_ANGLE     0
