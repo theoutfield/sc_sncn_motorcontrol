@@ -35,7 +35,7 @@
  */
 #define AD7265_DIFF_A1A2_B1B2  0b0000
 #define AD7265_DIFF_A3A4_B3B4  0b0010
-#define AD7265_DIFF_A5A6_B5B6  0b0101
+#define AD7265_DIFF_A5A6_B5B6  0b0100
 
 /**
  * @brief Define proper configuration register values of AD7949 chip in UNIPOLAR (SINGLE_ENDED) sampling mode

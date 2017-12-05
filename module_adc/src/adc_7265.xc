@@ -197,8 +197,8 @@ void adc_ad7265(
     int data_updated=0;
 
     int j=0;
-    unsigned short channel_config[8] = {AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3, AD7265_SGL_A4_B4, AD7265_SGL_A5_B5, AD7265_SGL_A6_B6,
-                                        AD7265_DIFF_A3A4_B3B4, AD7265_DIFF_A5A6_B5B6};
+    unsigned short channel_config[9] = {AD7265_SGL_A1_B1, AD7265_SGL_A2_B2, AD7265_SGL_A3_B3, AD7265_SGL_A4_B4, AD7265_SGL_A5_B5, AD7265_SGL_A6_B6,
+                                        AD7265_DIFF_A1A2_B1B2, AD7265_DIFF_A3A4_B3B4, AD7265_DIFF_A5A6_B5B6};
     int OUT_A[20];
 
     ////proper task startup
@@ -214,6 +214,35 @@ void adc_ad7265(
         select
         {
         case iADC[int i].get_channel(unsigned short channel_in)-> {int output_a, int output_b}:
+
+                adc_ports.p4_mux <: channel_in;       //mux_config;
+
+                t :> time;
+                t when timerafter (time + 500) :> void; //5 us of wait
+
+                clearbuf( adc_ports.p32_data[0] );          //Clear the buffers used by the input ports.
+                clearbuf( adc_ports.p32_data[1] );
+                adc_ports.p1_ready <: 1 @ time_stamp;       // Switch ON input reads (and ADC conversion)
+                time_stamp += (ADC_TOTAL_BITS+2);           // Allows sample-bits to be read on buffered input ports
+                adc_ports.p1_ready @ time_stamp <: 0;       // Switch OFF input reads, (and ADC conversion)
+
+                sync( adc_ports.p1_ready );                 // Wait until port has completed any pending outputs
+
+                // Get data from port a
+                endin( adc_ports.p32_data[0] );             // End the previous input on this buffered port
+                adc_ports.p32_data[0] :> inp_val;           // Get new input
+                tmp_val = bitrev( inp_val );                // Reverse bit order. WARNING. Machine dependent
+                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+                tmp_val = (short)(tmp_val & ADC_MASK);      // Mask out active bits and convert to signed word
+                output_a = (int)tmp_val;
+
+                // Get data from port b
+                endin( adc_ports.p32_data[1] );             // End the previous input on this buffered port
+                adc_ports.p32_data[1] :> inp_val;           // Get new input
+                tmp_val = bitrev( inp_val );                // Reverse bit order. WARNING. Machine dependent
+                tmp_val = tmp_val >> (SHIFTING_BITS+1);
+                tmp_val = (short)(tmp_val & ADC_MASK);      // Mask out active bits and convert to signed word
+                output_b = (int)tmp_val;
                 break;
 
         case iADC[int i].status() -> {int status}:
@@ -264,6 +293,7 @@ void adc_ad7265(
 
             phaseB_out = current_sensor_config.sign_phase_b * (out_a - 2048);
             phaseC_out = current_sensor_config.sign_phase_c * (out_b - 2048);
+
             if(current_sensor_config.sign_phase_a != 0)//if phase a is measured instead of phase C
                 phaseC_out = current_sensor_config.sign_phase_a * (phaseB_out+phaseC_out);
 
@@ -303,6 +333,7 @@ void adc_ad7265(
             V_dc_out           = OUT_A[adc_ports.ad7265_channel_index.voltage_dc];
             I_dc_out           = OUT_A[adc_ports.ad7265_channel_index.current_dc];
             Temperature_out    = OUT_A[adc_ports.ad7265_channel_index.temperature];
+
             if(operational_mode==0)
             {
                 analogue_input_a_1 = OUT_A[adc_ports.ad7265_channel_index.analogue_input_1];
