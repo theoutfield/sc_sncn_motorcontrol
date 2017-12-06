@@ -10,15 +10,15 @@
 
 // IMPORTANT PARAMETERS (=> lead to mulfunction or damage if set wrong)
 #define MOTOR_POLE_PAIRS        2       //number of motor pole-pairs
-#define MOTOR_TORQUE_CONSTANT   100000  //Torque constant [micro-Nm/Amp-RMS]
-#define MOTOR_RATED_CURRENT           14500   //rated phase current [milli-Amp-RMS]
-#define MOTOR_MAXIMUM_TORQUE          3000    //maximum value of torque which can be produced by motor [milli-Nm]
+#define MOTOR_TORQUE_CONSTANT   63000  //Torque constant [micro-Nm/Amp-RMS]
+#define MOTOR_RATED_CURRENT           6670   //rated phase current [milli-Amp-RMS]
+#define MOTOR_MAXIMUM_TORQUE          1300    //maximum value of torque which can be produced by motor [milli-Nm]
 #define MOTOR_RATED_TORQUE            420     // rated motor torque [milli-Nm]
-#define MOTOR_MAX_SPEED               3000    // please update from the motor datasheet [rpm]
+#define MOTOR_MAX_SPEED               4000    // please update from the motor datasheet [rpm]
 
 // OTHER PARAMETERS (do not change if not having access to the following parameter values)
 #define RATED_POWER             176     // rated power [W]
-#define PEAK_SPEED              4000    // maximum motor speed [rpm]
+#define PEAK_SPEED              5300    // maximum motor speed [rpm]
 #define MOTOR_PHASE_RESISTANCE  350000  // motor phase resistance [micro-ohm]
 #define MOTOR_PHASE_INDUCTANCE  1000    // motor phase inductance [micro-Henry]
 
