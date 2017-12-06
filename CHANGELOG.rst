@@ -3,6 +3,8 @@ sc_sncn_motorcontrol Change Log
 
 3.2.1
 -----
+  * Fix bug in watchdog error LED blinking
+  * Add field weakening feature to torque_control_service
   * Remove reset of Incremental encoder multiturn position when passing the index pulse to prevent a jump when doing position/velocity control.
   * Cogging compensation algorithm compensates for a gravity effect 
 

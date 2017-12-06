@@ -158,6 +158,11 @@ int main(void) {
                 {
                     MotorcontrolConfig motorcontrol_config;
 
+                    motorcontrol_config.motor_type =  BLDC_MOTOR;
+                    motorcontrol_config.field_weakening_status= FIELD_WEAKENING_STATUS;
+                    motorcontrol_config.field_weakening_percentage = FIELD_WEAKENING_PERCENTAGE;
+                    motorcontrol_config.field_weakening_starting_range=FIELD_WEAKENING_STARTING_RANGE;
+                    motorcontrol_config.field_weakening_ending_range  =FIELD_WEAKENING_ENDING_RANGE;
                     motorcontrol_config.dc_bus_voltage =  DC_BUS_VOLTAGE;
                     motorcontrol_config.phases_inverted = MOTOR_PHASES_CONFIGURATION;
                     motorcontrol_config.torque_P_gain =  TORQUE_Kp;
@@ -199,7 +204,7 @@ int main(void) {
                     position_feedback_config.polarity    = SENSOR_1_POLARITY;
                     position_feedback_config.velocity_compute_period = SENSOR_1_VELOCITY_COMPUTE_PERIOD;
                     position_feedback_config.pole_pairs  = MOTOR_POLE_PAIRS;
-                    position_feedback_config.ifm_usec    = IF2_TILE_USEC;
+                    position_feedback_config.tile_usec   = IF2_TILE_USEC;
                     position_feedback_config.max_ticks   = SENSOR_MAX_TICKS;
                     position_feedback_config.offset      = HOME_OFFSET;
                     position_feedback_config.sensor_function = SENSOR_1_FUNCTION;

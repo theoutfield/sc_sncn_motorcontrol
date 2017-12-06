@@ -95,6 +95,15 @@ interface TorqueControlInterface
     void set_torque(int torque_sp);
 
     /**
+     * @brief Sets field target value.
+     *
+     * @param integer value field_sp
+     *
+     * @return void
+     */
+    void set_field(int field_sp);
+
+    /**
      * @brief   Sets MotorcontrolConfig parameters which are used by motor_control_service.
      *          Note that not all configuration parameters can be changed on runtime.
      *

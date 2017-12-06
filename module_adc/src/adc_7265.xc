@@ -175,7 +175,7 @@ void adc_ad7265(
         interface ADCInterface server iADC[2],
         AD7265Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
-        interface WatchdogInterface client ?i_watchdog, int operational_mode, int ifm_tile_usec)
+        interface WatchdogInterface client ?i_watchdog, int operational_mode, int tile_usec)
 {
     timer t;
     unsigned int time;
@@ -301,6 +301,7 @@ void adc_ad7265(
             }
 
             V_dc_out           = OUT_A[adc_ports.ad7265_channel_index.voltage_dc];
+            I_dc_out           = OUT_A[adc_ports.ad7265_channel_index.current_dc];
             Temperature_out    = OUT_A[adc_ports.ad7265_channel_index.temperature];
             if(operational_mode==0)
             {

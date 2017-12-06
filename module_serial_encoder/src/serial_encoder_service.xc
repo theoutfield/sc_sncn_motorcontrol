@@ -36,8 +36,8 @@ void read_position(port * biss_clock_port, port * biss_data_port, SPIPorts * spi
     switch(sensor_type)
     {
     case REM_16MT_SENSOR:
-        t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
-        { state.status, state.count, state.position, state.angle, state.timestamp } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
+        t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.tile_usec) :> void;
+        { state.status, state.count, state.position, state.angle, state.timestamp } = rem_16mt_read(*spi_ports, position_feedback_config.tile_usec);
         t :> last_read;
 #ifdef XSCOPE_REM_16MT
             xscope_int(POSITION_RAW, state.angle);
@@ -45,7 +45,7 @@ void read_position(port * biss_clock_port, port * biss_data_port, SPIPorts * spi
         state.angle = (position_feedback_config.pole_pairs * (state.angle >> 4) ) & 4095;
         break;
     case REM_14_SENSOR:
-        { state.position,state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
+        { state.position,state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.tile_usec);
         t :> last_read;
         multiturn(state.count, state.last_position, state.position, position_feedback_config.resolution);
         state.angle = (position_feedback_config.pole_pairs * (state.position >> 2) ) & 4095;
@@ -95,15 +95,15 @@ int init_sensor(port * biss_clock_port, port * biss_data_port, SPIPorts * spi_po
         init_spi_ports(*spi_ports);
         pos_state.status = rem_16mt_init(*spi_ports, position_feedback_config);
         if (pos_state.status != SENSOR_NO_ERROR) { //wait 200 ms and retry init
-            delay_ticks(200000*position_feedback_config.ifm_usec);
+            delay_ticks(200000*position_feedback_config.tile_usec);
             pos_state.status = rem_16mt_init(*spi_ports, position_feedback_config);
         }
-        read_period = position_feedback_config.ifm_usec*REM_16MT_POLLING_TIME;
+        read_period = position_feedback_config.tile_usec*REM_16MT_POLLING_TIME;
         break;
     case REM_14_SENSOR:
         init_spi_ports(*spi_ports);
         pos_state.status = initRotarySensor(*spi_ports,  position_feedback_config);
-        read_period = position_feedback_config.ifm_usec*REM_14_POLLING_TIME;
+        read_period = position_feedback_config.tile_usec*REM_14_POLLING_TIME;
         break;
     case BISS_SENSOR:
     case SSI_SENSOR:
@@ -147,7 +147,7 @@ int init_sensor(port * biss_clock_port, port * biss_data_port, SPIPorts * spi_po
         break;
     case REM_16MT_SENSOR:
         if (pos_state.status != SENSOR_NO_ERROR) {
-            delay_ticks(200000*position_feedback_config.ifm_usec);
+            delay_ticks(200000*position_feedback_config.tile_usec);
             pos_state.status = rem_16mt_init(*spi_ports, position_feedback_config);
             if (pos_state.status != SENSOR_NO_ERROR) {
                 printstr("Error with REM_16MT sensor initialization");
@@ -240,9 +240,9 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
                 last_sensor_error = SENSOR_NO_ERROR;
                 sensor_error_count = 0;
-                UsecType ifm_usec = position_feedback_config.ifm_usec;
+                UsecType tile_usec = position_feedback_config.tile_usec;
                 position_feedback_config = in_config;
-                position_feedback_config.ifm_usec = ifm_usec;
+                position_feedback_config.tile_usec = tile_usec;
                 read_period = init_sensor(biss_clock_port, biss_data_port, spi_ports, biss_clock_low, biss_clock_high, position_feedback_config, sensor_type, pos_state, t, last_read);
                 crossover = position_feedback_config.resolution - position_feedback_config.resolution/10;
                 write_hall_state_angle_shared_memory(position_feedback_config, i_shared_memory);
@@ -273,11 +273,11 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
                         multiturn = (new_count / position_feedback_config.resolution);
                         singleturn = new_count % position_feedback_config.resolution;
                     }
-                    t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
-                    rem_16mt_write(*spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + singleturn, 32, position_feedback_config.ifm_usec);
+                    t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.tile_usec) :> void;
+                    rem_16mt_write(*spi_ports, REM_16MT_CONF_PRESET, (multiturn << 16) + singleturn, 32, position_feedback_config.tile_usec);
                     break;
                 case REM_14_SENSOR:
-                    { pos_state.last_position, pos_state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.ifm_usec);
+                    { pos_state.last_position, pos_state.status } = readRotarySensorAngleWithoutCompensation(*spi_ports, position_feedback_config.tile_usec);
                     break;
                 case BISS_SENSOR:
                 case SSI_SENSOR:
@@ -292,9 +292,9 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
         case i_position_feedback[int i].send_command(int opcode, int data, int data_bits) -> unsigned int status:
                 if (sensor_type == REM_16MT_SENSOR)
                 {
-                    t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.ifm_usec) :> void;
-                    rem_16mt_write(*spi_ports, opcode, data, data_bits, position_feedback_config.ifm_usec);
-                    { status, void, void, void, void } = rem_16mt_read(*spi_ports, position_feedback_config.ifm_usec);
+                    t when timerafter(last_read + REM_16MT_TIMEOUT*position_feedback_config.tile_usec) :> void;
+                    rem_16mt_write(*spi_ports, opcode, data, data_bits, position_feedback_config.tile_usec);
+                    { status, void, void, void, void } = rem_16mt_read(*spi_ports, position_feedback_config.tile_usec);
                     t :> last_read;
                 }
                 break;
@@ -324,11 +324,11 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
                 timediff_long += timediff;
                 old_timestamp = pos_state.timestamp;
             } else {
-                timediff_long = (last_read-last_velocity_read)/position_feedback_config.ifm_usec;
+                timediff_long = (last_read-last_velocity_read)/position_feedback_config.tile_usec;
             }
 
             //compute velocity every position_feedback_config.velocity_compute_period microseconds
-            if (timeafter(last_read, last_velocity_read+position_feedback_config.ifm_usec*position_feedback_config.velocity_compute_period)) {
+            if (timeafter(last_read, last_velocity_read+position_feedback_config.tile_usec*position_feedback_config.velocity_compute_period)) {
                 int difference = pos_state.count - old_count;
                 old_count = pos_state.count;
 
@@ -367,7 +367,7 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
                     sensor_error_count++;
                     //reset sensor error count
                     if (timeafter(last_read, sensor_error_check_time)) {
-                        sensor_error_check_time = last_read + 10000*position_feedback_config.ifm_usec;//10 msec
+                        sensor_error_check_time = last_read + 10000*position_feedback_config.tile_usec;//10 msec
                         sensor_error_count = 0;
                     }
                 } else {
@@ -395,7 +395,7 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
             }
 
             //send data to shared memory
-            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, singleturn, velocity, pos_state.angle, 0, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.ifm_usec);
+            write_shared_memory(i_shared_memory, position_feedback_config.sensor_function, pos_state.count + position_feedback_config.offset, singleturn, velocity, pos_state.angle, 0, 0, pos_state.status, last_sensor_error, last_read/position_feedback_config.tile_usec);
 
             //gpio
             gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
@@ -404,7 +404,7 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
             //compute next loop time
             if (sensor_type == BISS_SENSOR || sensor_type == SSI_SENSOR) {
                 //for BiSS we read just after the timeout is finished
-                next_read = last_read + (position_feedback_config.biss_config.timeout+2)*position_feedback_config.ifm_usec;
+                next_read = last_read + (position_feedback_config.biss_config.timeout+2)*position_feedback_config.tile_usec;
             } else {
                 //for others we read at a fixed frequency
                 next_read += read_period;
@@ -413,7 +413,7 @@ void serial_encoder_service(port * biss_clock_port, port * biss_data_port, SPIPo
             //to prevent blocking
             t :> end_time;
             if (timeafter(end_time, next_read)) {
-                next_read = end_time + position_feedback_config.ifm_usec;
+                next_read = end_time + position_feedback_config.tile_usec;
             }
             break;
         }

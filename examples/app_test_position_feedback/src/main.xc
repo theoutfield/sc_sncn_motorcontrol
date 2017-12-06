@@ -215,7 +215,7 @@ int main(void)
         on tile[APP_TILE]: position_feedback_commands(i_position_feedback_1[1], i_position_feedback_2[1]);
 
         /***************************************************
-         * IFM TILE
+         * IF2 TILE
          ***************************************************/
         on tile[IF2_TILE]: par {
             position_feedback_display(i_position_feedback_1[0], i_position_feedback_2[0], i_shared_memory[2]);
@@ -229,7 +229,7 @@ int main(void)
                 PositionFeedbackConfig position_feedback_config_1;
                 position_feedback_config_1.polarity    = SENSOR_POLARITY_NORMAL;
                 position_feedback_config_1.pole_pairs  = MOTOR_POLE_PAIRS;
-                position_feedback_config_1.ifm_usec    = IF2_TILE_USEC;
+                position_feedback_config_1.tile_usec   = IF2_TILE_USEC;
                 position_feedback_config_1.max_ticks   = SENSOR_MAX_TICKS;
                 position_feedback_config_1.offset      = HOME_OFFSET;
 

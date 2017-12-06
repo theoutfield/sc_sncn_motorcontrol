@@ -13,7 +13,7 @@ This module provides a Service that will read and process the data coming from t
 on your SOMANET device. Up to 2 clients could retrieve data from the Service
 through interfaces.
 
-The ADC Service should always run over an **IFM Tile** so it can access the ports of your SOMANET IFM device.
+The ADC Service should always run over an **IF2 Tile** so it can access the ports of your SOMANET Drive module.
 
 .. cssclass:: github
 
@@ -52,8 +52,8 @@ How to use
 
 .. code-block:: c
 
-        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C22 device 
-        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET IFM DC100 device 
+        #include <CoreC2X.bsp>   			//Board Support file for SOMANET Core C2X device 
+        #include <Drive1000-rev-c4.bsp>     //Board Support file for SOMANET Drive module 
                                             //(select your board support files according to your device)
 
         #include <adc_service.h> // 2

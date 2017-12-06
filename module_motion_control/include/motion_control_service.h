@@ -132,6 +132,11 @@ typedef struct {
     int torque_kp;                    /**< Parameter for torque controller P-constant */
     int torque_ki;                    /**< Parameter for torque controller I-constant */
     int torque_kd;                    /**< Parameter for torque controller D-constant */
+    // field weakening members:
+    int field_weakening_status;            /**< field_weakening 1-> enabled, 0-> disabled */
+    int field_weakening_percentage;        /**< field_weakening percentage. This parameter changes between 0 and 100, and represents the reduction percentage of rotor magnetic field */
+    int field_weakening_starting_range;    /**< speed in which field weakening will start (in rpm) */
+    int field_weakening_ending_range;      /**< speed in which field weakening will end (in rpm) */
     float position_kp;                    /**< Parameter for position controller P-constant */
     float position_ki;                    /**< Parameter for position controller I-constant */
     float position_kd;                    /**< Parameter for position controller D-constant */
@@ -387,7 +392,7 @@ void init_motion_control(interface MotionControlInterface client i_motion_contro
  *        and compute the corresponding duty cycles which are then sent to the pwm service.
  *
  * @param motion_ctrl_config config structure of the motion control
- * @param i_torque_control client interface to get the ifm tile frequency from the motorcontrol service.
+ * @param i_torque_control client interface to get the IF2 tile frequency from the motorcontrol service.
  * @param i_update_brake client enterface to the pwm service to send the brake configuration
  *
  */

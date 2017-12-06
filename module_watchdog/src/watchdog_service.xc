@@ -8,10 +8,10 @@
 #include <watchdog_service.h>
 
 [[combinable]]
- void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int ifm_tile_usec)
+ void watchdog_service(WatchdogPorts &watchdog_ports, interface WatchdogInterface server i_watchdog[2], int tile_usec)
 {
     unsigned int usec;
-    if(ifm_tile_usec==250)
+    if(tile_usec==250)
     {
         //Set freq to 250MHz (always needed for proper timing)
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
@@ -22,13 +22,13 @@
         usec = 100;
     }
 
-    int IFM_module_type = -1;
+    int drive_module_type = -1;
 
     unsigned int wd_half_period = 40 * usec;
 
     unsigned char led_motor_on_wdtick_wden_buffer = 0;
-    unsigned char   set_wd_en_mask = 0b0001;
-    unsigned char p_ifm_wdtick = 0b0000;
+    unsigned char set_wd_en_mask = 0b0001;
+    unsigned char wdtick_buffer = 0b0000;
     //CPLD
     unsigned cpld_out_state = 0x8;//set green LED off
     WatchdogError fault_monitor = WATCHDOG_NO_ERROR;
@@ -49,29 +49,29 @@
     t :> ts;
     t when timerafter (ts + (1000*100*10)) :> void;
 
-    //Do the IFM type identification only once
+    //Do the Drive type identification only once
     if(!isnull(watchdog_ports.p_shared_enable_tick_led)){//DC100, DC300, or DC1K
         if(!isnull(watchdog_ports.p_tick)){
-            IFM_module_type = DC100_DC300;
+            drive_module_type = DC100_DC300;
         } else {
-            IFM_module_type = DC1K_DC5K;
+            drive_module_type = DC1K_DC5K;
         }
     }
     else if(!isnull(watchdog_ports.p_cpld_shared)){//DC500
-        IFM_module_type = DC500;
+        drive_module_type = DC500;
         if (!isnull(watchdog_ports.p_cpld_fault_monitor)) {
-            IFM_module_type = DC1KD1;
+            drive_module_type = DC1KD1;
             wd_half_period = 80 * usec;
             cycles_reset = 25; //12.5 periods
         }
     }
     else if (!isnull(watchdog_ports.p_diag_enable)) { //DC30
-        IFM_module_type = DC30;
+        drive_module_type = DC30;
         cycles_reset = 500; // 20 ms
     }
 
     /* WD Initialization routine */
-    switch(IFM_module_type){
+    switch(drive_module_type){
         case DC100_DC300:
             //Enable WD
             led_motor_on_wdtick_wden_buffer |= set_wd_en_mask;
@@ -111,7 +111,7 @@
                 break;
 
         case i_watchdog[int i].protect(int fault_id):
-                switch(IFM_module_type){
+                switch(drive_module_type){
                     case DC100_DC300:
                         //Disable WD and set red LED on
                         led_motor_on_wdtick_wden_buffer &= 0b1100;
@@ -122,21 +122,19 @@
                         wd_enabled = 0;
                         break;
                     case DC500:
-                        cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
+                    case DC1KD1:
+                        cpld_out_state &= 0b0111;//turn orange LED off
                         watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
                         wd_enabled = 0;
                         break;
-                    case DC1KD1:
-                        cpld_out_state |= 0b1000;//set green LED off, on DC1K rev d1 turn orange LED on
-                        watchdog_ports.p_cpld_shared <: cpld_out_state & 0xf;
-                        break;
                     case DC1K_DC5K://[ LED | Motor_En | WD_Tick | WD_En ]
-                        led_motor_on_wdtick_wden_buffer &= 0b1000;
+                        led_motor_on_wdtick_wden_buffer &= 0b0111; //turn LED off
                         watchdog_ports.p_shared_enable_tick_led <: led_motor_on_wdtick_wden_buffer;
                         wd_enabled = 0;
                         break;
                 }
-
+                times = 0;
+                LED_counter = 0;
                 fault=fault_id;
                 break;
 
@@ -145,10 +143,10 @@
                 t :> ts;
                 if (wd_enabled == 1)
                 {
-                    switch(IFM_module_type){
+                    switch(drive_module_type){
                         case DC100_DC300:
-                            p_ifm_wdtick ^= 1;//toggle wd tick
-                            watchdog_ports.p_tick <: p_ifm_wdtick;
+                            wdtick_buffer ^= 1;//toggle wd tick
+                            watchdog_ports.p_tick <: wdtick_buffer;
 
                             //Reset WD after fault
                             if (WD_En_sent_flag<20)
@@ -159,8 +157,8 @@
                             }
                             break;
                         case DC30:
-                            p_ifm_wdtick ^= 1;//toggle wd tick
-                            watchdog_ports.p_tick <: p_ifm_wdtick;
+                            wdtick_buffer ^= 1;//toggle wd tick
+                            watchdog_ports.p_tick <: wdtick_buffer;
                             break;
                         case DC500:
                         case DC1KD1:
@@ -193,7 +191,7 @@
                 }
 
                 //read cpld fault monitor on DC1KD1
-                switch(IFM_module_type) {
+                switch(drive_module_type) {
                 case DC1KD1:
                     unsigned int tmp = 0;
                     watchdog_ports.p_cpld_fault_monitor :> tmp;
@@ -223,7 +221,7 @@
                 }
 
                 //showing the fault type by LED flashing (once, twice, ..., five times)
-                if(fault!=NO_FAULT) blink_red(fault, 5000, watchdog_ports, IFM_module_type, led_motor_on_wdtick_wden_buffer, cpld_out_state, times, LED_counter);
+                if(fault!=NO_FAULT) blink_red(fault, 5000, watchdog_ports, drive_module_type, led_motor_on_wdtick_wden_buffer, cpld_out_state, times, LED_counter);
 
                 LED_counter++;
 
@@ -236,7 +234,7 @@
                 fault=NO_FAULT;
                 fault_counter=0;
 
-                switch(IFM_module_type){
+                switch(drive_module_type){
                     case DC100_DC300://ToDo: this needs to be tested!
                         //reset WD_EN and LED
                         led_motor_on_wdtick_wden_buffer &= 0b0000;
@@ -264,7 +262,7 @@
                 }
 
                 wd_enabled = 1;
-                if (IFM_module_type != DC1KD1) {
+                if (drive_module_type != DC1KD1) {
                     t :> ts;
                     t when timerafter (ts + 100*usec  ) :> void;//100 us
                     t :> ts;
@@ -274,9 +272,11 @@
     }
 }
 
-void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_module_type, unsigned char &output, unsigned &output_cpld, unsigned int &times, unsigned int &delay_counter){
-    if ((delay_counter % period == 0) && times != (fault*2)){//blinking
-        switch(IFM_module_type){
+void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int drive_module_type, unsigned char &output, unsigned &output_cpld, unsigned int &times, unsigned int &delay_counter) {
+    if ((delay_counter % period) == 0) {
+        times++;
+        if (times <= (fault*2)) {               //blinking (fault*2) times
+            switch(drive_module_type){
             case DC100_DC300://ToDo: to be tested
                 output |= 0b1100;
                 output ^= (1 << 1);
@@ -292,9 +292,8 @@ void blink_red(int fault, int period, WatchdogPorts &watchdog_ports, int IFM_mod
                 watchdog_ports.p_shared_enable_tick_led <: output;
                 break;
             }
-        times++;
-    }
-    else if ((delay_counter % (period*20) == 0) && times == (fault*2)){//idling
-        times = 0;
+        } else if (times > (20-(fault*2))) {    //resume blinking after 20 periods
+            times = 0;
+        }
     }
 }

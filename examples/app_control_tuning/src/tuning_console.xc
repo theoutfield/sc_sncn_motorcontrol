@@ -477,9 +477,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
         //set torque commmand
         case 't':
-                downstream_control_data.offset_torque = 0;
-                downstream_control_data.torque_cmd = (int)value;
-                motion_ctrl_config = i_motion_control.get_motion_control_config();
+            motion_ctrl_config = i_motion_control.get_motion_control_config();
                 switch(mode_2)
                 {
                 //step command (forward and backward)
@@ -520,13 +518,67 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         i_motion_control.set_motion_control_config(motion_ctrl_config);
                         i_motion_control.update_control_data(downstream_control_data);
                         break;
+
+                case 'f':
+                        switch(mode_3)
+                        {
+
+                        case 'p'://percentage of field weakening (between 0 and 100) in pu.
+
+                            motion_ctrl_config.field_weakening_percentage=value;
+                            i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                            // check if motion_ctrl_config structure is set properly in motion_control_service:
+                            motion_ctrl_config = i_motion_control.get_motion_control_config();
+                            printf("field weakening percentage: %d \n", motion_ctrl_config.field_weakening_percentage);
+                            break;
+
+                        case 'v'://velocity settings for field weakening strategy
+
+                                switch(mode_4)
+                                {
+                                case 's'://starting velocity range for field weakening (in rpm)
+
+                                    motion_ctrl_config.field_weakening_starting_range=value;
+                                    i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                    // check if motion_ctrl_config structure is set properly in motion_control_service:
+                                    motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                    printf("field weakening starting range: %d \n", motion_ctrl_config.field_weakening_starting_range);
+                                    break;
+
+                                case 'e'://ending velocity range for field weakening (in rpm)
+
+                                    motion_ctrl_config.field_weakening_ending_range=value;
+                                    i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                                    // check if motion_ctrl_config structure is set properly in motion_control_service:
+                                    motion_ctrl_config = i_motion_control.get_motion_control_config();
+                                    printf("field weakening ending range: %d \n", motion_ctrl_config.field_weakening_ending_range);
+                                    break;
+
+                                }
+                            break;
+                        }
+
+                        // enable/disable field weakening depending on user command (tf1 -> enable, tf0 -> disable)
+                        if      (((int)value) == 0)     motion_ctrl_config.field_weakening_status=0;
+                        else if (((int)value) == 1)     motion_ctrl_config.field_weakening_status=1;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
+
+                        // check if motion_ctrl_config structure is set properly in motion_control_service:
+                        motion_ctrl_config = i_motion_control.get_motion_control_config();
+                        if      (motion_ctrl_config.field_weakening_status==0) printf("field weakening disabled. \n");
+                        else if (motion_ctrl_config.field_weakening_status==1) printf("field weakening enabled.  \n");
+
+                    break;
+
                 //direct command
                 default:
-                        motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        motion_ctrl_config.enable_profiler = 0;
-                        i_motion_control.set_motion_control_config(motion_ctrl_config);
                         downstream_control_data.offset_torque = 0;
                         downstream_control_data.torque_cmd = (int)value;
+                        motion_ctrl_config.enable_profiler = 0;
+                        i_motion_control.set_motion_control_config(motion_ctrl_config);
                         i_motion_control.update_control_data(downstream_control_data);
                         printf("set torque %d\n", downstream_control_data.torque_cmd);
                         break;
@@ -1038,10 +1090,13 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                 {
                 //set offset
                 case 's':
+                    i_motion_control.disable();
+                    brake_flag = 0;
+                    printf("torque ctrl disabled (before setting commutation offset).\n");
+                    delay_ticks(500*1000*tile_usec);
                     motorcontrol_config.commutation_angle_offset = (int)value;
                     i_motion_control.set_motorcontrol_config(motorcontrol_config);
                     printf("set offset to %d\n", motorcontrol_config.commutation_angle_offset);
-                    brake_flag = 0;
                     break;
                 //set percent offset torque
                 case 'p':

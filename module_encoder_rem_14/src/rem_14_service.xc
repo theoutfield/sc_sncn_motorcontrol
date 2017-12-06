@@ -65,25 +65,25 @@ SensorError initRotarySensor(SPIPorts &spi_ports, PositionFeedbackConfig &config
 
     {settings1, settings2} = transform_settings(config);
 
-    data_in = writeSettings(spi_ports, config.ifm_usec, ADDR_SETTINGS1, settings1);
+    data_in = writeSettings(spi_ports, config.tile_usec, ADDR_SETTINGS1, settings1);
 
     if(data_in < 0){
 
        return data_in;
     }
 
-    delay_ticks(1000*config.ifm_usec);
+    delay_ticks(1000*config.tile_usec);
 
-    data_in = writeSettings(spi_ports, config.ifm_usec, ADDR_SETTINGS2, settings2);
+    data_in = writeSettings(spi_ports, config.tile_usec, ADDR_SETTINGS2, settings2);
 
     if(data_in < 0){
 
        return data_in;
     }
 
-    delay_ticks(1000*config.ifm_usec);
+    delay_ticks(1000*config.tile_usec);
 
-    data_in = writeZeroPosition(spi_ports, config.ifm_usec, config.offset);
+    data_in = writeZeroPosition(spi_ports, config.tile_usec, config.offset);
 
     if(data_in < 0){
 
@@ -124,7 +124,7 @@ unsigned char checkEvenParity(unsigned short bitStream){
      return (calc_parity(bitStream) == ((bitStream >> 15) & 1));    //comparison the parity bit the the real one
 }
 
-short SPIReadTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short reg) {
+short SPIReadTransaction(SPIPorts &spi_ports, UsecType tile_usec, unsigned short reg) {
     unsigned short data_in = 0;
 
     reg |= READ_MASK;                           //read command
@@ -136,7 +136,7 @@ short SPIReadTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short 
     *spi_ports.spi_interface.mosi <: 0;
 
     slave_deselect(*spi_ports.slave_select);                 //pause for
-    delay_ticks(ifm_usec/REM_14_EXECUTING_TIME);      //executing the command
+    delay_ticks(tile_usec/REM_14_EXECUTING_TIME);      //executing the command
     slave_select(*spi_ports.slave_select);                   //on the sensor
 
     data_in = spi_master_in_short(spi_ports.spi_interface);  //handle response
@@ -146,7 +146,7 @@ short SPIReadTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short 
     return data_in;
 }
 
-short SPIWriteTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short reg, unsigned short data) {
+short SPIWriteTransaction(SPIPorts &spi_ports, UsecType tile_usec, unsigned short reg, unsigned short data) {
     unsigned short data_in = 0;
 
     reg &= WRITE_MASK;                          //action
@@ -160,14 +160,14 @@ short SPIWriteTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short
     spi_master_out_short(spi_ports.spi_interface, reg);      //send command
 
     slave_deselect(*spi_ports.slave_select);                 //pause for
-    delay_ticks(ifm_usec/REM_14_EXECUTING_TIME);      //executing the command
+    delay_ticks(tile_usec/REM_14_EXECUTING_TIME);      //executing the command
     slave_select(*spi_ports.slave_select);                   //on the sensor
 
     spi_master_out_short(spi_ports.spi_interface, data);
     *spi_ports.spi_interface.mosi <: 0;
 
     slave_deselect(*spi_ports.slave_select);                 //pause for
-    delay_ticks(ifm_usec/REM_14_SAVING_TIME);         //saving the data
+    delay_ticks(tile_usec/REM_14_SAVING_TIME);         //saving the data
     slave_select(*spi_ports.slave_select);                   //on the reg
 
     data_in = spi_master_in_short(spi_ports.spi_interface);  //handle response
@@ -178,11 +178,11 @@ short SPIWriteTransaction(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short
 }
 
 
-int readRedundancyReg(SPIPorts &spi_ports, UsecType ifm_usec){
+int readRedundancyReg(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec,ADDR_RED);
+    data_in = SPIReadTransaction(spi_ports, tile_usec,ADDR_RED);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -193,11 +193,11 @@ int readRedundancyReg(SPIPorts &spi_ports, UsecType ifm_usec){
     }
 }
 
-int readProgrammingReg(SPIPorts &spi_ports, UsecType ifm_usec){
+int readProgrammingReg(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_PROG);
+    data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_PROG);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -209,11 +209,11 @@ int readProgrammingReg(SPIPorts &spi_ports, UsecType ifm_usec){
     }
 }
 
-int readSettings1(SPIPorts &spi_ports, UsecType ifm_usec){
+int readSettings1(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_SETTINGS1);
+    data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_SETTINGS1);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -225,11 +225,11 @@ int readSettings1(SPIPorts &spi_ports, UsecType ifm_usec){
     }
 }
 
-int readSettings2(SPIPorts &spi_ports, UsecType ifm_usec){
+int readSettings2(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_SETTINGS2);
+    data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_SETTINGS2);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -241,11 +241,11 @@ int readSettings2(SPIPorts &spi_ports, UsecType ifm_usec){
     }
 }
 
-int readZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec){
+int readZeroPosition(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0, data_in_tmp = 0;
 
-    data_in_tmp = SPIReadTransaction(spi_ports, ifm_usec, ADDR_ZPOSM);   //register address (MSB)
+    data_in_tmp = SPIReadTransaction(spi_ports, tile_usec, ADDR_ZPOSM);   //register address (MSB)
 
     if(checkEvenParity(data_in_tmp)){                            //check right parity
 
@@ -258,7 +258,7 @@ int readZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec){
         return REM_14_PARITY_ERROR;
     }
 
-    data_in_tmp = SPIReadTransaction(spi_ports, ifm_usec, ADDR_ZPOSL);   //register address (LSB)
+    data_in_tmp = SPIReadTransaction(spi_ports, tile_usec, ADDR_ZPOSL);   //register address (LSB)
 
     if(checkEvenParity(data_in_tmp)){                            //check right parity
 
@@ -273,11 +273,11 @@ int readZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec){
         }
 }
 
-int readCORDICMagnitude(SPIPorts &spi_ports, UsecType ifm_usec){
+int readCORDICMagnitude(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_MAG);  //register address
+    data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_MAG);  //register address
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -290,11 +290,11 @@ int readCORDICMagnitude(SPIPorts &spi_ports, UsecType ifm_usec){
 }
 
 
-int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports, UsecType ifm_usec){
+int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_DIAAGC);
+    data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_DIAAGC);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -306,11 +306,11 @@ int readRotaryDiagnosticAndAutoGainControl(SPIPorts &spi_ports, UsecType ifm_use
     }
 }
 
-int readRotarySensorError(SPIPorts &spi_ports, UsecType ifm_usec){
+int readRotarySensorError(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_ERRFL);
+    data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_ERRFL);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -323,11 +323,11 @@ int readRotarySensorError(SPIPorts &spi_ports, UsecType ifm_usec){
 }
 
 
-{ unsigned int, unsigned int } readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
+{ unsigned int, unsigned int } readRotarySensorAngleWithoutCompensation(SPIPorts &spi_ports, UsecType tile_usec){
 
    unsigned short data_in = 0;
 
-   data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_ANGLEUNC);
+   data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_ANGLEUNC);
 
    if(checkEvenParity(data_in)){             //check right parity
 
@@ -340,11 +340,11 @@ int readRotarySensorError(SPIPorts &spi_ports, UsecType ifm_usec){
 }
 
 
-{ unsigned int, unsigned int } readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType ifm_usec){
+{ unsigned int, unsigned int } readRotarySensorAngleWithCompensation(SPIPorts &spi_ports, UsecType tile_usec){
 
     unsigned short data_in = 0;
 
-    data_in = SPIReadTransaction(spi_ports, ifm_usec, ADDR_ANGLECOM);
+    data_in = SPIReadTransaction(spi_ports, tile_usec, ADDR_ANGLECOM);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -356,11 +356,11 @@ int readRotarySensorError(SPIPorts &spi_ports, UsecType ifm_usec){
     }
 }
 
-int readNumberPolePairs(SPIPorts &spi_ports, UsecType ifm_usec){
+int readNumberPolePairs(SPIPorts &spi_ports, UsecType tile_usec){
 
     int data_in = 0;
 
-    data_in = readSettings2(spi_ports, ifm_usec);                //read current settings
+    data_in = readSettings2(spi_ports, tile_usec);                //read current settings
 
     if(data_in < 0){
         return data_in;
@@ -373,12 +373,12 @@ int readNumberPolePairs(SPIPorts &spi_ports, UsecType ifm_usec){
 }
 
 
-int writeSettings(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short address, unsigned short data){
+int writeSettings(SPIPorts &spi_ports, UsecType tile_usec, unsigned short address, unsigned short data){
 
     unsigned short data_in = 0;
 
     data &= BITS_8_MASK;
-    data_in = SPIWriteTransaction(spi_ports, ifm_usec, address, data);
+    data_in = SPIWriteTransaction(spi_ports, tile_usec, address, data);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -395,13 +395,13 @@ int writeSettings(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short address
     }
 }
 
-int writeZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short data){
+int writeZeroPosition(SPIPorts &spi_ports, UsecType tile_usec, unsigned short data){
 
     unsigned short data_in = 0, msb_data = 0, lsb_data = 0;
 
     msb_data = (data >> 6) & BITS_8_MASK;
 
-    data_in = SPIWriteTransaction(spi_ports, ifm_usec, ADDR_ZPOSM, msb_data);
+    data_in = SPIWriteTransaction(spi_ports, tile_usec, ADDR_ZPOSM, msb_data);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -415,7 +415,7 @@ int writeZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short dat
     }
 
     lsb_data = data & BITS_6_MASK;
-    data_in = SPIWriteTransaction(spi_ports, ifm_usec, ADDR_ZPOSL, lsb_data);
+    data_in = SPIWriteTransaction(spi_ports, tile_usec, ADDR_ZPOSL, lsb_data);
 
     if(checkEvenParity(data_in)){            //check right parity
 
@@ -432,14 +432,14 @@ int writeZeroPosition(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short dat
         }
 }
 
-int writeNumberPolePairs(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short data){
+int writeNumberPolePairs(SPIPorts &spi_ports, UsecType tile_usec, unsigned short data){
 
     int data_in = 0;
 
     data -= 1;                                              //substract 1 because of REM_14 sensor convention
     data &= POLE_PAIRS_SET_MASK;                            //mask pole pairs bits
 
-    data_in = readSettings2(spi_ports, ifm_usec);           //read current settings
+    data_in = readSettings2(spi_ports, tile_usec);           //read current settings
 
     if(data_in < 0){                                        //something went wrong
         return data_in;
@@ -447,7 +447,7 @@ int writeNumberPolePairs(SPIPorts &spi_ports, UsecType ifm_usec, unsigned short 
 
     data_in &= POLE_PAIRS_ZERO_MASK;                        //clean pole pairs bits
     data_in |= data;                                        //add new pole pairs bits
-    data_in = writeSettings(spi_ports, ifm_usec, ADDR_SETTINGS2, data_in); //write new settings
+    data_in = writeSettings(spi_ports, tile_usec, ADDR_SETTINGS2, data_in); //write new settings
 
     return data_in;
 }

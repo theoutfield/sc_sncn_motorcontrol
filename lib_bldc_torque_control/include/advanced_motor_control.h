@@ -23,7 +23,7 @@
  * @param i_watchdog            Interface to communicate with watchdog_service
  * @param i_torque_control[2]   Array of interfaces to communicate with up to two clients for motor_control_service.
  * @param i_update_pwm          Interface to communicate with PWM module
- * @param if2_tile_usec         Reference clock frequency of IF2 tile (in MHz)
+ * @param tile_usec             Number of ticks in a microsecond on this tile
  * @param p_trq_ctrl            Nullable output port
  *
  * @return void
@@ -35,6 +35,6 @@ void torque_control_service( MotorcontrolConfig &motorcontrol_config,
                             interface WatchdogInterface client i_watchdog,
                             interface TorqueControlInterface server i_torque_control[2],
                             client interface UpdatePWMGeneral i_update_pwm,
-                            int if2_tile_usec, out port? p_trq_ctrl);
+                            int tile_usec, out port? p_trq_ctrl);
 
 #endif /* ADVANCED_MOTOR_CONTROL_H_ */

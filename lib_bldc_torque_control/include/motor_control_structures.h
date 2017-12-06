@@ -86,8 +86,9 @@ typedef enum {
  * @brief Type for motors.
  */
 typedef enum {
-    BDC_MOTOR  = 10, /**< Brushed DC Motor. */
-    BLDC_MOTOR = 11  /**< Brush-less DC Motor. */
+    BDC_MOTOR  = 10,        /**< Brushed DC Motor. */
+    BLDC_MOTOR = 11,        /**< Default setting for BLDC drives.*/
+    SPM_BLDC_MOTOR = 12     /**< Surface Mounted Brushless DC Motor. Only use this setting if it is mentioned in the datasheet of your motor */
 } MotorType;
 
 /**
@@ -153,7 +154,7 @@ typedef struct {
     MotorPhasesConfiguration phases_inverted;   /**< Type of polarity of your motor. */
     int licence;                            /**< Licence number for using the library of module_advanced_foc  */
     SensorType commutation_sensor;          /**< Absolute position sensor used for commutation (if using a BLDC motor). For the moment just Hall sensor can be used [HALL_SENSOR]. */
-    int ifm_tile_usec;
+    int tile_usec;
     int hall_offset[2];                     /**< Feedback Hall sensor error offset for positive (hall_offset[0]) and negative (hall_offset[1]) turning [0:4095]. (Often required to optimize commutation if using a BLDC motor). */
     int hall_state[6];                       /**< Hall port state while being in sector [1-6] */
 
@@ -163,6 +164,10 @@ typedef struct {
     int max_current;                       /**< maximum stator current*/
     int rated_current;                     /**< rated motor phase current*/
     int rated_torque;                      /**< rated motor torque*/
+    int field_weakening_status;            /**< field_weakening 1-> enabled, 0-> disabled */
+    int field_weakening_percentage;        /**< field_weakening percentage. This parameter changes between 0 and 100, and represents the reduction percentage of rotor magnetic field */
+    int field_weakening_starting_range;    /**< speed in which field weakening will start (in rpm) */
+    int field_weakening_ending_range;      /**< speed in which field weakening will end (in rpm) */
     int commutation_angle_offset;          /**< position offset (which is finally added to the value which is recived from position sensor to compensate the required angle shift)*/
     int torque_constant;                   /**< motor torque constant*/
     int torque_P_gain;                     /**< proportional constant in torque controller*/
@@ -214,6 +219,8 @@ typedef struct
     int torque_set;
 
     int V_dc;
+    int I_dc;
+
     int I_b;
     int I_c;
 
@@ -264,6 +271,7 @@ typedef struct
     int position_cmd;
     int velocity_cmd;
     int torque_cmd;
+    int field_cmd;
     int offset_torque;
     unsigned int gpio_output;
 }DownstreamControlData;

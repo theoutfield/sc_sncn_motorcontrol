@@ -38,9 +38,9 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
         select {
         //receive config
         case i_position_feedback[int i].set_config(PositionFeedbackConfig in_config):
-                UsecType ifm_usec = position_feedback_config.ifm_usec;
+                UsecType tile_usec = position_feedback_config.tile_usec;
                 position_feedback_config = in_config;
-                position_feedback_config.ifm_usec = ifm_usec;
+                position_feedback_config.tile_usec = tile_usec;
                 break;
 
         //send config
@@ -77,7 +77,7 @@ void fallback_service(port * (&?gpio_ports)[4], PositionFeedbackConfig &position
                 break;
 
         //gpio
-        case t when timerafter(ts + (1000*position_feedback_config.ifm_usec)) :> ts:
+        case t when timerafter(ts + (1000*position_feedback_config.tile_usec)) :> ts:
                 gpio_shared_memory(gpio_ports, position_feedback_config, i_shared_memory, gpio_on);
                 break;
         }
@@ -219,7 +219,7 @@ void check_ports(port * qei_hall_port_1, port * qei_hall_port_2, port * hall_enc
             }
             //configure clock rate
             set_clock_on(spi_ports->spi_interface.blk1);
-            configure_clock_rate_at_most(spi_ports->spi_interface.blk1, position_feedback_config.ifm_usec, ((position_feedback_config.ifm_usec*1000)/(position_feedback_config.biss_config.clock_frequency*2))+1);
+            configure_clock_rate_at_most(spi_ports->spi_interface.blk1, position_feedback_config.tile_usec, ((position_feedback_config.tile_usec*1000)/(position_feedback_config.biss_config.clock_frequency*2))+1);
             start_clock(spi_ports->spi_interface.blk1);
         }
     }
@@ -375,7 +375,7 @@ void position_feedback_service(port ?qei_hall_port_1, port ?qei_hall_port_2, Hal
     t :> ts;
     t when timerafter (ts + (1000*100*30)) :> void;
 
-    if (position_feedback_config_1.ifm_usec == USEC_FAST) { //Set freq to 250MHz
+    if (position_feedback_config_1.tile_usec == USEC_FAST) { //Set freq to 250MHz
         write_sswitch_reg(get_local_tile_id(), 8, 1); // (8) = REFDIV_REGNUM // 500MHz / ((1) + 1) = 250MHz
     }
 

@@ -93,7 +93,7 @@ typedef struct {
     SensorType sensor_type;         /**< Select the sensor type */
     SensorFunction sensor_function; /**< Select which data to write to shared memory */
     SensorPolarity polarity;        /**< Encoder polarity. */
-    UsecType ifm_usec;              /**< Number of clock ticks in a microsecond >*/
+    UsecType tile_usec;             /**< Number of clock ticks in a microsecond >*/
     int pole_pairs;                 /**< Number of pole pairs */
     int resolution;                 /**< Number of ticks per turn */
     int offset;                     /**< Offset (in ticks) added to the absolute multiturn position (count). Does not affect the electrical angle */

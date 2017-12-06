@@ -256,7 +256,7 @@ void adc_ad7949(
         interface ADCInterface server iADC[2],
         AD7949Ports &adc_ports,
         CurrentSensorsConfig &current_sensor_config,
-        interface WatchdogInterface client ?i_watchdog, int operational_mode, int ifm_tile_usec)
+        interface WatchdogInterface client ?i_watchdog, int operational_mode, int tile_usec)
 {
     timer t;
     unsigned int time;
@@ -290,7 +290,6 @@ void adc_ad7949(
      *  bits[2:1] 00        bit[0] 1
      *
      */
-    const unsigned int adc_config_mot=   0b11110001001001;
     unsigned int ad7949_config       =   0b11110001001001;
 
     unsigned int adc_data_a=0;

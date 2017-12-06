@@ -36,7 +36,7 @@ Hardware Compatibility
 +===========================+
 | 1x SOMANET **Core**       |
 +---------------------------+
-| 1x SOMANET **IFM**        |
+| 1x SOMANET **Drive**      |
 +---------------------------+
 
 .. class:: float-left
@@ -46,7 +46,7 @@ Hardware Compatibility
 +==========================================================================================================+
 | SOMANET Core: :ref:`C22 <core_c22>`, :ref:`C21 DX <core_c21_dx>`                                         |
 +----------------------------------------------------------------------------------------------------------+
-| SOMANET IFM:  :ref:`DC 100 <ifm_dc100>`, :ref:`DC 1000 <ifm_dc1000_b2>`                                  |
+| SOMANET Drive:  :ref:`Drive 100 <ifm_dc100>`, :ref:`Drive 1000 <ifm_dc1000_b2>`                          |
 +----------------------------------------------------------------------------------------------------------+
 
 Modules
@@ -87,9 +87,9 @@ This is the complete list of modules and libraries currently included into the *
 * `REM 16MT Encoder Module <module_encoder_rem_16mt/doc/index.html>`_: Driver to read data from a SYNAPTICON featured REM 16MT Encoder.
 * `Serial Encoder Module <module_serial_encoder/doc/index.html>`_: Combined service to read position feedback data from Serial Encoders (SPI or BiSS)
 * `SPI Master Module <module_spi_master/doc/index.html>`_: Driver to read/write data from/to an SPI slave device.
-* `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC of your IFM DC-Drive board.
-* `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your IFM DC-Drive board.
-* `GPIO Server Module <module_gpio/doc/index.html>`_: Provides a service to handle the external digital input/outputs of your IFM DC-Drive board.
+* `ADC Module <module_adc/doc/index.html>`_: Driver for the ADC of your Drive board.
+* `Watchdog Module <module_watchdog/doc/index.html>`_: Driver for the Watchdog on your Drive board.
+* `GPIO Server Module <module_gpio/doc/index.html>`_: Provides a service to handle the external digital input/outputs of your Drive board.
 * `BLDC Torque Control Library <lib_bldc_torque_control/doc/index.html>`_: Provides a service to control torque of BLDC motors.
 * `Miscellaneous Module <module_utils/doc/index.html>`_: Contains constants and utilities used by the library.
 * `Controllers Implementation Module <module_controllers/doc/index.html>`_: Contains PID and NL controllers implementations. 
