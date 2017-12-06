@@ -93,6 +93,7 @@ int main(void) {
                     motorcontrol_config.pole_pairs =  MOTOR_POLE_PAIRS;
                     motorcontrol_config.commutation_sensor=SENSOR_1_TYPE;
                     motorcontrol_config.commutation_angle_offset=COMMUTATION_ANGLE_OFFSET;
+                    motorcontrol_config.offset_compensation_constant=OFFSET_COMPENSATION_CONSTANT;
                     motorcontrol_config.max_torque =  MOTOR_MAXIMUM_TORQUE;
                     motorcontrol_config.phase_resistance =  MOTOR_PHASE_RESISTANCE;
                     motorcontrol_config.phase_inductance =  MOTOR_PHASE_INDUCTANCE;
