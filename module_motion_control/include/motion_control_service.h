@@ -132,6 +132,7 @@ typedef struct {
     int torque_kp;                    /**< Parameter for torque controller P-constant */
     int torque_ki;                    /**< Parameter for torque controller I-constant */
     int torque_kd;                    /**< Parameter for torque controller D-constant */
+    int offset_compensation_constant; /**< (optional) difference between measured and real electrical angle at 1000 rpm in software.  please notice that [0-360] degree range is mapped to [0-4095] range inside the software. Default value is 0 */
     // field weakening members:
     int field_weakening_status;            /**< field_weakening 1-> enabled, 0-> disabled */
     int field_weakening_percentage;        /**< field_weakening percentage. This parameter changes between 0 and 100, and represents the reduction percentage of rotor magnetic field */

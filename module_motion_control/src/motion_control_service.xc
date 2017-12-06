@@ -675,6 +675,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
     motion_ctrl_config.field_weakening_starting_range  = motorcontrol_config.field_weakening_starting_range;
     motion_ctrl_config.field_weakening_ending_range    = motorcontrol_config.field_weakening_ending_range;
     motion_ctrl_config.field_weakening_percentage      = motorcontrol_config.field_weakening_percentage;
+    motion_ctrl_config.offset_compensation_constant    = motorcontrol_config.offset_compensation_constant;
 
     int current_ratio = motorcontrol_config.current_ratio;
 
@@ -1833,7 +1834,9 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     motion_ctrl_config.field_weakening_status         != motorcontrol_config.field_weakening_status        ||
                     motion_ctrl_config.field_weakening_starting_range != motorcontrol_config.field_weakening_starting_range||
                     motion_ctrl_config.field_weakening_ending_range   != motorcontrol_config.field_weakening_ending_range  ||
-                    motion_ctrl_config.field_weakening_percentage     != motorcontrol_config.field_weakening_percentage)
+                    motion_ctrl_config.field_weakening_percentage     != motorcontrol_config.field_weakening_percentage    ||
+
+                    motion_ctrl_config.offset_compensation_constant   != motorcontrol_config.offset_compensation_constant )
                 {
                     motorcontrol_config.torque_P_gain = motion_ctrl_config.torque_kp;
                     motorcontrol_config.torque_I_gain = motion_ctrl_config.torque_ki;
@@ -1843,6 +1846,8 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     motorcontrol_config.field_weakening_starting_range  = motion_ctrl_config.field_weakening_starting_range;
                     motorcontrol_config.field_weakening_ending_range    = motion_ctrl_config.field_weakening_ending_range;
                     motorcontrol_config.field_weakening_percentage      = motion_ctrl_config.field_weakening_percentage;
+
+                    motorcontrol_config.offset_compensation_constant    = motion_ctrl_config.offset_compensation_constant;
 
                     i_torque_control.set_config(motorcontrol_config);
                 }
