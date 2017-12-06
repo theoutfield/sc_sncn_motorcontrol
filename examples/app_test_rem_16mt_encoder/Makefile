@@ -3,10 +3,11 @@
 # or a valid argument for the --target option when compiling
 
 # Possible SOMANET targets:
-# SOMANET-C22
-# SOMANET-C21-DX
-TARGET = 
-
+# SOMANET-CoreC22
+# SOMANET-CoreC21
+# SOMANET-CoreC21-rev-b
+# SOMANET-CoreC2X
+TARGET = SOMANET-CoreC2X
 
 # The APP_NAME variable determines the name of the final .xe file. It should
 # not include the .xe postfix. If left blank the name will default to

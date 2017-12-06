@@ -173,6 +173,7 @@ typedef struct {
     int torque_P_gain;                     /**< proportional constant in torque controller*/
     int torque_I_gain;                     /**< integral constant in torque controller*/
     int torque_D_gain;                     /**< derivative constant in torque controller*/
+    int offset_compensation_constant;      /**< Difference between measured and real electrical angle at 1000 rpm in software. Please notice that [0-360] degree range is mapped to [0-4095] range inside the software.*/
     int current_ratio;                     /**<ratio between current recieved in control core, and real phase current*/
     int voltage_ratio;                     /**<ratio between adc measured value and real dc-bus voltage*/
     int temperature_ratio;                 /**<ratio between adc measured value and Drive board temperature*/

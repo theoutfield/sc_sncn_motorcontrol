@@ -1105,6 +1105,17 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                     printf("set offset detection torque percentage to %d\n", motorcontrol_config.percent_offset_torque);
                     brake_flag = 0;
                     break;
+
+                //compensation constant
+                case 'c':
+                    motion_ctrl_config = i_motion_control.get_motion_control_config();
+                    motion_ctrl_config.offset_compensation_constant=(int)value;
+                    i_motion_control.set_motion_control_config(motion_ctrl_config);
+                    motion_ctrl_config = i_motion_control.get_motion_control_config();
+                    printf("offset compensation constant: %d \n", motion_ctrl_config.offset_compensation_constant);
+
+                    break;
+
                 //print offset
                 default:
                     printf("offset %d (set with 'os' command)\n", motorcontrol_config.commutation_angle_offset);
