@@ -519,7 +519,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
                         i_motion_control.update_control_data(downstream_control_data);
                         break;
 
-                case 'f':
+                case 'f'://field weakening related commands
                         switch(mode_3)
                         {
 
@@ -530,7 +530,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                             // check if motion_ctrl_config structure is set properly in motion_control_service:
                             motion_ctrl_config = i_motion_control.get_motion_control_config();
-                            printf("field weakening percentage: %d \n", motion_ctrl_config.field_weakening_percentage);
                             break;
 
                         case 'v'://velocity settings for field weakening strategy
@@ -544,7 +543,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                                     // check if motion_ctrl_config structure is set properly in motion_control_service:
                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                    printf("field weakening starting range: %d \n", motion_ctrl_config.field_weakening_starting_range);
                                     break;
 
                                 case 'e'://ending velocity range for field weakening (in rpm)
@@ -554,7 +552,6 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                                     // check if motion_ctrl_config structure is set properly in motion_control_service:
                                     motion_ctrl_config = i_motion_control.get_motion_control_config();
-                                    printf("field weakening ending range: %d \n", motion_ctrl_config.field_weakening_ending_range);
                                     break;
 
                                 }
@@ -568,8 +565,16 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                         // check if motion_ctrl_config structure is set properly in motion_control_service:
                         motion_ctrl_config = i_motion_control.get_motion_control_config();
-                        if      (motion_ctrl_config.field_weakening_status==0) printf("field weakening disabled. \n");
-                        else if (motion_ctrl_config.field_weakening_status==1) printf("field weakening enabled.  \n");
+                        if      (motion_ctrl_config.field_weakening_status==0)
+                        {
+                            printf("field weakening disabled. \n");
+                            printf("V1: %d rpm, V2: %d rpm, strength: 0.%d PU\n", motion_ctrl_config.field_weakening_starting_range, motion_ctrl_config.field_weakening_ending_range, motion_ctrl_config.field_weakening_percentage);
+                        }
+                        else if (motion_ctrl_config.field_weakening_status==1)
+                        {
+                            printf("field weakening enabled.  \n");
+                            printf("V1: %d rpm, V2: %d rpm, strength: 0.%d PU\n", motion_ctrl_config.field_weakening_starting_range, motion_ctrl_config.field_weakening_ending_range, motion_ctrl_config.field_weakening_percentage);
+                        }
 
                     break;
 
