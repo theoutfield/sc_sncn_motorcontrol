@@ -20,28 +20,68 @@ How to use
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
 .. seealso:: 
-    You might find useful the **app_demo_motion_control** example apps, which illustrate the use of this module: 
+    You might find the **app_demo_motion_control** example apps useful, which illustrate the use of this module: 
     
     * :ref:`BLDC Motion Control Demo <app_demo_bldc_motion_control>`
 
-1. First, add all the :ref:`SOMANET Motion Control <somanet_motion_control>` modules to your app Makefile.
+1. In your app, modify your Makefile so that looks like this:
+   
+   .. code-block:: c
 
-    ::
+        # The TARGET variable determines what target system the application is
+        # compiled for. It either refers to an XN file in the source directories
+        # or a valid argument for the --target option when compiling
 
-        USED_MODULES = module_controllers lib_bldc_torque_control module_pwm module_adc module_hall_sensor module_utils module_profiles module_incremental_encoder module_gpio module_watchdog module_board-support
+        # Possible SOMANET targets:
+        # SOMANET-CoreC22
+        # SOMANET-CoreC21
+        # SOMANET-CoreC21-rev-b
+        # SOMANET-CoreC2X
+        TARGET = SOMANET-CoreC2X
 
-    .. note:: Not all modules will be required, but when using a library it is recommended to include always all the contained modules. 
-              This will help solving internal dependency issues.
 
-2. Properly instantiate a :ref:`Torque Control Service <lib_bldc_torque_control>`.
+        # The APP_NAME variable determines the name of the final .xe file. It should
+        # not include the .xe postfix. If left blank the name will default to
+        # the project name
+        APP_NAME = app_demo_test_motion_control
 
-3. Include the Motion Control Service header **motion_control_service.h** in your app. 
+        # The USED_MODULES variable lists other module used by the application.
+        USED_MODULES = configuration_parameters lib_bldc_torque_control lib_limited_torque_position_control module_adc module_autotune module_biss_encoder module_board-support module_controllers module_encoder_rem_14 module_encoder_rem_16mt module_filters module_hall_sensor module_incremental_encoder module_motion_control module_position_feedback module_profiles module_pwm module_serial_encoder module_shared_memory module_spi_master module_utils module_watchdog
 
-4. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
 
-5. Outside your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
+        # The flags passed to xcc when building the application
+        # You can also set the following to override flags for a particular language:
+        # XCC_XC_FLAGS, XCC_C_FLAGS, XCC_ASM_FLAGS, XCC_CPP_FLAGS
+        # If the variable XCC_MAP_FLAGS is set it overrides the flags passed to
+        # xcc for the final link (mapping) stage.
+        XCC_FLAGS_Debug = -g -O3 -report -DXSCOPE_POSITION_CTRL -DXSCOPE_ANALOGUE_MEASUREMENT
+        XCC_FLAGS_Release = -g -O3
 
-6. Now you can perform calls to the Motion Control Service through the interfaces connected to it. You can do this at whichever other core. 
+        # The XCORE_ARM_PROJECT variable, if set to 1, configures this
+        # project to create both xCORE and ARM binaries.
+        XCORE_ARM_PROJECT = 0
+
+        # The VERBOSE variable, if set to 1, enables verbose output from the make system.
+        VERBOSE = 0
+
+        XMOS_MAKE_PATH ?= ../..
+        -include $(XMOS_MAKE_PATH)/xcommon/module_xcommon/build/Makefile.common
+
+2. Please add this file to your project:
+
+.. cssclass:: downloadable-button 
+
+  `config.xscope <https://github.com/synapticon/sc_somanet-base/archive/master.zip>`_
+
+3. Properly instantiate a :ref:`Torque Control Service <lib_bldc_torque_control>`.
+
+4. Include the Motion Control Service header **motion_control_service.h** in your app. 
+
+5. Inside your main function, instantiate the interfaces array for the Service-Clients communication.
+
+6. Outside your IF2 tile, instantiate the Service. For that, first you will have to fill up your Service configuration and provide interfaces to your position feedback sensor Service and Torque Control Service.
+
+7. Now you can perform calls to the Motion Control Service through the interfaces connected to it. You can do this at whichever other core. 
 
     .. code-block:: c
 
