@@ -20,7 +20,7 @@ How to use
 .. important:: We assume that you are using :ref:`SOMANET Base <somanet_base>` and your app includes the required **board support** files for your SOMANET device.
           
 .. seealso:: 
-    You might find useful the **app_demo_motion_control** example apps, which illustrate the use of this module: 
+    You might find the **app_demo_motion_control** example apps useful, which illustrate the use of this module: 
     
     * :ref:`BLDC Motion Control Demo <app_demo_bldc_motion_control>`
 
@@ -33,10 +33,11 @@ How to use
         # or a valid argument for the --target option when compiling
 
         # Possible SOMANET targets:
-        # SOMANET-C22
-        # SOMANET-C21-DX
-        # SOMANET-C21-DX_G2
-        TARGET = SOMANET-C21-DX_G2
+        # SOMANET-CoreC22
+        # SOMANET-CoreC21
+        # SOMANET-CoreC21-rev-b
+        # SOMANET-CoreC2X
+        TARGET = SOMANET-CoreC2X
 
 
         # The APP_NAME variable determines the name of the final .xe file. It should
