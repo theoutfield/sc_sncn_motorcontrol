@@ -1881,7 +1881,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     upstream_control_data_out.sensor_error = SENSOR_POSITION_FAULT;
                     break;
                 case SPEED_ERR:
-                    upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
+                    upstream_control_data_out.sensor_error = SENSOR_SPEED_FAULT;
                     break;
                 case ANGLE_ERR:
                     if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
@@ -2014,6 +2014,25 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         }
                         else
                         {
+                            switch (error_sens)
+                            {
+                                case POS_ERR:
+                                    upstream_control_data.sensor_error = SENSOR_POSITION_FAULT;
+                                    break;
+                                case SPEED_ERR:
+                                    upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
+                                    break;
+                                case ANGLE_ERR:
+                                    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                                        upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                                    else
+                                        upstream_control_data.sensor_error = SENSOR_INCREMENTAL_FAULT;
+                                    break;
+                                case PORTS_ERR:
+                                    upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                                    break;
+                            }
+
                             switch (error_phase)
                             {
                                 case A:
