@@ -1987,8 +1987,46 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
 
                 case i_motion_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
 
-                        if (general_system_evaluation(i_motion_control) == 0)
+                        float resistance;
+                        int error_phase = 0, sensor_error = 0;
+
+                        printf("evaluating motor terminal connections ...\n");
+
+                        error_phase = open_phase_detection_offline(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec, current_ratio, &resist);
+
+                        if (error_phase == 1)
                         {
+                            printf(">>  ERROR: open circuit fault (phase A) ...\n");
+                        }
+                        else if (error_phase == 2)
+                        {
+                            printf(">>  ERROR: open circuit fault (phase B) ...\n");
+                        }
+                        else if(error_phase == 3)
+                        {
+                            printf(">>  ERROR: open circuit fault (phase C) ...\n");
+                        }
+                        else
+                        {
+                            printf("good (proper) connection between motor and drive ...\n");
+
+                            printf("checking position sensor functionality ...\n");
+                            printf("(motor will rotate a couple of turns in both directions)...\n");
+                            delay_seconds(1);
+
+                            sensor_error = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec);
+
+                            if (sensor_error == 0)
+                                printf("good (proper) functionality of position sensor\n\n");
+                        }
+
+                        if (sensor_error==0 && error_phase==0)
+                        {
+                            torque_enable_flag   = 0;
+                            position_enable_flag = 0;
+                            velocity_enable_flag = 0;
+
+
                             //offset detection
                             out_motorcontrol_config = i_torque_control.get_config();
                             out_motorcontrol_config.commutation_angle_offset = -1;
@@ -2004,47 +2042,72 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                             if(i_torque_control.get_sensor_polarity_state() != 1)
                             {
                                 out_motorcontrol_config.commutation_angle_offset = -1;
+                                printf(">>  ERROR: wrong position sensor polarity \n");
+                                printf(">>         please flip the sensor polarity in your configuration file.\n");
                             }
-                            //write offset in config
-                            i_torque_control.set_config(out_motorcontrol_config);
+                            else
+                            {
+                                printf("detected offset is: %i\n", out_motorcontrol_config.commutation_angle_offset);
 
-                            torque_enable_flag   = 0;
-                            position_enable_flag = 0;
-                            velocity_enable_flag = 0;
+                                if(out_motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                                {
+                                    printf("set the following constants in your configuration file in case of using low quality hall sensor \n");
+                                    for (int i=0;i<6;i++) {
+                                        printf("      hall_state_angle[%d]: %d\n", i, out_motorcontrol_config.hall_state[i]);
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-                            switch (error_sens)
+                            switch (sensor_error)
                             {
                                 case POS_ERR:
                                     upstream_control_data.sensor_error = SENSOR_POSITION_FAULT;
+                                    printf("POS_ERR fault is detected :-).\n");
+
                                     break;
                                 case SPEED_ERR:
                                     upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
+                                    printf("SPEED_ERR fault is detected :-).\n");
+
                                     break;
                                 case ANGLE_ERR:
                                     if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                                    {
                                         upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                                        printf("SENSOR_HALL_FAULT fault is detected :-).\n");
+                                    }
                                     else
+                                    {
                                         upstream_control_data.sensor_error = SENSOR_INCREMENTAL_FAULT;
+                                        printf("SENSOR_INCREMENTAL_FAULT fault is detected :-).\n");
+                                    }
                                     break;
                                 case PORTS_ERR:
                                     upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                                    printf("SENSOR_HALL_FAULT fault is detected :-).\n");
                                     break;
                             }
 
                             switch (error_phase)
                             {
                                 case A:
-                                    upstream_control_datat.error_status = PHASE_FAILURE_L1;
+                                    upstream_control_data.error_status = PHASE_FAILURE_L1;
+                                    printf("PHASE_FAILURE_L1 fault is detected :-).\n");
                                     break;
                                 case B:
                                     upstream_control_data.error_status = PHASE_FAILURE_L2;
+                                    printf("PHASE_FAILURE_L2 fault is detected :-).\n");
                                     break;
                                 case C:
                                     upstream_control_data.error_status = PHASE_FAILURE_L3;
+                                    printf("PHASE_FAILURE_L3 fault is detected :-).\n");
                                     break;
                             }
+                            printf("Error: offset detection is not possible :-).\n");
+                            printf("       please check position sensor/motor connections :-)\n");
+                            printf("       and repeat the evaluation process :-).\n");
                         }
 
                         break;
