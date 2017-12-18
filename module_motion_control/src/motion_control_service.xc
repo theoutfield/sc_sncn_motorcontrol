@@ -1986,28 +1986,48 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
 
                 case i_motion_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
-                        //offset detection
-                        out_motorcontrol_config = i_torque_control.get_config();
-                        out_motorcontrol_config.commutation_angle_offset = -1;
-                        i_torque_control.set_offset_detection_enabled();
-                        while(out_motorcontrol_config.commutation_angle_offset == -1)
+
+                        if (general_system_evaluation(i_motion_control) == 0)
                         {
+                            //offset detection
                             out_motorcontrol_config = i_torque_control.get_config();
-                            out_motorcontrol_config.commutation_angle_offset = i_torque_control.get_offset();
-                            delay_milliseconds(50);//wait until offset is detected
-                        }
-
-                        //check polarity state
-                        if(i_torque_control.get_sensor_polarity_state() != 1)
-                        {
                             out_motorcontrol_config.commutation_angle_offset = -1;
-                        }
-                        //write offset in config
-                        i_torque_control.set_config(out_motorcontrol_config);
+                            i_torque_control.set_offset_detection_enabled();
+                            while(out_motorcontrol_config.commutation_angle_offset == -1)
+                            {
+                                out_motorcontrol_config = i_torque_control.get_config();
+                                out_motorcontrol_config.commutation_angle_offset = i_torque_control.get_offset();
+                                delay_milliseconds(50);//wait until offset is detected
+                            }
 
-                        torque_enable_flag   = 0;
-                        position_enable_flag = 0;
-                        velocity_enable_flag = 0;
+                            //check polarity state
+                            if(i_torque_control.get_sensor_polarity_state() != 1)
+                            {
+                                out_motorcontrol_config.commutation_angle_offset = -1;
+                            }
+                            //write offset in config
+                            i_torque_control.set_config(out_motorcontrol_config);
+
+                            torque_enable_flag   = 0;
+                            position_enable_flag = 0;
+                            velocity_enable_flag = 0;
+                        }
+                        else
+                        {
+                            switch (error_phase)
+                            {
+                                case A:
+                                    upstream_control_datat.error_status = PHASE_FAILURE_L1;
+                                    break;
+                                case B:
+                                    upstream_control_data.error_status = PHASE_FAILURE_L2;
+                                    break;
+                                case C:
+                                    upstream_control_data.error_status = PHASE_FAILURE_L3;
+                                    break;
+                            }
+                        }
+
                         break;
 
                 case i_motion_control[int i].reset_motorcontrol_faults():
