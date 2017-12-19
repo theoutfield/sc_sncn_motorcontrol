@@ -271,7 +271,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     if(rated_curr < 2)
         threshold = 1;
     else
-        threshold = rated_curr/10;
+        threshold = rated_curr/2;
 
     // algorithm is applied until all currents become high enough, i.e. have enough information to make a conclusion that phases are not open
     while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
