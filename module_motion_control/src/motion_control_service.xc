@@ -446,7 +446,7 @@ Timestamp_t ErrGetTimpestamp(client interface i2c_master_if i2c)
     if (result != I2C_REGOP_SUCCESS)
         timestamp.month = 0;
 
-    timestamp.year = rtc_get_Year(i2c, result) + (rtc_get_Century(i2c, result) + 19) * 100;
+    timestamp.year = rtc_get_Year(i2c, result) + rtc_get_Century(i2c, result) * 100 + 2000;
     if (result != I2C_REGOP_SUCCESS)
         timestamp.year = 0;
 
