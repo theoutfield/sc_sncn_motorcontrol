@@ -301,7 +301,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
             ic_integral=0;
 
             filter_counter=0;
-            printf("V: %d\t I1: %.2f\t I2: %.2f\t I3: %.2f \n", refer[B], ia_filtered, ib_filtered, ic_filtered);
+            //printf("V: %d\t I1: %.2f\t I2: %.2f\t I3: %.2f \n", refer[B], ia_filtered, ib_filtered, ic_filtered);
 
         }
 
