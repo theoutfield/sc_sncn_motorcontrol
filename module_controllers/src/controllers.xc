@@ -62,7 +62,7 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
     if (param.Kd == 0)
         param.derivative = 0; // reset the derivative in case kd is set to 0
     else
-        param.v = 100;
+        param.v = 1000;
 
     param.T_s = T_s;
     param.b = PSEUDO_DERIVATIVE;
@@ -72,7 +72,7 @@ void pid_set_parameters(double Kp, double Ki, double Kd, double integral_limit, 
  * @brief updating the PIDT1 controller.
  * @param desired_value, the reference set point
  * @param actual_value, the actual value (measurement)
- * @param T_s, sampling time in us (microseconds)
+ * @param T_s, sampling time in seconds
  * @param param, the structure containing the PIDT1 controller parameters
  *
  * @return the output of PIDT1 controller
