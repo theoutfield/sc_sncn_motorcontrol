@@ -258,6 +258,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     unsigned counter = 1;
     float voltage = 0;
     float rated_curr = (float)motorcontrol_config.rated_current/1000;
+    float threshold = 0;
     int error_phase = NO_ERROR;
 
     timer tmr;
@@ -266,6 +267,11 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     i_torque_control.set_torque_control_disabled();
     i_torque_control.start_system_eval();
     i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
+
+    if(rated_curr < 2)
+        threshold = 1;
+    else
+        threshold = rated_curr/2;
 
     // algorithm is applied until all currents become high enough, i.e. have enough information to make a conclusion that phases are not open
     while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
@@ -288,17 +294,17 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
             i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
         }
 
-        // break the algortihm if voltage on terminals goes over the max limit or currents went over 80 % raed current
+        // break the algortihm if voltage on terminals goes over the max limit or currents went over 80 % rated current
         // at this moment we can conclude if the phase is opened
         // at such a high voltage at the terminals, if the current is below 10 % of rated current it can be said that the phase is opened
         // if non of the conditions here are met, it can be said that phases are not opened
         if (refer[B] > 90 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
         {
-            if (I[A] < rated_curr/10)
+            if (I[A] < threshold)
                 error_phase = A;
-            else if (I[B] < rated_curr/10)
+            else if (I[B] < threshold)
                 error_phase = B;
-            else if (I[C] < rated_curr/10)
+            else if (I[C] < threshold)
                 error_phase = C;
             break;
         }
@@ -309,7 +315,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         ++counter;
     }
 
-    //    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
+        printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
 
     // calculation of phase resistance
     voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
