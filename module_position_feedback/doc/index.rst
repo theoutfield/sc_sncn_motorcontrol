@@ -34,11 +34,6 @@ It is possible to switch the sensor service type at runtime. You need fist to up
 This Service should always run over an **IF2 Tile** so it can access the ports to
 your SOMANET Drive module.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_position_feedback>`_
-
-
 .. image:: images/core-diagram-position-feedback-interface.png
    :width: 50%
 

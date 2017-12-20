@@ -16,10 +16,6 @@ This service can run independently but is meant to be used by the :ref:`Position
 The Hall Service should always run over an **IF2 Tile** so it can access the ports to
 your SOMANET Drive module.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_hall_sensor>`_
-
 .. image:: images/core-diagram-hall-interface.png
    :width: 50%
 
