@@ -20,10 +20,6 @@ allocated will be automatically changed to **250MHz**.
 The GPIO Service should always run over an **IF2 Tile** so it can access the ports to
 your SOMANET Drive module.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_gpio>`_
-
 How to use
 ==========
 

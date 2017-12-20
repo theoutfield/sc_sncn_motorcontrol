@@ -41,11 +41,6 @@ As it is shown in Fig. 1, torque control service is responsible for transferring
 
     analogue signals (measured by ADC)
 
-.. cssclass:: github
-
-  `See Library on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/develop/lib_bldc_torque_control>`_
-
-
 How to use
 ==========
 **important**
