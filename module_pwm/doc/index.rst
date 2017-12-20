@@ -14,10 +14,6 @@ The PWM Service should always run over an **IF2 Tile** so it can access the port
 
 If PWM signals are used to drive an Drive module, the watchdog service should also be running to activate the Drive module ports.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_pwm>`_
-
 .. image:: images/pwm_concept.png
    :width: 80%
 

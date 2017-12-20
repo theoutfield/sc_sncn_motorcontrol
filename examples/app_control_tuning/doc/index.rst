@@ -19,11 +19,6 @@ The app also displays various data in real time with `XScope`
 * **Minimum Number of Cores**: 7
 * **Minimum Number of Tiles**: 3
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_control_tuning/>`_
-
-
 Console commands
 ================
 

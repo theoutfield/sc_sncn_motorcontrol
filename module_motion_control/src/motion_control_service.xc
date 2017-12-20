@@ -134,14 +134,14 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
         }
 
         // calculating the real mean position, point between mean and max, point between mean and 0
-        // given threshold is 5000
+        // given threshold is 10000
         if (max_pos_found)
         {
-            if (position > mean_pos -5000 && position < mean_pos + 5000)
+            if (position > mean_pos - 10000 && position < mean_pos + 10000)
                 real_mean_pos = position;
-            if (position > tq_pos - 5000 && position < tq_pos + 5000)
+            if (position > tq_pos - 10000 && position < tq_pos + 10000)
                 real_tq_pos = position;
-            if (position > fq_pos - 5000 && position < fq_pos + 5000)
+            if (position > fq_pos - 10000 && position < fq_pos + 10000)
                 real_fq_pos = position;
         }
 
@@ -206,9 +206,9 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
     }
 
     // comparison of position data
-    if ((mean_pos-real_mean_pos < -5000 || mean_pos-real_mean_pos > 5000)
-            || (tq_pos - real_tq_pos < -5000 || tq_pos - real_tq_pos > 5000)
-            || (fq_pos - real_fq_pos < -5000 || fq_pos - real_fq_pos > 5000)
+    if ((mean_pos-real_mean_pos < -10000 || mean_pos-real_mean_pos > 10000)
+            || (tq_pos - real_tq_pos < -10000 || tq_pos - real_tq_pos > 10000)
+            || (fq_pos - real_fq_pos < -10000 || fq_pos - real_fq_pos > 10000)
             || max_pos < 60000)
         error_sens = POS_ERR;
 
@@ -237,8 +237,8 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             error_sens = PORTS_ERR;
     }
 
-    //    printf("%d\n", error_sens);
-    //    printf("%d %d %d %d\n", max_pos, real_mean_pos, real_tq_pos, real_fq_pos);
+//    printf("%d\n", error_sens);
+//    printf("%d %d %d %d\n", max_pos, real_mean_pos, real_tq_pos, real_fq_pos);
     i_torque_control.disable_index_detection();
     i_torque_control.set_sensor_status(error_sens);
     return error_sens;
@@ -253,11 +253,13 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         int app_tile_usec, int current_ratio, float * ret)
 {
     UpstreamControlData upstream_control_data;
+    float filter_counter=0, ia_integral=0, ib_integral=0, ic_integral=0;
+    float ia_filtered=0, ib_filtered=0, ic_filtered=0;
+    float abs_ia_filtered=0, abs_ib_filtered=0, abs_ic_filtered=0;
     float I[NR_PHASES] = { 0 };
     int refer[NR_PHASES] = {0, 20, 20, 20};
     unsigned counter = 1;
-    float voltage = 0;
-    float rated_curr = (float)motorcontrol_config.rated_current/1000;
+    float threshold = 0;
     int error_phase = NO_ERROR;
 
     timer tmr;
@@ -267,18 +269,51 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     i_torque_control.start_system_eval();
     i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
 
+    threshold = 1;//1 amp is the set point for making decision (whether the phase is having open-circuit fault or not)
+    int all_phase_currents_are_high_enough=0;
+    int high_enough_phase_current_for_decision_making  =5;//Amp
+
     // algorithm is applied until all currents become high enough, i.e. have enough information to make a conclusion that phases are not open
-    while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
+    while (all_phase_currents_are_high_enough==0)
     {
+
         upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
         I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
         I[C] = (float)upstream_control_data.I_c/(float)(current_ratio);
         I[A] = -(I[B]+I[C]);
 
-        for(int i = 0; i < NR_PHASES; i++)
-            if (I[i] < 0)
-                I[i] = -I[i];
+        filter_counter++;
+        ia_integral += I[A];
+        ib_integral += I[B];
+        ic_integral += I[C];
+
+        if(filter_counter == 20)
+        {
+            ia_filtered = ia_integral/filter_counter;
+            ib_filtered = ib_integral/filter_counter;
+            ic_filtered = ic_integral/filter_counter;
+
+            ia_integral=0;
+            ib_integral=0;
+            ic_integral=0;
+
+            filter_counter=0;
+            //printf("V: %d\t I1: %.2f\t I2: %.2f\t I3: %.2f \n", refer[B], ia_filtered, ib_filtered, ic_filtered);
+
+        }
+
+        if(ia_filtered>0) abs_ia_filtered= ia_filtered;
+        else              abs_ia_filtered=-ia_filtered;
+
+        if(ib_filtered>0) abs_ib_filtered= ib_filtered;
+        else              abs_ib_filtered=-ib_filtered;
+
+        if(ic_filtered>0) abs_ic_filtered= ic_filtered;
+        else              abs_ic_filtered=-ic_filtered;
+
+        if(abs_ia_filtered>1 && abs_ib_filtered>1 && abs_ic_filtered>1) all_phase_currents_are_high_enough = 1;
+        else                                                            all_phase_currents_are_high_enough = 0;
 
         // change terminal b and c voltages
         if (counter % 100 == 0)
@@ -288,19 +323,22 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
             i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
         }
 
-        // break the algortihm if voltage on terminals goes over the max limit or currents went over 80 % raed current
+        // break the algortihm if voltage on terminals goes over the max limit or currents went over 80 % rated current
         // at this moment we can conclude if the phase is opened
         // at such a high voltage at the terminals, if the current is below 10 % of rated current it can be said that the phase is opened
         // if non of the conditions here are met, it can be said that phases are not opened
-        if (refer[B] > 90 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
+        if (    refer[B]>90                                                   ||
+                abs_ia_filtered>high_enough_phase_current_for_decision_making ||
+                abs_ib_filtered>high_enough_phase_current_for_decision_making ||
+                abs_ic_filtered>high_enough_phase_current_for_decision_making   )
         {
-            if (I[A] < rated_curr/10)
-                error_phase = A;
-            else if (I[B] < rated_curr/10)
-                error_phase = B;
-            else if (I[C] < rated_curr/10)
-                error_phase = C;
-            break;
+            printf("time to make decision!\n");
+
+            if      (abs_ia_filtered < threshold)       error_phase = A;
+            else if (abs_ib_filtered < threshold)       error_phase = B;
+            else if (abs_ic_filtered < threshold)       error_phase = C;
+
+            break;//after the decision is made, we exit the while loop by this "break;" command.
         }
 
         tmr :> ts;
@@ -309,12 +347,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         ++counter;
     }
 
-    //    printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
 
-    // calculation of phase resistance
-    voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
-    if (error_phase == 0)
-        *ret = voltage / I[B];
 
     i_torque_control.set_evaluation_references(0, 0, 0);
 
@@ -1881,7 +1914,7 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                     upstream_control_data_out.sensor_error = SENSOR_POSITION_FAULT;
                     break;
                 case SPEED_ERR:
-                    upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
+                    upstream_control_data_out.sensor_error = SENSOR_SPEED_FAULT;
                     break;
                 case ANGLE_ERR:
                     if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
@@ -1986,28 +2019,128 @@ void motion_control_service(MotionControlConfig &motion_ctrl_config,
                         break;
 
                 case i_motion_control[int i].set_offset_detection_enabled() -> MotorcontrolConfig out_motorcontrol_config:
-                        //offset detection
-                        out_motorcontrol_config = i_torque_control.get_config();
-                        out_motorcontrol_config.commutation_angle_offset = -1;
-                        i_torque_control.set_offset_detection_enabled();
-                        while(out_motorcontrol_config.commutation_angle_offset == -1)
+
+                        float resistance;
+
+                        printf("evaluating motor terminal connections ...\n");
+
+                        error_phase = open_phase_detection_offline(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec, current_ratio, &resist);
+
+                        if (error_phase == 1)
                         {
+                            printf(">>  ERROR: open circuit fault (phase A) ...\n");
+                        }
+                        else if (error_phase == 2)
+                        {
+                            printf(">>  ERROR: open circuit fault (phase B) ...\n");
+                        }
+                        else if(error_phase == 3)
+                        {
+                            printf(">>  ERROR: open circuit fault (phase C) ...\n");
+                        }
+                        else
+                        {
+                            printf("good (proper) connection between motor and drive ...\n");
+
+                            printf("checking position sensor functionality ...\n");
+                            printf("(motor will rotate a couple of turns in both directions)...\n");
+                            delay_seconds(1);
+
+                            error_sens = sensor_functionality_evaluation(i_torque_control, motorcontrol_config, downstream_control_data, app_tile_usec);
+
+                            if (error_sens == 0)
+                                printf("good (proper) functionality of position sensor\n\n");
+                        }
+
+                        if (error_sens==0 && error_phase==0)
+                        {
+                            torque_enable_flag   = 0;
+                            position_enable_flag = 0;
+                            velocity_enable_flag = 0;
+
+                            //offset detection
                             out_motorcontrol_config = i_torque_control.get_config();
-                            out_motorcontrol_config.commutation_angle_offset = i_torque_control.get_offset();
-                            delay_milliseconds(50);//wait until offset is detected
-                        }
-
-                        //check polarity state
-                        if(i_torque_control.get_sensor_polarity_state() != 1)
-                        {
                             out_motorcontrol_config.commutation_angle_offset = -1;
-                        }
-                        //write offset in config
-                        i_torque_control.set_config(out_motorcontrol_config);
+                            i_torque_control.set_offset_detection_enabled();
+                            while(out_motorcontrol_config.commutation_angle_offset == -1)
+                            {
+                                out_motorcontrol_config = i_torque_control.get_config();
+                                out_motorcontrol_config.commutation_angle_offset = i_torque_control.get_offset();
+                                delay_milliseconds(50);//wait until offset is detected
+                            }
 
-                        torque_enable_flag   = 0;
-                        position_enable_flag = 0;
-                        velocity_enable_flag = 0;
+                            //check polarity state
+                            if(i_torque_control.get_sensor_polarity_state() != 1)
+                            {
+                                out_motorcontrol_config.commutation_angle_offset = -1;
+                                printf(">>  ERROR: wrong position sensor polarity \n");
+                                printf(">>         please flip the sensor polarity in your configuration file.\n");
+                            }
+                            else
+                            {
+                                printf("detected offset is: %i\n", out_motorcontrol_config.commutation_angle_offset);
+
+                                if(out_motorcontrol_config.commutation_sensor==HALL_SENSOR)
+                                {
+                                    printf("set the following constants in your configuration file in case of using low quality hall sensor \n");
+                                    for (int i=0;i<6;i++) {
+                                        printf("      hall_state_angle[%d]: %d\n", i, out_motorcontrol_config.hall_state[i]);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            switch (error_sens)
+                            {
+                                case POS_ERR:
+                                    upstream_control_data.sensor_error = SENSOR_POSITION_FAULT;
+                                    printf("POS_ERR fault is detected.\n");
+
+                                    break;
+                                case SPEED_ERR:
+                                    upstream_control_data.sensor_error = SENSOR_SPEED_FAULT;
+                                    printf("SPEED_ERR fault is detected.\n");
+
+                                    break;
+                                case ANGLE_ERR:
+                                    if (motorcontrol_config.commutation_sensor == HALL_SENSOR)
+                                    {
+                                        upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                                        printf("SENSOR_HALL_FAULT fault is detected.\n");
+                                    }
+                                    else
+                                    {
+                                        upstream_control_data.sensor_error = SENSOR_INCREMENTAL_FAULT;
+                                        printf("SENSOR_INCREMENTAL_FAULT fault is detected.\n");
+                                    }
+                                    break;
+                                case PORTS_ERR:
+                                    upstream_control_data.sensor_error = SENSOR_HALL_FAULT;
+                                    printf("SENSOR_HALL_FAULT fault is detected.\n");
+                                    break;
+                            }
+
+                            switch (error_phase)
+                            {
+                                case A:
+                                    upstream_control_data.error_status = PHASE_FAILURE_L1;
+                                    printf("PHASE_FAILURE_L1 fault is detected.\n");
+                                    break;
+                                case B:
+                                    upstream_control_data.error_status = PHASE_FAILURE_L2;
+                                    printf("PHASE_FAILURE_L2 fault is detected.\n");
+                                    break;
+                                case C:
+                                    upstream_control_data.error_status = PHASE_FAILURE_L3;
+                                    printf("PHASE_FAILURE_L3 fault is detected.\n");
+                                    break;
+                            }
+                            printf("Error: offset detection is not possible.\n");
+                            printf("       please check position sensor/motor connections\n");
+                            printf("       and repeat the evaluation process.\n");
+                        }
+
                         break;
 
                 case i_motion_control[int i].reset_motorcontrol_faults():

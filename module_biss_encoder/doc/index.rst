@@ -17,10 +17,6 @@ Those functions are used in :ref:`Serial Encoder Module <module_serial_encoder>`
 The BiSS functions should always run over an **IF2 Tile** so it can access the ports to
 your SOMANET Drive module.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_biss>`_
-
 .. _biss-interface.com: http://www.biss-interface.com/
 
 

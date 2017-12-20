@@ -340,39 +340,7 @@ void control_tuning_console(client interface MotionControlInterface i_motion_con
 
                 default://find motor commutation offset automatically
 
-                    if (general_system_evaluation(i_motion_control) == 0)
-                    {
-                        printf("checking the configurations of position sensor ...\n");
-
-                        motorcontrol_config = i_motion_control.set_offset_detection_enabled();
-
-                        if(motorcontrol_config.commutation_angle_offset == -1)
-                        {
-                            printf(">>  ERROR: wrong position sensor polarity \n");
-                            printf(">>         please flip the sensor polarity in your configuration file.\n");
-                        }
-                        else
-                        {
-                            motorcontrol_config = i_motion_control.get_motorcontrol_config();
-                            printf(">>  good (proper) settings of sensor polarity...\n");
-
-                            printf("detected offset is: %i\n", motorcontrol_config.commutation_angle_offset);
-
-                            if(motorcontrol_config.commutation_sensor==HALL_SENSOR)
-                            {
-                                printf("set the following constants in your configuration file in case of using low quality hall sensor \n");
-                                for (int i=0;i<6;i++) {
-                                    printf("      hall_state_angle[%d]: %d\n", i, motorcontrol_config.hall_state[i]);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        printf("Error: offset detection is not possible.\n");
-                        printf("       please check position sensor/motor connections\n");
-                        printf("       and repeat the evaluation process.\n");
-                    }
+                    i_motion_control.set_offset_detection_enabled();
 
                     break;
 

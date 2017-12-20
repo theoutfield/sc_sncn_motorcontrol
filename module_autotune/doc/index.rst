@@ -10,10 +10,6 @@ Module AutoTune
 
 Somanet motion controllers provide the user with velocity and position control. The module AutoTune provides the user with an initial estimation of proper constants for **velocity controller with pid structure**, **position controller with cascaded-pid structure**, and **position controller with limited-torque structure**. Autotuning is a feature of motion control service. As a result, all steps of motion_control_service should be accomplished for using the functions of this module.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_autotune>`_
-
 How to use
 ==========
 

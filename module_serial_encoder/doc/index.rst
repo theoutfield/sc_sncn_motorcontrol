@@ -15,10 +15,6 @@ This service can run independently but is meant to be used by the :ref:`Position
 The Service should always run over an **IF2 tile** so it can access the ports to
 your SOMANET Drive module.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_serial_encoder>`_
-
 .. image:: images/core-diagram-serial-encoder.png
    :width: 50%
 

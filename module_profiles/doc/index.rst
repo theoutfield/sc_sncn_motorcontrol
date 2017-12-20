@@ -11,10 +11,6 @@ Profiles Module
 This module contains utilities to generate Torque/Velocity/Position ramps to smooth the variation rate of their corresponding reference signals, and to ensure a smooth transition between set points on a control loop. 
 In some cases, where two set points are not close enough, it is mandatory to use a profiled reference signal to avoid mechanical stresses.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_profiles>`_
-
 
 How to use
 ==========
