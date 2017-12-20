@@ -134,14 +134,14 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
         }
 
         // calculating the real mean position, point between mean and max, point between mean and 0
-        // given threshold is 5000
+        // given threshold is 10000
         if (max_pos_found)
         {
-            if (position > mean_pos -5000 && position < mean_pos + 5000)
+            if (position > mean_pos - 10000 && position < mean_pos + 10000)
                 real_mean_pos = position;
-            if (position > tq_pos - 5000 && position < tq_pos + 5000)
+            if (position > tq_pos - 10000 && position < tq_pos + 10000)
                 real_tq_pos = position;
-            if (position > fq_pos - 5000 && position < fq_pos + 5000)
+            if (position > fq_pos - 10000 && position < fq_pos + 10000)
                 real_fq_pos = position;
         }
 
@@ -206,9 +206,9 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
     }
 
     // comparison of position data
-    if ((mean_pos-real_mean_pos < -5000 || mean_pos-real_mean_pos > 5000)
-            || (tq_pos - real_tq_pos < -5000 || tq_pos - real_tq_pos > 5000)
-            || (fq_pos - real_fq_pos < -5000 || fq_pos - real_fq_pos > 5000)
+    if ((mean_pos-real_mean_pos < -10000 || mean_pos-real_mean_pos > 10000)
+            || (tq_pos - real_tq_pos < -10000 || tq_pos - real_tq_pos > 10000)
+            || (fq_pos - real_fq_pos < -10000 || fq_pos - real_fq_pos > 10000)
             || max_pos < 60000)
         error_sens = POS_ERR;
 
@@ -237,8 +237,8 @@ sensor_fault sensor_functionality_evaluation(client interface TorqueControlInter
             error_sens = PORTS_ERR;
     }
 
-    //    printf("%d\n", error_sens);
-    //    printf("%d %d %d %d\n", max_pos, real_mean_pos, real_tq_pos, real_fq_pos);
+//    printf("%d\n", error_sens);
+//    printf("%d %d %d %d\n", max_pos, real_mean_pos, real_tq_pos, real_fq_pos);
     i_torque_control.disable_index_detection();
     i_torque_control.set_sensor_status(error_sens);
     return error_sens;
@@ -259,8 +259,6 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     float I[NR_PHASES] = { 0 };
     int refer[NR_PHASES] = {0, 20, 20, 20};
     unsigned counter = 1;
-    float voltage = 0;
-    float rated_curr = (float)motorcontrol_config.rated_current/1000;
     float threshold = 0;
     int error_phase = NO_ERROR;
 
