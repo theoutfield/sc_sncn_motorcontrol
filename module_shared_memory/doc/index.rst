@@ -11,10 +11,6 @@ Shared Memory Module
 
 This module provides a Shared Memory Service which allow other service to exchange data asynchronously without blocking. For example the Positin feedback service write the position to the Shared memory and the Motorcontrol service can read it later without being blocked by the Positin feedback service. The Shared Memory Service is also a distributable task so it doesn't need a core and it is actually run by the calling task (if all calling task are runnig on the same tile).
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_shared_memory>`_
-
 
 How to use
 ==========

@@ -15,10 +15,6 @@ Those functions are used in the SPI encoders :ref:`REM 14 Encoder Module <module
 The functions should always run over an **IF2 Tile** so it can access the ports to
 your SOMANET Drive module.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_spi_master>`_
-
 
 How to use
 ==========

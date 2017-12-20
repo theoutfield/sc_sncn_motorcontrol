@@ -11,13 +11,6 @@ Limited Torque Position Control Library
 This library provides a position control strategy which is based on limited torque of electric motor. Depending on the maximum torque of electrical actuator, the proposed position controller calculates the proper reference value of electrical torque in a way that the overshoot of the load in step responses becomes minimum in step responses.
 It is recommended to use the provided automatic tuner to tune the PID parameters of this controller.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/lib_limited_torque_position_control>`_
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/module_autotune>`_
-
-
 How to use
 ==========
 

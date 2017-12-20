@@ -37,8 +37,6 @@ Figure 1 gives a general view of torque controller application including differe
 * **Minimum Number of Cores**: 6
 * **Minimum Number of Tiles**: 2
 
-`See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_torque_control/>`_
-
 Quick How-to
 ============
 **Important**

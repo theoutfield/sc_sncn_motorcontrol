@@ -13,10 +13,6 @@ This PID controller is used in control of velocity in our SOMANET software. Four
 Gain scheduling controller can be used when the controlled process shows nonlinearity and time variant dynamics. This controller changes gains based on velocity. It uses one set of gains for low velocities and the other set for high velocities. Low velocities and high velociteis are determined by two parameters set by user, low and high velocity limit. Between these two limits controller changes gains linearly. Tuning of the gain scheduling controller begins with the tuning of standard cascaded position controller for low and high velocities. In addition, low and high velocity limits needs to be set. 
 
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/module_controllers>`_
-
 How to use
 ==========
 
