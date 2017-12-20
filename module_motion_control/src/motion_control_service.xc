@@ -253,6 +253,9 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         int app_tile_usec, int current_ratio, float * ret)
 {
     UpstreamControlData upstream_control_data;
+    float filter_counter=0, ia_integral=0, ib_integral=0, ic_integral=0;
+    float ia_filtered=0, ib_filtered=0, ic_filtered=0;
+    float abs_ia_filtered=0, abs_ib_filtered=0, abs_ic_filtered=0;
     float I[NR_PHASES] = { 0 };
     int refer[NR_PHASES] = {0, 20, 20, 20};
     unsigned counter = 1;
@@ -268,23 +271,51 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
     i_torque_control.start_system_eval();
     i_torque_control.set_evaluation_references(refer[A], refer[B], refer[C]);
 
-    if(rated_curr < 2)
-        threshold = 1;
-    else
-        threshold = rated_curr/2;
+    threshold = 1;//1 amp is the set point for making decision (whether the phase is having open-circuit fault or not)
+    int all_phase_currents_are_high_enough=0;
+    int high_enough_phase_current_for_decision_making  =5;//Amp
 
     // algorithm is applied until all currents become high enough, i.e. have enough information to make a conclusion that phases are not open
-    while ((I[A] < 1|| I[B] < 1 || I[C] < 1) || (I[A] != (2*I[B]) || I[A] != (2*I[C])))
+    while (all_phase_currents_are_high_enough==0)
     {
+
         upstream_control_data = i_torque_control.update_upstream_control_data(downstream_control_data.gpio_output);
 
         I[B] = (float)upstream_control_data.I_b/(float)(current_ratio);
         I[C] = (float)upstream_control_data.I_c/(float)(current_ratio);
         I[A] = -(I[B]+I[C]);
 
-        for(int i = 0; i < NR_PHASES; i++)
-            if (I[i] < 0)
-                I[i] = -I[i];
+        filter_counter++;
+        ia_integral += I[A];
+        ib_integral += I[B];
+        ic_integral += I[C];
+
+        if(filter_counter == 20)
+        {
+            ia_filtered = ia_integral/filter_counter;
+            ib_filtered = ib_integral/filter_counter;
+            ic_filtered = ic_integral/filter_counter;
+
+            ia_integral=0;
+            ib_integral=0;
+            ic_integral=0;
+
+            filter_counter=0;
+            printf("V: %d\t I1: %.2f\t I2: %.2f\t I3: %.2f \n", refer[B], ia_filtered, ib_filtered, ic_filtered);
+
+        }
+
+        if(ia_filtered>0) abs_ia_filtered= ia_filtered;
+        else              abs_ia_filtered=-ia_filtered;
+
+        if(ib_filtered>0) abs_ib_filtered= ib_filtered;
+        else              abs_ib_filtered=-ib_filtered;
+
+        if(ic_filtered>0) abs_ic_filtered= ic_filtered;
+        else              abs_ic_filtered=-ic_filtered;
+
+        if(abs_ia_filtered>1 && abs_ib_filtered>1 && abs_ic_filtered>1) all_phase_currents_are_high_enough = 1;
+        else                                                            all_phase_currents_are_high_enough = 0;
 
         // change terminal b and c voltages
         if (counter % 100 == 0)
@@ -298,15 +329,18 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         // at this moment we can conclude if the phase is opened
         // at such a high voltage at the terminals, if the current is below 10 % of rated current it can be said that the phase is opened
         // if non of the conditions here are met, it can be said that phases are not opened
-        if (refer[B] > 90 || I[A] > 0.8*rated_curr || I[B] > 0.8*rated_curr || I[C] > 0.8*rated_curr)
+        if (    refer[B]>90                                                   ||
+                abs_ia_filtered>high_enough_phase_current_for_decision_making ||
+                abs_ib_filtered>high_enough_phase_current_for_decision_making ||
+                abs_ic_filtered>high_enough_phase_current_for_decision_making   )
         {
-            if (I[A] < threshold)
-                error_phase = A;
-            else if (I[B] < threshold)
-                error_phase = B;
-            else if (I[C] < threshold)
-                error_phase = C;
-            break;
+            printf("time to make decision!\n");
+
+            if      (abs_ia_filtered < threshold)       error_phase = A;
+            else if (abs_ib_filtered < threshold)       error_phase = B;
+            else if (abs_ic_filtered < threshold)       error_phase = C;
+
+            break;//after the decision is made, we exit the while loop by this "break;" command.
         }
 
         tmr :> ts;
@@ -315,12 +349,7 @@ int open_phase_detection_offline(client interface TorqueControlInterface i_torqu
         ++counter;
     }
 
-        printf("%.2f %.2f %.2f\n", I[A], I[B], I[C]);
 
-    // calculation of phase resistance
-    voltage =  (((float)refer[B] - refer[A])/100) * (float)upstream_control_data.V_dc / 2;
-    if (error_phase == 0)
-        *ret = voltage / I[B];
 
     i_torque_control.set_evaluation_references(0, 0, 0);
 
