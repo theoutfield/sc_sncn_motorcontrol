@@ -24,10 +24,6 @@ This module was originally created by XMOS and then reworked by Synapticon befor
 * `Original forked XMOS repository`_
 * `Forked repository by Synapticon`_
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_pwm_symmetrical>`_
-
 How to use
 ==========
 
@@ -109,4 +105,3 @@ Client
 
 
 .. _`Original forked XMOS repository`: https://github.com/xcore/sc_pwm/tree/53f275204764669c9d8ae10378453aa279a5bc47
-.. _`Forked repository by Synapticon`: https://github.com/synapticon/sc_pwm/tree/30623702ab9b535e34113f41abb429d55edd26ec

@@ -13,10 +13,6 @@ The purpose of this app (app_test_hall) is showing the use of the :ref:`Hall Sen
 * **Minimum Number of Cores**: 2
 * **Minimum Number of Tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_hall/>`_
-
 Quick How-to
 ============
 

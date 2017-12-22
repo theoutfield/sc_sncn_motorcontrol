@@ -13,10 +13,6 @@ The purpose of this app (app_demo_bldc_motorcontrol) is showing the use of the :
 * **Minimum Number of Cores**: 7
 * **Minimum Number of Tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_bldc_motorcontrol/>`_
-
 Quick How-to
 ============
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.

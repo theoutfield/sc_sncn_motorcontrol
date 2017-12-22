@@ -13,10 +13,6 @@ The purpose of this app (app_test_biss) is showing the use of the :ref:`BiSS Int
 * **Min. Nr. of cores**: 2
 * **Min. Nr. of tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_biss/>`_
-
 Quick How-to
 ============
 

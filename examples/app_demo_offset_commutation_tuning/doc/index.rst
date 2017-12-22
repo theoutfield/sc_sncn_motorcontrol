@@ -15,10 +15,6 @@ The motor will commutate at a certain voltage (either positive, clockwise spin, 
 * **Minimum Number of Cores**: 7
 * **Minimum Number of Tiles**: 3
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_offset_commutation_tuning/>`_
-
 Quick How-to
 ============
 

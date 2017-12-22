@@ -16,14 +16,6 @@ The library offer following functionalities:
 * Watchdog
 * GPIO server (e.g. for homing-related functions)
 
-.. cssclass:: downloadable-button 
-
-  `Download Library <https://github.com/synapticon/sc_sncn_motorcontrol/archive/v2.0.0.zip>`_
-
-.. cssclass:: github
-
-  `Visit Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release_2.0.0>`_
-
 .. _motor_control_hw_compatibility:
 
 Hardware Compatibility
@@ -155,10 +147,3 @@ Dependencies
 
 To run your **Motor Control library** it is necessary to include :ref:`SOMANET Base <somanet_base>`.
 
-.. cssclass:: downloadable-button 
-
-  `Download SOMANET Base Library <https://github.com/synapticon/sc_somanet-base/archive/v2.0.0.zip>`_
-
-.. cssclass:: github
-
-  `Visit SOMANET Base Public Repository <https://github.com/synapticon/sc_somanet-base/tree/release_2.0.0>`_

@@ -11,7 +11,7 @@ arguments of the Services and therefore they must be set before the Service inst
 .. note:: Check the API of each Service you use for further information of its specific configuration.
 
 However, for simplicity and in order to use a common configuration for all your apps. We encourage you to gather your configuration in a common header
-for all your apps. We do exactly this for most of our example apps, in a way that each app fetches its configuration from `config_motor/user_config.h <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/config_motor>`. 
+for all your apps. We do exactly this for most of our example apps, in a way that each app fetches its configuration from `config_motor/user_config.h`. 
 
 .. note:: In order to include such configuration header in your app, you must tell the Makefile to use the module where the header is contained. e.g.
 

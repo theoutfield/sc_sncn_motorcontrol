@@ -18,10 +18,6 @@ allocated will be automatically changed to **250MHz**.
 The BiSS Service should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_biss>`_
-
 .. image:: images/core-diagram-biss-interface.png
    :width: 50%
 

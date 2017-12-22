@@ -17,10 +17,6 @@ Nevertheless, you can use the xTIMEcomposer simulator to check what is being pro
 * **Minimum Number of Cores**: 1
 * **Minimum Number of Tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_pwm_symmetrical_demo/>`_
-
 Quick how-to
 ============
 

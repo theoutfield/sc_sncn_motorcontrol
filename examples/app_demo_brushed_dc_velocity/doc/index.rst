@@ -13,10 +13,6 @@ The purpose of this app (app_demo_brushed_dc_velocity) is showing the use of the
 * **Minimum Number of Cores**: 8
 * **Minimum Number of Tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_brushed_dc_velocity/>`_
-
 Quick How-to
 ============
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.

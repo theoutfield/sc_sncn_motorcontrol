@@ -15,10 +15,6 @@ through interfaces.
 The Position, Velocity and Torque Control Services are intended to run at a **100MHz Reference Frequency**,
 therefore they must be instantiated in a different tile from the remaining Motor Control Services.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_ctrl_loops>`_
-
 How to use (e.g. Position Control Service)
 ==========================================
 

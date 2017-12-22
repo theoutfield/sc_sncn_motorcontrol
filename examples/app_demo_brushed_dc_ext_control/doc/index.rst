@@ -13,12 +13,6 @@ With this app (app_demo_brushed_dc_ext_control) it is possible to control the sp
 * **Minimum Number of Cores**: 5
 * **Minimum Number of Tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_brushed_dc_ext_control/>`_
-
-
-
 Hardware setup
 ==============
 To use this app, you need to connect a potentiometer to the Analog IN connector of your SOMANET IFM Drive.

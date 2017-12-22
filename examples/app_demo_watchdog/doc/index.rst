@@ -13,10 +13,6 @@ The purpose of this app (app_demo_watchdog) is showing the use of the :ref:`Watc
 * **Minimum Number of Cores**: 5
 * **Minimum Number of Tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_watchdog/>`_
-
 Quick How-to
 ============
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
