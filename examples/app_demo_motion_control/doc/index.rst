@@ -38,14 +38,11 @@ The data displayed over XScope will be:
 - Minimum Number of Cores: 5
 - Minimum Number of Tiles: 3
 
-`see app_demo_motion_control on public repository <http://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_motion_control>`_
-
-
 Quick How-to
 ============
 **Important**
 
-It is assumed that before starting this application, profiler parameters and PID parameters for velocity and position control are tuned and set in the software. To do this, please check app_demo_tuning in `synapticon sc_sncn_motorcontrol repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples>`_
+It is assumed that before starting this application, profiler parameters and PID parameters for velocity and position control are tuned and set in the software. To do this, please check app_demo_tuning in `sc_sncn_motorcontrol`.
 
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
 

@@ -15,10 +15,6 @@ It also displays the status of the sensor for debugging.
 * **Min. Nr. of cores**: 2
 * **Min. Nr. of tiles**: 1
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_rem_14/>`_
-
 Quick How-to
 ============
 

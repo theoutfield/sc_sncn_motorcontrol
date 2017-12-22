@@ -15,10 +15,6 @@ through interfaces.
 
 The ADC Service should always run over an **IFM Tile** so it can access the ports of your SOMANET IFM device.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_adc>`_
-
 .. image:: images/adc_concept.jpg
    :width: 80%
 

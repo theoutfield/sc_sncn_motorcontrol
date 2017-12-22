@@ -10,10 +10,6 @@ Motion Control Module
 
 This module provides a Service (motion_control_service) to perform Torque/Velocity/Position control. This Service is recommended to be running at **100MHz Reference Clock Frequency**. After running this service, the user can select the controlling mode (either torque, velocity, or position control mode). Depending on the selected mode, motion_control_service will call the corresponding function from module_controllers to calculate the proper reference value of the torque, and calculated values of reference torque will be sent to torque control service.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/release/module_motion_control>`_
-
 How to use
 ==========
 

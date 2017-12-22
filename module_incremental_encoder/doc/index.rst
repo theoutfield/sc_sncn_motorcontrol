@@ -16,10 +16,6 @@ This service can run independently but is meant to be used by the :ref:`Position
 The Service should always run over an **IFM tile** so it can access the ports to
 your SOMANET IFM device.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_incremental_encoder>`_
-
 .. image:: images/core-diagram-qe-interface.png
    :width: 50%
 

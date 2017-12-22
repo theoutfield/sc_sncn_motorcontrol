@@ -41,10 +41,6 @@ The new sensor types are taken into account when the service is restarted
 * **Min. Nr. of cores**: 4
 * **Min. Nr. of tiles**: 2
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_position_feedback/>`_
-
 Quick How-to
 ============
 

@@ -14,10 +14,6 @@ For that, it implements a simple app that reads the output of a Hall sensor and 
 * **Min. Nr. of cores**: 2
 * **Min. Nr. of tiles**: 1
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_test_hall/>`_
-
 Quick How-to
 ============
 

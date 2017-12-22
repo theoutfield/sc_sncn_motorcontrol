@@ -34,10 +34,6 @@ It is possible to switch the sensor service type at runtime. You need fist to up
 This Service should always run over an **IFM Tile** so it can access the ports to
 your SOMANET IFM device.
 
-.. cssclass:: github
-
-  `See Module on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/module_position_feedback>`_
-
 
 .. image:: images/core-diagram-position-feedback-interface.png
    :width: 50%

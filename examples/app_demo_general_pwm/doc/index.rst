@@ -13,10 +13,6 @@ The purpose of this app (app_demo_general_pwm) is showing the use of pwm_service
 * **Minimum Number of Cores**: 3
 * **Minimum Number of Tiles**: 1
 
-.. cssclass:: github
-
-  `See Application on Public Repository <https://github.com/synapticon/sc_sncn_motorcontrol/tree/master/examples/app_demo_general_pwm/>`_
-
 Quick How-to
 ============
 1. :ref:`Assemble your SOMANET device <assembling_somanet_node>`.
