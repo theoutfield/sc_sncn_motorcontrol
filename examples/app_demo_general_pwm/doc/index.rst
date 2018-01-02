@@ -25,4 +25,4 @@ Quick How-to
 
 7. :ref:`Run the application enabling XScope <running_an_application>`.
 
-.. seealso:: Did everything go well? If you need further support please check out our `forum <http://forum.synapticon.com/>`_.
+.. seealso:: Did everything go well? If you need further support please check out our `forum <synapticon.com/support/forum>`_.
