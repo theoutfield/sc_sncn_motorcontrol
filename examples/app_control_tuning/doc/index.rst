@@ -199,17 +199,26 @@ Quick How-to
 
 #. When the app start you can check if the motor control and sensor error are `0` and maybe turn the motor manually to see if the position and velocity feedback are working
 
-   Use the ``ao`` command to start the offset detection. This should make the motor turn slowly in both direction for maximum one minute. When it is finished the 
-   offset is printed. If the motor does not move or with difficulty try increasing the offset detection torque with the ``op`` command. If it displays "WRONG 
-   POSITION SENSOR POLARITY" you need to change the sensor polarity of ``position_feedback_service()`` and recompile the app. You can try to run the offset 
-   detection several time to see if you get similar result. After the offset is found you need to make sure that a positive torque command result in a positive 
-   velocity/position increment. Otherwise the position and velocity controller will not work. You can tune the offset manually with the ``os`` command.
+   Use the ``ao`` command to start the offset detection. This should make the
+   motor turn slowly in both direction for maximum one minute. When it is
+   finished the offset is printed. If the motor does not move or with
+   difficulty try increasing the offset detection torque with the ``op``
+   command. If it displays "WRONG POSITION SENSOR POLARITY" you need to change
+   the sensor polarity of ``position_feedback_service()`` and recompile the
+   app. You can try to run the offset detection several time to see if you get
+   similar result. After the offset is found you need to make sure that a
+   positive torque command result in a positive velocity/position increment.
+   Otherwise the position and velocity controller will not work. You can tune
+   the offset manually with the ``os`` command.
 
-   Then you can use the command starting with `k` to tune the position and velocity controllers. There are tutorials on the `documentation <https://doc.synapticon.com/tutorials/index.html>`_
+   Then you can use the command starting with `k` to tune the position and
+   velocity controllers.
 
-	To be able to start the cogging torque detection you need to tune your velocity controller in order to have a stable speed at 10 RPM. Then start the measurement with the command 'ac'. 
-	The motor will operate two turns in each direction at slow speed.
-	Once the measurement is done, it is possible to enable or disable the compensation with the command 'ec'
+   To be able to start the cogging torque detection you need to tune your
+   velocity controller in order to have a stable speed at 10 RPM. Then start
+   the measurement with the command 'ac'.  The motor will operate two turns in
+   each direction at slow speed.  Once the measurement is done, it is possible
+   to enable or disable the compensation with the command 'ec'.
    
 .. important:: When you have found the offset and PID parameters save them in your **user_config.h** file for your app
 
